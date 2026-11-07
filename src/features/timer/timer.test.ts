@@ -237,6 +237,15 @@ describe("설정 변경", () => {
   });
 });
 
+describe("테스트 모드", () => {
+  it("모든 세션이 지정한 초만큼으로 바뀐다", () => {
+    const test = { ...settings, testDurationSeconds: 5 };
+    const { state } = finishSession(createInitialState(test), test, T0);
+    expect(state).toMatchObject({ mode: "short-break", remainingMs: 5000 });
+    expect(createInitialState(test).remainingMs).toBe(5000);
+  });
+});
+
 describe("시간 표시", () => {
   it.each([
     [25 * MIN, "25:00"],

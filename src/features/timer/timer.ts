@@ -27,6 +27,7 @@ export function getModeDurationMs(
   mode: TimerMode,
   settings: TimerSettings,
 ): number {
+  if (settings.testDurationSeconds) return settings.testDurationSeconds * 1000;
   const minutes = {
     focus: settings.focusMinutes,
     "short-break": settings.shortBreakMinutes,

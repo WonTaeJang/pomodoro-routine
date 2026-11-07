@@ -5,6 +5,7 @@ import { TodaySummary } from "@/features/history/components/TodaySummary";
 import { useHydrateStores } from "@/lib/useHydrateStores";
 import { useTimerStore } from "../store";
 import { CompletionDialog } from "./CompletionDialog";
+import { TestModeBadge } from "./TestModeBadge";
 import { TimerPanel } from "./TimerPanel";
 import styles from "./TimerScreen.module.scss";
 
@@ -15,7 +16,10 @@ export function TimerScreen() {
 
   return (
     <div className={styles.screen} data-mode={mode}>
-      <AppHeader>{ready ? <TodaySummary /> : null}</AppHeader>
+      <AppHeader>
+        <TestModeBadge ready={ready} />
+        {ready ? <TodaySummary /> : null}
+      </AppHeader>
       <main className={styles.main}>
         <TimerPanel ready={ready} />
       </main>
