@@ -1,109 +1,59 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  MedalIcon,
-  PauseIcon,
-  PawIcon,
-  PlayIcon,
-  ResetIcon,
-  SkipIcon,
-} from "@/components/icons";
-import { Button, Dialog, IconButton, SegmentedControl } from "@/components/ui";
-import { cx } from "@/lib/cx";
+import { Card } from "@/components/ui";
 import { getTodayFocus, useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
+import { cx } from "@/lib/cx";
 import { useNow } from "@/lib/useNow";
-import { getStatusMessage, MODE_LABELS } from "../labels";
+import { useCompleteWhenDue, useTimerTitle } from "../hooks";
+import { getStatusMessage } from "../labels";
 import { useTimerStore } from "../store";
 import { formatRemaining, getRemainingMs } from "../timer";
-import type { TimerMode } from "../types";
+import { CycleProgress } from "./CycleProgress";
 import { KkamiPhoto } from "./KkamiPhoto";
+import { ModeSwitcher } from "./ModeSwitcher";
+import { TimerControls } from "./TimerControls";
 import { TimerRing } from "./TimerRing";
 import styles from "./TimerPanel.module.scss";
-
-const MODES: TimerMode[] = ["focus", "short-break", "long-break"];
-const modeOptions = MODES.map((value) => ({
-  value,
-  label: MODE_LABELS[value],
-}));
 
 type TimerPanelProps = {
   /** 저장된 값을 불러오기 전이면 false. 그동안은 시간을 숨기고 버튼을 막습니다. */
   ready: boolean;
 };
 
+/** 타이머 카드: 모드 탭, 까미 사진과 진행 띠, 남은 시간, 버튼, 사이클 진행 */
 export function TimerPanel({ ready }: TimerPanelProps) {
   const timer = useTimerStore((s) => s.timer);
-  const longBreakInterval = useTimerStore((s) => s.settings.longBreakInterval);
-  const actions = useTimerStore.getState();
-  const now = useNow();
-  const [pendingMode, setPendingMode] = useState<TimerMode | null>(null);
-  const sessions = useHistoryStore((s) => s.sessions);
+  const interval = useTimerStore((s) => s.settings.longBreakInterval);
   const lastCompleted = useTimerStore((s) => s.lastCompleted);
+  const sessions = useHistoryStore((s) => s.sessions);
   const activeTask = useTasksStore((s) =>
     s.tasks.find((t) => t.id === s.activeTaskId),
   );
+  const now = useNow();
 
   const remainingMs =
     now === null ? timer.remainingMs : getRemainingMs(timer, now);
   const timeText = ready ? formatRemaining(remainingMs) : "--:--";
-  const running = timer.status === "running";
-
-  // 시간이 다 되면 다음 세션으로
-  useEffect(() => {
-    if (
-      running &&
-      timer.endsAt !== null &&
-      now !== null &&
-      now >= timer.endsAt
-    ) {
-      useTimerStore.getState().sync();
-    }
-  }, [running, timer.endsAt, now]);
-
-  // 브라우저 탭 제목에 남은 시간 표시
-  useEffect(() => {
-    document.title =
-      ready && timer.status !== "idle"
-        ? `${timeText} · ${MODE_LABELS[timer.mode]} | 까미도로`
-        : "까미도로";
-  }, [ready, timer.status, timer.mode, timeText]);
-
-  function handleModeChange(mode: TimerMode) {
-    if (mode === timer.mode) return;
-    // 진행 중이거나 멈춘 세션이 있으면 한 번 확인
-    if (timer.status !== "idle") {
-      setPendingMode(mode);
-      return;
-    }
-    actions.switchMode(mode);
-  }
-
   const todayCycles =
     ready && now !== null ? getTodayFocus(sessions, now).cycles : 0;
-  const cycleDone = Math.min(timer.completedInCycle, longBreakInterval);
-  const cycleLeft = longBreakInterval - cycleDone;
-  const cycleText =
-    timer.mode === "long-break"
-      ? "긴 휴식 시간이에요"
-      : cycleLeft === 0
-        ? "이번 휴식은 긴 휴식이에요"
-        : `긴 휴식까지 ${cycleLeft}번 남았어요`;
+
+  useCompleteWhenDue(timer, now);
+  useTimerTitle(ready, timer, timeText);
 
   return (
-    <section className={styles.panel} aria-label="타이머">
-      <SegmentedControl
-        label="타이머 모드"
-        options={modeOptions}
-        value={timer.mode}
-        onChange={handleModeChange}
-      />
+    <Card
+      as="section"
+      padding="none"
+      className={styles.panel}
+      aria-label="타이머"
+    >
+      <ModeSwitcher mode={timer.mode} status={timer.status} />
 
       <div className={styles.kkami}>
         <TimerRing
           ready={ready}
-          running={running}
+          running={timer.status === "running"}
           remainingMs={remainingMs}
           durationMs={timer.durationMs}
           celebrateKey={
@@ -130,86 +80,14 @@ export function TimerPanel({ ready }: TimerPanelProps) {
         </p>
       ) : null}
 
-      <div className={styles.controls}>
-        <IconButton
-          label="리셋"
-          icon={<ResetIcon />}
-          variant="secondary"
-          size="lg"
-          disabled={!ready || timer.status === "idle"}
-          onClick={actions.reset}
-        />
-        <IconButton
-          label={
-            running
-              ? "일시정지"
-              : timer.status === "paused"
-                ? "다시 시작"
-                : "시작"
-          }
-          icon={running ? <PauseIcon size={30} /> : <PlayIcon size={30} />}
-          variant="primary"
-          size="xl"
-          disabled={!ready}
-          onClick={running ? actions.pause : actions.start}
-        />
-        <IconButton
-          label="다음 세션"
-          icon={<SkipIcon />}
-          variant="secondary"
-          size="lg"
-          disabled={!ready}
-          onClick={actions.skip}
-        />
-      </div>
+      <TimerControls status={timer.status} disabled={!ready} />
 
-      <div className={styles.cycle}>
-        <span className={styles.cycleLabel}>이번 사이클</span>
-        <div
-          className={styles.paws}
-          role="img"
-          aria-label={`이번 사이클 집중 ${cycleDone}번 완료, 전체 ${longBreakInterval}번`}
-        >
-          {Array.from({ length: longBreakInterval }, (_, i) => (
-            <PawIcon
-              key={i}
-              size={18}
-              className={cx(i < cycleDone && styles.pawDone)}
-            />
-          ))}
-        </div>
-        <span>{cycleText}</span>
-        {todayCycles > 0 ? (
-          <span className={styles.cycleCount}>
-            <MedalIcon size={16} />
-            오늘 {todayCycles}사이클 완료
-          </span>
-        ) : null}
-      </div>
-
-      <Dialog
-        open={pendingMode !== null}
-        onClose={() => setPendingMode(null)}
-        title={pendingMode ? `${MODE_LABELS[pendingMode]}으로 바꿀까요?` : ""}
-        footer={
-          <>
-            <Button variant="ghost" onClick={() => setPendingMode(null)}>
-              취소
-            </Button>
-            <Button
-              onClick={() => {
-                if (pendingMode) actions.switchMode(pendingMode);
-                setPendingMode(null);
-              }}
-            >
-              바꾸기
-            </Button>
-          </>
-        }
-      >
-        지금 {MODE_LABELS[timer.mode]} 세션이 진행 중이에요. 바꾸면 이 세션은
-        완료로 세지 않아요.
-      </Dialog>
-    </section>
+      <CycleProgress
+        mode={timer.mode}
+        completedInCycle={timer.completedInCycle}
+        interval={interval}
+        todayCycles={todayCycles}
+      />
+    </Card>
   );
 }
