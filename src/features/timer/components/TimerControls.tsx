@@ -2,6 +2,7 @@
 
 import { PauseIcon, PlayIcon, ResetIcon, SkipIcon } from "@/components/icons";
 import { ConfirmDialog, IconButton } from "@/components/ui";
+import { SHORTCUTS, useShortcuts } from "@/features/shortcuts";
 import { useSessionState } from "../hooks";
 import { startSession } from "../startSession";
 import { useTimerStore } from "../store";
@@ -32,7 +33,7 @@ const CONFIRMS = {
 type ConfirmAction = keyof typeof CONFIRMS;
 
 /**
- * 리셋 · 시작/일시정지 · 다음 세션 버튼.
+ * 리셋 · 시작/일시정지 · 다음 세션 버튼과 단축키(Space, R, N).
  * 시작한 집중을 리셋하거나 건너뛰면 완료로 세지 않으므로 한 번 확인합니다.
  * 휴식이나 시작 전 세션은 잃을 게 없어서 바로 실행합니다.
  */
@@ -58,12 +59,18 @@ export function TimerControls({ mode, status, disabled }: TimerControlsProps) {
     if (status !== "idle") request("reset");
   }
 
+  useShortcuts(
+    { toggle, reset: handleReset, skip: () => request("skip") },
+    !disabled,
+  );
+
   const confirm = pending ? CONFIRMS[pending] : null;
 
   return (
     <div className={styles.controls}>
       <IconButton
         label="리셋"
+        shortcut={SHORTCUTS.reset.key}
         icon={<ResetIcon />}
         variant="secondary"
         size="lg"
@@ -72,6 +79,7 @@ export function TimerControls({ mode, status, disabled }: TimerControlsProps) {
       />
       <IconButton
         label={mainLabel}
+        shortcut={SHORTCUTS.toggle.key}
         icon={running ? <PauseIcon size={30} /> : <PlayIcon size={30} />}
         variant="primary"
         size="xl"
@@ -80,6 +88,7 @@ export function TimerControls({ mode, status, disabled }: TimerControlsProps) {
       />
       <IconButton
         label="다음 세션"
+        shortcut={SHORTCUTS.skip.key}
         icon={<SkipIcon />}
         variant="secondary"
         size="lg"

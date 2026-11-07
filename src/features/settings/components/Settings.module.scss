@@ -46,3 +46,38 @@
   min-width: 136px;
   justify-content: space-between;
 }
+
+// 키보드가 없는 기기(터치만 되는 휴대폰 등)에서는 숨김
+.keyboardOnly {
+  @media (hover: none) and (pointer: coarse) {
+    display: none;
+  }
+}
+
+.shortcuts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-6);
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.kbd {
+  display: inline-block;
+  min-width: var(--control-sm);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-bottom-width: var(--border-width-thick);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+}

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { SettingsIcon } from "@/components/icons";
 import { IconButton } from "@/components/ui";
+import { SHORTCUTS, useShortcuts } from "@/features/shortcuts";
 import { SettingsDialog } from "./SettingsDialog";
 
 type SettingsButtonProps = {
@@ -10,14 +11,16 @@ type SettingsButtonProps = {
   ready: boolean;
 };
 
-/** 헤더의 설정 버튼. 누르면 설정 창을 엽니다. */
+/** 헤더의 설정 버튼. 누르거나 S 키로 설정 창을 엽니다. */
 export function SettingsButton({ ready }: SettingsButtonProps) {
   const [open, setOpen] = useState(false);
+  useShortcuts({ settings: () => setOpen(true) }, ready);
 
   return (
     <>
       <IconButton
         label="설정"
+        shortcut={SHORTCUTS.settings.key}
         icon={<SettingsIcon />}
         disabled={!ready}
         onClick={() => setOpen(true)}

@@ -9,6 +9,8 @@ export type IconButtonProps = Omit<ComponentProps<"button">, "children"> & {
   icon: ReactNode;
   variant?: ButtonVariant;
   size?: "sm" | "md" | "lg" | "xl";
+  /** 키보드 단축키 (예: "Space"). 마우스를 올리면 "시작 (Space)"처럼 보임 */
+  shortcut?: string;
 };
 
 /** 아이콘만 있는 동그란 버튼 */
@@ -17,6 +19,7 @@ export function IconButton({
   icon,
   variant = "ghost",
   size = "md",
+  shortcut,
   type = "button",
   className,
   ...rest
@@ -25,7 +28,8 @@ export function IconButton({
     <button
       type={type}
       aria-label={label}
-      title={label}
+      aria-keyshortcuts={shortcut}
+      title={shortcut ? `${label} (${shortcut})` : label}
       className={cx(
         styles.iconButton,
         styles[variant],

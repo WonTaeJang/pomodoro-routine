@@ -5,6 +5,7 @@ import { AlertSection } from "./AlertSection";
 import { DataSection } from "./DataSection";
 import { DisplaySection } from "./DisplaySection";
 import styles from "./Settings.module.scss";
+import { ShortcutSection } from "./ShortcutSection";
 import { TimerSection } from "./TimerSection";
 
 type SettingsDialogProps = {
@@ -25,6 +26,7 @@ export function SettingsDialog({ onClose }: SettingsDialogProps) {
         <TimerSection />
         <AlertSection />
         <DisplaySection />
+        <ShortcutSection />
         <DataSection />
       </div>
     </Dialog>
