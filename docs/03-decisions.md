@@ -40,8 +40,22 @@
 - 검색으로 같은 이름의 서비스는 확인되지 않음.
 
 ### 프로젝트 기본 구성 (2026-11-07)
-- **App Router**, **Tailwind CSS**, **ESLint**, **npm**, 코드는 `src/` 폴더 안에 둠 (`docs/`와 분리)
+- **App Router**, **ESLint**, **npm**, 코드는 `src/` 폴더 안에 둠 (`docs/`와 분리)
 - 설치 방법: [05-setup.md](./05-setup.md)
+
+### 스타일: SCSS 직접 작성 (2026-11-07)
+- Tailwind CSS는 쓰지 않음. **SCSS + CSS Modules**(`*.module.scss`)로 컴포넌트마다 스타일 파일을 둠.
+- 색상은 CSS 변수(`--color-*`)로 정의 → 다크 모드를 실행 중에 바로 전환 가능. 화면 크기 기준점과 공통 mixin은 SCSS로 관리.
+- 구조는 [05-setup.md](./05-setup.md)의 "스타일 구조" 참고.
+
+### UI 컴포넌트: 직접 만들기 (2026-11-07)
+- shadcn/ui 같은 UI 라이브러리를 쓰지 않고 직접 만듦. 까미도로만의 디자인을 자유롭게 하기 위함.
+- 팝업(설정 창, 완료 팝업)은 ESC로 닫기, 바깥 클릭으로 닫기, 포커스 가두기 같은 접근성 처리를 직접 챙겨야 함. HTML 기본 `<dialog>` 요소를 쓰면 상당 부분 해결됨.
+
+### 코드 포맷: Prettier (2026-11-07)
+- 기본 설정 그대로 사용.
+- ESLint와 규칙이 겹치지 않게 `eslint-config-prettier` 적용.
+- `docs/`는 직접 쓰는 문서라 포맷 대상에서 제외.
 
 ## 미정
 
@@ -58,9 +72,7 @@
 
 | 항목 | 선택지 | 제안 |
 |---|---|---|
-| UI 컴포넌트 | 직접 만들기 / shadcn/ui | **shadcn/ui** (설정 창, 팝업 등을 빠르게, 코드가 프로젝트에 복사되어 수정 자유로움) |
 | 상태 관리 + 저장 | React 기본 기능 / Zustand / Redux | **Zustand** (`persist`로 localStorage 저장이 간단) |
-| 코드 포맷 | Prettier / 없음 | **Prettier** (ESLint는 설치 때 포함) |
 | 테스트 | 없음 / Vitest | **Vitest** (타이머 시간 계산 로직만이라도 테스트) |
 
 ### 운영
@@ -77,3 +89,5 @@
 - 2026-11-07: 마스코트를 까미로 결정, 서비스 이름 후보를 까미 중심으로 변경.
 - 2026-11-07: 서비스 이름 까미도로(Kkamidoro) 확정. App Router, Tailwind CSS, ESLint, pnpm, src 폴더 사용 결정.
 - 2026-11-07: 패키지 매니저를 pnpm에서 npm으로 변경
+- 2026-11-07: UI는 직접 만들기로 결정(shadcn/ui 제외), Prettier 도입.
+- 2026-11-07: Tailwind CSS 제거, SCSS + CSS Modules로 변경.
