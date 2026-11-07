@@ -18,9 +18,9 @@
   --radius-lg: 20px;
 
   --font-sans:
-    var(--font-geist-sans), "Apple SD Gothic Neo", "Malgun Gothic", system-ui,
-    sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+    var(--font-pretendard), -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
 
   color-scheme: light;
 }
