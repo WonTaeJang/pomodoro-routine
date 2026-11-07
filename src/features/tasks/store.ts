@@ -24,7 +24,6 @@ type TasksStore = TasksState & {
   /** 집중을 마친 할 일들에 뽀모도로 추가 (타이머 store가 호출) */
   recordPomodoros: (taskIds: string[]) => void;
   clearDone: () => void;
-  reset: () => void;
 };
 
 export const useTasksStore = create<TasksStore>()(
@@ -51,7 +50,6 @@ export const useTasksStore = create<TasksStore>()(
         setActive: (id) => apply((s) => setActiveTask(s, id)),
         recordPomodoros: (ids) => apply((s) => recordPomodoros(s, ids)),
         clearDone: () => apply(clearDone),
-        reset: () => set(initialTasksState),
       };
     },
     {

@@ -23,10 +23,7 @@ export const DEFAULT_SETTINGS: TimerSettings = {
   autoStartFocus: false,
 };
 
-export function getModeDurationMs(
-  mode: TimerMode,
-  settings: TimerSettings,
-): number {
+function getModeDurationMs(mode: TimerMode, settings: TimerSettings): number {
   if (settings.testDurationSeconds) return settings.testDurationSeconds * 1000;
   const minutes = {
     focus: settings.focusMinutes,
