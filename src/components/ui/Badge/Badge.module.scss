@@ -1,0 +1,66 @@
+// 작은 배지는 글자 높이에 맞춰 위아래 여백을 4px보다 살짝 줄임
+$sm-padding-y: 3px;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+
+.icon {
+  display: inline-flex;
+}
+
+// 크기
+.sm {
+  gap: var(--space-1);
+  padding: $sm-padding-y var(--space-2);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.md {
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2-5);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.lg {
+  gap: var(--space-1-5);
+  padding: var(--space-1-5) var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+// 모양
+.solid {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+}
+
+.soft {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  // 숫자가 바뀌어도 폭이 흔들리지 않게 (오늘 기록 등)
+  font-variant-numeric: tabular-nums;
+
+  .icon {
+    color: var(--color-accent);
+  }
+}
+
+.medal {
+  background: var(--color-medal-tint);
+  color: var(--color-text);
+
+  .icon {
+    color: var(--color-medal);
+  }
+}
+
+.outline {
+  border: var(--border-width) dashed var(--color-accent);
+  color: var(--color-accent);
+}

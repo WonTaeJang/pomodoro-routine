@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { EditIcon, PawIcon, TrashIcon } from "@/components/icons";
-import { Button, Checkbox, IconButton } from "@/components/ui";
+import { EditIcon, TrashIcon } from "@/components/icons";
+import { Badge, Button, Checkbox, IconButton } from "@/components/ui";
 import { cx } from "@/lib/cx";
 import { useTasksStore } from "../store";
 import type { Task } from "../types";
+import { PawCount } from "./PawCount";
 import { TaskForm } from "./TaskForm";
 import styles from "./TaskItem.module.scss";
 
@@ -53,7 +54,9 @@ export function TaskItem({ task, active }: TaskItemProps) {
       />
       <div className={styles.meta}>
         {active ? (
-          <span className={styles.badge}>집중 중</span>
+          <Badge variant="solid" size="sm" className={styles.badge}>
+            집중 중
+          </Badge>
         ) : !task.done ? (
           <Button
             size="sm"
@@ -64,14 +67,11 @@ export function TaskItem({ task, active }: TaskItemProps) {
             선택
           </Button>
         ) : null}
-        <span
+        <PawCount
+          done={task.completedPomodoros}
+          estimate={task.estimate}
           className={styles.count}
-          aria-label={`뽀모도로 ${task.completedPomodoros}개 완료, 예상 ${task.estimate}개`}
-          title={`완료 ${task.completedPomodoros}번 · 예상 ${task.estimate}번`}
-        >
-          <PawIcon size={14} />
-          {task.completedPomodoros}/{task.estimate}
-        </span>
+        />
         <IconButton
           label={`${task.title} 수정`}
           icon={<EditIcon size={16} />}

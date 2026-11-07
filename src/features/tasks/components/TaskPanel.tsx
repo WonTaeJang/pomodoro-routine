@@ -2,7 +2,7 @@
 
 import { useId } from "react";
 import { PawIcon } from "@/components/icons";
-import { Button } from "@/components/ui";
+import { Button, Card } from "@/components/ui";
 import { useTasksStore } from "../store";
 import { sortForDisplay } from "../tasks";
 import { TaskForm } from "./TaskForm";
@@ -20,7 +20,7 @@ export function TaskPanel() {
   const doneCount = tasks.length - openCount;
 
   return (
-    <section className={styles.panel} aria-labelledby={titleId}>
+    <Card as="section" className={styles.panel} aria-labelledby={titleId}>
       <div className={styles.header}>
         <h2 id={titleId} className={styles.title}>
           할 일
@@ -60,6 +60,6 @@ export function TaskPanel() {
           ))}
         </ul>
       )}
-    </section>
+    </Card>
   );
 }

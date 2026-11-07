@@ -1,4 +1,6 @@
+export * from "./Badge/Badge";
 export * from "./Button/Button";
+export * from "./Card/Card";
 export * from "./Checkbox/Checkbox";
 export * from "./Dialog/Dialog";
 export * from "./IconButton/IconButton";

@@ -1,28 +1,15 @@
 @use "../../../styles/breakpoints" as bp;
 
+// 좁은 화면에서는 헤더 공간이 부족해 숨김 (타이머 아래에 사이클 수가 따로 보임)
 .summary {
   display: none;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-
-  svg {
-    color: var(--color-accent);
-  }
 
   @include bp.up(sm) {
-    display: inline-flex;
+    display: block;
   }
 }
 
-// .summary svg(강조색)보다 우선하도록 함께 지정
-.summary .medal {
-  margin-left: 4px;
-  color: #d4a017;
+.medal {
+  margin-left: var(--space-1);
+  color: var(--color-medal);
 }

@@ -1,9 +1,9 @@
 "use client";
 
-import { PawIcon } from "@/components/icons";
 import { Checkbox } from "@/components/ui";
 import { cx } from "@/lib/cx";
 import { useTasksStore } from "../store";
+import { PawCount } from "./PawCount";
 import styles from "./TaskDoneCheck.module.scss";
 
 type TaskDoneCheckProps = {
@@ -29,13 +29,11 @@ export function TaskDoneCheck({ taskId, className }: TaskDoneCheckProps) {
     <div className={cx(styles.card, task.done && styles.done, className)}>
       <p className={styles.title}>
         <span className={styles.name}>{task.title}</span>
-        <span
-          className={styles.count}
-          title={`완료 ${task.completedPomodoros}번 · 예상 ${task.estimate}번`}
-        >
-          <PawIcon size={16} />
-          {task.completedPomodoros}/{task.estimate}
-        </span>
+        <PawCount
+          done={task.completedPomodoros}
+          estimate={task.estimate}
+          size="md"
+        />
       </p>
 
       {!task.done && reachedEstimate ? (

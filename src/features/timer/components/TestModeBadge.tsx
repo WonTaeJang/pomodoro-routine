@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { Badge } from "@/components/ui";
 import { useTimerStore } from "../store";
 import styles from "./TestModeBadge.module.scss";
 
@@ -29,7 +30,7 @@ export function TestModeBadge({ ready }: { ready: boolean }) {
   if (!isDev || !seconds) return null;
 
   return (
-    <span className={styles.badge}>
+    <Badge variant="outline" className={styles.badge}>
       테스트 모드 · {seconds}초
       <button
         type="button"
@@ -38,7 +39,7 @@ export function TestModeBadge({ ready }: { ready: boolean }) {
       >
         끄기
       </button>
-    </span>
+    </Badge>
   );
 }
 

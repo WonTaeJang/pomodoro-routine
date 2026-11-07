@@ -1,33 +1,23 @@
-@use "../../../styles/breakpoints" as bp;
-
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 20px 16px;
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
-
-  @include bp.up(md) {
-    padding: 24px;
-  }
+  gap: var(--space-4);
 }
 
 .header {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .title {
-  font-size: 1.125rem;
-  font-weight: 700;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
 }
 
 .count {
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
 .clear {
@@ -36,22 +26,25 @@
 }
 
 .empty {
-  padding: 24px 8px;
+  padding: var(--space-6) var(--space-2);
   color: var(--color-text-muted);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-md);
   text-align: center;
 }
+
+// 문장 안의 발자국 아이콘을 글자 높이에 맞춤
+$inline-icon-offset: -2px;
 
 .paw {
   display: inline;
   color: var(--color-accent);
-  vertical-align: -2px;
+  vertical-align: $inline-icon-offset;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
   padding: 0;
   list-style: none;
 }
