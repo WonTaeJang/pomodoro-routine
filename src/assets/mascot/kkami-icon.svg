@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 340" width="400" height="340"><defs>
+  <pattern id="gingham" width="16" height="16" patternUnits="userSpaceOnUse">
+    <rect width="16" height="16" fill="#eef3ff"/>
+    <rect width="8" height="16" fill="#9db7f0" opacity="0.55"/>
+    <rect width="16" height="8" fill="#9db7f0" opacity="0.55"/>
+  </pattern>
+  <radialGradient id="fur" cx="40%" cy="30%" r="75%"><stop offset="0" stop-color="#3a3a44"/><stop offset="0.6" stop-color="#2a2a31"/><stop offset="1" stop-color="#1f1f25"/></radialGradient>
+  <radialGradient id="eyeShine" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#2c2c36"/><stop offset="1" stop-color="#0b0b0e"/></radialGradient>
+</defs><ellipse cx="88" cy="230" rx="50" ry="78" fill="#1d1d22"/><ellipse cx="312" cy="230" rx="50" ry="78" fill="#1d1d22"/><path d="M324.0,200.0 A30.0,30.0 0 0 1 311.7,250.3 A30.8,30.8 0 0 1 277.3,290.7 A31.6,31.6 0 0 1 227.6,313.1 A32.0,32.0 0 0 1 172.4,313.1 A31.6,31.6 0 0 1 122.7,290.7 A30.8,30.8 0 0 1 88.3,250.3 A30.0,30.0 0 0 1 76.0,200.0 A30.0,30.0 0 0 1 88.3,149.7 A30.8,30.8 0 0 1 122.7,109.3 A31.6,31.6 0 0 1 172.4,86.9 A32.0,32.0 0 0 1 227.6,86.9 A31.6,31.6 0 0 1 277.3,109.3 A30.8,30.8 0 0 1 311.7,149.7 A30.0,30.0 0 0 1 324.0,200.0Z" fill="#2a2a31"/><path d="M264.0,92.0 A17.9,17.9 0 0 1 249.0,117.7 A24.2,24.2 0 0 1 211.1,131.4 A26.0,26.0 0 0 1 168.0,126.6 A21.1,21.1 0 0 1 139.9,105.7 A16.4,16.4 0 0 1 139.9,78.3 A21.1,21.1 0 0 1 168.0,57.4 A26.0,26.0 0 0 1 211.1,52.6 A24.2,24.2 0 0 1 249.0,66.3 A17.9,17.9 0 0 1 264.0,92.0Z" fill="#2a2a31"/><ellipse cx="200" cy="260" rx="56" ry="40" fill="#383842"/><circle cx="154" cy="208" r="15" fill="#0b0b0e"/><circle cx="150" cy="202" r="5" fill="#fff"/><circle cx="246" cy="208" r="15" fill="#0b0b0e"/><circle cx="242" cy="202" r="5" fill="#fff"/><ellipse cx="200" cy="246" rx="19" ry="14" fill="#0b0b0e"/><path d="M178,274 Q200,312 222,274Z" fill="#ff8da1"/></svg>
