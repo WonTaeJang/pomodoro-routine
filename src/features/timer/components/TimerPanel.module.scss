@@ -14,20 +14,8 @@
   }
 }
 
-// 까미 이미지가 들어갈 자리 (사진이 준비되면 교체)
 .kkami {
-  display: flex;
-  width: 120px;
-  height: 120px;
-  align-items: center;
-  justify-content: center;
-  margin-top: 28px;
-  border: 2px dashed color-mix(in srgb, var(--color-accent) 40%, transparent);
-  border-radius: 50%;
-  color: var(--color-accent);
-  transition:
-    color 0.3s,
-    border-color 0.3s;
+  margin-top: 24px;
 }
 
 .time {

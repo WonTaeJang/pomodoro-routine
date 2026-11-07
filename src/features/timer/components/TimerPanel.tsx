@@ -15,6 +15,7 @@ import { getStatusMessage, MODE_LABELS } from "../labels";
 import { useTimerStore } from "../store";
 import { formatRemaining, getRemainingMs } from "../timer";
 import type { TimerMode } from "../types";
+import { KkamiPhoto } from "./KkamiPhoto";
 import styles from "./TimerPanel.module.scss";
 
 const MODES: TimerMode[] = ["focus", "short-break", "long-break"];
@@ -88,8 +89,8 @@ export function TimerPanel({ ready }: TimerPanelProps) {
         onChange={handleModeChange}
       />
 
-      <div className={styles.kkami} aria-hidden="true">
-        <PawIcon size={40} />
+      <div className={styles.kkami}>
+        <KkamiPhoto mode={timer.mode} status={timer.status} />
       </div>
 
       <p
