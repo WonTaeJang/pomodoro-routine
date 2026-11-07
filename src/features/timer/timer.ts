@@ -61,7 +61,9 @@ export function createInitialState(
 
 export function getRemainingMs(state: TimerState, now: number): number {
   if (state.status === "running" && state.endsAt !== null) {
-    return Math.max(0, state.endsAt - now);
+    // 화면 시계(now)는 최대 0.25초 늦을 수 있어서, 시작 직후에 시작 시점의
+    // 남은 시간(remainingMs)보다 커 보이지 않게 막음 (20초 → 21초로 보이는 문제)
+    return Math.min(state.remainingMs, Math.max(0, state.endsAt - now));
   }
   return state.remainingMs;
 }

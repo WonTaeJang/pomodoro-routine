@@ -48,6 +48,11 @@ describe("시작과 남은 시간", () => {
     expect(getRemainingMs(running, T0 + 60 * MIN)).toBe(0);
   });
 
+  it("시작 직후 화면 시계가 조금 늦어도 설정한 시간보다 커지지 않는다", () => {
+    const running = start(createInitialState(settings), T0);
+    expect(getRemainingMs(running, T0 - 200)).toBe(25 * MIN);
+  });
+
   it("이미 진행 중이면 다시 시작해도 바뀌지 않는다", () => {
     const running = start(createInitialState(settings), T0);
     expect(start(running, T0 + MIN)).toBe(running);
