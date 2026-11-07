@@ -42,3 +42,6 @@ next-env.d.ts
 
 # design originals (원본 사진은 저장소에 올리지 않음)
 /design/
+
+# Claude 앱이 보내준 파일을 저장하는 폴더
+/Claude outputs/
