@@ -73,6 +73,13 @@ import { PawIcon } from "@/components/icons";
 - 타이머: `TimerPanel`(카드 조립), `ModeSwitcher`(모드 탭 + 전환 확인), `TimerRing`(진행 띠 + 효과), `KkamiPhoto`, `TimerControls`, `CycleProgress`, `CompletionDialog`, `Celebration`, `TestModeBadge`
 - 할 일: `TaskPanel`, `TaskForm`, `TaskItem`, `TaskDoneCheck`, `PawCount`(🐾 완료/예상)
 - 기록: `TodaySummary`
+- 알림(`src/features/alerts/`, 화면 없음). 밖에서는 `index.ts`의 `useAlerts`, `prepareAlerts`만 씀
+  - `alerts.ts`: 다음 알림 계산, 알림 문구 (순수 함수)
+  - `scheduler.ts`: 예약·취소·중복 방지 규칙. 시간, 소리, 알림을 바깥에서 끼워 넣어(`AlertEnv`) 테스트 가능
+  - `sound.ts` / `audio.ts` / `chime.ts` / `sounds.ts`: 브라우저 오디오 통로, 오디오 깨우기, 소리 만들기, 음 정의
+  - `notify.ts`: 브라우저 알림, `prepare.ts`: 시작할 때 오디오 깨우기와 권한 요청
+  - `useAlerts.ts`: 스케줄러를 타이머와 브라우저 기능에 연결하는 훅
+- 타이머 시작은 `startSession()`(`src/features/timer/startSession.ts`)으로 함. 알림 준비 + 시작을 한 번에 하므로 시작 버튼, 완료 팝업, 단축키가 같은 동작을 씀
 
 ### 공통으로 뺄지 정하는 기준
 - **두 곳 이상**에서 같은 모양으로 쓰이고, 특정 기능(타이머, 할 일)을 몰라도 쓸 수 있으면 `components/ui/`

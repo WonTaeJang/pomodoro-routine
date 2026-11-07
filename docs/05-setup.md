@@ -21,7 +21,7 @@ npm install
 npm run dev
 ```
 
-브라우저에서 http://localhost:3000 을 열어 "까미도로" 제목이 보이면 성공입니다.
+브라우저에서 http://localhost:3000 을 열어 "까모도로" 제목이 보이면 성공입니다.
 
 ## 5초 테스트 모드
 
@@ -97,7 +97,8 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
   - `components/`는 store를 읽어 화면을 그립니다.
 - 저장된 값은 화면이 뜬 뒤 `useHydrateStores()`로 불러옵니다. 서버에서 그린 화면과 첫 화면이 달라 생기는 오류(hydration 불일치)를 막기 위함입니다.
 - 렌더링 중에 `Date.now()`를 직접 부르지 않고 `useNow()` 시계를 씁니다.
-- localStorage 키: `kkamidoro-timer`(설정, 타이머), `kkamidoro-history`(세션 기록), `kkamidoro-tasks`(할 일), `kkamidoro-theme`(테마)
+- localStorage 키는 `src/lib/storage.ts`의 `STORAGE_KEYS`에서 관리: `kkamodoro-timer`(설정, 타이머), `kkamodoro-history`(세션 기록), `kkamodoro-tasks`(할 일), `kkamodoro-theme`(테마)
+- 서비스 이름은 `src/lib/brand.ts`의 `APP_NAME`에서 관리
 
 ## 폴더 구조
 
@@ -110,6 +111,7 @@ pomodoro-routine/
 ├── src/features/history/  세션 기록, 오늘 기록
 ├── src/features/tasks/    할 일 (로직, store, 화면)
 ├── src/features/theme/    다크 모드
+├── src/features/alerts/   알림 소리, 브라우저 알림
 ├── src/components/layout/ 헤더 등 화면 틀
 ├── src/components/ui/     공통 컴포넌트
 ├── src/components/icons/  아이콘
@@ -136,3 +138,4 @@ pomodoro-routine/
 - 2026-11-07: 할 일, 테마 폴더와 Stepper 컴포넌트 추가
 - 2026-11-07: ProgressRing 컴포넌트 추가
 - 2026-11-07: 스타일·컴포넌트 내용을 06-design-system.md로 옮김
+- 2026-11-07: alerts 폴더 추가
