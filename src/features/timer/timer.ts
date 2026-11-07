@@ -26,6 +26,7 @@ export const DEFAULT_SETTINGS: TimerSettings = {
   notificationsEnabled: true,
   ringEffects: true,
   keepScreenOn: true,
+  certificateShowTasks: true,
 };
 
 function getModeDurationMs(mode: TimerMode, settings: TimerSettings): number {

@@ -1,3 +1,5 @@
+@use "../../../styles/mixins";
+
 .cycle {
   display: flex;
   flex-direction: column;
@@ -26,6 +28,27 @@
   color: var(--color-accent);
 }
 
+// 메달 배지를 누르면 수료증 팝업
 .today {
   margin-top: var(--space-1);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  cursor: pointer;
+  transition: transform var(--duration-fast);
+
+  @include mixins.focus-ring;
+
+  &:hover {
+    transform: scale(1.04);
+  }
+
+  @include mixins.reduced-motion {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
 }

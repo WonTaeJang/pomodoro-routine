@@ -24,6 +24,8 @@ export type TimerSettings = {
   ringEffects: boolean;
   /** 타이머가 도는 동안 화면이 꺼지지 않게 (Screen Wake Lock) */
   keepScreenOn: boolean;
+  /** 수료증에 이번 사이클에 한 할 일을 보여줄지 */
+  certificateShowTasks: boolean;
   /**
    * 개발용 테스트 모드. 값이 있으면 모든 세션 길이를 이 초로 바꿉니다.
    * 개발 환경에서 주소에 ?test=5 를 붙이면 켜집니다.

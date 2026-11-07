@@ -2,6 +2,7 @@
 
 import { MedalIcon, PawIcon } from "@/components/icons";
 import { Badge } from "@/components/ui";
+import { CertificateLauncher } from "@/features/certificate";
 import { cx } from "@/lib/cx";
 import { getCycleMessage } from "../labels";
 import type { TimerMode } from "../types";
@@ -45,13 +46,21 @@ export function CycleProgress({
       </div>
       <span>{message}</span>
       {todayCycles > 0 ? (
-        <Badge
-          variant="medal"
-          icon={<MedalIcon size={16} />}
-          className={styles.today}
-        >
-          오늘 {todayCycles}사이클 완료
-        </Badge>
+        <CertificateLauncher>
+          {(open) => (
+            <button
+              type="button"
+              className={styles.today}
+              title="수료증 만들기"
+              aria-label={`오늘 ${todayCycles}사이클 완료, 수료증 만들기`}
+              onClick={open}
+            >
+              <Badge variant="medal" icon={<MedalIcon size={16} />}>
+                오늘 {todayCycles}사이클 완료
+              </Badge>
+            </button>
+          )}
+        </CertificateLauncher>
       ) : null}
     </div>
   );

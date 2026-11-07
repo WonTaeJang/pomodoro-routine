@@ -6,6 +6,7 @@ import kkamiDefault from "@/assets/kkami/kkami-default.webp";
 import kkamiDone from "@/assets/kkami/kkami-done.webp";
 import { MedalIcon } from "@/components/icons";
 import { Button, Dialog } from "@/components/ui";
+import { CertificateLauncher } from "@/features/certificate";
 import { TaskDoneCheck } from "@/features/tasks/components/TaskDoneCheck";
 import { MODE_LABELS } from "../labels";
 import { startSession } from "../startSession";
@@ -83,6 +84,19 @@ export function CompletionDialog() {
           ) : null}
         </div>
         <p>{message}</p>
+        {cycleDone ? (
+          <CertificateLauncher>
+            {(open) => (
+              <Button
+                variant="secondary"
+                icon={<MedalIcon size={18} />}
+                onClick={open}
+              >
+                수료증 만들기
+              </Button>
+            )}
+          </CertificateLauncher>
+        ) : null}
         {focusDone && completed?.taskId ? (
           <TaskDoneCheck taskId={completed.taskId} />
         ) : null}
