@@ -1,5 +1,7 @@
 .stepper {
   display: inline-flex;
+  // 세로로 쌓이는 곳에서도 내용 크기만큼만 차지
+  width: fit-content;
   height: var(--control-field);
   flex-shrink: 0;
   align-items: center;
