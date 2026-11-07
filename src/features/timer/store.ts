@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { useHistoryStore } from "@/features/history/store";
+import { useTasksStore } from "@/features/tasks/store";
 import {
   applySettings,
   createInitialState,
@@ -35,6 +36,13 @@ type TimerStore = {
   updateSettings: (patch: Partial<TimerSettings>) => void;
 };
 
+/** 끝난 집중 세션에 지금 선택된 할 일을 붙입니다. */
+function attachActiveTask(sessions: CompletedSession[]): CompletedSession[] {
+  const taskId = useTasksStore.getState().activeTaskId;
+  if (!taskId) return sessions;
+  return sessions.map((s) => (s.mode === "focus" ? { ...s, taskId } : s));
+}
+
 export const useTimerStore = create<TimerStore>()(
   persist(
     (set, get) => {
@@ -46,8 +54,14 @@ export const useTimerStore = create<TimerStore>()(
         const now = Date.now();
         const { settings, timer } = get();
         const synced = sync(timer, settings, now);
-        useHistoryStore.getState().addSessions(synced.completed);
-        const lastCompleted = synced.completed.at(-1) ?? get().lastCompleted;
+        const completed = attachActiveTask(synced.completed);
+        useHistoryStore.getState().addSessions(completed);
+        useTasksStore
+          .getState()
+          .recordPomodoros(
+            completed.flatMap((c) => (c.taskId ? [c.taskId] : [])),
+          );
+        const lastCompleted = completed.at(-1) ?? get().lastCompleted;
         set({ timer: action(synced.state, now), lastCompleted });
       }
 

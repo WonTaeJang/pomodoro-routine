@@ -1,0 +1,25 @@
+@use "../../../styles/breakpoints" as bp;
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+
+  @include bp.up(sm) {
+    grid-template-columns: 1fr auto;
+  }
+
+  > .actions > button {
+    height: 44px;
+  }
+}
+
+.title {
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

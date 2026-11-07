@@ -1,3 +1,5 @@
+@use "../../../styles/breakpoints" as bp;
+
 .screen {
   min-height: 100%;
   background: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg));
@@ -8,11 +10,18 @@
   }
 }
 
-// 할 일을 붙이면 넓은 화면에서 2단으로 바뀝니다.
+// 휴대폰: 타이머 아래 할 일 / 넓은 화면: 왼쪽 타이머, 오른쪽 할 일
 .main {
   display: grid;
   max-width: 560px;
   gap: 16px;
   margin: 0 auto;
   padding: 8px 16px 48px;
+
+  @include bp.up(lg) {
+    max-width: 1080px;
+    grid-template-columns: 1.2fr 1fr;
+    align-items: start;
+    gap: 24px;
+  }
 }

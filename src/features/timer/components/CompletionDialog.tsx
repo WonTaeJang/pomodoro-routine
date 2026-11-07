@@ -3,7 +3,9 @@
 import Image from "next/image";
 import kkamiDone from "@/assets/kkami/kkami-done.webp";
 import kkamiDefault from "@/assets/kkami/kkami-default.webp";
+import { PawIcon } from "@/components/icons";
 import { Button, Dialog } from "@/components/ui";
+import { useTasksStore } from "@/features/tasks/store";
 import { MODE_LABELS } from "../labels";
 import { useTimerStore } from "../store";
 import styles from "./CompletionDialog.module.scss";
@@ -13,6 +15,11 @@ export function CompletionDialog() {
   const completed = useTimerStore((s) => s.lastCompleted);
   const next = useTimerStore((s) => s.timer);
   const { dismissCompleted, start } = useTimerStore.getState();
+  const task = useTasksStore((s) =>
+    completed?.taskId
+      ? s.tasks.find((t) => t.id === completed.taskId)
+      : undefined,
+  );
 
   const focusDone = completed?.mode === "focus";
   const nextLabel = MODE_LABELS[next.mode];
@@ -56,6 +63,13 @@ export function CompletionDialog() {
           className={styles.photo}
         />
         <p>{message}</p>
+        {focusDone && task ? (
+          <p className={styles.task}>
+            {task.title}
+            <PawIcon size={16} />
+            {task.completedPomodoros}/{task.estimate}
+          </p>
+        ) : null}
         {nextIsRunning ? (
           <p className={styles.hint}>{nextLabel}이 자동으로 시작됐어요.</p>
         ) : null}

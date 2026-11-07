@@ -10,6 +10,7 @@ import {
 } from "@/components/icons";
 import { Button, Dialog, IconButton, SegmentedControl } from "@/components/ui";
 import { cx } from "@/lib/cx";
+import { useTasksStore } from "@/features/tasks/store";
 import { useNow } from "@/lib/useNow";
 import { getStatusMessage, MODE_LABELS } from "../labels";
 import { useTimerStore } from "../store";
@@ -35,6 +36,9 @@ export function TimerPanel({ ready }: TimerPanelProps) {
   const actions = useTimerStore.getState();
   const now = useNow();
   const [pendingMode, setPendingMode] = useState<TimerMode | null>(null);
+  const activeTask = useTasksStore((s) =>
+    s.tasks.find((t) => t.id === s.activeTaskId),
+  );
 
   const remainingMs =
     now === null ? timer.remainingMs : getRemainingMs(timer, now);
@@ -102,6 +106,11 @@ export function TimerPanel({ ready }: TimerPanelProps) {
       <p className={styles.status}>
         {getStatusMessage(timer.mode, timer.status)}
       </p>
+      {ready && activeTask && timer.mode === "focus" ? (
+        <p className={styles.currentTask}>
+          지금 할 일 <strong>{activeTask.title}</strong>
+        </p>
+      ) : null}
 
       <div className={styles.controls}>
         <IconButton

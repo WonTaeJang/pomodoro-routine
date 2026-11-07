@@ -40,6 +40,8 @@ export type CompletedSession = {
   /** 끝난 시각(epoch ms) */
   endedAt: number;
   durationMs: number;
+  /** 집중 세션이면, 그때 선택돼 있던 할 일 */
+  taskId?: string;
 };
 
 /** 상태를 바꾸는 함수의 결과. 이번에 완료된 세션이 있으면 completed에 담김 */

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useHistoryStore } from "@/features/history/store";
+import { useTasksStore } from "@/features/tasks/store";
 import { useTimerStore } from "@/features/timer/store";
 
 /**
@@ -16,6 +17,7 @@ export function useHydrateStores(): boolean {
     Promise.all([
       useTimerStore.persist.rehydrate(),
       useHistoryStore.persist.rehydrate(),
+      useTasksStore.persist.rehydrate(),
     ]).then(() => {
       if (cancelled) return;
       // 자리를 비운 사이 끝난 세션 처리
