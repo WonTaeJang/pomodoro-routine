@@ -8,7 +8,8 @@
 | [02-mvp-scope.md](./02-mvp-scope.md) | 개발 범위 (MVP와 이후 단계) |
 | [03-decisions.md](./03-decisions.md) | 결정 기록과 아직 정하지 않은 항목 |
 | [04-reference-pomodotree.md](./04-reference-pomodotree.md) | 참고 사이트 PomodoTree 분석 |
-| [05-setup.md](./05-setup.md) | 개발 환경 설정, 설치와 실행 방법 |
+| [05-setup.md](./05-setup.md) | 개발 환경 설정, 설치와 실행 방법, 폴더 구조 |
+| [06-design-system.md](./06-design-system.md) | 디자인 토큰과 공통 컴포넌트 |
 
 ## 개발 규칙
 
