@@ -47,6 +47,8 @@ export function Dialog({
       onCancel={(event) => {
         // ESC: 브라우저가 직접 닫지 않게 하고 open 상태로 제어
         event.preventDefault();
+        // 이 팝업 위에 겹쳐 연 팝업의 ESC가 React 트리를 타고 올라온 경우는 무시
+        if (event.target !== event.currentTarget) return;
         onClose();
       }}
       onClick={(event) => {
