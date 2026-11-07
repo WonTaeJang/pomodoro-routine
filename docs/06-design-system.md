@@ -55,7 +55,7 @@ import { PawIcon } from "@/components/icons";
 | `Card` | 흰 바탕 둥근 카드 (타이머, 할 일 영역) | `as`(div, section, article), `padding`(default, none) |
 | `Badge` | 짧은 정보 배지 | `variant`(solid, soft, medal, outline), `size`(sm, md, lg), `icon` |
 | `Button` | 글자 버튼 | `variant`(primary, secondary, ghost, danger), `size`(sm, md, lg), `icon`, `fullWidth` |
-| `IconButton` | 아이콘만 있는 동그란 버튼 | `label`(필수, 화면 낭독기용), `icon`, `variant`, `size`(sm~xl) |
+| `IconButton` | 아이콘만 있는 동그란 버튼 | `label`(필수, 화면 낭독기용), `icon`, `variant`, `size`(sm~xl), `shortcut`(마우스를 올리면 "시작 (Space)") |
 | `Dialog` | 팝업 창 | `open`, `onClose`, `title`, `footer`. ESC, 바깥 클릭으로 닫힘. 팝업 위에 팝업을 열면 ESC는 맨 위 것만 닫음 |
 | `ConfirmDialog` | "정말 할까요?" 확인 팝업 | `open`, `title`, `confirmLabel`, `tone`(primary, danger), `onConfirm`, `onClose` |
 | `FieldRow` | 왼쪽 이름·설명, 오른쪽 조작 요소인 한 줄. 좁으면 조작 요소가 다음 줄로 | `label`, `description`, `htmlFor`, `children`(조작 요소) |
@@ -76,7 +76,7 @@ import { PawIcon } from "@/components/icons";
 - 타이머: `TimerPanel`(카드 조립), `ModeSwitcher`(모드 탭 + 전환 확인), `TimerRing`(진행 띠 + 효과), `KkamiPhoto`, `TimerControls`, `CycleProgress`, `CompletionDialog`, `Celebration`, `TestModeBadge`
 - 할 일: `TaskPanel`, `TaskForm`, `TaskItem`, `TaskDoneCheck`, `PawCount`(🐾 완료/예상)
 - 기록: `TodaySummary`
-- 설정: `SettingsButton`(헤더 버튼 + 창 열기), `SettingsDialog`, 묶음별 `TimerSection`, `AlertSection`, `DisplaySection`, `DataSection`. 한 줄 모양은 공통 `FieldRow`
+- 설정: `SettingsButton`(헤더 버튼 + 창 열기), `SettingsDialog`, 묶음별 `TimerSection`, `AlertSection`, `DisplaySection`, `ShortcutSection`, `DataSection`. 한 줄 모양은 공통 `FieldRow`
   - 설정 되돌리기, 모든 데이터 지우기는 여러 store를 함께 바꾸므로 `src/features/settings/resetData.ts`에 둠
 - 알림(`src/features/alerts/`, 화면 없음). 밖에서는 `index.ts`에서 내보낸 것만 씀 (`useAlerts`, `prepareAlerts`, 설정 화면용 `previewAlertSound`, 알림 권한 함수 등)
   - `alerts.ts`: 다음 알림 계산, 알림 문구 (순수 함수)
@@ -84,6 +84,8 @@ import { PawIcon } from "@/components/icons";
   - `sound.ts` / `audio.ts` / `chime.ts` / `sounds.ts`: 브라우저 오디오 통로, 오디오 깨우기, 소리 만들기, 음 정의
   - `notify.ts`: 브라우저 알림과 권한, `prepare.ts`: 시작할 때 오디오 깨우기와 권한 요청, `preview.ts`: 설정의 미리 듣기
   - `useAlerts.ts`: 스케줄러를 타이머와 브라우저 기능에 연결하는 훅
+- 단축키(`src/features/shortcuts/`, 화면 없음): `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
+- 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 메인 화면에서 "진행 중 + 설정 켜짐"일 때 켬
 - 타이머 시작은 `startSession()`(`src/features/timer/startSession.ts`)으로 함. 알림 준비 + 시작을 한 번에 하므로 시작 버튼, 완료 팝업, 단축키가 같은 동작을 씀
 
 ### 공통으로 뺄지 정하는 기준
@@ -98,3 +100,4 @@ import { PawIcon } from "@/components/icons";
 
 - 2026-11-07: 작성. 디자인 토큰 도입, Card·Badge 추가, `05-setup.md`의 스타일·컴포넌트 내용을 옮김
 - 2026-11-07: Slider, ConfirmDialog, FieldRow, 설정 컴포넌트 추가
+- 2026-11-07: 단축키, 화면 꺼짐 방지 구조 추가
