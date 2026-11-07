@@ -1,0 +1,15 @@
+// 움직임 토큰: 시간, 가속도
+
+:root {
+  --duration-instant: 0.1s; // 버튼 눌림
+  --duration-fast: 0.15s; // 색, 테두리 변화
+  --duration-enter: 0.18s; // 팝업 등장
+  --duration-base: 0.2s;
+  --duration-tick: 0.25s; // 시계 갱신 간격(useNow)과 같게 맞춤
+  --duration-slow: 0.3s; // 모드 색 전환
+  --duration-slower: 0.4s; // 사진 전환
+
+  --ease-out: ease-out;
+  --ease-in-out: ease-in-out;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); // 톡 튀어나오기
+}

@@ -4,10 +4,10 @@ import styles from "./Celebration.module.scss";
 
 const COLORS = [
   "var(--color-accent)",
-  "#f5c542",
-  "#ff8fab",
-  "#6ea8fe",
-  "#63c78b",
+  "var(--color-confetti-1)",
+  "var(--color-confetti-2)",
+  "var(--color-confetti-3)",
+  "var(--color-confetti-4)",
 ];
 
 type CelebrationProps = {

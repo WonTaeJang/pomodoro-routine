@@ -11,10 +11,28 @@
   border: 0;
 }
 
+// 키보드 포커스 테두리 (요소 자신에게)
+@mixin focus-outline {
+  outline: var(--focus-ring-width) solid var(--color-focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
 // 키보드로 이동했을 때만 보이는 포커스 테두리
 @mixin focus-ring {
   &:focus-visible {
-    outline: 2px solid var(--color-focus-ring);
-    outline-offset: 2px;
+    @include focus-outline;
+  }
+}
+
+// 사용할 수 없는 상태
+@mixin disabled {
+  opacity: var(--opacity-disabled);
+  cursor: not-allowed;
+}
+
+// 기기에서 "움직임 줄이기"를 켰을 때
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    @content;
   }
 }

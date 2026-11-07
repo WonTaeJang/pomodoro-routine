@@ -1,11 +1,11 @@
 .stepper {
   display: inline-flex;
-  height: 44px;
+  height: var(--control-field);
   flex-shrink: 0;
   align-items: center;
-  gap: 2px;
-  padding: 0 4px;
-  border: 1px solid var(--color-border);
+  gap: var(--space-0-5);
+  padding: 0 var(--space-1);
+  border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-full);
   background: var(--color-surface);
 }
@@ -15,14 +15,14 @@
   min-width: 2.5ch;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: var(--space-1);
   font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   text-align: center;
   white-space: nowrap;
-}
 
-// 값 앞 아이콘은 강조색
-.value svg {
-  color: var(--color-accent);
+  // 값 앞 아이콘은 강조색
+  svg {
+    color: var(--color-accent);
+  }
 }

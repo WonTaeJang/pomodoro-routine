@@ -1,14 +1,15 @@
 @use "../../../styles/mixins";
 
+$box-size: 22px;
+
 .checkbox {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-2-5);
   cursor: pointer;
 
   &:has(:disabled) {
-    opacity: 0.45;
-    cursor: not-allowed;
+    @include mixins.disabled;
   }
 }
 
@@ -21,19 +22,19 @@
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  border: 2px solid var(--color-border);
+  width: $box-size;
+  height: $box-size;
+  border: var(--border-width-thick) solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
   color: var(--color-accent-contrast);
   transition:
-    background-color 0.15s,
-    border-color 0.15s;
+    background-color var(--duration-fast),
+    border-color var(--duration-fast);
 
   svg {
     opacity: 0;
-    transition: opacity 0.15s;
+    transition: opacity var(--duration-fast);
   }
 
   .input:checked + & {
@@ -46,11 +47,10 @@
   }
 
   .input:focus-visible + & {
-    outline: 2px solid var(--color-focus-ring);
-    outline-offset: 2px;
+    @include mixins.focus-outline;
   }
 
-  @media (prefers-reduced-motion: reduce) {
+  @include mixins.reduced-motion {
     &,
     svg {
       transition: none;

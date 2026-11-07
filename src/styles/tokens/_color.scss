@@ -1,0 +1,134 @@
+@use "sass:map";
+
+// 색 토큰
+// - 원색 팔레트($palette)는 이 파일 안에서만 씁니다.
+// - 화면에서는 쓰임별 이름(--color-*)만 씁니다. 그래야 다크 모드, 모드별 색이 한 곳에서 바뀝니다.
+
+$palette: (
+  cream-50: #fffaf5,
+  white: #ffffff,
+  ink-900: #1f1b18,
+  ink-500: #6b625b,
+  sand-100: #f5eee7,
+  sand-200: #e8e0d8,
+  red-500: #d23c3c,
+  tomato-500: #e5533d,
+  green-500: #3f9b6e,
+  blue-500: #3d7ae5,
+  night-950: #121010,
+  night-900: #1c1918,
+  night-800: #26221f,
+  night-700: #2e2a27,
+  paper-100: #f2ece6,
+  stone-400: #a69d95,
+  gold-500: #d4a017,
+  gold-300: #f5c542,
+  gold-900: #6b4a00,
+  pink-300: #ff8fab,
+  sky-300: #6ea8fe,
+  mint-300: #63c78b,
+);
+
+@function palette($name) {
+  @return map.get($palette, $name);
+}
+
+/// 강조색과, 강조색에서 만든 색들.
+/// 강조색이 바뀌는 곳(:root, [data-mode])마다 함께 다시 정해야 파생 색도 같이 바뀝니다.
+@mixin accent($color) {
+  --color-accent: #{$color};
+  --color-accent-contrast: #{palette(white)};
+  --color-accent-hover: color-mix(in srgb, #{$color} 86%, black);
+  // 화면 배경에 아주 옅게 (모드별 배경)
+  --color-accent-tint: color-mix(in srgb, #{$color} 8%, var(--color-bg));
+  // 카드 위 옅은 강조 (선택된 할 일 등)
+  --color-accent-subtle: color-mix(in srgb, #{$color} 6%, var(--color-surface));
+  // 반투명 강조 (포커스 테두리, 도장 테두리)
+  --color-accent-faint: color-mix(in srgb, #{$color} 30%, transparent);
+  // 강조가 섞인 테두리
+  --color-accent-border: color-mix(in srgb, #{$color} 35%, var(--color-border));
+  // 진행 띠의 지나간 부분
+  --color-accent-track: color-mix(in srgb, #{$color} 14%, var(--color-border));
+}
+
+:root {
+  // 바탕, 글자, 테두리
+  --color-bg: #{palette(cream-50)};
+  --color-surface: #{palette(white)};
+  --color-surface-hover: #{palette(sand-100)};
+  --color-text: #{palette(ink-900)};
+  --color-text-muted: #{palette(ink-500)};
+  --color-border: #{palette(sand-200)};
+  --color-border-strong: color-mix(
+    in srgb,
+    var(--color-border) 60%,
+    var(--color-text)
+  );
+  --color-focus-ring: #{palette(ink-900)};
+  --color-backdrop: rgb(0 0 0 / 0.45);
+
+  // 상태
+  --color-danger: #{palette(red-500)};
+  --color-danger-hover: color-mix(in srgb, var(--color-danger) 86%, black);
+  --color-on-danger: #{palette(white)};
+
+  // 타이머 모드
+  --color-focus: #{palette(tomato-500)};
+  --color-short-break: #{palette(green-500)};
+  --color-long-break: #{palette(blue-500)};
+
+  // 스위치 손잡이, 진행 띠 끝점처럼 항상 흰색인 것
+  --color-knob: #{palette(white)};
+
+  // 사이클 완료 메달
+  --color-medal: #{palette(gold-500)};
+  --color-medal-strong: #{palette(gold-300)};
+  --color-medal-ink: #{palette(gold-900)};
+  --color-medal-tint: color-mix(
+    in srgb,
+    var(--color-medal) 14%,
+    var(--color-surface)
+  );
+
+  // 축하 색종이
+  --color-confetti-1: #{palette(gold-300)};
+  --color-confetti-2: #{palette(pink-300)};
+  --color-confetti-3: #{palette(sky-300)};
+  --color-confetti-4: #{palette(mint-300)};
+
+  @include accent(var(--color-focus));
+
+  color-scheme: light;
+}
+
+// 다크 모드: 기기 설정을 따르고, data-theme으로 직접 고를 수도 있음
+@mixin dark {
+  --color-bg: #{palette(night-950)};
+  --color-surface: #{palette(night-900)};
+  --color-surface-hover: #{palette(night-800)};
+  --color-text: #{palette(paper-100)};
+  --color-text-muted: #{palette(stone-400)};
+  --color-border: #{palette(night-700)};
+  --color-focus-ring: #{palette(paper-100)};
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    @include dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  @include dark;
+}
+
+// 모드별 강조색. 타이머 화면 등에서 data-mode 속성으로 지정
+[data-mode="short-break"] {
+  @include accent(var(--color-short-break));
+}
+
+[data-mode="long-break"] {
+  @include accent(var(--color-long-break));
+}

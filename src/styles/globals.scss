@@ -1,71 +1,5 @@
-// 색상은 CSS 변수로 둡니다. 다크 모드 전환이 실행 중에 바로 반영되도록 하기 위함입니다.
-// 값은 임시이며, 디자인 분위기를 정할 때 바꿉니다.
-
-:root {
-  --color-bg: #fffaf5;
-  --color-surface: #ffffff;
-  --color-text: #1f1b18;
-  --color-text-muted: #6b625b;
-  --color-surface-hover: #f5eee7;
-  --color-border: #e8e0d8;
-  --color-focus-ring: #1f1b18;
-  --color-danger: #d23c3c;
-
-  // 모드별 색상
-  --color-focus: #e5533d; // 집중: 토마토
-  --color-short-break: #3f9b6e; // 짧은 휴식
-  --color-long-break: #3d7ae5; // 긴 휴식
-
-  // 강조색: 버튼, 선택된 탭 등. data-mode에 따라 모드 색으로 바뀜
-  --color-accent: var(--color-focus);
-  --color-accent-contrast: #ffffff;
-
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-full: 999px;
-
-  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.16);
-
-  --font-sans:
-    var(--font-pretendard), -apple-system, BlinkMacSystemFont,
-    "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
-
-  color-scheme: light;
-}
-
-// 다크 모드: 시스템 설정을 따르고, 나중에 data-theme 속성으로 직접 바꿀 수 있게 함
-@mixin dark-colors {
-  --color-bg: #121010;
-  --color-surface: #1c1918;
-  --color-text: #f2ece6;
-  --color-text-muted: #a69d95;
-  --color-surface-hover: #26221f;
-  --color-border: #2e2a27;
-  --color-focus-ring: #f2ece6;
-
-  color-scheme: dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    @include dark-colors;
-  }
-}
-
-:root[data-theme="dark"] {
-  @include dark-colors;
-}
-
-// 모드별 강조색. 타이머 화면 등에서 data-mode 속성으로 지정
-[data-mode="short-break"] {
-  --color-accent: var(--color-short-break);
-}
-
-[data-mode="long-break"] {
-  --color-accent: var(--color-long-break);
-}
+// 전체 기본 스타일. 색, 간격 등 값은 tokens/ 에서 관리합니다.
+@use "tokens";
 
 // 팝업이 열려 있는 동안 뒤 화면 스크롤 막기
 html:has(dialog[open]) {
@@ -92,7 +26,7 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);
-  line-height: 1.5;
+  line-height: var(--line-height-base);
   // 한글이 단어 중간에서 끊기지 않게
   word-break: keep-all;
   overflow-wrap: break-word;

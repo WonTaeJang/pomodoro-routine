@@ -1,11 +1,12 @@
 @use "../../../styles/breakpoints" as bp;
+@use "../../../styles/mixins";
 
 .screen {
   min-height: 100%;
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg));
-  transition: background-color 0.3s;
+  background: var(--color-accent-tint);
+  transition: background-color var(--duration-slow);
 
-  @media (prefers-reduced-motion: reduce) {
+  @include mixins.reduced-motion {
     transition: none;
   }
 }
@@ -13,15 +14,15 @@
 // 휴대폰: 타이머 아래 할 일 / 넓은 화면: 왼쪽 타이머, 오른쪽 할 일
 .main {
   display: grid;
-  max-width: 560px;
-  gap: 16px;
+  max-width: var(--layout-narrow);
+  gap: var(--space-4);
   margin: 0 auto;
-  padding: 8px 16px 48px;
+  padding: var(--space-2) var(--space-4) var(--space-12);
 
   @include bp.up(lg) {
-    max-width: 1080px;
+    max-width: var(--layout-max);
     grid-template-columns: 1.2fr 1fr;
     align-items: start;
-    gap: 24px;
+    gap: var(--space-6);
   }
 }

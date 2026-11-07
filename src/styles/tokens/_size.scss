@@ -1,0 +1,21 @@
+// 크기 토큰: 조작 요소 높이, 화면 폭, 쌓임 순서
+
+:root {
+  // 버튼, 입력칸 높이
+  --control-sm: 32px;
+  --control-tab: 36px;
+  --control-md: 40px;
+  --control-field: 44px;
+  --control-lg: 56px;
+  --control-xl: 72px;
+
+  // 화면 폭
+  --layout-max: 1080px;
+  --layout-narrow: 560px;
+  --header-height: 64px;
+  --dialog-width: 440px;
+
+  // 쌓임 순서
+  --z-raised: 1;
+  --z-overlay: 2;
+}

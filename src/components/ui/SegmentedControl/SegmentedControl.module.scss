@@ -4,8 +4,8 @@
   display: inline-flex;
   width: fit-content;
   max-width: 100%;
-  gap: 4px;
-  padding: 4px;
+  gap: var(--space-1);
+  padding: var(--space-1);
   border-radius: var(--radius-full);
   background: var(--color-surface-hover);
 }
@@ -15,28 +15,28 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 16px;
+  gap: var(--space-1-5);
+  height: var(--control-tab);
+  padding: 0 var(--space-4);
   border-radius: var(--radius-full);
   color: var(--color-text-muted);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
   cursor: pointer;
   transition:
-    background-color 0.15s,
-    color 0.15s;
+    background-color var(--duration-fast),
+    color var(--duration-fast);
 
   &:hover {
     color: var(--color-text);
   }
 
+  // 안에 숨긴 라디오 버튼에 키보드 포커스가 오면 라벨에 테두리
   &:has(:focus-visible) {
-    outline: 2px solid var(--color-focus-ring);
-    outline-offset: 2px;
+    @include mixins.focus-outline;
   }
 
-  @media (prefers-reduced-motion: reduce) {
+  @include mixins.reduced-motion {
     transition: none;
   }
 }
