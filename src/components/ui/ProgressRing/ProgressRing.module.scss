@@ -1,0 +1,45 @@
+.ring {
+  position: relative;
+  display: inline-flex;
+  width: var(--ring-size);
+  height: var(--ring-size);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  // 12시 방향에서 시작
+  transform: rotate(-90deg);
+}
+
+.track {
+  fill: none;
+  stroke: color-mix(in srgb, var(--color-accent) 14%, var(--color-border));
+  transition: stroke 0.3s;
+}
+
+.indicator {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-linecap: round;
+  // 시계가 0.25초마다 갱신되므로 그 사이를 부드럽게 이어줌
+  transition:
+    stroke-dashoffset 0.25s linear,
+    stroke 0.3s;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+// 띠와 가운데 내용 사이에 간격을 둠
+.content {
+  display: flex;
+  width: calc(var(--ring-size) - var(--ring-thickness) * 2 - 12px);
+  height: calc(var(--ring-size) - var(--ring-thickness) * 2 - 12px);
+  align-items: center;
+  justify-content: center;
+}

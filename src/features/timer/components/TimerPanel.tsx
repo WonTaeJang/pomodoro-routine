@@ -9,7 +9,13 @@ import {
   ResetIcon,
   SkipIcon,
 } from "@/components/icons";
-import { Button, Dialog, IconButton, SegmentedControl } from "@/components/ui";
+import {
+  Button,
+  Dialog,
+  IconButton,
+  ProgressRing,
+  SegmentedControl,
+} from "@/components/ui";
 import { cx } from "@/lib/cx";
 import { getTodayFocus, useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
@@ -99,7 +105,9 @@ export function TimerPanel({ ready }: TimerPanelProps) {
       />
 
       <div className={styles.kkami}>
-        <KkamiPhoto mode={timer.mode} status={timer.status} />
+        <ProgressRing value={ready ? remainingMs / timer.durationMs : 1}>
+          <KkamiPhoto mode={timer.mode} status={timer.status} />
+        </ProgressRing>
       </div>
 
       <p
