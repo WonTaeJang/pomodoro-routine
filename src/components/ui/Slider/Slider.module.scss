@@ -1,0 +1,99 @@
+@use "../../../styles/mixins";
+
+// 막대 모양
+$track-height: 6px;
+$thumb-size: 20px;
+
+@mixin track {
+  height: $track-height;
+  border-radius: var(--radius-full);
+}
+
+@mixin thumb {
+  width: $thumb-size;
+  height: $thumb-size;
+  border: var(--border-width-thick) solid var(--color-accent);
+  border-radius: 50%;
+  background: var(--color-knob);
+  box-shadow: var(--shadow-knob);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.label {
+  font-weight: var(--font-weight-medium);
+}
+
+.value {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.range {
+  width: 100%;
+  // 손가락으로 잡기 쉽게 높이를 넉넉히
+  height: var(--control-sm);
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+
+  // 크롬, 사파리: 채워진 부분을 그라데이션으로 표시
+  &::-webkit-slider-runnable-track {
+    @include track;
+    background: linear-gradient(
+      to right,
+      var(--color-accent) var(--fill),
+      var(--color-border) var(--fill)
+    );
+  }
+
+  &::-webkit-slider-thumb {
+    @include thumb;
+    margin-top: ($track-height - $thumb-size) * 0.5;
+    appearance: none;
+  }
+
+  // 파이어폭스
+  &::-moz-range-track {
+    @include track;
+    background: var(--color-border);
+  }
+
+  &::-moz-range-progress {
+    @include track;
+    background: var(--color-accent);
+  }
+
+  &::-moz-range-thumb {
+    @include thumb;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible::-webkit-slider-thumb {
+    @include mixins.focus-outline;
+  }
+
+  &:focus-visible::-moz-range-thumb {
+    @include mixins.focus-outline;
+  }
+
+  &:disabled {
+    @include mixins.disabled;
+  }
+}

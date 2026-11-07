@@ -1,5 +1,5 @@
 import { useId, type ComponentProps } from "react";
-import { cx } from "@/lib/cx";
+import { FieldRow } from "../FieldRow/FieldRow";
 import styles from "./Switch.module.scss";
 
 export type SwitchProps = Omit<
@@ -28,17 +28,13 @@ export function Switch({
   const descriptionId = `${switchId}-description`;
 
   return (
-    <div className={cx(styles.field, className)}>
-      <span className={styles.text}>
-        <label htmlFor={switchId} className={styles.label}>
-          {label}
-        </label>
-        {description ? (
-          <span id={descriptionId} className={styles.description}>
-            {description}
-          </span>
-        ) : null}
-      </span>
+    <FieldRow
+      label={label}
+      description={description}
+      htmlFor={switchId}
+      descriptionId={descriptionId}
+      className={className}
+    >
       <button
         id={switchId}
         type="button"
@@ -51,6 +47,6 @@ export function Switch({
       >
         <span className={styles.thumb} />
       </button>
-    </div>
+    </FieldRow>
   );
 }

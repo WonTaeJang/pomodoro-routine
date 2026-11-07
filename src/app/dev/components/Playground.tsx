@@ -23,10 +23,12 @@ import {
   Button,
   Card,
   Checkbox,
+  ConfirmDialog,
   Dialog,
   IconButton,
   ProgressRing,
   SegmentedControl,
+  Slider,
   Stepper,
   Switch,
   TextField,
@@ -69,6 +71,8 @@ export function Playground() {
   const [estimate, setEstimate] = useState(3);
   const [progress, setProgress] = useState(0.6);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [volume, setVolume] = useState(70);
 
   return (
     <main className={styles.page} data-mode={mode}>
@@ -242,6 +246,34 @@ export function Playground() {
         >
           뽀모도로 하나를 완료했어요. 5분 동안 쉬어요.
         </Dialog>
+      </Section>
+
+      <Section title="Slider · ConfirmDialog">
+        <div className={styles.stack}>
+          <Slider
+            label="소리 크기"
+            value={volume}
+            step={5}
+            format={(v) => `${v}%`}
+            onChange={setVolume}
+          />
+          <Slider label="꺼진 상태" value={40} onChange={() => {}} disabled />
+        </div>
+        <div className={styles.row}>
+          <Button variant="danger" onClick={() => setConfirmOpen(true)}>
+            확인 팝업 열기
+          </Button>
+        </div>
+        <ConfirmDialog
+          open={confirmOpen}
+          title="모든 데이터를 지울까요?"
+          confirmLabel="모두 지우기"
+          tone="danger"
+          onConfirm={() => {}}
+          onClose={() => setConfirmOpen(false)}
+        >
+          지운 뒤에는 되돌릴 수 없어요.
+        </ConfirmDialog>
       </Section>
 
       <Section title="Icons">

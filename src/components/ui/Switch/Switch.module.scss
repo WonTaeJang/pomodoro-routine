@@ -6,29 +6,6 @@ $track-height: 26px;
 $knob-size: 20px;
 $knob-gap: ($track-height - $knob-size) * 0.5;
 
-.field {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-}
-
-.text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-0-5);
-}
-
-.label {
-  font-weight: var(--font-weight-medium);
-  cursor: pointer;
-}
-
-.description {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-}
-
 .switch {
   position: relative;
   flex-shrink: 0;

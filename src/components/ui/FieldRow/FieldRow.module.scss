@@ -1,0 +1,30 @@
+// 글자 영역이 이 폭보다 좁아질 상황이면 조작 요소를 다음 줄로 내림
+$text-min-width: 7rem;
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.text {
+  display: flex;
+  flex: 1 1 $text-min-width;
+  flex-direction: column;
+  gap: var(--space-0-5);
+}
+
+.label {
+  font-weight: var(--font-weight-medium);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.description {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
