@@ -7,6 +7,7 @@ import { SettingsButton } from "@/features/settings/components/SettingsButton";
 import { TaskPanel } from "@/features/tasks/components/TaskPanel";
 import { ThemeToggle } from "@/features/theme/ThemeToggle";
 import { useHydrateStores } from "@/lib/useHydrateStores";
+import { useWakeLock } from "@/lib/useWakeLock";
 import { useTimerStore } from "../store";
 import { CompletionDialog } from "./CompletionDialog";
 import { TestModeBadge } from "./TestModeBadge";
@@ -17,7 +18,11 @@ import styles from "./TimerScreen.module.scss";
 export function TimerScreen() {
   const ready = useHydrateStores();
   const mode = useTimerStore((s) => s.timer.mode);
+  const keepAwake = useTimerStore(
+    (s) => s.timer.status === "running" && s.settings.keepScreenOn,
+  );
   useAlerts(ready);
+  useWakeLock(ready && keepAwake);
 
   return (
     <div className={styles.screen} data-mode={mode}>

@@ -22,6 +22,8 @@ export type TimerSettings = {
   notificationsEnabled: boolean;
   /** 진행 띠의 발자국 도장, 마지막 구간 빛, 완료 축하 효과 */
   ringEffects: boolean;
+  /** 타이머가 도는 동안 화면이 꺼지지 않게 (Screen Wake Lock) */
+  keepScreenOn: boolean;
   /**
    * 개발용 테스트 모드. 값이 있으면 모든 세션 길이를 이 초로 바꿉니다.
    * 개발 환경에서 주소에 ?test=5 를 붙이면 켜집니다.

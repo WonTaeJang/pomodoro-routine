@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS: TimerSettings = {
   soundVolume: 0.7,
   notificationsEnabled: true,
   ringEffects: true,
+  keepScreenOn: true,
 };
 
 function getModeDurationMs(mode: TimerMode, settings: TimerSettings): number {
