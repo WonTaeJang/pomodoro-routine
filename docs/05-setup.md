@@ -112,6 +112,7 @@ pomodoro-routine/
 ├── src/features/tasks/    할 일 (로직, store, 화면)
 ├── src/features/theme/    다크 모드
 ├── src/features/alerts/   알림 소리, 브라우저 알림
+├── src/features/settings/ 설정 창, 데이터 초기화
 ├── src/components/layout/ 헤더 등 화면 틀
 ├── src/components/ui/     공통 컴포넌트
 ├── src/components/icons/  아이콘
@@ -139,3 +140,4 @@ pomodoro-routine/
 - 2026-11-07: ProgressRing 컴포넌트 추가
 - 2026-11-07: 스타일·컴포넌트 내용을 06-design-system.md로 옮김
 - 2026-11-07: alerts 폴더 추가
+- 2026-11-07: settings 폴더 추가
