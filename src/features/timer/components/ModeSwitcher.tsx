@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Button, Dialog, SegmentedControl } from "@/components/ui";
+import { ConfirmDialog, SegmentedControl } from "@/components/ui";
+import { useSessionState } from "../hooks";
 import { MODE_LABELS } from "../labels";
 import { useTimerStore } from "../store";
 import type { TimerMode, TimerStatus } from "../types";
@@ -22,7 +22,7 @@ type ModeSwitcherProps = {
  * 진행 중이거나 멈춘 세션이 있으면, 완료로 세지 않는다는 걸 알리고 한 번 확인합니다.
  */
 export function ModeSwitcher({ mode, status }: ModeSwitcherProps) {
-  const [pendingMode, setPendingMode] = useState<TimerMode | null>(null);
+  const [pendingMode, setPendingMode] = useSessionState<TimerMode | null>(null);
   const switchMode = useTimerStore.getState().switchMode;
 
   function handleChange(next: TimerMode) {
@@ -42,29 +42,18 @@ export function ModeSwitcher({ mode, status }: ModeSwitcherProps) {
         value={mode}
         onChange={handleChange}
       />
-      <Dialog
+      <ConfirmDialog
         open={pendingMode !== null}
-        onClose={() => setPendingMode(null)}
         title={pendingMode ? `${MODE_LABELS[pendingMode]}으로 바꿀까요?` : ""}
-        footer={
-          <>
-            <Button variant="ghost" onClick={() => setPendingMode(null)}>
-              취소
-            </Button>
-            <Button
-              onClick={() => {
-                if (pendingMode) switchMode(pendingMode);
-                setPendingMode(null);
-              }}
-            >
-              바꾸기
-            </Button>
-          </>
-        }
+        confirmLabel="바꾸기"
+        onConfirm={() => {
+          if (pendingMode) switchMode(pendingMode);
+        }}
+        onClose={() => setPendingMode(null)}
       >
         지금 {MODE_LABELS[mode]} 세션이 진행 중이에요. 바꾸면 이 세션은 완료로
         세지 않아요.
-      </Dialog>
+      </ConfirmDialog>
     </>
   );
 }

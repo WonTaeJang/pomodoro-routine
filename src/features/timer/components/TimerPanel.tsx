@@ -80,7 +80,11 @@ export function TimerPanel({ ready }: TimerPanelProps) {
         </p>
       ) : null}
 
-      <TimerControls status={timer.status} disabled={!ready} />
+      <TimerControls
+        mode={timer.mode}
+        status={timer.status}
+        disabled={!ready}
+      />
 
       <CycleProgress
         mode={timer.mode}
