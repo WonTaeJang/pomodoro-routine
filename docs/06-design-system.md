@@ -56,7 +56,7 @@ import { PawIcon } from "@/components/icons";
 | `Badge` | 짧은 정보 배지 | `variant`(solid, soft, medal, outline), `size`(sm, md, lg), `icon` |
 | `Button` | 글자 버튼 | `variant`(primary, secondary, ghost, danger), `size`(sm, md, lg), `icon`, `fullWidth` |
 | `IconButton` | 아이콘만 있는 동그란 버튼 | `label`(필수, 화면 낭독기용), `icon`, `variant`, `size`(sm~xl), `shortcut`(마우스를 올리면 "시작 (Space)") |
-| `Dialog` | 팝업 창 | `open`, `onClose`, `title`, `footer`. ESC, 바깥 클릭으로 닫힘. 팝업 위에 팝업을 열면 ESC는 맨 위 것만 닫음 |
+| `Dialog` | 팝업 창 | `open`, `onClose`, `title`, `footer`. ESC, 바깥 클릭으로 닫힘. 팝업 위에 팝업을 열면 ESC는 맨 위 것만 닫고, 바깥 팝업의 글자 정렬을 물려받지 않음 |
 | `ConfirmDialog` | "정말 할까요?" 확인 팝업 | `open`, `title`, `confirmLabel`, `tone`(primary, danger), `onConfirm`, `onClose` |
 | `FieldRow` | 왼쪽 이름·설명, 오른쪽 조작 요소인 한 줄. 좁으면 조작 요소가 다음 줄로 | `label`, `description`, `htmlFor`, `children`(조작 요소) |
 | `Switch` | 켜기/끄기 (`FieldRow` 모양) | `checked`, `onCheckedChange`, `label`, `description` |
@@ -84,6 +84,13 @@ import { PawIcon } from "@/components/icons";
   - `sound.ts` / `audio.ts` / `chime.ts` / `sounds.ts`: 브라우저 오디오 통로, 오디오 깨우기, 소리 만들기, 음 정의
   - `notify.ts`: 브라우저 알림과 권한, `prepare.ts`: 시작할 때 오디오 깨우기와 권한 요청, `preview.ts`: 설정의 미리 듣기
   - `useAlerts.ts`: 스케줄러를 타이머와 브라우저 기능에 연결하는 훅
+- 수료증(`src/features/certificate/`): 밖에서는 `CertificateLauncher`만 씀 (완료 팝업 버튼, 메달 배지)
+  - `certificate.ts`: 최근 사이클 수료증 내용 계산, 시간 표기 (순수 함수, 테스트)
+  - `render/layout.ts`: 이미지 크기, 색, 위치(위에서부터 차례로). 디자인을 고칠 때는 주로 여기만 바꿈
+  - `render/drawCertificate.ts`: 1080×1920 캔버스에 그리기, `render/canvas.ts`: 글자 쓰기(`drawText`)·둥근 사각형·글자 줄이기·원형 글자·발자국 등 그리기 도우미
+  - `share.ts`: 공유 창, 내려받기 / `components/CertificateDialog`: 미리보기, 할 일 보이기, 공유·저장
+  - `components/useCertificateImage.ts`: 이미지를 미리 만들어 둠. 내용이 실제로 바뀔 때만 다시 그리고, 다 만들기 전에는 공유·저장을 막고, 쓰지 않는 이미지 주소는 정리
+- 마스코트(`src/assets/mascot/`): `kkami-graduate.svg`는 수료증, `kkami-basic.svg`·`kkami-icon.svg`는 로고·파비콘 등에 쓸 예정
 - 단축키(`src/features/shortcuts/`, 화면 없음): `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
 - 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 메인 화면에서 "진행 중 + 설정 켜짐"일 때 켬
 - 타이머 시작은 `startSession()`(`src/features/timer/startSession.ts`)으로 함. 알림 준비 + 시작을 한 번에 하므로 시작 버튼, 완료 팝업, 단축키가 같은 동작을 씀
@@ -101,3 +108,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-07: 작성. 디자인 토큰 도입, Card·Badge 추가, `05-setup.md`의 스타일·컴포넌트 내용을 옮김
 - 2026-11-07: Slider, ConfirmDialog, FieldRow, 설정 컴포넌트 추가
 - 2026-11-07: 단축키, 화면 꺼짐 방지 구조 추가
+- 2026-11-07: 수료증 구조, 마스코트 추가

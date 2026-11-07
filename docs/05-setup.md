@@ -114,12 +114,14 @@ pomodoro-routine/
 ├── src/features/alerts/   알림 소리, 브라우저 알림
 ├── src/features/settings/ 설정 창, 데이터 초기화
 ├── src/features/shortcuts/ 키보드 단축키
+├── src/features/certificate/ 수료증 (내용 계산, 캔버스 그리기, 공유·저장, 팝업)
 ├── src/components/layout/ 헤더 등 화면 틀
 ├── src/components/ui/     공통 컴포넌트
 ├── src/components/icons/  아이콘
 ├── src/styles/            토큰(tokens/), mixin, 브레이크포인트, 전체 기본 스타일
-├── src/lib/               공통 함수, 훅 (cx, useNow, useHydrateStores)
+├── src/lib/               공통 함수, 훅 (cx, date, useNow, useHydrateStores, useWakeLock)
 ├── src/assets/kkami/      까미 이미지 (정리된 것)
+├── src/assets/mascot/     까미 마스코트 SVG (basic, graduate, icon)
 ├── design/                원본 사진 등 (Git에 올리지 않음)
 ├── public/                파비콘 등 주소가 고정된 파일
 ├── AGENTS.md              AI 코딩 도우미용 Next.js 안내
@@ -143,3 +145,4 @@ pomodoro-routine/
 - 2026-11-07: alerts 폴더 추가
 - 2026-11-07: settings 폴더 추가
 - 2026-11-07: shortcuts 폴더 추가
+- 2026-11-07: certificate 폴더, 마스코트 SVG 추가
