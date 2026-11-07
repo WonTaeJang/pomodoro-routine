@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { PawIcon } from "@/components/icons";
+import { APP_NAME } from "@/lib/brand";
 import styles from "./AppHeader.module.scss";
 
 type AppHeaderProps = {
@@ -12,7 +13,7 @@ export function AppHeader({ children }: AppHeaderProps) {
     <header className={styles.header}>
       <span className={styles.brand}>
         <PawIcon size={22} />
-        까미도로
+        {APP_NAME}
       </span>
       <div className={styles.right}>{children}</div>
     </header>

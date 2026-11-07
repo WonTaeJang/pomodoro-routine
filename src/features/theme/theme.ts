@@ -1,11 +1,11 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { THEME_STORAGE_KEY } from "./themeScript";
+import { STORAGE_KEYS } from "@/lib/storage";
 
 export type Theme = "light" | "dark";
 
-const CHANGE_EVENT = "kkamidoro-theme-change";
+const CHANGE_EVENT = "kkamodoro-theme-change";
 
 const darkQuery = () => window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -35,8 +35,8 @@ export function useTheme(): Theme | null {
 export function setTheme(theme: Theme | null) {
   const root = document.documentElement;
   try {
-    if (theme) localStorage.setItem(THEME_STORAGE_KEY, theme);
-    else localStorage.removeItem(THEME_STORAGE_KEY);
+    if (theme) localStorage.setItem(STORAGE_KEYS.theme, theme);
+    else localStorage.removeItem(STORAGE_KEYS.theme);
   } catch {
     // 저장이 막힌 환경(사생활 보호 모드 등)에서도 화면 전환은 되게 함
   }

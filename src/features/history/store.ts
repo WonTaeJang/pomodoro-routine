@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { STORAGE_KEYS } from "@/lib/storage";
 import type { CompletedSession } from "@/features/timer/types";
 
 type HistoryStore = {
@@ -18,7 +19,7 @@ export const useHistoryStore = create<HistoryStore>()(
       },
     }),
     {
-      name: "kkamidoro-history",
+      name: STORAGE_KEYS.history,
       version: 1,
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { STORAGE_KEYS } from "@/lib/storage";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import {
@@ -84,7 +85,7 @@ export const useTimerStore = create<TimerStore>()(
       };
     },
     {
-      name: "kkamidoro-timer",
+      name: STORAGE_KEYS.timer,
       version: 1,
       storage: createJSONStorage(() => localStorage),
       partialize: ({ settings, timer }) => ({ settings, timer }),

@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { STORAGE_KEYS } from "@/lib/storage";
 import {
   addTask,
   clearDone,
@@ -53,7 +54,7 @@ export const useTasksStore = create<TasksStore>()(
       };
     },
     {
-      name: "kkamidoro-tasks",
+      name: STORAGE_KEYS.tasks,
       // v2: 할 일에 순서(order), 완료 시각(completedAt) 추가
       version: 2,
       migrate: (persisted) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { APP_NAME } from "@/lib/brand";
 import { MODE_LABELS } from "./labels";
 import { useTimerStore } from "./store";
 import type { TimerState } from "./types";
@@ -21,7 +22,7 @@ export function useCompleteWhenDue(timer: TimerState, now: number | null) {
   }, [status, endsAt, now]);
 }
 
-/** 브라우저 탭 제목에 남은 시간을 표시합니다. (예: "24:13 · 집중 | 까미도로") */
+/** 브라우저 탭 제목에 남은 시간을 표시합니다. (예: "24:13 · 집중 | 까모도로") */
 export function useTimerTitle(
   ready: boolean,
   timer: TimerState,
@@ -32,7 +33,7 @@ export function useTimerTitle(
   useEffect(() => {
     document.title =
       ready && status !== "idle"
-        ? `${timeText} · ${MODE_LABELS[mode]} | 까미도로`
-        : "까미도로";
+        ? `${timeText} · ${MODE_LABELS[mode]} | ${APP_NAME}`
+        : APP_NAME;
   }, [ready, status, mode, timeText]);
 }

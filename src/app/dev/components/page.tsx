@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { APP_NAME } from "@/lib/brand";
 import { Playground } from "./Playground";
 
 export const metadata: Metadata = {
-  title: "컴포넌트 미리보기 · 까미도로",
+  title: `컴포넌트 미리보기 · ${APP_NAME}`,
   robots: { index: false },
 };
 
