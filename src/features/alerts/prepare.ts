@@ -9,5 +9,5 @@ import { requestNotificationPermission } from "./notify";
 export function prepareAlerts() {
   const { settings } = useTimerStore.getState();
   if (settings.soundEnabled) unlockAudio();
-  if (settings.notificationsEnabled) requestNotificationPermission();
+  if (settings.notificationsEnabled) void requestNotificationPermission();
 }

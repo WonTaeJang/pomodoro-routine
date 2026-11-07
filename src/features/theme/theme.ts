@@ -4,6 +4,8 @@ import { useSyncExternalStore } from "react";
 import { STORAGE_KEYS } from "@/lib/storage";
 
 export type Theme = "light" | "dark";
+/** 사용자가 고른 테마. system이면 기기 설정을 따름 */
+export type ThemeChoice = Theme | "system";
 
 const CHANGE_EVENT = "kkamodoro-theme-change";
 
@@ -29,6 +31,16 @@ function subscribe(onChange: () => void) {
 /** 지금 테마. 서버와 첫 렌더링에서는 null */
 export function useTheme(): Theme | null {
   return useSyncExternalStore(subscribe, getEffectiveTheme, () => null);
+}
+
+function getThemeChoice(): ThemeChoice {
+  const chosen = document.documentElement.dataset.theme;
+  return chosen === "light" || chosen === "dark" ? chosen : "system";
+}
+
+/** 사용자가 고른 테마 (설정 화면용). 서버와 첫 렌더링에서는 null */
+export function useThemeChoice(): ThemeChoice | null {
+  return useSyncExternalStore(subscribe, getThemeChoice, () => null);
 }
 
 /** 테마를 직접 고릅니다. null이면 기기 설정을 따릅니다. */

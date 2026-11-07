@@ -25,6 +25,7 @@ type TimerPanelProps = {
 export function TimerPanel({ ready }: TimerPanelProps) {
   const timer = useTimerStore((s) => s.timer);
   const interval = useTimerStore((s) => s.settings.longBreakInterval);
+  const ringEffects = useTimerStore((s) => s.settings.ringEffects);
   const lastCompleted = useTimerStore((s) => s.lastCompleted);
   const sessions = useHistoryStore((s) => s.sessions);
   const activeTask = useTasksStore((s) =>
@@ -56,6 +57,7 @@ export function TimerPanel({ ready }: TimerPanelProps) {
           running={timer.status === "running"}
           remainingMs={remainingMs}
           durationMs={timer.durationMs}
+          effects={ringEffects}
           celebrateKey={
             lastCompleted?.mode === "focus" ? lastCompleted.endedAt : null
           }

@@ -35,7 +35,19 @@ type TimerStore = {
   /** 진행 중인 세션이 끝났는지 확인하고 다음 세션으로 넘깁니다. 시계가 돌 때마다 호출 */
   sync: () => void;
   updateSettings: (patch: Partial<TimerSettings>) => void;
+  /** 설정만 기본값으로 되돌립니다. */
+  resetSettings: () => void;
+  /** 설정과 타이머를 처음 상태로 되돌립니다. (데이터 초기화) */
+  resetAll: () => void;
 };
+
+/** 기본 설정. 개발용 테스트 모드는 주소(?test=)로 켠 것이라 그대로 둡니다. */
+function defaultSettings(current: TimerSettings): TimerSettings {
+  return {
+    ...DEFAULT_SETTINGS,
+    testDurationSeconds: current.testDurationSeconds,
+  };
+}
 
 /** 끝난 집중 세션에 지금 선택된 할 일을 붙입니다. */
 function attachActiveTask(sessions: CompletedSession[]): CompletedSession[] {
@@ -81,6 +93,18 @@ export const useTimerStore = create<TimerStore>()(
         updateSettings: (patch) => {
           const settings = { ...get().settings, ...patch };
           set({ settings, timer: applySettings(get().timer, settings) });
+        },
+        resetSettings: () => {
+          const settings = defaultSettings(get().settings);
+          set({ settings, timer: applySettings(get().timer, settings) });
+        },
+        resetAll: () => {
+          const settings = defaultSettings(get().settings);
+          set({
+            settings,
+            timer: createInitialState(settings),
+            lastCompleted: null,
+          });
         },
       };
     },

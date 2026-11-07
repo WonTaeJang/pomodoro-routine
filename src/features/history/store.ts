@@ -7,6 +7,8 @@ type HistoryStore = {
   /** 끝까지 마친 세션 기록. 오늘 기록과 v1.5 통계에 사용 */
   sessions: CompletedSession[];
   addSessions: (sessions: CompletedSession[]) => void;
+  /** 기록을 모두 지웁니다. (데이터 초기화) */
+  clear: () => void;
 };
 
 export const useHistoryStore = create<HistoryStore>()(
@@ -17,6 +19,7 @@ export const useHistoryStore = create<HistoryStore>()(
         if (sessions.length === 0) return;
         set((s) => ({ sessions: [...s.sessions, ...sessions] }));
       },
+      clear: () => set({ sessions: [] }),
     }),
     {
       name: STORAGE_KEYS.history,

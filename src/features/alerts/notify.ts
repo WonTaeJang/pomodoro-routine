@@ -6,10 +6,22 @@ function supported(): boolean {
   return typeof window !== "undefined" && "Notification" in window;
 }
 
+export type NotificationStatus = NotificationPermission | "unsupported";
+
+/** 지금 알림 권한 상태 (허용 / 차단 / 아직 묻지 않음 / 지원 안 함) */
+export function getNotificationStatus(): NotificationStatus {
+  return supported() ? Notification.permission : "unsupported";
+}
+
 /** 아직 묻지 않았으면 알림 권한을 묻습니다. 사용자가 버튼을 누를 때 불러야 합니다. */
-export function requestNotificationPermission() {
-  if (supported() && Notification.permission === "default") {
-    void Notification.requestPermission();
+export async function requestNotificationPermission(): Promise<NotificationStatus> {
+  if (!supported()) return "unsupported";
+  if (Notification.permission !== "default") return Notification.permission;
+  try {
+    // 옛 사파리는 결과를 돌려주지 않으므로 현재 값으로 대신함
+    return (await Notification.requestPermission()) ?? Notification.permission;
+  } catch {
+    return Notification.permission;
   }
 }
 

@@ -3,6 +3,7 @@
 import { AppHeader } from "@/components/layout/AppHeader";
 import { useAlerts } from "@/features/alerts";
 import { TodaySummary } from "@/features/history/components/TodaySummary";
+import { SettingsButton } from "@/features/settings/components/SettingsButton";
 import { TaskPanel } from "@/features/tasks/components/TaskPanel";
 import { ThemeToggle } from "@/features/theme/ThemeToggle";
 import { useHydrateStores } from "@/lib/useHydrateStores";
@@ -24,6 +25,7 @@ export function TimerScreen() {
         <TestModeBadge ready={ready} />
         {ready ? <TodaySummary /> : null}
         <ThemeToggle />
+        <SettingsButton ready={ready} />
       </AppHeader>
       <main className={styles.main}>
         <TimerPanel ready={ready} />

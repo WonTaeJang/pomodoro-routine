@@ -22,6 +22,8 @@ type TimerRingProps = {
   running: boolean;
   remainingMs: number;
   durationMs: number;
+  /** 발자국 도장, 빛, 완료 축하 효과. 끄면 띠만 줄어듦 (설정) */
+  effects: boolean;
   /** 집중을 마친 시각. 값이 바뀌면 축하 효과를 보여줌 */
   celebrateKey: number | null;
   /** 한 사이클 완료 축하 */
@@ -34,12 +36,14 @@ type TimerRingProps = {
  * - 10%가 지날 때마다 발자국 도장 하나
  * - 마지막 구간에는 띠가 빛나고 지금 위치에 빛나는 점
  * - 집중을 마치면 띠가 퍼지며 발자국과 색종이가 터짐
+ * 설정에서 효과를 끄면 띠만 줄어듭니다.
  */
 export function TimerRing({
   ready,
   running,
   remainingMs,
   durationMs,
+  effects,
   celebrateKey,
   bigCelebration = false,
   children,
@@ -47,32 +51,35 @@ export function TimerRing({
   const remaining = ready && durationMs > 0 ? remainingMs / durationMs : 1;
   const elapsed = 1 - remaining;
   const finalPhase = Math.min(FINAL_PHASE_MS, durationMs * 0.2);
-  const glow = ready && running && remainingMs > 0 && remainingMs <= finalPhase;
+  const glow =
+    effects && ready && running && remainingMs > 0 && remainingMs <= finalPhase;
+  const celebration = effects ? celebrateKey : null;
 
-  const markers = ready
-    ? MILESTONES.filter((m) => elapsed >= m.at).map((m) => ({
-        at: m.at,
-        content: (
-          <span className={styles.stamp}>
-            <PawIcon
-              size={16}
-              style={{ transform: `rotate(${m.rotate}deg)` }}
-            />
-          </span>
-        ),
-      }))
-    : [];
+  const markers =
+    effects && ready
+      ? MILESTONES.filter((m) => elapsed >= m.at).map((m) => ({
+          at: m.at,
+          content: (
+            <span className={styles.stamp}>
+              <PawIcon
+                size={16}
+                style={{ transform: `rotate(${m.rotate}deg)` }}
+              />
+            </span>
+          ),
+        }))
+      : [];
 
   return (
     <ProgressRing
       value={remaining}
       markers={markers}
       glow={glow}
-      flashKey={celebrateKey}
+      flashKey={celebration}
       overlay={
-        celebrateKey !== null ? (
+        celebration !== null ? (
           <Celebration
-            key={`celebration-${celebrateKey}`}
+            key={`celebration-${celebration}`}
             big={bigCelebration}
           />
         ) : null
