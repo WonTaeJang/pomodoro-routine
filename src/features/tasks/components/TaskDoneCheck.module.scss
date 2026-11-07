@@ -1,0 +1,55 @@
+.card {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface));
+  text-align: left;
+}
+
+.done {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+
+  .name {
+    color: var(--color-text-muted);
+    text-decoration: line-through;
+  }
+}
+
+.title {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.count {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-variant-numeric: tabular-nums;
+
+  svg {
+    color: var(--color-accent);
+  }
+}
+
+.note {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.check {
+  font-weight: 600;
+}

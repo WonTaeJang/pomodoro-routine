@@ -67,6 +67,7 @@ export function TaskItem({ task, active }: TaskItemProps) {
         <span
           className={styles.count}
           aria-label={`뽀모도로 ${task.completedPomodoros}개 완료, 예상 ${task.estimate}개`}
+          title={`완료 ${task.completedPomodoros}번 · 예상 ${task.estimate}번`}
         >
           <PawIcon size={14} />
           {task.completedPomodoros}/{task.estimate}

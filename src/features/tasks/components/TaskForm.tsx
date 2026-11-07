@@ -69,7 +69,12 @@ export function TaskForm({
           min={ESTIMATE_MIN}
           max={ESTIMATE_MAX}
           onChange={setEstimate}
-          prefix={<PawIcon size={16} />}
+          prefix={
+            <>
+              <span className={styles.estimateLabel}>예상</span>
+              <PawIcon size={16} />
+            </>
+          }
         />
         {onCancel ? (
           <Button variant="ghost" onClick={onCancel}>

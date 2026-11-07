@@ -1,26 +1,24 @@
 "use client";
 
 import Image from "next/image";
-import kkamiDone from "@/assets/kkami/kkami-done.webp";
 import kkamiDefault from "@/assets/kkami/kkami-default.webp";
-import { MedalIcon, PawIcon } from "@/components/icons";
+import kkamiDone from "@/assets/kkami/kkami-done.webp";
+import { MedalIcon } from "@/components/icons";
 import { Button, Dialog } from "@/components/ui";
-import { useTasksStore } from "@/features/tasks/store";
+import { TaskDoneCheck } from "@/features/tasks/components/TaskDoneCheck";
 import { MODE_LABELS } from "../labels";
 import { useTimerStore } from "../store";
 import styles from "./CompletionDialog.module.scss";
 
-/** 세션이 끝났을 때 뜨는 팝업. 다음 세션을 바로 시작할 수 있습니다. */
+/**
+ * 세션이 끝났을 때 뜨는 팝업.
+ * 집중이 끝났으면 할 일을 다 끝냈는지 묻고, 다음 세션을 바로 시작할 수 있습니다.
+ */
 export function CompletionDialog() {
   const completed = useTimerStore((s) => s.lastCompleted);
   const next = useTimerStore((s) => s.timer);
   const interval = useTimerStore((s) => s.settings.longBreakInterval);
   const { dismissCompleted, start } = useTimerStore.getState();
-  const task = useTasksStore((s) =>
-    completed?.taskId
-      ? s.tasks.find((t) => t.id === completed.taskId)
-      : undefined,
-  );
 
   const focusDone = completed?.mode === "focus";
   const cycleDone = focusDone && completed?.cycleCompleted === true;
@@ -79,12 +77,8 @@ export function CompletionDialog() {
           ) : null}
         </div>
         <p>{message}</p>
-        {focusDone && task ? (
-          <p className={styles.task}>
-            {task.title}
-            <PawIcon size={16} />
-            {task.completedPomodoros}/{task.estimate}
-          </p>
+        {focusDone && completed?.taskId ? (
+          <TaskDoneCheck taskId={completed.taskId} />
         ) : null}
         {nextIsRunning ? (
           <p className={styles.hint}>{nextLabel}이 자동으로 시작됐어요.</p>
