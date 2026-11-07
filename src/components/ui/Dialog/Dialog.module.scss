@@ -1,0 +1,64 @@
+.dialog {
+  // 전역 margin 초기화를 덮어써서 화면 가운데에 두기
+  margin: auto;
+  width: min(100% - 32px, 440px);
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-lg);
+
+  &::backdrop {
+    background: rgb(0 0 0 / 0.45);
+  }
+
+  &[open] {
+    animation: dialog-in 0.18s ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &[open] {
+      animation: none;
+    }
+  }
+}
+
+.panel {
+  display: flex;
+  max-height: inherit;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 12px 4px 20px;
+}
+
+.title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.body {
+  overflow-y: auto;
+  padding: 8px 20px 20px;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 20px 20px;
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}

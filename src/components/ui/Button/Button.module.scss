@@ -1,0 +1,33 @@
+@use "button-styles" as btn;
+
+.button {
+  @include btn.base;
+  @include btn.variants;
+}
+
+.sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 0.875rem;
+}
+
+.md {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 1rem;
+}
+
+.lg {
+  height: 56px;
+  padding: 0 28px;
+  font-size: 1.125rem;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.icon {
+  display: inline-flex;
+  margin-left: -2px;
+}

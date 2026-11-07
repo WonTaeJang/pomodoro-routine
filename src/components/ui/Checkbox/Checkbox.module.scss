@@ -1,0 +1,59 @@
+@use "../../../styles/mixins";
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  &:has(:disabled) {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.input {
+  @include mixins.visually-hidden;
+}
+
+.box {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-accent-contrast);
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+
+  svg {
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .input:checked + & {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+
+    svg {
+      opacity: 1;
+    }
+  }
+
+  .input:focus-visible + & {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    svg {
+      transition: none;
+    }
+  }
+}

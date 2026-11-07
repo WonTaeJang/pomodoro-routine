@@ -1,0 +1,55 @@
+@use "../../../styles/mixins";
+
+.group {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-hover);
+}
+
+.option {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+
+  &:hover {
+    color: var(--color-text);
+  }
+
+  &:has(:focus-visible) {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+.selected {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+
+  &:hover {
+    color: var(--color-accent-contrast);
+  }
+}
+
+.input {
+  @include mixins.visually-hidden;
+}

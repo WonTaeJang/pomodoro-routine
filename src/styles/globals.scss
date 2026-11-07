@@ -6,16 +6,26 @@
   --color-surface: #ffffff;
   --color-text: #1f1b18;
   --color-text-muted: #6b625b;
+  --color-surface-hover: #f5eee7;
   --color-border: #e8e0d8;
   --color-focus-ring: #1f1b18;
+  --color-danger: #d23c3c;
 
   // 모드별 색상
   --color-focus: #e5533d; // 집중: 토마토
   --color-short-break: #3f9b6e; // 짧은 휴식
   --color-long-break: #3d7ae5; // 긴 휴식
 
+  // 강조색: 버튼, 선택된 탭 등. data-mode에 따라 모드 색으로 바뀜
+  --color-accent: var(--color-focus);
+  --color-accent-contrast: #ffffff;
+
+  --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
+  --radius-full: 999px;
+
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.16);
 
   --font-sans:
     var(--font-pretendard), -apple-system, BlinkMacSystemFont,
@@ -31,6 +41,7 @@
   --color-surface: #1c1918;
   --color-text: #f2ece6;
   --color-text-muted: #a69d95;
+  --color-surface-hover: #26221f;
   --color-border: #2e2a27;
   --color-focus-ring: #f2ece6;
 
@@ -45,6 +56,20 @@
 
 :root[data-theme="dark"] {
   @include dark-colors;
+}
+
+// 모드별 강조색. 타이머 화면 등에서 data-mode 속성으로 지정
+[data-mode="short-break"] {
+  --color-accent: var(--color-short-break);
+}
+
+[data-mode="long-break"] {
+  --color-accent: var(--color-long-break);
+}
+
+// 팝업이 열려 있는 동안 뒤 화면 스크롤 막기
+html:has(dialog[open]) {
+  overflow: hidden;
 }
 
 // 기본 스타일 초기화

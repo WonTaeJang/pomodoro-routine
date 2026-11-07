@@ -1,0 +1,78 @@
+// Button, IconButton이 함께 쓰는 스타일
+@use "../../../styles/mixins";
+
+@mixin base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    color 0.15s,
+    transform 0.1s;
+
+  @include mixins.focus-ring;
+
+  &:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active:not(:disabled) {
+      transform: none;
+    }
+  }
+}
+
+@mixin variants {
+  &.primary {
+    background: var(--color-accent);
+    color: var(--color-accent-contrast);
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-accent) 86%, black);
+    }
+  }
+
+  &.secondary {
+    background: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+
+    &:hover:not(:disabled) {
+      background: var(--color-surface-hover);
+    }
+  }
+
+  &.ghost {
+    background: transparent;
+    color: var(--color-text);
+
+    &:hover:not(:disabled) {
+      background: var(--color-surface-hover);
+    }
+  }
+
+  &.danger {
+    background: var(--color-danger);
+    color: #ffffff;
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-danger) 86%, black);
+    }
+  }
+}
