@@ -3,5 +3,6 @@ export * from "./Checkbox/Checkbox";
 export * from "./Dialog/Dialog";
 export * from "./IconButton/IconButton";
 export * from "./SegmentedControl/SegmentedControl";
+export * from "./Stepper/Stepper";
 export * from "./Switch/Switch";
 export * from "./TextField/TextField";

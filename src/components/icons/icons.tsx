@@ -75,6 +75,15 @@ export function PlusIcon(props: IconProps) {
   );
 }
 
+/** 빼기 */
+export function MinusIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M5 12h14" />
+    </Icon>
+  );
+}
+
 /** 완료 체크 */
 export function CheckIcon(props: IconProps) {
   return (
