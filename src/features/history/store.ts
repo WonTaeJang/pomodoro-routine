@@ -35,12 +35,13 @@ function startOfDay(time: number): number {
   return date.getTime();
 }
 
-/** 오늘 완료한 집중 세션 수와 집중한 분 */
+/** 오늘 완료한 집중 세션 수, 집중한 분, 완료한 사이클 수 */
 export function getTodayFocus(sessions: CompletedSession[], now: number) {
   const from = startOfDay(now);
   const focus = sessions.filter((s) => s.mode === "focus" && s.endedAt >= from);
   const minutes = Math.round(
     focus.reduce((sum, s) => sum + s.durationMs, 0) / 60_000,
   );
-  return { count: focus.length, minutes };
+  const cycles = focus.filter((s) => s.cycleCompleted).length;
+  return { count: focus.length, minutes, cycles };
 }

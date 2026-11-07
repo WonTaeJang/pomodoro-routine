@@ -157,6 +157,9 @@ export function sync(
   let next: TimerState;
   if (state.mode === "focus") {
     const completedInCycle = state.completedInCycle + 1;
+    if (completedInCycle >= settings.longBreakInterval) {
+      completed.cycleCompleted = true;
+    }
     next = createSession(
       breakAfterFocus(completedInCycle, settings),
       completedInCycle,

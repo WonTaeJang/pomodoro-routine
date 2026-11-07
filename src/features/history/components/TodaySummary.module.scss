@@ -20,3 +20,9 @@
     display: inline-flex;
   }
 }
+
+// .summary svg(강조색)보다 우선하도록 함께 지정
+.summary .medal {
+  margin-left: 4px;
+  color: #d4a017;
+}

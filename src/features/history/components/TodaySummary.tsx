@@ -1,6 +1,6 @@
 "use client";
 
-import { PawIcon } from "@/components/icons";
+import { MedalIcon, PawIcon } from "@/components/icons";
 import { getTodayFocus, useHistoryStore } from "@/features/history/store";
 import { useNow } from "@/lib/useNow";
 import styles from "./TodaySummary.module.scss";
@@ -11,13 +11,19 @@ export function TodaySummary() {
   const now = useNow();
   if (now === null) return null;
 
-  const { count, minutes } = getTodayFocus(sessions, now);
+  const { count, minutes, cycles } = getTodayFocus(sessions, now);
   return (
     <p className={styles.summary}>
       <PawIcon size={16} />
       <span>
         오늘 {count}개 · {minutes}분
       </span>
+      {cycles > 0 ? (
+        <>
+          <MedalIcon size={16} className={styles.medal} />
+          <span>{cycles}사이클</span>
+        </>
+      ) : null}
     </p>
   );
 }

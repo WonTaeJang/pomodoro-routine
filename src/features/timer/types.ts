@@ -42,6 +42,8 @@ export type CompletedSession = {
   durationMs: number;
   /** 집중 세션이면, 그때 선택돼 있던 할 일 */
   taskId?: string;
+  /** 이 집중으로 한 사이클(긴 휴식 주기만큼 집중)을 모두 마쳤으면 true */
+  cycleCompleted?: boolean;
 };
 
 /** 상태를 바꾸는 함수의 결과. 이번에 완료된 세션이 있으면 completed에 담김 */

@@ -139,6 +139,21 @@ export function MoonIcon(props: IconProps) {
   );
 }
 
+/** 메달. 완료한 사이클 표시에 사용 */
+export function MedalIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M8 3l3 6.5M16 3l-3 6.5" />
+      <circle cx="12" cy="15" r="5.5" />
+      <path
+        d="M12 12.5l.8 1.6 1.7.2-1.3 1.2.3 1.7-1.5-.8-1.5.8.3-1.7-1.3-1.2 1.7-.2z"
+        fill="currentColor"
+        strokeWidth={1}
+      />
+    </Icon>
+  );
+}
+
 /** 까미 발자국. 완료한 뽀모도로 표시 등에 사용 */
 export function PawIcon(props: IconProps) {
   return (

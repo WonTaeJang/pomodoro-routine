@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  MedalIcon,
   PauseIcon,
   PawIcon,
   PlayIcon,
@@ -10,6 +11,7 @@ import {
 } from "@/components/icons";
 import { Button, Dialog, IconButton, SegmentedControl } from "@/components/ui";
 import { cx } from "@/lib/cx";
+import { getTodayFocus, useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { useNow } from "@/lib/useNow";
 import { getStatusMessage, MODE_LABELS } from "../labels";
@@ -36,6 +38,7 @@ export function TimerPanel({ ready }: TimerPanelProps) {
   const actions = useTimerStore.getState();
   const now = useNow();
   const [pendingMode, setPendingMode] = useState<TimerMode | null>(null);
+  const sessions = useHistoryStore((s) => s.sessions);
   const activeTask = useTasksStore((s) =>
     s.tasks.find((t) => t.id === s.activeTaskId),
   );
@@ -75,6 +78,8 @@ export function TimerPanel({ ready }: TimerPanelProps) {
     actions.switchMode(mode);
   }
 
+  const todayCycles =
+    ready && now !== null ? getTodayFocus(sessions, now).cycles : 0;
   const cycleDone = Math.min(timer.completedInCycle, longBreakInterval);
   const cycleLeft = longBreakInterval - cycleDone;
   const cycleText =
@@ -146,6 +151,7 @@ export function TimerPanel({ ready }: TimerPanelProps) {
       </div>
 
       <div className={styles.cycle}>
+        <span className={styles.cycleLabel}>이번 사이클</span>
         <div
           className={styles.paws}
           role="img"
@@ -160,6 +166,12 @@ export function TimerPanel({ ready }: TimerPanelProps) {
           ))}
         </div>
         <span>{cycleText}</span>
+        {todayCycles > 0 ? (
+          <span className={styles.cycleCount}>
+            <MedalIcon size={16} />
+            오늘 {todayCycles}사이클 완료
+          </span>
+        ) : null}
       </div>
 
       <Dialog

@@ -67,6 +67,28 @@
   font-size: 0.8125rem;
 }
 
+.cycleLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.cycleCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, #d4a017 14%, var(--color-surface));
+  color: var(--color-text);
+  font-weight: 600;
+
+  svg {
+    color: #d4a017;
+  }
+}
+
 .paws {
   display: flex;
   flex-wrap: wrap;

@@ -124,6 +124,19 @@ describe("완료와 다음 세션", () => {
     expect(state.completedInCycle).toBe(0);
   });
 
+  it("4번째 집중을 마친 세션에만 사이클 완료 표시가 붙는다", () => {
+    let state = createInitialState(settings);
+    const flags: boolean[] = [];
+    for (let i = 0; i < 8; i++) {
+      const result = finishSession(state, settings, T0);
+      state = result.state;
+      if (result.completed[0].mode === "focus") {
+        flags.push(result.completed[0].cycleCompleted === true);
+      }
+    }
+    expect(flags).toEqual([false, false, false, true]);
+  });
+
   it("긴 휴식 주기 설정을 따른다", () => {
     const every2 = { ...settings, longBreakInterval: 2 };
     let state = finishSession(createInitialState(every2), every2, T0).state; // 집중 1
