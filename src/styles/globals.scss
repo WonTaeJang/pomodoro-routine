@@ -1,0 +1,90 @@
+// 색상은 CSS 변수로 둡니다. 다크 모드 전환이 실행 중에 바로 반영되도록 하기 위함입니다.
+// 값은 임시이며, 디자인 분위기를 정할 때 바꿉니다.
+
+:root {
+  --color-bg: #fffaf5;
+  --color-surface: #ffffff;
+  --color-text: #1f1b18;
+  --color-text-muted: #6b625b;
+  --color-border: #e8e0d8;
+  --color-focus-ring: #1f1b18;
+
+  // 모드별 색상
+  --color-focus: #e5533d; // 집중: 토마토
+  --color-short-break: #3f9b6e; // 짧은 휴식
+  --color-long-break: #3d7ae5; // 긴 휴식
+
+  --radius-md: 12px;
+  --radius-lg: 20px;
+
+  --font-sans:
+    var(--font-geist-sans), "Apple SD Gothic Neo", "Malgun Gothic", system-ui,
+    sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  color-scheme: light;
+}
+
+// 다크 모드: 시스템 설정을 따르고, 나중에 data-theme 속성으로 직접 바꿀 수 있게 함
+@mixin dark-colors {
+  --color-bg: #121010;
+  --color-surface: #1c1918;
+  --color-text: #f2ece6;
+  --color-text-muted: #a69d95;
+  --color-border: #2e2a27;
+  --color-focus-ring: #f2ece6;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    @include dark-colors;
+  }
+}
+
+:root[data-theme="dark"] {
+  @include dark-colors;
+}
+
+// 기본 스타일 초기화
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}

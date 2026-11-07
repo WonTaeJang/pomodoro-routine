@@ -1,0 +1,15 @@
+@use "sass:map";
+
+// 화면 너비 기준점. 모바일 우선으로 작성하고 큰 화면에서 덮어씁니다.
+$breakpoints: (
+  sm: 480px,
+  md: 768px,
+  lg: 1024px,
+);
+
+// 사용 예: @include bp.up(md) { ... }
+@mixin up($name) {
+  @media (min-width: map.get($breakpoints, $name)) {
+    @content;
+  }
+}
