@@ -1,58 +1,76 @@
 @use "../../../styles/breakpoints" as bp;
 
+$page-width: 880px;
+$stack-width: 400px;
+
 .page {
   display: flex;
-  max-width: 880px;
+  max-width: $page-width;
   flex-direction: column;
-  gap: 40px;
+  gap: var(--space-10);
   margin: 0 auto;
-  padding: 32px 16px 80px;
+  padding: var(--space-8) var(--space-4) var(--space-20);
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .title {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .sectionTitle {
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--border-width) solid var(--color-border);
   color: var(--color-text-muted);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
 }
 
 .row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .stack {
   display: flex;
-  max-width: 400px;
+  max-width: $stack-width;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
+}
+
+.cardDemo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.ringValue {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.marker {
+  color: var(--color-accent);
 }
 
 .iconGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: var(--space-2);
 
   @include bp.up(md) {
     grid-template-columns: repeat(6, 1fr);
@@ -63,12 +81,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 16px 8px;
-  border: 1px solid var(--color-border);
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--font-size-2xs);
 
   svg {
     color: var(--color-text);
