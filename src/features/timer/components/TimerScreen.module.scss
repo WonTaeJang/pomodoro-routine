@@ -1,0 +1,18 @@
+.screen {
+  min-height: 100%;
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg));
+  transition: background-color 0.3s;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+// 할 일을 붙이면 넓은 화면에서 2단으로 바뀝니다.
+.main {
+  display: grid;
+  max-width: 560px;
+  gap: 16px;
+  margin: 0 auto;
+  padding: 8px 16px 48px;
+}

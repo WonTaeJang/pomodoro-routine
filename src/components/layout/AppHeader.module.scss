@@ -1,0 +1,26 @@
+.header {
+  display: flex;
+  max-width: 1080px;
+  min-height: 64px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 auto;
+  padding: 12px 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-accent);
+  font-size: 1.25rem;
+  font-weight: 800;
+  transition: color 0.3s;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

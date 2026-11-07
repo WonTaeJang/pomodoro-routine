@@ -1,0 +1,79 @@
+@use "../../../styles/breakpoints" as bp;
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 28px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+
+  @include bp.up(md) {
+    padding: 32px 24px 36px;
+  }
+}
+
+// 까미 이미지가 들어갈 자리 (사진이 준비되면 교체)
+.kkami {
+  display: flex;
+  width: 120px;
+  height: 120px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 28px;
+  border: 2px dashed color-mix(in srgb, var(--color-accent) 40%, transparent);
+  border-radius: 50%;
+  color: var(--color-accent);
+  transition:
+    color 0.3s,
+    border-color 0.3s;
+}
+
+.time {
+  margin-top: 12px;
+  font-size: clamp(4.5rem, 20vw, 7.5rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.timeLoading {
+  color: var(--color-border);
+}
+
+.status {
+  margin-top: 12px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 28px;
+}
+
+.cycle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 24px;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.paws {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  color: var(--color-border);
+}
+
+.pawDone {
+  color: var(--color-accent);
+}
