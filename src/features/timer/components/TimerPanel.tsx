@@ -9,13 +9,7 @@ import {
   ResetIcon,
   SkipIcon,
 } from "@/components/icons";
-import {
-  Button,
-  Dialog,
-  IconButton,
-  ProgressRing,
-  SegmentedControl,
-} from "@/components/ui";
+import { Button, Dialog, IconButton, SegmentedControl } from "@/components/ui";
 import { cx } from "@/lib/cx";
 import { getTodayFocus, useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
@@ -25,6 +19,7 @@ import { useTimerStore } from "../store";
 import { formatRemaining, getRemainingMs } from "../timer";
 import type { TimerMode } from "../types";
 import { KkamiPhoto } from "./KkamiPhoto";
+import { TimerRing } from "./TimerRing";
 import styles from "./TimerPanel.module.scss";
 
 const MODES: TimerMode[] = ["focus", "short-break", "long-break"];
@@ -45,6 +40,7 @@ export function TimerPanel({ ready }: TimerPanelProps) {
   const now = useNow();
   const [pendingMode, setPendingMode] = useState<TimerMode | null>(null);
   const sessions = useHistoryStore((s) => s.sessions);
+  const lastCompleted = useTimerStore((s) => s.lastCompleted);
   const activeTask = useTasksStore((s) =>
     s.tasks.find((t) => t.id === s.activeTaskId),
   );
@@ -105,9 +101,18 @@ export function TimerPanel({ ready }: TimerPanelProps) {
       />
 
       <div className={styles.kkami}>
-        <ProgressRing value={ready ? remainingMs / timer.durationMs : 1}>
+        <TimerRing
+          ready={ready}
+          running={running}
+          remainingMs={remainingMs}
+          durationMs={timer.durationMs}
+          celebrateKey={
+            lastCompleted?.mode === "focus" ? lastCompleted.endedAt : null
+          }
+          bigCelebration={lastCompleted?.cycleCompleted === true}
+        >
           <KkamiPhoto mode={timer.mode} status={timer.status} />
-        </ProgressRing>
+        </TimerRing>
       </div>
 
       <p

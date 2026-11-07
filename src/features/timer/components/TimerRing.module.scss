@@ -1,0 +1,17 @@
+// 띠 위에 찍히는 발자국 도장
+.stamp {
+  display: flex;
+  width: 22px;
+  height: 22px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid
+    color-mix(in srgb, var(--color-accent) 30%, var(--color-surface));
+  border-radius: 50%;
+  background: var(--color-surface);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.12);
+  color: var(--color-accent);
+  transition:
+    color 0.3s,
+    border-color 0.3s;
+}

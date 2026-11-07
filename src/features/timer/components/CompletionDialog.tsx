@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import kkamiDefault from "@/assets/kkami/kkami-default.webp";
 import kkamiDone from "@/assets/kkami/kkami-done.webp";
 import { MedalIcon } from "@/components/icons";
@@ -19,6 +20,10 @@ export function CompletionDialog() {
   const next = useTimerStore((s) => s.timer);
   const interval = useTimerStore((s) => s.settings.longBreakInterval);
   const { dismissCompleted, start } = useTimerStore.getState();
+  const shown = useDelayedOpen(
+    completed?.endedAt ?? null,
+    completed?.mode === "focus",
+  );
 
   const focusDone = completed?.mode === "focus";
   const cycleDone = focusDone && completed?.cycleCompleted === true;
@@ -39,7 +44,7 @@ export function CompletionDialog() {
 
   return (
     <Dialog
-      open={completed !== null}
+      open={completed !== null && shown}
       onClose={dismissCompleted}
       title={title}
       footer={
@@ -86,4 +91,23 @@ export function CompletionDialog() {
       </div>
     </Dialog>
   );
+}
+
+/** 집중 완료 축하 효과가 보이도록 팝업을 잠깐 늦게 엽니다. (움직임 줄이기면 바로) */
+const CELEBRATION_MS = 1000;
+
+function useDelayedOpen(key: number | null, celebrate: boolean): boolean {
+  const [openedKey, setOpenedKey] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (key === null) return;
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const delay = celebrate && !reduceMotion ? CELEBRATION_MS : 0;
+    const timer = setTimeout(() => setOpenedKey(key), delay);
+    return () => clearTimeout(timer);
+  }, [key, celebrate]);
+
+  return key !== null && openedKey === key;
 }

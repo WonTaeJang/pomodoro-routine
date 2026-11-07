@@ -1,0 +1,45 @@
+.celebration {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  opacity: 0;
+  animation: burst 1.1s cubic-bezier(0.15, 0.7, 0.3, 1) var(--delay) forwards;
+}
+
+.confetti {
+  width: 8px;
+  height: 12px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+@keyframes burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.3) rotate(0);
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(1)
+      rotate(var(--r));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .celebration {
+    display: none;
+  }
+}

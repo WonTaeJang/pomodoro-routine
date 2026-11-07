@@ -11,6 +11,7 @@
 .svg {
   position: absolute;
   inset: 0;
+  overflow: visible;
   // 12시 방향에서 시작
   transform: rotate(-90deg);
 }
@@ -29,10 +30,6 @@
   transition:
     stroke-dashoffset 0.25s linear,
     stroke 0.3s;
-
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
-  }
 }
 
 // 띠와 가운데 내용 사이에 간격을 둠
@@ -42,4 +39,99 @@
   height: calc(var(--ring-size) - var(--ring-thickness) * 2 - 12px);
   align-items: center;
   justify-content: center;
+}
+
+// 띠 위 표시 (발자국 도장 등)
+.marker {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  animation: marker-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+// 마지막 구간: 띠가 숨 쉬듯 빛나고, 지금 위치에 빛나는 점
+.glow .indicator {
+  animation: ring-breathe 2s ease-in-out infinite;
+}
+
+.tip {
+  fill: #ffffff;
+  stroke: var(--color-accent);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 6px var(--color-accent));
+  transition:
+    cx 0.25s linear,
+    cy 0.25s linear;
+  animation: tip-pulse 1s ease-in-out infinite;
+}
+
+// 완료 순간 띠가 한 번 퍼져 나가는 효과
+.flash {
+  position: absolute;
+  inset: 0;
+  border: var(--ring-thickness) solid var(--color-accent);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: ring-flash 0.9s ease-out forwards;
+}
+
+@keyframes marker-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+  }
+}
+
+@keyframes ring-breathe {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px var(--color-accent));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 10px var(--color-accent));
+  }
+}
+
+@keyframes tip-pulse {
+  50% {
+    filter: drop-shadow(0 0 12px var(--color-accent));
+  }
+}
+
+@keyframes ring-flash {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+// 움직임 줄이기: 움직임은 빼고 색과 빛만 유지
+@media (prefers-reduced-motion: reduce) {
+  .indicator,
+  .tip {
+    transition: none;
+  }
+
+  .marker,
+  .tip,
+  .glow .indicator {
+    animation: none;
+  }
+
+  .glow .indicator {
+    filter: drop-shadow(0 0 6px var(--color-accent));
+  }
+
+  .flash {
+    display: none;
+  }
 }
