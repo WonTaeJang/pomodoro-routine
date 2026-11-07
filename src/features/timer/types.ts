@@ -14,6 +14,12 @@ export type TimerSettings = {
   autoStartBreaks: boolean;
   /** 휴식이 끝나면 집중을 자동으로 시작 */
   autoStartFocus: boolean;
+  /** 세션이 끝날 때 소리 */
+  soundEnabled: boolean;
+  /** 소리 크기 0~1 */
+  soundVolume: number;
+  /** 다른 탭에 있을 때 브라우저 알림 */
+  notificationsEnabled: boolean;
   /**
    * 개발용 테스트 모드. 값이 있으면 모든 세션 길이를 이 초로 바꿉니다.
    * 개발 환경에서 주소에 ?test=5 를 붙이면 켜집니다.

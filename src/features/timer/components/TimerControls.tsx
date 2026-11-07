@@ -2,6 +2,7 @@
 
 import { PauseIcon, PlayIcon, ResetIcon, SkipIcon } from "@/components/icons";
 import { IconButton } from "@/components/ui";
+import { startSession } from "../startSession";
 import { useTimerStore } from "../store";
 import type { TimerStatus } from "../types";
 import styles from "./TimerControls.module.scss";
@@ -14,7 +15,7 @@ type TimerControlsProps = {
 
 /** 리셋 · 시작/일시정지 · 다음 세션 버튼 */
 export function TimerControls({ status, disabled }: TimerControlsProps) {
-  const { reset, start, pause, skip } = useTimerStore.getState();
+  const { reset, pause, skip } = useTimerStore.getState();
   const running = status === "running";
   const mainLabel = running
     ? "일시정지"
@@ -38,7 +39,7 @@ export function TimerControls({ status, disabled }: TimerControlsProps) {
         variant="primary"
         size="xl"
         disabled={disabled}
-        onClick={running ? pause : start}
+        onClick={running ? pause : startSession}
       />
       <IconButton
         label="다음 세션"

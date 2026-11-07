@@ -8,6 +8,7 @@ import { MedalIcon } from "@/components/icons";
 import { Button, Dialog } from "@/components/ui";
 import { TaskDoneCheck } from "@/features/tasks/components/TaskDoneCheck";
 import { MODE_LABELS } from "../labels";
+import { startSession } from "../startSession";
 import { useTimerStore } from "../store";
 import styles from "./CompletionDialog.module.scss";
 
@@ -19,7 +20,7 @@ export function CompletionDialog() {
   const completed = useTimerStore((s) => s.lastCompleted);
   const next = useTimerStore((s) => s.timer);
   const interval = useTimerStore((s) => s.settings.longBreakInterval);
-  const { dismissCompleted, start } = useTimerStore.getState();
+  const dismissCompleted = useTimerStore.getState().dismissCompleted;
   const shown = useDelayedOpen(
     completed?.endedAt ?? null,
     completed?.mode === "focus",
@@ -57,7 +58,7 @@ export function CompletionDialog() {
             </Button>
             <Button
               onClick={() => {
-                start();
+                startSession();
                 dismissCompleted();
               }}
             >

@@ -21,6 +21,9 @@ export const DEFAULT_SETTINGS: TimerSettings = {
   longBreakInterval: 4,
   autoStartBreaks: false,
   autoStartFocus: false,
+  soundEnabled: true,
+  soundVolume: 0.7,
+  notificationsEnabled: true,
 };
 
 function getModeDurationMs(mode: TimerMode, settings: TimerSettings): number {

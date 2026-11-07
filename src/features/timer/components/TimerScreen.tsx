@@ -1,6 +1,7 @@
 "use client";
 
 import { AppHeader } from "@/components/layout/AppHeader";
+import { useAlerts } from "@/features/alerts";
 import { TodaySummary } from "@/features/history/components/TodaySummary";
 import { TaskPanel } from "@/features/tasks/components/TaskPanel";
 import { ThemeToggle } from "@/features/theme/ThemeToggle";
@@ -15,6 +16,7 @@ import styles from "./TimerScreen.module.scss";
 export function TimerScreen() {
   const ready = useHydrateStores();
   const mode = useTimerStore((s) => s.timer.mode);
+  useAlerts(ready);
 
   return (
     <div className={styles.screen} data-mode={mode}>
