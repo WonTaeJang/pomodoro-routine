@@ -99,6 +99,7 @@ import { PlayIcon, SettingsIcon } from "@/components/icons";
 | `SegmentedControl` | 여러 개 중 하나 선택 (모드 탭) | `label`, `options`, `value`, `onChange`. 방향키로 이동 |
 | `TextField` | 라벨 붙은 입력칸 | `label`, `hint`, `error`, `hideLabel` + input 속성 |
 | `Checkbox` | 체크박스 (할 일 완료) | `label` + input 속성 |
+| `ProgressRing` | 원형 진행 띠 (까미 사진 둘레) | `value`(남은 비율 0~1), `size`, `thickness`, `markers`(띠 위 표시), `glow`, `flashKey`(바뀔 때 반짝), `overlay`, `children` |
 | `Stepper` | − 값 + 숫자 조절 (예상 개수, 설정 시간) | `label`, `value`, `onChange`, `min`, `max`, `format`, `prefix` |
 
 아이콘: `PlayIcon`, `PauseIcon`, `ResetIcon`, `SkipIcon`, `SettingsIcon`, `PlusIcon`, `MinusIcon`, `CheckIcon`, `CloseIcon`, `TrashIcon`, `EditIcon`, `SunIcon`, `MoonIcon`, `PawIcon`
@@ -194,3 +195,4 @@ pomodoro-routine/
 - 2026-11-07: 까미 이미지 폴더와 규칙 추가
 - 2026-11-07: 까미 이미지 파일 목록, 5초 테스트 모드 사용법 추가
 - 2026-11-07: 할 일, 테마 폴더와 Stepper 컴포넌트 추가
+- 2026-11-07: ProgressRing 컴포넌트 추가
