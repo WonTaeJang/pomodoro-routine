@@ -12,11 +12,19 @@ import {
   switchMode,
   sync,
 } from "./timer";
-import type { TimerMode, TimerSettings, TimerState } from "./types";
+import type {
+  CompletedSession,
+  TimerMode,
+  TimerSettings,
+  TimerState,
+} from "./types";
 
 type TimerStore = {
   settings: TimerSettings;
   timer: TimerState;
+  /** 방금 끝난 세션. 완료 팝업을 띄우는 데 사용 (저장하지 않음) */
+  lastCompleted: CompletedSession | null;
+  dismissCompleted: () => void;
   start: () => void;
   pause: () => void;
   reset: () => void;
@@ -39,12 +47,15 @@ export const useTimerStore = create<TimerStore>()(
         const { settings, timer } = get();
         const synced = sync(timer, settings, now);
         useHistoryStore.getState().addSessions(synced.completed);
-        set({ timer: action(synced.state, now) });
+        const lastCompleted = synced.completed.at(-1) ?? get().lastCompleted;
+        set({ timer: action(synced.state, now), lastCompleted });
       }
 
       return {
         settings: DEFAULT_SETTINGS,
         timer: createInitialState(DEFAULT_SETTINGS),
+        lastCompleted: null,
+        dismissCompleted: () => set({ lastCompleted: null }),
         start: () => update((timer, now) => start(timer, now)),
         pause: () => update((timer, now) => pause(timer, now)),
         reset: () => update((timer) => reset(timer, get().settings)),

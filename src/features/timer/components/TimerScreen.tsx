@@ -4,6 +4,7 @@ import { AppHeader } from "@/components/layout/AppHeader";
 import { TodaySummary } from "@/features/history/components/TodaySummary";
 import { useHydrateStores } from "@/lib/useHydrateStores";
 import { useTimerStore } from "../store";
+import { CompletionDialog } from "./CompletionDialog";
 import { TimerPanel } from "./TimerPanel";
 import styles from "./TimerScreen.module.scss";
 
@@ -18,6 +19,7 @@ export function TimerScreen() {
       <main className={styles.main}>
         <TimerPanel ready={ready} />
       </main>
+      {ready ? <CompletionDialog /> : null}
     </div>
   );
 }
