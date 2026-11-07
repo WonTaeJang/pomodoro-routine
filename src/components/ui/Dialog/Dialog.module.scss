@@ -11,6 +11,8 @@
   background: var(--color-surface);
   color: var(--color-text);
   box-shadow: var(--shadow-lg);
+  // 팝업 안에서 연 팝업이 바깥 팝업의 가운데 정렬 등을 물려받지 않게
+  text-align: start;
 
   &::backdrop {
     background: var(--color-backdrop);
