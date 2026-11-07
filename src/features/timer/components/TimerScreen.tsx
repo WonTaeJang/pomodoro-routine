@@ -2,6 +2,7 @@
 
 import { AppHeader } from "@/components/layout/AppHeader";
 import { TodaySummary } from "@/features/history/components/TodaySummary";
+import { ThemeToggle } from "@/features/theme/ThemeToggle";
 import { useHydrateStores } from "@/lib/useHydrateStores";
 import { useTimerStore } from "../store";
 import { CompletionDialog } from "./CompletionDialog";
@@ -19,6 +20,7 @@ export function TimerScreen() {
       <AppHeader>
         <TestModeBadge ready={ready} />
         {ready ? <TodaySummary /> : null}
+        <ThemeToggle />
       </AppHeader>
       <main className={styles.main}>
         <TimerPanel ready={ready} />

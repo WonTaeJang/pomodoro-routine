@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { themeInitScript } from "@/features/theme/themeScript";
 import "@/styles/globals.scss";
 
 const pretendard = localFont({
@@ -16,7 +17,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="ko" className={pretendard.variable}>
+    // data-theme은 아래 스크립트가 화면 표시 전에 바꾸므로 서버 결과와 다를 수 있음
+    <html lang="ko" className={pretendard.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );
