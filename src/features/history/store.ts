@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { startOfDay } from "@/lib/date";
 import { STORAGE_KEYS } from "@/lib/storage";
 import type { CompletedSession } from "@/features/timer/types";
 
@@ -29,13 +30,6 @@ export const useHistoryStore = create<HistoryStore>()(
     },
   ),
 );
-
-/** 하루의 시작 시각(로컬 자정) */
-function startOfDay(time: number): number {
-  const date = new Date(time);
-  date.setHours(0, 0, 0, 0);
-  return date.getTime();
-}
 
 /** 오늘 완료한 집중 세션 수, 집중한 분, 완료한 사이클 수 */
 export function getTodayFocus(sessions: CompletedSession[], now: number) {
