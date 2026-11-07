@@ -3,6 +3,7 @@
 import { MedalIcon, PawIcon } from "@/components/icons";
 import { Badge } from "@/components/ui";
 import { cx } from "@/lib/cx";
+import { getCycleMessage } from "../labels";
 import type { TimerMode } from "../types";
 import styles from "./CycleProgress.module.scss";
 
@@ -24,13 +25,7 @@ export function CycleProgress({
   todayCycles,
 }: CycleProgressProps) {
   const done = Math.min(completedInCycle, interval);
-  const left = interval - done;
-  const message =
-    mode === "long-break"
-      ? "긴 휴식 시간이에요"
-      : left === 0
-        ? "이번 휴식은 긴 휴식이에요"
-        : `긴 휴식까지 ${left}번 남았어요`;
+  const message = getCycleMessage(mode, completedInCycle, interval);
 
   return (
     <div className={styles.cycle}>
