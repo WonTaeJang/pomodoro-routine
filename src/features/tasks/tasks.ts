@@ -19,9 +19,19 @@ function cleanTitle(title: string): string {
   return title.trim().slice(0, TITLE_MAX_LENGTH);
 }
 
-/** 완료하지 않은 할 일 중 첫 번째 (except는 제외) */
+function byOrder(a: Task, b: Task): number {
+  return a.order - b.order;
+}
+
+/** 완료하지 않은 할 일 중 목록에서 가장 위에 있는 것 (except는 제외) */
 function firstOpenTaskId(tasks: Task[], except?: string): string | null {
-  return tasks.find((t) => !t.done && t.id !== except)?.id ?? null;
+  return (
+    [...tasks].sort(byOrder).find((t) => !t.done && t.id !== except)?.id ?? null
+  );
+}
+
+function nextOrder(tasks: Task[]): number {
+  return tasks.reduce((max, t) => Math.max(max, t.order), -1) + 1;
 }
 
 /** 할 일을 추가합니다. 집중할 할 일이 없으면 새 할 일을 선택합니다. */
@@ -37,7 +47,9 @@ export function addTask(
     estimate: clampEstimate(input.estimate),
     completedPomodoros: 0,
     done: false,
+    order: nextOrder(state.tasks),
     createdAt: input.now,
+    completedAt: null,
   };
   return {
     tasks: [...state.tasks, task],
@@ -76,12 +88,22 @@ export function removeTask(state: TasksState, id: string): TasksState {
   return { tasks, activeTaskId };
 }
 
-/** 완료 체크를 바꿉니다. 집중 중인 할 일을 완료하면 다음 할 일을 선택합니다. */
-export function toggleDone(state: TasksState, id: string): TasksState {
+/**
+ * 완료 체크를 바꿉니다. 완료하면 완료 시각을 기록하고, 취소하면 지웁니다.
+ * 집중 중인 할 일을 완료하면 다음 할 일을 선택합니다.
+ */
+export function toggleDone(
+  state: TasksState,
+  id: string,
+  now: number,
+): TasksState {
   const target = state.tasks.find((t) => t.id === id);
   if (!target) return state;
   const done = !target.done;
-  const tasks = state.tasks.map((t) => (t.id === id ? { ...t, done } : t));
+  const completedAt = done ? now : null;
+  const tasks = state.tasks.map((t) =>
+    t.id === id ? { ...t, done, completedAt } : t,
+  );
 
   let activeTaskId = state.activeTaskId;
   if (done && activeTaskId === id) activeTaskId = firstOpenTaskId(tasks, id);
@@ -126,7 +148,44 @@ export function clearDone(state: TasksState): TasksState {
   return { tasks, activeTaskId };
 }
 
-/** 화면 표시 순서: 할 일(추가한 순서) → 완료한 할 일 */
+/** 화면 표시 순서: 할 일(순서대로) → 완료한 할 일(순서대로) */
 export function sortForDisplay(tasks: Task[]): Task[] {
-  return [...tasks.filter((t) => !t.done), ...tasks.filter((t) => t.done)];
+  const sorted = [...tasks].sort(byOrder);
+  return [...sorted.filter((t) => !t.done), ...sorted.filter((t) => t.done)];
+}
+
+/**
+ * 할 일을 위/아래로 한 칸 옮깁니다.
+ * 화면에 보이는 순서 기준으로, 같은 묶음(할 일 / 완료한 할 일) 안에서만 움직입니다.
+ */
+export function moveTask(
+  state: TasksState,
+  id: string,
+  direction: "up" | "down",
+): TasksState {
+  const target = state.tasks.find((t) => t.id === id);
+  if (!target) return state;
+  const group = sortForDisplay(state.tasks).filter(
+    (t) => t.done === target.done,
+  );
+  const index = group.findIndex((t) => t.id === id);
+  const neighbor = group[direction === "up" ? index - 1 : index + 1];
+  if (!neighbor) return state;
+  return {
+    ...state,
+    tasks: state.tasks.map((t) => {
+      if (t.id === target.id) return { ...t, order: neighbor.order };
+      if (t.id === neighbor.id) return { ...t, order: target.order };
+      return t;
+    }),
+  };
+}
+
+/** 예전 형식(순서, 완료일 없음)으로 저장된 할 일을 새 형식으로 바꿉니다. */
+export function migrateTasks(tasks: Partial<Task>[]): Task[] {
+  return tasks.map((t, index) => ({
+    ...(t as Task),
+    order: t.order ?? index,
+    completedAt: t.completedAt ?? null,
+  }));
 }
