@@ -23,6 +23,15 @@ npm run dev
 
 브라우저에서 http://localhost:3000 을 열어 "까미도로" 제목이 보이면 성공입니다.
 
+## 5초 테스트 모드
+
+`npm run dev` 실행 후 http://localhost:3000/?test=5 로 열면 집중과 휴식이 모두 5초가 됩니다.
+
+- 상단에 "테스트 모드 · 5초" 배지가 보이고, "끄기"를 누르거나 `?test=off`로 열면 꺼집니다.
+- 숫자를 바꾸면 다른 초로도 가능합니다. (예: `?test=10`)
+- 테스트 중에 완료한 세션도 오늘 기록에 쌓입니다.
+- 배포(production) 환경에서는 동작하지 않습니다.
+
 ## 테스트 (Vitest)
 
 ```bash
@@ -90,8 +99,9 @@ import { PlayIcon, SettingsIcon } from "@/components/icons";
 | `SegmentedControl` | 여러 개 중 하나 선택 (모드 탭) | `label`, `options`, `value`, `onChange`. 방향키로 이동 |
 | `TextField` | 라벨 붙은 입력칸 | `label`, `hint`, `error`, `hideLabel` + input 속성 |
 | `Checkbox` | 체크박스 (할 일 완료) | `label` + input 속성 |
+| `Stepper` | − 값 + 숫자 조절 (예상 개수, 설정 시간) | `label`, `value`, `onChange`, `min`, `max`, `format`, `prefix` |
 
-아이콘: `PlayIcon`, `PauseIcon`, `ResetIcon`, `SkipIcon`, `SettingsIcon`, `PlusIcon`, `CheckIcon`, `CloseIcon`, `TrashIcon`, `EditIcon`, `SunIcon`, `MoonIcon`, `PawIcon`
+아이콘: `PlayIcon`, `PauseIcon`, `ResetIcon`, `SkipIcon`, `SettingsIcon`, `PlusIcon`, `MinusIcon`, `CheckIcon`, `CloseIcon`, `TrashIcon`, `EditIcon`, `SunIcon`, `MoonIcon`, `PawIcon`
 
 - 모든 아이콘은 `size`(기본 20), `title` props를 받습니다. 색은 글자색을 따릅니다.
 - 새 아이콘은 `src/components/icons/icons.tsx`에 24x24 격자, 선 두께 2 기준으로 추가합니다.
@@ -122,9 +132,13 @@ import { PlayIcon, SettingsIcon } from "@/components/icons";
 
 | 파일 | 쓰는 곳 |
 |---|---|
-| `kkami-default.webp` | 기본, 시작 전 |
-| `kkami-focus.webp` | 집중 중 (예: 옆에서 자는 모습) |
-| `kkami-break.webp` | 휴식 중 (예: 산책, 공 물고 오기) |
+| `kkami-default.webp` | 시작 전 |
+| `kkami-focus.webp` | 집중 중 |
+| `kkami-short-break.webp` | 짧은 휴식 |
+| `kkami-long-break.webp` | 긴 휴식 |
+| `kkami-done.webp` | 완료 팝업 |
+
+- 정리 기준: 얼굴 중심 정사각형으로 자르기 → 480x480 → WebP(품질 82), 메타데이터 없음
 
 - 화면에서는 `import`해서 `next/image`로 씁니다. 크기 정보가 자동으로 들어가고, 파일이 바뀌면 캐시도 자동으로 새로 받습니다.
 
@@ -143,7 +157,7 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
   - `components/`는 store를 읽어 화면을 그립니다.
 - 저장된 값은 화면이 뜬 뒤 `useHydrateStores()`로 불러옵니다. 서버에서 그린 화면과 첫 화면이 달라 생기는 오류(hydration 불일치)를 막기 위함입니다.
 - 렌더링 중에 `Date.now()`를 직접 부르지 않고 `useNow()` 시계를 씁니다.
-- localStorage 키: `kkamidoro-timer`(설정, 타이머), `kkamidoro-history`(세션 기록)
+- localStorage 키: `kkamidoro-timer`(설정, 타이머), `kkamidoro-history`(세션 기록), `kkamidoro-tasks`(할 일), `kkamidoro-theme`(테마)
 
 ## 폴더 구조
 
@@ -154,6 +168,8 @@ pomodoro-routine/
 ├── src/app/dev/components 컴포넌트 미리보기 (개발 중에만)
 ├── src/features/timer/    타이머 (로직, store, 화면)
 ├── src/features/history/  세션 기록, 오늘 기록
+├── src/features/tasks/    할 일 (로직, store, 화면)
+├── src/features/theme/    다크 모드
 ├── src/components/layout/ 헤더 등 화면 틀
 ├── src/components/ui/     공통 컴포넌트
 ├── src/components/icons/  아이콘
@@ -176,3 +192,5 @@ pomodoro-routine/
 - 2026-11-07: Node 최소 버전 22.12로 변경, 테스트 명령 추가
 - 2026-11-07: 코드 구조 원칙, 기능 폴더 추가
 - 2026-11-07: 까미 이미지 폴더와 규칙 추가
+- 2026-11-07: 까미 이미지 파일 목록, 5초 테스트 모드 사용법 추가
+- 2026-11-07: 할 일, 테마 폴더와 Stepper 컴포넌트 추가
