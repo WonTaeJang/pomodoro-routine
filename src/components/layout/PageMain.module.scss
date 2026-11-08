@@ -1,0 +1,17 @@
+@use "../../styles/breakpoints" as bp;
+
+// 휴대폰: 위아래로 쌓기 / 넓은 화면: 왼쪽(넓게), 오른쪽 두 칸
+.main {
+  display: grid;
+  max-width: var(--layout-narrow);
+  gap: var(--space-4);
+  margin: 0 auto;
+  padding: var(--space-2) var(--space-4) var(--space-12);
+
+  @include bp.up(lg) {
+    max-width: var(--layout-max);
+    grid-template-columns: 1.2fr 1fr;
+    align-items: start;
+    gap: var(--space-6);
+  }
+}

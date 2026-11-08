@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { startOfDay } from "./date";
 
 /**
  * 현재 시각을 일정 간격으로 알려주는 시계.
@@ -40,6 +41,15 @@ export function useNow(): number | null {
   return useSyncExternalStore(
     subscribe,
     () => now,
+    () => null,
+  );
+}
+
+/** 오늘 날짜(그날 시작 시각). 자정이 지나면 바뀝니다. 날짜가 바뀔 때만 다시 그립니다. */
+export function useToday(): number | null {
+  return useSyncExternalStore(
+    subscribe,
+    () => (now === null ? null : startOfDay(now)),
     () => null,
   );
 }

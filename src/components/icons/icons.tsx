@@ -136,6 +136,24 @@ export function GripIcon(props: IconProps) {
   );
 }
 
+/** 이전 (왼쪽 꺾쇠) */
+export function ChevronLeftIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M15 5l-7 7 7 7" />
+    </Icon>
+  );
+}
+
+/** 다음 (오른쪽 꺾쇠) */
+export function ChevronRightIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M9 5l7 7-7 7" />
+    </Icon>
+  );
+}
+
 /** 라이트 모드 */
 export function SunIcon(props: IconProps) {
   return (

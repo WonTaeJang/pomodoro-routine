@@ -10,11 +10,11 @@ export function TodaySummary() {
   const today = useTodayFocus();
   if (today === null) return null;
 
-  const { count, minutes } = today;
+  const minutes = Math.round(today.focusMs / 60_000);
   return (
     <p className={styles.summary}>
       <Badge variant="soft" size="lg" icon={<PawIcon size={16} />}>
-        오늘 {count}개 · {minutes}분
+        오늘 {today.focusCount}개 · {minutes}분
       </Badge>
     </p>
   );

@@ -2,7 +2,7 @@ import { focusSessions, taskTitleOf } from "@/features/history/sessions";
 import type { Task } from "@/features/tasks/types";
 import type { CompletedSession } from "@/features/timer/types";
 import { APP_NAME } from "@/lib/brand";
-import { startOfDay } from "@/lib/date";
+import { formatDuration, startOfDay } from "@/lib/date";
 
 /** "까모도로 수료증" */
 export const CERTIFICATE_TITLE = `${APP_NAME} 수료증`;
@@ -26,19 +26,22 @@ export type CertificateData = {
 };
 
 /**
- * 가장 최근에 완료한 사이클의 수료증 내용을 만듭니다. 완료한 사이클이 없으면 null.
+ * number번째로 완료한 사이클의 수료증 내용을 만듭니다. number를 빼면 가장 최근 사이클.
+ * 그런 사이클이 없으면 null.
  * 사이클 = 직전 사이클이 끝난 뒤부터 이번 사이클을 마친 집중까지의 집중 세션들
  */
-export function getLatestCertificate(
+export function getCertificate(
   sessions: CompletedSession[],
   tasks: Task[],
+  number?: number,
 ): CertificateData | null {
   const focus = focusSessions(sessions);
   const ends = focus.flatMap((s, i) => (s.cycleCompleted ? [i] : []));
-  if (ends.length === 0) return null;
+  const n = number ?? ends.length;
+  if (n < 1 || n > ends.length) return null;
 
-  const end = ends[ends.length - 1];
-  const start = ends.length > 1 ? ends[ends.length - 2] + 1 : 0;
+  const end = ends[n - 1];
+  const start = n > 1 ? ends[n - 2] + 1 : 0;
   const cycle = focus.slice(start, end + 1);
   const completedAt = focus[end].endedAt;
 
@@ -55,25 +58,15 @@ export function getLatestCertificate(
   ];
 
   return {
-    number: ends.length,
+    number: n,
     completedAt,
     focusCount: cycle.length,
     focusEachMs: durations.size === 1 ? cycle[0].durationMs : null,
     focusTotalMs: cycle.reduce((sum, s) => sum + s.durationMs, 0),
-    cyclesThatDay: ends.filter((i) => focus[i].endedAt >= dayStart).length,
+    cyclesThatDay: ends.slice(0, n).filter((i) => focus[i].endedAt >= dayStart)
+      .length,
     taskTitles,
   };
-}
-
-/** 시간 길이를 "25분", "1시간 40분", "5초"처럼 */
-export function formatDuration(ms: number): string {
-  const totalSeconds = Math.round(ms / 1000);
-  if (totalSeconds < 60) return `${totalSeconds}초`;
-  const totalMinutes = Math.round(totalSeconds / 60);
-  if (totalMinutes < 60) return `${totalMinutes}분`;
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return minutes === 0 ? `${hours}시간` : `${hours}시간 ${minutes}분`;
 }
 
 /** 수료증 본문. 예: "25분 집중을 4번 해내었기에" / "이 수료증을 드립니다." */

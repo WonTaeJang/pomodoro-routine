@@ -6,28 +6,30 @@ import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { useTimerStore } from "@/features/timer/store";
 import { useHoldAutoPopups } from "@/lib/popupHold";
-import { CERTIFICATE_TITLE, getLatestCertificate } from "../certificate";
+import { CERTIFICATE_TITLE, getCertificate } from "../certificate";
 import { canShareFile, downloadFile, shareFile } from "../share";
 import styles from "./CertificateDialog.module.scss";
 import { useCertificateImage } from "./useCertificateImage";
 
 type CertificateDialogProps = {
+  /** 몇 번째 사이클의 수료증인지 (제 N호). 없으면 가장 최근 사이클 */
+  number?: number;
   onClose: () => void;
 };
 
 /**
- * 가장 최근에 완료한 사이클의 수료증 미리보기, 공유, 저장.
+ * 수료증 미리보기, 공유, 저장.
  * 열리자마자 이미지를 만들어 둡니다. (공유 창은 버튼을 누른 순간에만 열 수 있음)
  */
-export function CertificateDialog({ onClose }: CertificateDialogProps) {
+export function CertificateDialog({ number, onClose }: CertificateDialogProps) {
   // 수료증을 보는 중에 세션이 끝나도 완료 팝업이 덮지 않게
   useHoldAutoPopups();
   const sessions = useHistoryStore((s) => s.sessions);
   const tasks = useTasksStore((s) => s.tasks);
   const showTasks = useTimerStore((s) => s.settings.certificateShowTasks);
   const data = useMemo(
-    () => getLatestCertificate(sessions, tasks),
-    [sessions, tasks],
+    () => getCertificate(sessions, tasks, number),
+    [sessions, tasks, number],
   );
   const { preview, current, failed } = useCertificateImage(data, showTasks);
   const [shareFailed, setShareFailed] = useState(false);

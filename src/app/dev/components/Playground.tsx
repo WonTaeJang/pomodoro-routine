@@ -3,6 +3,8 @@
 import { useState } from "react";
 import {
   CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   CloseIcon,
   EditIcon,
   GripIcon,
@@ -59,6 +61,8 @@ const icons = [
   { name: "Trash", Icon: TrashIcon },
   { name: "Edit", Icon: EditIcon },
   { name: "Grip", Icon: GripIcon },
+  { name: "ChevronLeft", Icon: ChevronLeftIcon },
+  { name: "ChevronRight", Icon: ChevronRightIcon },
   { name: "Sun", Icon: SunIcon },
   { name: "Moon", Icon: MoonIcon },
   { name: "Paw", Icon: PawIcon },

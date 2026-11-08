@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Task } from "@/features/tasks/types";
 import type { CompletedSession } from "@/features/timer/types";
-import {
-  formatDuration,
-  getCertificateMessage,
-  getLatestCertificate,
-} from "./certificate";
+import { getCertificateMessage, getCertificate } from "./certificate";
 
 const MIN = 60_000;
 const day = (d: number, h: number, m = 0) =>
@@ -51,12 +47,12 @@ function cycle(d: number, h: number, taskIds: (string | undefined)[] = []) {
 
 describe("수료증 내용", () => {
   it("완료한 사이클이 없으면 null", () => {
-    expect(getLatestCertificate([focus(day(7, 9))], [])).toBeNull();
+    expect(getCertificate([focus(day(7, 9))], [])).toBeNull();
   });
 
   it("가장 최근 사이클의 번호, 집중 횟수와 시간, 마친 시각", () => {
     const sessions = [...cycle(6, 9), ...cycle(7, 9), ...cycle(7, 14)];
-    const data = getLatestCertificate(sessions, []);
+    const data = getCertificate(sessions, []);
     expect(data).toMatchObject({
       number: 3,
       completedAt: day(7, 15, 55),
@@ -68,7 +64,18 @@ describe("수료증 내용", () => {
 
   it("그날 완료한 사이클 수 (전날 사이클은 빼고)", () => {
     const sessions = [...cycle(6, 9), ...cycle(7, 9), ...cycle(7, 14)];
-    expect(getLatestCertificate(sessions, [])?.cyclesThatDay).toBe(2);
+    expect(getCertificate(sessions, [])?.cyclesThatDay).toBe(2);
+  });
+
+  it("지난 사이클도 번호로 만든다. 그날 수는 그 사이클까지만 셈", () => {
+    const sessions = [...cycle(6, 9), ...cycle(7, 9), ...cycle(7, 14)];
+    expect(getCertificate(sessions, [], 2)).toMatchObject({
+      number: 2,
+      completedAt: day(7, 10, 55),
+      cyclesThatDay: 1,
+    });
+    expect(getCertificate(sessions, [], 0)).toBeNull();
+    expect(getCertificate(sessions, [], 4)).toBeNull();
   });
 
   it("기록에 남은 제목을 먼저 쓰고, 지운 할 일도 제목이 남는다", () => {
@@ -76,7 +83,7 @@ describe("수료증 내용", () => {
     const sessions = cycle(7, 9, ["a", "deleted"]);
     sessions[0] = { ...sessions[0], taskTitle: "처음 제목" };
     sessions[2] = { ...sessions[2], taskTitle: "지운 할 일" };
-    expect(getLatestCertificate(sessions, tasks)?.taskTitles).toEqual([
+    expect(getCertificate(sessions, tasks)?.taskTitles).toEqual([
       "처음 제목",
       "지운 할 일",
     ]);
@@ -85,7 +92,7 @@ describe("수료증 내용", () => {
   it("할 일 제목: 집중한 순서대로, 중복 없이, 지운 할 일은 빼고", () => {
     const tasks = [task("a", "영어 단어"), task("b", "알고리즘")];
     const sessions = cycle(7, 9, ["b", "a", "b", "deleted"]);
-    expect(getLatestCertificate(sessions, tasks)?.taskTitles).toEqual([
+    expect(getCertificate(sessions, tasks)?.taskTitles).toEqual([
       "알고리즘",
       "영어 단어",
     ]);
@@ -94,7 +101,7 @@ describe("수료증 내용", () => {
   it("사이클 중에 집중 시간을 바꿨으면 한 번 길이는 null", () => {
     const sessions = cycle(7, 9);
     sessions[0] = { ...sessions[0], durationMs: 50 * MIN };
-    const data = getLatestCertificate(sessions, []);
+    const data = getCertificate(sessions, []);
     expect(data?.focusEachMs).toBeNull();
     expect(data?.focusTotalMs).toBe(125 * MIN);
   });
@@ -105,16 +112,7 @@ describe("수료증 내용", () => {
       focus(day(7, 12), {}),
       focus(day(7, 12, 30), { cycleCompleted: true }),
     ];
-    expect(getLatestCertificate(sessions, [])?.focusCount).toBe(2);
-  });
-});
-
-describe("시간 표기", () => {
-  it("초, 분, 시간", () => {
-    expect(formatDuration(5000)).toBe("5초");
-    expect(formatDuration(25 * MIN)).toBe("25분");
-    expect(formatDuration(100 * MIN)).toBe("1시간 40분");
-    expect(formatDuration(120 * MIN)).toBe("2시간");
+    expect(getCertificate(sessions, [])?.focusCount).toBe(2);
   });
 });
 

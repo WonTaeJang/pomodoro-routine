@@ -1,3 +1,6 @@
+@use "../../styles/breakpoints" as bp;
+@use "../../styles/mixins";
+
 .header {
   display: flex;
   max-width: var(--layout-max);
@@ -9,6 +12,13 @@
   padding: var(--space-3) var(--space-4);
 }
 
+.left {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3);
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -17,10 +27,22 @@
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-extrabold);
   transition: color var(--duration-slow);
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+// 좁은 화면에서는 메뉴 자리를 위해 이름 글자를 숨기고 발자국만 (화면 낭독기는 이름을 읽음)
+.brandName {
+  @include bp.down(sm) {
+    @include mixins.visually-hidden;
+  }
 }
 
 .right {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   gap: var(--space-1);
 }

@@ -1,44 +1,17 @@
 "use client";
 
-import { AppHeader } from "@/components/layout/AppHeader";
-import { useAlerts } from "@/features/alerts";
-import { TodayCertificateButton } from "@/features/certificate";
-import { TodaySummary } from "@/features/history/components/TodaySummary";
-import { SettingsButton } from "@/features/settings/components/SettingsButton";
+import { PageMain } from "@/components/layout/PageMain";
 import { TaskPanel } from "@/features/tasks/components/TaskPanel";
-import { ThemeToggle } from "@/features/theme/ThemeToggle";
-import { useHydrateStores } from "@/lib/useHydrateStores";
-import { useWakeLock } from "@/lib/useWakeLock";
-import { useTimerStore } from "../store";
-import { CompletionDialog } from "./CompletionDialog";
-import { TestModeBadge } from "./TestModeBadge";
+import { useStoresReady } from "@/lib/useHydrateStores";
 import { TimerPanel } from "./TimerPanel";
-import styles from "./TimerScreen.module.scss";
 
-/** 메인 화면. 모드에 따라 배경과 강조색이 바뀝니다. */
+/** 타이머 페이지: 휴대폰은 타이머 아래 할 일, 넓은 화면은 왼쪽 타이머, 오른쪽 할 일 */
 export function TimerScreen() {
-  const ready = useHydrateStores();
-  const mode = useTimerStore((s) => s.timer.mode);
-  const keepAwake = useTimerStore(
-    (s) => s.timer.status === "running" && s.settings.keepScreenOn,
-  );
-  useAlerts(ready);
-  useWakeLock(ready && keepAwake);
-
+  const ready = useStoresReady();
   return (
-    <div className={styles.screen} data-mode={mode}>
-      <AppHeader>
-        <TestModeBadge ready={ready} />
-        {ready ? <TodaySummary /> : null}
-        {ready ? <TodayCertificateButton /> : null}
-        <ThemeToggle />
-        <SettingsButton ready={ready} />
-      </AppHeader>
-      <main className={styles.main}>
-        <TimerPanel ready={ready} />
-        {ready ? <TaskPanel /> : null}
-      </main>
-      {ready ? <CompletionDialog /> : null}
-    </div>
+    <PageMain>
+      <TimerPanel ready={ready} />
+      {ready ? <TaskPanel /> : null}
+    </PageMain>
   );
 }

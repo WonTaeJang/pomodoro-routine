@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { useTimerStore } from "@/features/timer/store";
 
+/** 저장된 값을 다 불러왔는지. 앱 틀(AppShell)이 한 번 불러오고 아래 화면에 알려줍니다. */
+export const StoresReadyContext = createContext(false);
+
+/** 저장된 값을 다 불러왔는지 (불러오기 전에는 false) */
+export function useStoresReady(): boolean {
+  return useContext(StoresReadyContext);
+}
+
 /**
- * localStorage에 저장된 값을 화면이 뜬 뒤에 불러옵니다.
+ * localStorage에 저장된 값을 화면이 뜬 뒤에 불러옵니다. (앱 틀에서 한 번만 사용)
  * 불러오기 전에는 false를 돌려주므로, 그동안은 기본값 대신 자리만 잡아 둔 화면을 보여줍니다.
  */
 export function useHydrateStores(): boolean {

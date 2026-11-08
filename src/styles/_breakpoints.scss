@@ -13,3 +13,11 @@ $breakpoints: (
     @content;
   }
 }
+
+// 기준점보다 좁은 화면에서만 (모바일 우선으로 쓰기 어려운 경우에만 사용)
+// 사용 예: @include bp.down(sm) { ... }
+@mixin down($name) {
+  @media (max-width: (map.get($breakpoints, $name) - 0.02px)) {
+    @content;
+  }
+}

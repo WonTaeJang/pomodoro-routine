@@ -1,11 +1,14 @@
 "use client";
 
-import { useNow } from "@/lib/useNow";
-import { getTodayFocus, useHistoryStore } from "./store";
+import { useMemo } from "react";
+import { useToday } from "@/lib/useNow";
+import { EMPTY_DAY, getDayStats, type DayStats } from "./sessions";
+import { useHistoryStore } from "./store";
 
-/** 오늘 기록 (완료한 집중 수, 집중한 분, 완료한 사이클 수). 화면이 뜨기 전에는 null */
-export function useTodayFocus() {
+/** 오늘 기록 (집중 횟수, 집중한 시간, 마친 사이클). 화면이 뜨기 전에는 null */
+export function useTodayFocus(): DayStats | null {
   const sessions = useHistoryStore((s) => s.sessions);
-  const now = useNow();
-  return now === null ? null : getTodayFocus(sessions, now);
+  const today = useToday();
+  const stats = useMemo(() => getDayStats(sessions), [sessions]);
+  return today === null ? null : (stats.get(today) ?? EMPTY_DAY);
 }

@@ -5,7 +5,6 @@ import { Card } from "@/components/ui";
 import { useTasksStore } from "@/features/tasks/store";
 import { cx } from "@/lib/cx";
 import { useNow } from "@/lib/useNow";
-import { useCompleteWhenDue, useTimerTitle } from "../hooks";
 import { getStatusMessage } from "../labels";
 import { useTimerStore } from "../store";
 import { formatRemaining, getRemainingMs } from "../timer";
@@ -38,9 +37,6 @@ export function TimerPanel({ ready }: TimerPanelProps) {
   // 집중 중 고른 할 일이 있으면 상태 문구 대신 할 일을 보여줌 (멈췄을 때는 멈춘 상태가 더 중요)
   const showTask =
     ready && activeTask && timer.mode === "focus" && timer.status !== "paused";
-
-  useCompleteWhenDue(timer, now);
-  useTimerTitle(ready, timer, timeText);
 
   return (
     <Card

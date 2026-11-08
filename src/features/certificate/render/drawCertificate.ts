@@ -1,9 +1,8 @@
 import mascot from "@/assets/mascot/kkami-graduate.svg";
 import { APP_NAME } from "@/lib/brand";
-import { formatDate } from "@/lib/date";
+import { formatDate, formatDuration, startOfDay } from "@/lib/date";
 import {
   CERTIFICATE_TITLE,
-  formatDuration,
   getCertificateMessage,
   type CertificateData,
 } from "../certificate";
@@ -212,12 +211,13 @@ function drawTitle(ctx: Ctx, family: string, data: CertificateData) {
   });
 }
 
-/** 숫자 칸 3개: 집중한 시간 / 뽀모도로 / 오늘 완료 */
+/** 숫자 칸 3개: 집중한 시간 / 뽀모도로 / 오늘(지난 사이클이면 이날) 완료 */
 function drawStats(ctx: Ctx, family: string, data: CertificateData) {
+  const today = startOfDay(Date.now()) === startOfDay(data.completedAt);
   const stats = [
     [formatDuration(data.focusTotalMs), "집중한 시간"],
     [`${data.focusCount}번`, "뽀모도로"],
-    [`${data.cyclesThatDay}사이클`, "오늘 완료"],
+    [`${data.cyclesThatDay}사이클`, today ? "오늘 완료" : "이날 완료"],
   ];
   const { x: left, y: top, w: total, h, gap } = LAYOUT.stats;
   const w = (total - gap * (stats.length - 1)) / stats.length;

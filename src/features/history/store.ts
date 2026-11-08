@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { startOfDay } from "@/lib/date";
 import { STORAGE_KEYS } from "@/lib/storage";
 import type { CompletedSession } from "@/features/timer/types";
 
@@ -30,14 +29,3 @@ export const useHistoryStore = create<HistoryStore>()(
     },
   ),
 );
-
-/** 오늘 완료한 집중 세션 수, 집중한 분, 완료한 사이클 수 */
-export function getTodayFocus(sessions: CompletedSession[], now: number) {
-  const from = startOfDay(now);
-  const focus = sessions.filter((s) => s.mode === "focus" && s.endedAt >= from);
-  const minutes = Math.round(
-    focus.reduce((sum, s) => sum + s.durationMs, 0) / 60_000,
-  );
-  const cycles = focus.filter((s) => s.cycleCompleted).length;
-  return { count: focus.length, minutes, cycles };
-}

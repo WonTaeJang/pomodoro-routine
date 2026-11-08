@@ -1,0 +1,127 @@
+@use "../../../styles/breakpoints" as bp;
+@use "../../../styles/mixins";
+
+.panel {
+  @include mixins.stack(var(--space-5));
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+// 집중 · 시간 · 사이클 세 칸
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+
+  dt {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+  }
+
+  dd {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-top: var(--space-0-5);
+    font-size: var(--font-size-md);
+    white-space: nowrap;
+
+    @include bp.up(sm) {
+      font-size: var(--font-size-lg);
+    }
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.stat {
+  padding: var(--space-2-5) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-subtle);
+}
+
+.paw {
+  color: var(--color-accent);
+}
+
+.medal {
+  color: var(--color-medal);
+}
+
+.certificates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.list {
+  @include mixins.stack(var(--space-2));
+  padding: 0;
+  list-style: none;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-md);
+}
+
+.check {
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+// 진행 중 표시: 속이 빈 점
+.dot {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-text-muted);
+  border-radius: var(--radius-full);
+  transform: scale(0.6);
+}
+
+.taskTitle {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.count {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--space-0-5);
+  margin-left: auto;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+
+  svg {
+    color: var(--color-accent);
+  }
+}
+
+.none {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md);
+}
