@@ -95,8 +95,8 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
   - `timer.ts`처럼 **규칙은 순수 함수**로 두고 현재 시각을 인자로 받습니다. → 테스트에서 시간을 마음대로 넣어 검증
   - `store.ts`는 순수 함수를 불러 상태를 바꾸고 localStorage에 저장합니다.
   - `components/`는 store를 읽어 화면을 그립니다.
-- 저장된 값은 화면이 뜬 뒤 `useHydrateStores()`로 불러옵니다. 서버에서 그린 화면과 첫 화면이 달라 생기는 오류(hydration 불일치)를 막기 위함입니다.
-- 렌더링 중에 `Date.now()`를 직접 부르지 않고 `useNow()` 시계를 씁니다.
+- 저장된 값은 화면이 뜬 뒤 앱 틀(`AppShell`)이 `useHydrateStores()`로 한 번 불러옵니다. 서버에서 그린 화면과 첫 화면이 달라 생기는 오류(hydration 불일치)를 막기 위함입니다. 각 화면은 `useStoresReady()`로 다 불러왔는지 확인합니다.
+- 렌더링 중에 `Date.now()`를 직접 부르지 않고 `useNow()` 시계를 씁니다. 날짜만 필요하면 `useToday()` (날짜가 바뀔 때만 다시 그림).
 - localStorage 키는 `src/lib/storage.ts`의 `STORAGE_KEYS`에서 관리: `kkamodoro-timer`(설정, 타이머), `kkamodoro-history`(세션 기록), `kkamodoro-tasks`(할 일), `kkamodoro-theme`(테마)
 - 서비스 이름은 `src/lib/brand.ts`의 `APP_NAME`에서 관리
 
@@ -105,21 +105,23 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
 ```
 pomodoro-routine/
 ├── docs/                  기획 문서
-├── src/app/               페이지 (layout.tsx, page.tsx)
+├── src/app/               페이지 (layout.tsx, page.tsx 타이머, calendar/ 캘린더)
+├── src/app/_components/   모든 페이지의 틀 AppShell (헤더, 저장값 불러오기, 타이머 동작)
 ├── src/app/dev/components 컴포넌트 미리보기 (개발 중에만)
 ├── src/features/timer/    타이머 (로직, store, 화면)
-├── src/features/history/  세션 기록, 오늘 기록
+├── src/features/history/  세션 기록, 오늘 기록, 기록 공통 계산(sessions.ts: 날짜별 요약, 할 일 제목)
+├── src/features/calendar/ 캘린더 (날짜별 계산, 달력, 날짜 상세)
 ├── src/features/tasks/    할 일 (로직, store, 화면)
 ├── src/features/theme/    다크 모드
 ├── src/features/alerts/   알림 소리, 브라우저 알림
 ├── src/features/settings/ 설정 창, 데이터 초기화
 ├── src/features/shortcuts/ 키보드 단축키
 ├── src/features/certificate/ 수료증 (내용 계산, 캔버스 그리기, 공유·저장, 팝업)
-├── src/components/layout/ 헤더 등 화면 틀
+├── src/components/layout/ 헤더, 페이지 메뉴, 페이지 본문 틀
 ├── src/components/ui/     공통 컴포넌트
 ├── src/components/icons/  아이콘
 ├── src/styles/            토큰(tokens/), mixin, 브레이크포인트, 전체 기본 스타일
-├── src/lib/               공통 함수, 훅 (cx, date, useNow, useHydrateStores, useWakeLock)
+├── src/lib/               공통 함수, 훅 (cx, date, useNow·useToday, useHydrateStores·useStoresReady, useWakeLock)
 ├── src/assets/kkami/      까미 이미지 (정리된 것)
 ├── src/assets/mascot/     까미 마스코트 SVG (basic, graduate, icon)
 ├── design/                원본 사진 등 (Git에 올리지 않음)
@@ -146,3 +148,4 @@ pomodoro-routine/
 - 2026-11-07: settings 폴더 추가
 - 2026-11-07: shortcuts 폴더 추가
 - 2026-11-07: certificate 폴더, 마스코트 SVG 추가
+- 2026-11-08: calendar 폴더, 캘린더 페이지, 앱 틀(AppShell) 추가
