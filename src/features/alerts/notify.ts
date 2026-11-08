@@ -1,5 +1,6 @@
 import kkamiDone from "@/assets/kkami/kkami-done.webp";
-import { ALERT_MESSAGES, type AlertKind } from "./alerts";
+import { getTranslator } from "@/i18n";
+import type { AlertKind } from "./alerts";
 
 /** 이 브라우저가 알림을 지원하는지 */
 function supported(): boolean {
@@ -28,10 +29,11 @@ export async function requestNotificationPermission(): Promise<NotificationStatu
 /** 브라우저 알림을 띄웁니다. 권한이 없거나 지원하지 않으면 아무것도 하지 않습니다. */
 export function showNotification(kind: AlertKind) {
   if (!supported() || Notification.permission !== "granted") return;
-  const { title, body } = ALERT_MESSAGES[kind];
+  // 알림을 띄우는 순간의 화면 언어로
+  const t = getTranslator();
   try {
-    const notification = new Notification(title, {
-      body,
+    const notification = new Notification(t(`alerts.${kind}.title`), {
+      body: t(`alerts.${kind}.body`),
       icon: kkamiDone.src,
       // 같은 tag면 이전 알림을 새 알림이 대신함 (알림이 쌓이지 않게)
       tag: "kkamodoro-session",

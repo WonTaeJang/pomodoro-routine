@@ -20,7 +20,7 @@ import {
   SettingsIcon,
 } from "@/components/icons";
 import { IconButton, Kbd, SwitchTrack } from "@/components/ui";
-import { ONBOARDING, useOnboardingStore } from "@/features/guide";
+import { useGuideContent, useOnboardingStore } from "@/features/guide";
 import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 import { SHORTCUTS, useShortcuts } from "@/features/shortcuts";
 import { setTheme, useTheme } from "@/features/theme/theme";
@@ -49,6 +49,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
   const isDark = theme === "dark";
   const t = useTranslations("app.menu");
   const locale = useLocale();
+  const { onboarding } = useGuideContent();
 
   const close = () => menuRef.current?.hidePopover();
 
@@ -56,7 +57,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
     <>
       <IconButton
         ref={buttonRef}
-        label="메뉴"
+        label={t("label")}
         icon={<MenuIcon />}
         popoverTarget={menuId}
         aria-haspopup="menu"
@@ -67,7 +68,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
         id={menuId}
         popover="auto"
         role="menu"
-        aria-label="메뉴"
+        aria-label={t("label")}
         className={styles.menu}
         // 펼치면 첫 항목으로 (키보드로 바로 고를 수 있게)
         onToggle={(e) => {
@@ -84,7 +85,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
           disabled={theme === null}
           onClick={() => setTheme(isDark ? "light" : "dark")}
         >
-          <ItemLabel icon={<MoonIcon />}>다크 모드</ItemLabel>
+          <ItemLabel icon={<MoonIcon />}>{t("darkMode")}</ItemLabel>
           <SwitchTrack checked={isDark} />
         </button>
         {/* 언어도 메뉴를 연 채로 바뀜. 언어 이름은 그 언어로 */}
@@ -117,7 +118,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
             setSettingsOpen(true);
           }}
         >
-          <ItemLabel icon={<SettingsIcon />}>설정</ItemLabel>
+          <ItemLabel icon={<SettingsIcon />}>{t("settings")}</ItemLabel>
           <Kbd className={styles.key}>{SHORTCUTS.settings.key}</Kbd>
         </button>
         <Link
@@ -126,7 +127,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
           className={styles.item}
           onClick={close}
         >
-          <ItemLabel icon={<BookIcon />}>사용법</ItemLabel>
+          <ItemLabel icon={<BookIcon />}>{t("guide")}</ItemLabel>
         </Link>
         <button
           type="button"
@@ -137,7 +138,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
             useOnboardingStore.getState().show();
           }}
         >
-          <ItemLabel icon={<InfoIcon />}>{ONBOARDING.replay}</ItemLabel>
+          <ItemLabel icon={<InfoIcon />}>{onboarding.replay}</ItemLabel>
         </button>
       </div>
       {/* 열 때만 그려서, 열 때마다 알림 권한 같은 현재 상태를 새로 읽음 */}

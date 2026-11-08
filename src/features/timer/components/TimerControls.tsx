@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "use-intl";
 import { PauseIcon, PlayIcon, ResetIcon, SkipIcon } from "@/components/icons";
 import { ConfirmDialog, IconButton } from "@/components/ui";
 import { SHORTCUTS, useShortcuts } from "@/features/shortcuts";
@@ -16,21 +17,8 @@ type TimerControlsProps = {
   disabled: boolean;
 };
 
-/** 시작한 집중을 리셋하거나 건너뛸 때 묻는 내용 */
-const CONFIRMS = {
-  reset: {
-    title: "집중을 처음부터 할까요?",
-    confirmLabel: "리셋",
-    message: "지금 집중 세션은 완료로 세지 않고 처음 시간으로 돌아가요.",
-  },
-  skip: {
-    title: "집중을 건너뛸까요?",
-    confirmLabel: "건너뛰기",
-    message: "지금 집중 세션은 완료로 세지 않고 바로 휴식으로 넘어가요.",
-  },
-};
-
-type ConfirmAction = keyof typeof CONFIRMS;
+/** 시작한 집중을 리셋하거나 건너뛸 때 한 번 묻는 동작 (문구는 timer.confirm.*) */
+type ConfirmAction = "reset" | "skip";
 
 /**
  * 리셋 · 시작/일시정지 · 다음 세션 버튼과 단축키(Space, R, N).
@@ -40,13 +28,12 @@ type ConfirmAction = keyof typeof CONFIRMS;
 export function TimerControls({ mode, status, disabled }: TimerControlsProps) {
   const [pending, setPending] = useSessionState<ConfirmAction | null>(null);
   const { reset, pause, skip } = useTimerStore.getState();
+  const t = useTranslations("timer.controls");
   const running = status === "running";
   const focusStarted = mode === "focus" && status !== "idle";
-  const mainLabel = running
-    ? "일시정지"
-    : status === "paused"
-      ? "다시 시작"
-      : "시작";
+  const mainLabel = t(
+    running ? "pause" : status === "paused" ? "resume" : "start",
+  );
   const actions: Record<ConfirmAction, () => void> = { reset, skip };
 
   const toggle = running ? pause : startSession;
@@ -64,12 +51,10 @@ export function TimerControls({ mode, status, disabled }: TimerControlsProps) {
     !disabled,
   );
 
-  const confirm = pending ? CONFIRMS[pending] : null;
-
   return (
     <div className={styles.controls}>
       <IconButton
-        label="리셋"
+        label={t("reset")}
         shortcut={SHORTCUTS.reset.key}
         icon={<ResetIcon />}
         variant="secondary"
@@ -87,7 +72,7 @@ export function TimerControls({ mode, status, disabled }: TimerControlsProps) {
         onClick={toggle}
       />
       <IconButton
-        label="다음 세션"
+        label={t("skip")}
         shortcut={SHORTCUTS.skip.key}
         icon={<SkipIcon />}
         variant="secondary"
@@ -96,15 +81,15 @@ export function TimerControls({ mode, status, disabled }: TimerControlsProps) {
         onClick={() => request("skip")}
       />
       <ConfirmDialog
-        open={confirm !== null}
-        title={confirm?.title ?? ""}
-        confirmLabel={confirm?.confirmLabel ?? ""}
+        open={pending !== null}
+        title={pending ? t(`confirm.${pending}.title`) : ""}
+        confirmLabel={pending ? t(`confirm.${pending}.action`) : ""}
         onConfirm={() => {
           if (pending) actions[pending]();
         }}
         onClose={() => setPending(null)}
       >
-        {confirm?.message}
+        {pending ? t(`confirm.${pending}.message`) : null}
       </ConfirmDialog>
     </div>
   );

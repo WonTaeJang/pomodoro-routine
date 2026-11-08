@@ -60,10 +60,8 @@ function recording(id: FocusSoundId): RecordedSound {
   return { kind: "recording", src: `/sounds/${id}.m4a`, fade: config.fade };
 }
 
+/** 이름과 짧은 설명은 화면 문구 사전에 (focusSound.sounds.<id>) */
 type FocusSound = (SynthSound | RecordedSound) & {
-  label: string;
-  /** 짧은 설명 (한 줄) */
-  description: string;
   /** 창의 칸에 그리는 아이콘 */
   icon: IconComponent;
   /**
@@ -76,8 +74,6 @@ type FocusSound = (SynthSound | RecordedSound) & {
 export const FOCUS_SOUNDS: Record<FocusSoundId, FocusSound> = {
   white: {
     kind: "synth",
-    label: "백색소음",
-    description: "고른 치이익",
     icon: NoiseWhiteIcon,
     seconds: 6,
     level: 0.21,
@@ -85,8 +81,6 @@ export const FOCUS_SOUNDS: Record<FocusSoundId, FocusSound> = {
   },
   pink: {
     kind: "synth",
-    label: "핑크 노이즈",
-    description: "부드러운 쏴아",
     icon: NoisePinkIcon,
     seconds: 6,
     level: 0.31,
@@ -94,8 +88,6 @@ export const FOCUS_SOUNDS: Record<FocusSoundId, FocusSound> = {
   },
   brown: {
     kind: "synth",
-    label: "브라운 노이즈",
-    description: "묵직한 웅웅",
     icon: NoiseBrownIcon,
     seconds: 8,
     level: 0.43,
@@ -103,46 +95,39 @@ export const FOCUS_SOUNDS: Record<FocusSoundId, FocusSound> = {
   },
   rain: {
     ...recording("rain"),
-    label: "빗소리",
-    description: "쏴아 내리는 비",
     icon: CloudRainIcon,
     level: 0.85,
   },
   "window-rain": {
     ...recording("window-rain"),
-    label: "창가 빗소리",
-    description: "유리창에 톡톡",
     icon: WindowRainIcon,
     level: 0.85,
   },
   fireplace: {
     ...recording("fireplace"),
-    label: "모닥불",
-    description: "타닥타닥 장작",
     icon: FlameIcon,
     level: 0.85,
   },
   forest: {
     ...recording("forest"),
-    label: "숲속",
-    description: "새소리와 나뭇잎",
     icon: TreeIcon,
     level: 0.85,
   },
   waves: {
     ...recording("waves"),
-    label: "파도",
-    description: "잔잔한 바다",
     icon: WavesIcon,
     level: 0.85,
   },
 };
 
-/** 창에서 묶어 보여주는 순서 */
-export const FOCUS_SOUND_GROUPS: { title: string; ids: FocusSoundId[] }[] = [
-  { title: "노이즈", ids: ["white", "pink", "brown"] },
+/** 창에서 묶어 보여주는 순서. 묶음 이름은 focusSound.groups.<id> */
+export const FOCUS_SOUND_GROUPS: {
+  id: "noise" | "nature";
+  ids: FocusSoundId[];
+}[] = [
+  { id: "noise", ids: ["white", "pink", "brown"] },
   {
-    title: "자연의 소리",
+    id: "nature",
     ids: ["rain", "window-rain", "fireplace", "forest", "waves"],
   },
 ];

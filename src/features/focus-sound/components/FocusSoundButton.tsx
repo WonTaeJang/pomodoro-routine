@@ -1,11 +1,11 @@
 "use client";
 
 import { useId } from "react";
+import { useTranslations } from "use-intl";
 import { HeadphonesIcon } from "@/components/icons";
 import { IconButton } from "@/components/ui";
 import { useTimerStore } from "@/features/timer/store";
 import { cx } from "@/lib/cx";
-import { FOCUS_SOUNDS } from "../sounds";
 import styles from "./FocusSoundButton.module.scss";
 import { FocusSoundPanel } from "./FocusSoundPanel";
 
@@ -22,11 +22,16 @@ export function FocusSoundButton({ ready }: FocusSoundButtonProps) {
   const panelId = useId();
   const sound = useTimerStore((s) => s.settings.focusSound);
   const on = ready && sound !== "off";
+  const t = useTranslations("focusSound");
 
   return (
     <>
       <IconButton
-        label={on ? `집중 소리: ${FOCUS_SOUNDS[sound].label}` : "집중 소리"}
+        label={
+          on
+            ? t("buttonPlaying", { sound: t(`sounds.${sound}.label`) })
+            : t("title")
+        }
         icon={<HeadphonesIcon />}
         disabled={!ready}
         popoverTarget={panelId}

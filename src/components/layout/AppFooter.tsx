@@ -1,6 +1,6 @@
 import { ExternalLinkIcon } from "@/components/icons";
-import { VisuallyHidden } from "@/components/ui";
 import pkg from "../../../package.json";
+import { NewTabNote } from "./NewTabNote";
 import styles from "./AppFooter.module.scss";
 
 /** 저장소 주소는 package.json 한곳에 둠 (README와 함께 씀) */
@@ -24,7 +24,7 @@ export function AppFooter() {
       >
         GitHub
         <ExternalLinkIcon size={14} />
-        <VisuallyHidden>(새 탭에서 열림)</VisuallyHidden>
+        <NewTabNote />
       </a>
     </footer>
   );

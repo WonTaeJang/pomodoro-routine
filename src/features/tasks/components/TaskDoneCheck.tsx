@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "use-intl";
 import { Checkbox } from "@/components/ui";
 import { cx } from "@/lib/cx";
 import { useTasksStore } from "../store";
@@ -21,6 +22,7 @@ export function TaskDoneCheck({ taskId, className }: TaskDoneCheckProps) {
     s.tasks.find((t) => t.id === s.activeTaskId && t.id !== taskId),
   );
   const toggleDone = useTasksStore.getState().toggleDone;
+  const t = useTranslations("tasks.doneCheck");
 
   if (!task) return null;
   const reachedEstimate = task.completedPomodoros >= task.estimate;
@@ -37,11 +39,13 @@ export function TaskDoneCheck({ taskId, className }: TaskDoneCheckProps) {
       </p>
 
       {!task.done && reachedEstimate ? (
-        <p className={styles.note}>예상한 {task.estimate}번을 모두 채웠어요!</p>
+        <p className={styles.note}>
+          {t("reachedEstimate", { count: task.estimate })}
+        </p>
       ) : null}
 
       <Checkbox
-        label="이 할 일을 다 끝냈어요"
+        label={t("label")}
         checked={task.done}
         onChange={() => toggleDone(task.id)}
         className={styles.check}
@@ -49,9 +53,7 @@ export function TaskDoneCheck({ taskId, className }: TaskDoneCheckProps) {
 
       {task.done ? (
         <p className={styles.note}>
-          {nextTask
-            ? `다음 할 일: ${nextTask.title}`
-            : "남은 할 일이 없어요. 새 할 일을 추가해보세요."}
+          {nextTask ? t("next", { title: nextTask.title }) : t("noneLeft")}
         </p>
       ) : null}
     </div>

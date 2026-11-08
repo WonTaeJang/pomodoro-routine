@@ -11,14 +11,14 @@ type Shortcut = {
   code: string;
   /** 화면에 보여줄 키 이름 (aria-keyshortcuts 값으로도 씀) */
   key: string;
-  description: string;
 };
 
+/** 하는 일 설명은 화면 문구 사전에 (shortcuts.<id>) */
 export const SHORTCUTS: Record<ShortcutId, Shortcut> = {
-  toggle: { code: "Space", key: "Space", description: "시작 / 일시정지" },
-  reset: { code: "KeyR", key: "R", description: "리셋" },
-  skip: { code: "KeyN", key: "N", description: "다음 세션" },
-  settings: { code: "KeyS", key: "S", description: "설정 열기" },
+  toggle: { code: "Space", key: "Space" },
+  reset: { code: "KeyR", key: "R" },
+  skip: { code: "KeyN", key: "N" },
+  settings: { code: "KeyS", key: "S" },
 };
 
 export const SHORTCUT_ORDER: ShortcutId[] = [

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "use-intl";
 import { PawIcon } from "@/components/icons";
 import { Card, VisuallyHidden } from "@/components/ui";
 import { useTasksStore } from "@/features/tasks/store";
@@ -30,6 +31,7 @@ export function TimerPanel({ ready }: TimerPanelProps) {
     s.tasks.find((t) => t.id === s.activeTaskId),
   );
   const now = useNow();
+  const t = useTranslations();
 
   const remainingMs =
     now === null ? timer.remainingMs : getRemainingMs(timer, now);
@@ -43,7 +45,7 @@ export function TimerPanel({ ready }: TimerPanelProps) {
       as="section"
       padding="none"
       className={styles.panel}
-      aria-label="타이머"
+      aria-label={t("timer.label")}
     >
       <ModeSwitcher mode={timer.mode} status={timer.status} />
 
@@ -73,13 +75,13 @@ export function TimerPanel({ ready }: TimerPanelProps) {
         <p className={styles.status}>
           <span className={styles.task} title={activeTask.title}>
             <PawIcon size={14} />
-            <VisuallyHidden>지금 할 일</VisuallyHidden>
+            <VisuallyHidden>{t("timer.currentTask")}</VisuallyHidden>
             <span className={styles.taskTitle}>{activeTask.title}</span>
           </span>
         </p>
       ) : (
         <p className={styles.status}>
-          {getStatusMessage(timer.mode, timer.status)}
+          {getStatusMessage(t, timer.mode, timer.status)}
         </p>
       )}
 

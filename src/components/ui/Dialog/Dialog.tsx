@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useTranslations } from "use-intl";
 import { CloseIcon } from "@/components/icons";
 import { cx } from "@/lib/cx";
 import { IconButton } from "../IconButton/IconButton";
@@ -31,6 +32,7 @@ export function Dialog({
 }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const t = useTranslations("common");
 
   useEffect(() => {
     const dialog = ref.current;
@@ -62,7 +64,7 @@ export function Dialog({
             {title}
           </h2>
           <IconButton
-            label="닫기"
+            label={t("close")}
             icon={<CloseIcon />}
             size="sm"
             onClick={onClose}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useMemo } from "react";
+import { useTranslations } from "use-intl";
 import { CheckIcon, MedalIcon, PawIcon } from "@/components/icons";
 import { Badge, Button, Card, EmptyState, Section } from "@/components/ui";
 import { CertificateLauncher } from "@/features/certificate";
@@ -22,6 +23,8 @@ type DayDetailProps = {
 /** 고른 날짜의 기록: 집중, 수료증, 완료한 할 일, 진행 중이던 할 일 */
 export function DayDetail({ day, today, stats }: DayDetailProps) {
   const titleId = useId();
+  const t = useTranslations("calendar.day");
+  const common = useTranslations("common");
   const sessions = useHistoryStore((s) => s.sessions);
   const tasks = useTasksStore((s) => s.tasks);
   const { completed, inProgress } = useMemo(
@@ -39,34 +42,34 @@ export function DayDetail({ day, today, stats }: DayDetailProps) {
         </h2>
         {day === today ? (
           <Badge variant="soft" size="sm">
-            오늘
+            {common("today")}
           </Badge>
         ) : null}
       </div>
 
       {empty ? (
         <EmptyState imageSize={72}>
-          {day > today ? "아직 오지 않은 날이에요." : "이날은 기록이 없어요."}
+          {t(day > today ? "future" : "empty")}
         </EmptyState>
       ) : (
         <>
           <dl className={styles.stats}>
             <div className={styles.stat}>
-              <dt>집중</dt>
+              <dt>{t("focus")}</dt>
               <dd>
                 <PawIcon size={16} className={styles.paw} />
-                {stats.focusCount}번
+                {t("focusCount", { count: stats.focusCount })}
               </dd>
             </div>
             <div className={styles.stat}>
-              <dt>집중한 시간</dt>
+              <dt>{t("focusTime")}</dt>
               <dd>{formatDuration(stats.focusMs)}</dd>
             </div>
             <div className={styles.stat}>
-              <dt>사이클</dt>
+              <dt>{t("cycles")}</dt>
               <dd>
                 <MedalIcon size={16} className={styles.medal} />
-                {stats.cycleNumbers.length}개
+                {t("cycleCount", { count: stats.cycleNumbers.length })}
               </dd>
             </div>
           </dl>
@@ -82,7 +85,7 @@ export function DayDetail({ day, today, stats }: DayDetailProps) {
                       icon={<MedalIcon size={16} className={styles.medal} />}
                       onClick={open}
                     >
-                      제 {number}호 수료증
+                      {t("certificate", { number })}
                     </Button>
                   )}
                 </CertificateLauncher>
@@ -91,15 +94,15 @@ export function DayDetail({ day, today, stats }: DayDetailProps) {
           ) : null}
 
           <TaskList
-            title="완료한 할 일"
+            title={t("completed.title")}
             tasks={completed}
-            emptyText="이날 완료한 할 일이 없어요."
+            emptyText={t("completed.empty")}
             done
           />
           <TaskList
-            title="진행 중이던 할 일"
+            title={t("inProgress.title")}
             tasks={inProgress}
-            emptyText="이날 집중한 할 일은 모두 끝냈어요."
+            emptyText={t("inProgress.empty")}
           />
         </>
       )}
@@ -115,6 +118,7 @@ type TaskListProps = {
 };
 
 function TaskList({ title, tasks, emptyText, done = false }: TaskListProps) {
+  const t = useTranslations("calendar.day");
   return (
     <Section title={`${title} ${tasks.length}`}>
       {tasks.length === 0 ? (
@@ -132,7 +136,7 @@ function TaskList({ title, tasks, emptyText, done = false }: TaskListProps) {
               {task.pomodoros > 0 ? (
                 <span
                   className={styles.count}
-                  aria-label={`이날 집중 ${task.pomodoros}번`}
+                  aria-label={t("taskFocusCount", { count: task.pomodoros })}
                 >
                   <PawIcon size={14} />
                   {task.pomodoros}

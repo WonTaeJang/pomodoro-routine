@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "use-intl";
 import { Dialog } from "@/components/ui";
 import { useHoldAutoPopups } from "@/lib/popupHold";
 import { AlertSection } from "./AlertSection";
@@ -20,8 +21,9 @@ type SettingsDialogProps = {
 export function SettingsDialog({ onClose }: SettingsDialogProps) {
   // 설정을 보는 중에 세션이 끝나도 완료 팝업이 덮지 않게, 닫을 때까지 기다리게 함
   useHoldAutoPopups();
+  const t = useTranslations("settings");
   return (
-    <Dialog open onClose={onClose} title="설정" className={styles.dialog}>
+    <Dialog open onClose={onClose} title={t("title")} className={styles.dialog}>
       <div className={styles.sections}>
         <TimerSection />
         <AlertSection />

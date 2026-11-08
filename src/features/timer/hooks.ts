@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { APP_NAME } from "@/lib/brand";
-import { MODE_LABELS } from "./labels";
+import { useTranslations } from "use-intl";
 import { useTimerStore } from "./store";
 import type { TimerState } from "./types";
 
@@ -49,11 +48,14 @@ export function useTimerTitle(
   timeText: string,
 ) {
   const { status, mode } = timer;
+  const t = useTranslations();
+  const appName = t("app.name");
+  const modeLabel = t(`timer.modes.${mode}`);
 
   useEffect(() => {
     document.title =
       ready && status !== "idle"
-        ? `${timeText} · ${MODE_LABELS[mode]} | ${APP_NAME}`
-        : APP_NAME;
-  }, [ready, status, mode, timeText]);
+        ? `${timeText} · ${modeLabel} | ${appName}`
+        : appName;
+  }, [ready, status, modeLabel, appName, timeText]);
 }

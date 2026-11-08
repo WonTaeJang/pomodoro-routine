@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useTranslations } from "use-intl";
 import { Button } from "../Button/Button";
 import { Dialog } from "../Dialog/Dialog";
 
@@ -25,6 +28,7 @@ export function ConfirmDialog({
   onConfirm,
   onClose,
 }: ConfirmDialogProps) {
+  const t = useTranslations("common");
   return (
     <Dialog
       open={open}
@@ -33,7 +37,7 @@ export function ConfirmDialog({
       footer={
         <>
           <Button variant="ghost" onClick={onClose}>
-            취소
+            {t("cancel")}
           </Button>
           <Button
             variant={tone}

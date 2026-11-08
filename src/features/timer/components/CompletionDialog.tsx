@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "use-intl";
 import kkamiDefault from "@/assets/kkami/kkami-default.webp";
 import kkamiDone from "@/assets/kkami/kkami-done.webp";
 import { MedalIcon } from "@/components/icons";
 import { Button, Dialog } from "@/components/ui";
 import { CertificateLauncher } from "@/features/certificate";
 import { TaskDoneCheck } from "@/features/tasks/components/TaskDoneCheck";
-import { MODE_LABELS } from "../labels";
 import { startSession } from "../startSession";
 import { useTimerStore } from "../store";
 import styles from "./CompletionDialog.module.scss";
@@ -34,27 +34,24 @@ export function CompletionDialog() {
   );
   const open = completed !== null && shown;
   const { waiting: autoStart, secondsLeft } = useAutoStartCountdown(open);
+  const t = useTranslations();
 
   const focusDone = completed?.mode === "focus";
   const cycleDone = focusDone && completed?.cycleCompleted === true;
-  const nextLabel = MODE_LABELS[next.mode];
-  const walk = next.mode === "long-break" ? "긴" : "짧은";
+  const nextLabel = t(`timer.modes.${next.mode}`);
+  const walk = next.mode === "long-break" ? "long" : "short";
 
   function cancel() {
     cancelAutoStart();
     dismissCompleted();
   }
 
-  const title = cycleDone
-    ? "한 사이클 완료!"
-    : focusDone
-      ? "수고했어요!"
-      : "휴식 끝!";
-  const message = cycleDone
-    ? `집중 ${interval}번을 모두 마쳤어요. 까미랑 ${walk} 산책 다녀와요.`
-    : focusDone
-      ? `뽀모도로 하나를 완료했어요. 까미랑 ${walk} 산책 다녀와요.`
-      : "까미가 기다리고 있어요. 다시 집중해볼까요?";
+  const done = cycleDone ? "cycle" : focusDone ? "focus" : "break";
+  const title = t(`timer.completion.${done}.title`);
+  const message = t(`timer.completion.${done}.message`, {
+    count: interval,
+    walk,
+  });
 
   return (
     <Dialog
@@ -66,7 +63,7 @@ export function CompletionDialog() {
         autoStart ? (
           <>
             <Button variant="ghost" onClick={cancel}>
-              취소
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={() => {
@@ -74,13 +71,13 @@ export function CompletionDialog() {
                 dismissCompleted();
               }}
             >
-              지금 시작
+              {t("timer.completion.startNow")}
             </Button>
           </>
         ) : (
           <>
             <Button variant="ghost" onClick={dismissCompleted}>
-              나중에
+              {t("timer.completion.later")}
             </Button>
             <Button
               onClick={() => {
@@ -88,7 +85,7 @@ export function CompletionDialog() {
                 dismissCompleted();
               }}
             >
-              {nextLabel} 시작 →
+              {t("timer.completion.startNext", { mode: nextLabel })}
             </Button>
           </>
         )
@@ -98,7 +95,7 @@ export function CompletionDialog() {
         <div className={styles.photoWrap}>
           <Image
             src={focusDone ? kkamiDone : kkamiDefault}
-            alt={focusDone ? "웃고 있는 까미" : "정면을 바라보는 까미"}
+            alt={t(focusDone ? "kkami.done" : "kkami.default")}
             sizes="140px"
             className={styles.photo}
           />
@@ -117,7 +114,7 @@ export function CompletionDialog() {
                 icon={<MedalIcon size={18} />}
                 onClick={open}
               >
-                수료증 만들기
+                {t("certificate.make")}
               </Button>
             )}
           </CertificateLauncher>
@@ -127,7 +124,10 @@ export function CompletionDialog() {
         ) : null}
         {autoStart ? (
           <p className={styles.hint} aria-live="polite">
-            {secondsLeft}초 후 {nextLabel} 시작
+            {t("timer.completion.autoStart", {
+              seconds: secondsLeft,
+              mode: nextLabel,
+            })}
           </p>
         ) : null}
       </div>

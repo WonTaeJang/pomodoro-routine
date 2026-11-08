@@ -19,6 +19,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useId } from "react";
+import { useTranslations } from "use-intl";
 import { useTasksStore } from "../store";
 import type { Task } from "../types";
 import { TaskItem } from "./TaskItem";
@@ -28,11 +29,6 @@ const DRAG_START_DISTANCE = 4;
 
 /** 위아래로만 움직이게 */
 const verticalOnly: Modifier = ({ transform }) => ({ ...transform, x: 0 });
-
-const screenReaderInstructions: ScreenReaderInstructions = {
-  draggable:
-    "순서를 바꾸려면 스페이스나 엔터를 누른 뒤 위아래 화살표로 옮기고, 다시 스페이스나 엔터를 눌러 내려놓으세요. ESC를 누르면 취소합니다.",
-};
 
 type SortableTaskListProps = {
   /** 같은 묶음(할 일 또는 완료한 할 일)만, 화면 순서대로 */
@@ -50,6 +46,7 @@ export function SortableTaskList({
   activeTaskId,
 }: SortableTaskListProps) {
   const id = useId();
+  const t = useTranslations("tasks.sort");
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: DRAG_START_DISTANCE },
@@ -59,22 +56,26 @@ export function SortableTaskList({
     }),
   );
 
+  const screenReaderInstructions: ScreenReaderInstructions = {
+    draggable: t("instructions"),
+  };
   const titleOf = (taskId: UniqueIdentifier) =>
-    tasks.find((t) => t.id === taskId)?.title ?? "";
-  const positionOf = (taskId: UniqueIdentifier) =>
-    `${tasks.length}개 중 ${tasks.findIndex((t) => t.id === taskId) + 1}번째`;
+    tasks.find((task) => task.id === taskId)?.title ?? "";
+  const positionOf = (taskId: UniqueIdentifier) => ({
+    position: tasks.findIndex((task) => task.id === taskId) + 1,
+    total: tasks.length,
+  });
 
   const announcements: Announcements = {
     onDragStart: ({ active }) =>
-      `"${titleOf(active.id)}"을 들었습니다. ${positionOf(active.id)} 자리입니다.`,
+      t("pickedUp", { title: titleOf(active.id), ...positionOf(active.id) }),
     onDragOver: ({ over }) =>
-      over ? `${positionOf(over.id)} 자리입니다.` : undefined,
+      over ? t("movedTo", positionOf(over.id)) : undefined,
     onDragEnd: ({ active, over }) =>
       over
-        ? `"${titleOf(active.id)}"을 ${positionOf(over.id)} 자리에 놓았습니다.`
-        : `"${titleOf(active.id)}"을 제자리에 놓았습니다.`,
-    onDragCancel: ({ active }) =>
-      `옮기기를 취소했습니다. "${titleOf(active.id)}"은 제자리로 돌아갔습니다.`,
+        ? t("dropped", { title: titleOf(active.id), ...positionOf(over.id) })
+        : t("droppedInPlace", { title: titleOf(active.id) }),
+    onDragCancel: ({ active }) => t("cancelled", { title: titleOf(active.id) }),
   };
 
   if (tasks.length === 0) return null;

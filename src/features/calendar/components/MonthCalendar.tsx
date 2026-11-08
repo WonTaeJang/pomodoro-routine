@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { useTranslations } from "use-intl";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -41,6 +42,8 @@ export function MonthCalendar({
   stats,
 }: MonthCalendarProps) {
   const titleId = useId();
+  const t = useTranslations("calendar");
+  const common = useTranslations("common");
   const { year, month } = view;
   const weeks = getMonthWeeks(year, month);
   const { from, to } = monthBounds(view);
@@ -56,23 +59,23 @@ export function MonthCalendar({
             {year}년 {month + 1}월
           </h2>
           <p className={styles.summary}>
-            집중 {focusCount}번 · 사이클 {cycles}개
+            {t("monthSummary", { focusCount, cycles })}
           </p>
         </div>
         <div className={styles.nav}>
           {!isThisMonth || selected !== today ? (
             <Button size="sm" variant="ghost" onClick={() => onSelect(today)}>
-              오늘
+              {common("today")}
             </Button>
           ) : null}
           <IconButton
-            label="이전 달"
+            label={t("prevMonth")}
             icon={<ChevronLeftIcon size={18} />}
             size="sm"
             onClick={() => onViewChange(shiftMonth(view, -1))}
           />
           <IconButton
-            label="다음 달"
+            label={t("nextMonth")}
             icon={<ChevronRightIcon size={18} />}
             size="sm"
             onClick={() => onViewChange(shiftMonth(view, 1))}
@@ -112,15 +115,15 @@ export function MonthCalendar({
 
       <div className={styles.legend} aria-hidden="true">
         <span className={styles.scale}>
-          적게
+          {t("legend.less")}
           {[0, ...FOCUS_LEVELS.map((l) => l.level)].map((level) => (
             <span key={level} className={styles.swatch} data-level={level} />
           ))}
-          많이
+          {t("legend.more")}
         </span>
         <span className={styles.scale}>
           <MedalIcon size={12} className={styles.legendMedal} />
-          사이클 완료
+          {t("legend.cycle")}
         </span>
       </div>
     </Card>
@@ -149,10 +152,12 @@ function DayCell({
 }: DayCellProps) {
   const count = stats?.focusCount ?? 0;
   const cycleCount = stats?.cycleNumbers.length ?? 0;
+  const t = useTranslations("calendar.cell");
+  const common = useTranslations("common");
   const label = [
     formatLongDate(day),
-    count ? `집중 ${count}번` : "기록 없음",
-    cycleCount ? `사이클 ${cycleCount}개` : null,
+    count ? t("focusCount", { count }) : common("noRecords"),
+    cycleCount ? t("cycleCount", { count: cycleCount }) : null,
   ]
     .filter(Boolean)
     .join(", ");

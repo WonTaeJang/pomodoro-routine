@@ -1,3 +1,4 @@
+import { useTranslations } from "use-intl";
 import { PawIcon } from "@/components/icons";
 import { cx } from "@/lib/cx";
 import { getCycleMessage } from "../labels";
@@ -19,13 +20,14 @@ export function CycleProgress({
   interval,
 }: CycleProgressProps) {
   const done = Math.min(completedInCycle, interval);
+  const t = useTranslations();
 
   return (
     <div className={styles.cycle}>
       <div
         className={styles.paws}
         role="img"
-        aria-label={`이번 사이클 집중 ${done}번 완료, 전체 ${interval}번`}
+        aria-label={t("timer.cycle.progress", { done, total: interval })}
       >
         {Array.from({ length: interval }, (_, i) => (
           <PawIcon
@@ -35,7 +37,7 @@ export function CycleProgress({
           />
         ))}
       </div>
-      <span>{getCycleMessage(mode, completedInCycle, interval)}</span>
+      <span>{getCycleMessage(t, mode, completedInCycle, interval)}</span>
     </div>
   );
 }

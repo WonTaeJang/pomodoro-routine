@@ -1,3 +1,5 @@
+"use client";
+
 import { Fragment, type ComponentType } from "react";
 import {
   BellIcon,
@@ -19,11 +21,12 @@ import {
 import { VisuallyHidden } from "@/components/ui";
 import { ShortcutList } from "@/features/shortcuts";
 import {
-  INLINE_ICON_LABELS,
+  INLINE_ICON_NAMES,
+  useGuideContent,
   type GuideIcon,
   type GuideSection,
   type InlineIcon,
-} from "../content.ko";
+} from "../content";
 import styles from "./GuideParts.module.scss";
 
 const SECTION_ICONS: Record<GuideIcon, ComponentType<IconProps>> = {
@@ -61,10 +64,12 @@ export function SectionIcon({
   return <Icon size={size} />;
 }
 
-const isInlineIcon = (name: string): name is InlineIcon => name in INLINE_ICONS;
+const isInlineIcon = (name: string): name is InlineIcon =>
+  INLINE_ICON_NAMES.includes(name as InlineIcon);
 
 /** 문구 속 `{paw}` 같은 자리에 앱 아이콘을 넣음. 화면 낭독기는 아이콘 대신 이름을 읽음 */
 export function GuideText({ text }: { text: string }) {
+  const { inlineIcons } = useGuideContent();
   // split에 괄호 묶음을 쓰면 홀수 자리에 아이콘 이름이 들어옴
   const parts = text.split(/\{(\w+)\}/);
   return parts.map((part, i) => {
@@ -75,7 +80,7 @@ export function GuideText({ text }: { text: string }) {
     return (
       <span key={i} className={styles.inlineIcon}>
         <Icon size={16} />
-        <VisuallyHidden>{INLINE_ICON_LABELS[part]}</VisuallyHidden>
+        <VisuallyHidden>{inlineIcons[part]}</VisuallyHidden>
       </span>
     );
   });

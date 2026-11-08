@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useTranslations } from "use-intl";
 import { MinusIcon, PlusIcon } from "@/components/icons";
 import { cx } from "@/lib/cx";
 import { IconButton } from "../IconButton/IconButton";
@@ -31,6 +34,7 @@ export function Stepper({
   prefix,
   className,
 }: StepperProps) {
+  const t = useTranslations("common");
   return (
     <div
       role="group"
@@ -38,7 +42,7 @@ export function Stepper({
       className={cx(styles.stepper, className)}
     >
       <IconButton
-        label={`${label} 줄이기`}
+        label={t("decrease", { label })}
         icon={<MinusIcon size={16} />}
         size="sm"
         disabled={value <= min}
@@ -49,7 +53,7 @@ export function Stepper({
         {format(value)}
       </output>
       <IconButton
-        label={`${label} 늘리기`}
+        label={t("increase", { label })}
         icon={<PlusIcon size={16} />}
         size="sm"
         disabled={value >= max}

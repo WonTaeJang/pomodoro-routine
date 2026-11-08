@@ -1,16 +1,12 @@
 "use client";
 
+import { useTranslations } from "use-intl";
 import { ConfirmDialog, SegmentedControl } from "@/components/ui";
 import { useSessionState } from "../hooks";
-import { MODE_LABELS } from "../labels";
 import { useTimerStore } from "../store";
 import type { TimerMode, TimerStatus } from "../types";
 
 const MODES: TimerMode[] = ["focus", "short-break", "long-break"];
-const modeOptions = MODES.map((value) => ({
-  value,
-  label: MODE_LABELS[value],
-}));
 
 type ModeSwitcherProps = {
   mode: TimerMode;
@@ -24,6 +20,11 @@ type ModeSwitcherProps = {
 export function ModeSwitcher({ mode, status }: ModeSwitcherProps) {
   const [pendingMode, setPendingMode] = useSessionState<TimerMode | null>(null);
   const switchMode = useTimerStore.getState().switchMode;
+  const t = useTranslations("timer");
+  const modeOptions = MODES.map((value) => ({
+    value,
+    label: t(`modes.${value}`),
+  }));
 
   function handleChange(next: TimerMode) {
     if (next === mode) return;
@@ -37,22 +38,21 @@ export function ModeSwitcher({ mode, status }: ModeSwitcherProps) {
   return (
     <>
       <SegmentedControl
-        label="타이머 모드"
+        label={t("modeLabel")}
         options={modeOptions}
         value={mode}
         onChange={handleChange}
       />
       <ConfirmDialog
         open={pendingMode !== null}
-        title={pendingMode ? `${MODE_LABELS[pendingMode]}으로 바꿀까요?` : ""}
-        confirmLabel="바꾸기"
+        title={pendingMode ? t(`switchMode.title.${pendingMode}`) : ""}
+        confirmLabel={t("switchMode.confirm")}
         onConfirm={() => {
           if (pendingMode) switchMode(pendingMode);
         }}
         onClose={() => setPendingMode(null)}
       >
-        지금 {MODE_LABELS[mode]} 세션이 진행 중이에요. 바꾸면 이 세션은 완료로
-        세지 않아요.
+        {t("switchMode.message", { mode: t(`modes.${mode}`) })}
       </ConfirmDialog>
     </>
   );

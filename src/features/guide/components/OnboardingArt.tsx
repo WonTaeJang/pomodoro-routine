@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "use-intl";
 import {
   CalendarIcon,
   HeadphonesIcon,
@@ -9,7 +12,7 @@ import {
   PlusIcon,
 } from "@/components/icons";
 import { ShortcutList } from "@/features/shortcuts";
-import type { OnboardingSlide } from "../content.ko";
+import type { OnboardingSlide } from "../content";
 import styles from "./OnboardingArt.module.scss";
 
 /**
@@ -56,10 +59,11 @@ function CycleMock() {
 
 /** 할 일 입력칸 + 예상 발자국 + 시작 버튼 */
 function StartMock() {
+  const t = useTranslations("tasks");
   return (
     <div className={styles.start}>
       <div className={styles.taskRow}>
-        <span className={styles.input}>무엇에 집중할까요?</span>
+        <span className={styles.input}>{t("placeholder")}</span>
         <span className={styles.stepper}>
           <MinusIcon size={12} />
           <PawIcon size={12} />1
@@ -75,25 +79,26 @@ function StartMock() {
 
 /** 헤더의 집중 소리, 캘린더, 메뉴 */
 function HeaderMock() {
+  const t = useTranslations();
   return (
     <div className={styles.header}>
       <span className={styles.headerItem}>
         <span className={styles.round}>
           <HeadphonesIcon size={20} />
         </span>
-        집중 소리
+        {t("focusSound.title")}
       </span>
       <span className={styles.headerItem}>
         <span className={styles.round}>
           <CalendarIcon size={20} />
         </span>
-        캘린더
+        {t("app.nav.calendar")}
       </span>
       <span className={styles.headerItem}>
         <span className={styles.round}>
           <MenuIcon size={20} />
         </span>
-        메뉴
+        {t("app.menu.label")}
       </span>
     </div>
   );

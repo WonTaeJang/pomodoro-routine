@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useTranslations } from "use-intl";
 import { PawIcon } from "@/components/icons";
 import { Button, Stepper, TextField } from "@/components/ui";
 import { cx } from "@/lib/cx";
@@ -33,6 +34,7 @@ export function TaskForm({
 }: TaskFormProps) {
   const [title, setTitle] = useState(initialTitle);
   const [estimate, setEstimate] = useState(initialEstimate);
+  const t = useTranslations();
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -53,9 +55,9 @@ export function TaskForm({
       }}
     >
       <TextField
-        label="할 일"
+        label={t("tasks.title")}
         hideLabel
-        placeholder="무엇에 집중할까요?"
+        placeholder={t("tasks.placeholder")}
         value={title}
         maxLength={TITLE_MAX_LENGTH}
         autoFocus={autoFocus}
@@ -64,21 +66,23 @@ export function TaskForm({
       />
       <div className={styles.actions}>
         <Stepper
-          label="예상 뽀모도로 수"
+          label={t("tasks.estimate.label")}
           value={estimate}
           min={ESTIMATE_MIN}
           max={ESTIMATE_MAX}
           onChange={setEstimate}
           prefix={
             <>
-              <span className={styles.estimateLabel}>예상</span>
+              <span className={styles.estimateLabel}>
+                {t("tasks.estimate.short")}
+              </span>
               <PawIcon size={16} />
             </>
           }
         />
         {onCancel ? (
           <Button variant="ghost" onClick={onCancel}>
-            취소
+            {t("common.cancel")}
           </Button>
         ) : null}
         <Button type="submit" variant="secondary" disabled={!title.trim()}>

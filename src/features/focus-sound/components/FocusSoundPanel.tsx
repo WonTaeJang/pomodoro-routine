@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "use-intl";
 import {
   HeadphonesIcon,
   VolumeHighIcon,
@@ -25,6 +26,8 @@ export function FocusSoundPanel() {
   const volume = useTimerStore((s) => s.settings.focusSoundVolume);
   const focusing = useFocusRunning();
   const update = useTimerStore.getState().updateSettings;
+  const t = useTranslations("focusSound");
+  const common = useTranslations("common");
 
   function choose(value: FocusSoundSetting) {
     update({ focusSound: value });
@@ -37,36 +40,35 @@ export function FocusSoundPanel() {
       <div>
         <h2 className={styles.title}>
           <HeadphonesIcon size={20} className={styles.titleIcon} />
-          집중 소리
+          {t("title")}
         </h2>
         <p className={styles.hint}>
-          집중할 때만 들려요.
-          {focusing ? null : " 고르면 미리 들려줘요."}
+          {t(focusing ? "hint" : "hintWithPreview")}
         </p>
       </div>
 
       <fieldset className={styles.options}>
-        <legend className={styles.legend}>소리 종류</legend>
+        <legend className={styles.legend}>{t("kind")}</legend>
         <SoundOption
           value="off"
-          label="끄기"
-          description="소리 없이 집중"
+          label={t("off.label")}
+          description={t("off.description")}
           icon={VolumeOffIcon}
           checked={sound === "off"}
           playing={false}
           onChoose={choose}
           className={styles.off}
         />
-        {FOCUS_SOUND_GROUPS.map(({ title, ids }) => (
-          <div key={title} className={styles.group}>
-            <p className={styles.groupTitle}>{title}</p>
+        {FOCUS_SOUND_GROUPS.map((group) => (
+          <div key={group.id} className={styles.group}>
+            <p className={styles.groupTitle}>{t(`groups.${group.id}`)}</p>
             <div className={styles.grid}>
-              {ids.map((id) => (
+              {group.ids.map((id) => (
                 <SoundOption
                   key={id}
                   value={id}
-                  label={FOCUS_SOUNDS[id].label}
-                  description={FOCUS_SOUNDS[id].description}
+                  label={t(`sounds.${id}.label`)}
+                  description={t(`sounds.${id}.description`)}
                   icon={FOCUS_SOUNDS[id].icon}
                   checked={sound === id}
                   playing={focusing && sound === id}
@@ -79,7 +81,7 @@ export function FocusSoundPanel() {
       </fieldset>
 
       <Slider
-        label="소리 크기"
+        label={common("volume")}
         value={Math.round(volume * 100)}
         onChange={(value) => {
           update({ focusSoundVolume: value / 100 });
@@ -120,6 +122,7 @@ function SoundOption({
   onChoose,
   className,
 }: SoundOptionProps) {
+  const t = useTranslations("focusSound");
   return (
     <label className={cx(styles.option, className)} title={description}>
       <input
@@ -137,7 +140,7 @@ function SoundOption({
       </span>
       {playing ? (
         <>
-          <VisuallyHidden>(재생 중)</VisuallyHidden>
+          <VisuallyHidden>{t("playing")}</VisuallyHidden>
           <span className={styles.playing} aria-hidden="true">
             <span className={styles.bar} />
             <span className={styles.bar} />

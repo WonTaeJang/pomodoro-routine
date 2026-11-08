@@ -9,25 +9,8 @@ import type {
  * 화면이나 브라우저 API 없이 계산만 하므로 테스트할 수 있습니다.
  */
 
+/** 알림 종류. 알림 문구는 alerts.<종류>.title / body */
 export type AlertKind = "focus-end" | "break-end" | "cycle-done";
-
-export const ALERT_MESSAGES: Record<
-  AlertKind,
-  { title: string; body: string }
-> = {
-  "focus-end": {
-    title: "집중 끝! 🐾",
-    body: "수고했어요. 까미랑 짧은 산책 다녀와요.",
-  },
-  "cycle-done": {
-    title: "한 사이클 완료! 🏅",
-    body: "집중을 모두 마쳤어요. 까미랑 긴 산책 다녀와요.",
-  },
-  "break-end": {
-    title: "휴식 끝!",
-    body: "까미가 기다리고 있어요. 다시 집중해볼까요?",
-  },
-};
 
 /** 끝난 세션에 맞는 알림 */
 export function alertKindForSession(

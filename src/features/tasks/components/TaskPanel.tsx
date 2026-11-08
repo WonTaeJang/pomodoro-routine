@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { useTranslations } from "use-intl";
 import { PawIcon } from "@/components/icons";
 import { Button, Card } from "@/components/ui";
 import { useTasksStore } from "../store";
@@ -15,19 +16,22 @@ export function TaskPanel() {
   const tasks = useTasksStore((s) => s.tasks);
   const activeTaskId = useTasksStore((s) => s.activeTaskId);
   const { add, archiveDone } = useTasksStore.getState();
+  const t = useTranslations("tasks");
 
   const visible = sortForDisplay(visibleTasks(tasks));
-  const openTasks = visible.filter((t) => !t.done);
-  const doneTasks = visible.filter((t) => t.done);
+  const openTasks = visible.filter((task) => !task.done);
+  const doneTasks = visible.filter((task) => task.done);
 
   return (
     <Card as="section" className={styles.panel} aria-labelledby={titleId}>
       <div className={styles.header}>
         <h2 id={titleId} className={styles.title}>
-          할 일
+          {t("title")}
         </h2>
         {visible.length > 0 ? (
-          <span className={styles.count}>{openTasks.length}개 남음</span>
+          <span className={styles.count}>
+            {t("remaining", { count: openTasks.length })}
+          </span>
         ) : null}
         {doneTasks.length > 0 ? (
           <Button
@@ -35,21 +39,22 @@ export function TaskPanel() {
             variant="ghost"
             className={styles.clear}
             onClick={archiveDone}
-            title="목록에서 숨겨요. 캘린더에는 남아요"
+            title={t("clearDone.hint")}
           >
-            완료한 할 일 정리
+            {t("clearDone.label")}
           </Button>
         ) : null}
       </div>
 
-      <TaskForm submitLabel="추가" resetOnSubmit onSubmit={add} />
+      <TaskForm submitLabel={t("add")} resetOnSubmit onSubmit={add} />
 
       {visible.length === 0 ? (
         <p className={styles.empty}>
-          할 일을 추가하고 집중해보세요.
+          {t("empty.title")}
           <br />
-          집중을 마칠 때마다 선택한 할 일에{" "}
-          <PawIcon size={14} className={styles.paw} /> 발자국이 쌓여요.
+          {t.rich("empty.hint", {
+            paw: () => <PawIcon size={14} className={styles.paw} />,
+          })}
         </p>
       ) : (
         <ul className={styles.list}>

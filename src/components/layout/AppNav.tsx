@@ -2,13 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "use-intl";
 import { CalendarIcon, TimerIcon } from "@/components/icons";
 import { cx } from "@/lib/cx";
 import styles from "./AppNav.module.scss";
 
+/** 이름은 app.nav.<key> */
 const PAGES = [
-  { href: "/", label: "타이머", icon: TimerIcon },
-  { href: "/calendar", label: "캘린더", icon: CalendarIcon },
+  { href: "/", key: "timer", icon: TimerIcon },
+  { href: "/calendar", key: "calendar", icon: CalendarIcon },
 ] as const;
 
 /**
@@ -18,11 +20,13 @@ const PAGES = [
  */
 export function AppNav() {
   const pathname = usePathname();
+  const t = useTranslations("app.nav");
   return (
-    <nav aria-label="페이지">
+    <nav aria-label={t("label")}>
       <ul className={styles.list}>
-        {PAGES.map(({ href, label, icon: PageIcon }) => {
+        {PAGES.map(({ href, key, icon: PageIcon }) => {
           const current = pathname === href;
+          const label = t(key);
           return (
             <li key={href}>
               <Link

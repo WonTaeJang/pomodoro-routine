@@ -3,6 +3,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState, type CSSProperties } from "react";
+import { useTranslations } from "use-intl";
 import { EditIcon, GripIcon, TrashIcon } from "@/components/icons";
 import { Badge, Button, Checkbox, IconButton } from "@/components/ui";
 import { cx } from "@/lib/cx";
@@ -24,6 +25,7 @@ type TaskItemProps = {
 export function TaskItem({ task, active }: TaskItemProps) {
   const [editing, setEditing] = useState(false);
   const { update, remove, toggleDone, setActive } = useTasksStore.getState();
+  const t = useTranslations("tasks");
   const {
     attributes,
     listeners,
@@ -34,7 +36,7 @@ export function TaskItem({ task, active }: TaskItemProps) {
     isDragging,
   } = useSortable({
     id: task.id,
-    attributes: { roleDescription: "순서를 바꿀 수 있는 할 일" },
+    attributes: { roleDescription: t("sort.roleDescription") },
   });
   const style: CSSProperties = {
     transform: CSS.Translate.toString(transform),
@@ -51,7 +53,7 @@ export function TaskItem({ task, active }: TaskItemProps) {
         <TaskForm
           initialTitle={task.title}
           initialEstimate={task.estimate}
-          submitLabel="저장"
+          submitLabel={t("save")}
           autoFocus
           onSubmit={(title, estimate) => {
             update(task.id, { title, estimate });
@@ -81,8 +83,8 @@ export function TaskItem({ task, active }: TaskItemProps) {
         className={styles.handle}
         {...attributes}
         {...listeners}
-        aria-label={`${task.title} 순서 바꾸기`}
-        title="끌어서 순서 바꾸기"
+        aria-label={t("sort.handle", { title: task.title })}
+        title={t("sort.handleHint")}
       >
         <GripIcon size={16} />
       </button>
@@ -95,16 +97,16 @@ export function TaskItem({ task, active }: TaskItemProps) {
       <div className={styles.meta}>
         {active ? (
           <Badge variant="solid" size="sm" className={styles.badge}>
-            집중 중
+            {t("active")}
           </Badge>
         ) : !task.done ? (
           <Button
             size="sm"
             variant="ghost"
             onClick={() => setActive(task.id)}
-            aria-label={`${task.title}에 집중하기`}
+            aria-label={t("select.label", { title: task.title })}
           >
-            선택
+            {t("select.button")}
           </Button>
         ) : null}
         <PawCount
@@ -113,13 +115,13 @@ export function TaskItem({ task, active }: TaskItemProps) {
           className={styles.count}
         />
         <IconButton
-          label={`${task.title} 수정`}
+          label={t("edit", { title: task.title })}
           icon={<EditIcon size={16} />}
           size="sm"
           onClick={() => setEditing(true)}
         />
         <IconButton
-          label={`${task.title} 삭제`}
+          label={t("delete", { title: task.title })}
           icon={<TrashIcon size={16} />}
           size="sm"
           onClick={() => remove(task.id)}

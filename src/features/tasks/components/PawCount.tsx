@@ -1,3 +1,4 @@
+import { useTranslations } from "use-intl";
 import { PawIcon } from "@/components/icons";
 import { cx } from "@/lib/cx";
 import styles from "./PawCount.module.scss";
@@ -18,11 +19,12 @@ export function PawCount({
   size = "sm",
   className,
 }: PawCountProps) {
+  const t = useTranslations("tasks.pawCount");
   return (
     <span
       className={cx(styles.count, styles[size], className)}
-      aria-label={`뽀모도로 ${done}개 완료, 예상 ${estimate}개`}
-      title={`완료 ${done}번 · 예상 ${estimate}번`}
+      aria-label={t("label", { done, estimate })}
+      title={t("title", { done, estimate })}
     >
       <PawIcon size={size === "sm" ? 14 : 16} />
       {done}/{estimate}

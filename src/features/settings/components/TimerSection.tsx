@@ -1,90 +1,87 @@
 "use client";
 
+import { useTranslations } from "use-intl";
 import { FieldRow, Section, Stepper, Switch } from "@/components/ui";
 import { useTimerStore } from "@/features/timer/store";
+import type { TimerMode, TimerSettings } from "@/features/timer/types";
 import { SettingsNote } from "./SettingsNote";
 import styles from "./Settings.module.scss";
 
-const minutes = (v: number) => `${v}분`;
+/** 시간 설정 이름 (focusMinutes 등) */
+type MinutesKey = Extract<keyof TimerSettings, `${string}Minutes`>;
+
+/** 모드별 시간 조절 범위 (분) */
+const LENGTHS: {
+  mode: TimerMode;
+  key: MinutesKey;
+  min: number;
+  max: number;
+  step: number;
+}[] = [
+  { mode: "focus", key: "focusMinutes", min: 5, max: 90, step: 5 },
+  { mode: "short-break", key: "shortBreakMinutes", min: 1, max: 30, step: 1 },
+  { mode: "long-break", key: "longBreakMinutes", min: 5, max: 60, step: 5 },
+];
 
 /** 세션 길이, 긴 휴식 주기, 자동 시작 */
 export function TimerSection() {
   const settings = useTimerStore((s) => s.settings);
   const status = useTimerStore((s) => s.timer.status);
   const update = useTimerStore.getState().updateSettings;
+  const t = useTranslations("settings.timer");
+  const modes = useTranslations("timer.modes");
+  const minutes = (value: number) => t("minutes", { value });
 
   return (
-    <Section title="타이머" headingLevel={3}>
-      <FieldRow label="집중">
-        <Stepper
-          className={styles.stepper}
-          label="집중 시간"
-          value={settings.focusMinutes}
-          min={5}
-          max={90}
-          step={5}
-          format={minutes}
-          onChange={(focusMinutes) => update({ focusMinutes })}
-        />
-      </FieldRow>
-      <FieldRow label="짧은 휴식">
-        <Stepper
-          className={styles.stepper}
-          label="짧은 휴식 시간"
-          value={settings.shortBreakMinutes}
-          min={1}
-          max={30}
-          format={minutes}
-          onChange={(shortBreakMinutes) => update({ shortBreakMinutes })}
-        />
-      </FieldRow>
-      <FieldRow label="긴 휴식">
-        <Stepper
-          className={styles.stepper}
-          label="긴 휴식 시간"
-          value={settings.longBreakMinutes}
-          min={5}
-          max={60}
-          step={5}
-          format={minutes}
-          onChange={(longBreakMinutes) => update({ longBreakMinutes })}
-        />
-      </FieldRow>
+    <Section title={t("title")} headingLevel={3}>
+      {LENGTHS.map(({ mode, key, min, max, step }) => (
+        <FieldRow key={mode} label={modes(mode)}>
+          <Stepper
+            className={styles.stepper}
+            label={t(`length.${mode}`)}
+            value={settings[key]}
+            min={min}
+            max={max}
+            step={step}
+            format={minutes}
+            onChange={(value) => update({ [key]: value })}
+          />
+        </FieldRow>
+      ))}
       <FieldRow
-        label="긴 휴식 주기"
-        description={`집중을 ${settings.longBreakInterval}번 마치면 긴 휴식`}
+        label={t("interval.label")}
+        description={t("interval.description", {
+          count: settings.longBreakInterval,
+        })}
       >
         <Stepper
           className={styles.stepper}
-          label="긴 휴식 주기"
+          label={t("interval.label")}
           value={settings.longBreakInterval}
           min={2}
           max={8}
-          format={(v) => `${v}회`}
+          format={(value) => t("interval.value", { value })}
           onChange={(longBreakInterval) => update({ longBreakInterval })}
         />
       </FieldRow>
       <Switch
-        label="휴식 자동 시작"
-        description="집중이 끝나면 휴식을 바로 시작해요"
+        label={t("autoStartBreaks.label")}
+        description={t("autoStartBreaks.description")}
         checked={settings.autoStartBreaks}
         onCheckedChange={(autoStartBreaks) => update({ autoStartBreaks })}
       />
       <Switch
-        label="집중 자동 시작"
-        description="휴식이 끝나면 다음 집중을 바로 시작해요"
+        label={t("autoStartFocus.label")}
+        description={t("autoStartFocus.description")}
         checked={settings.autoStartFocus}
         onCheckedChange={(autoStartFocus) => update({ autoStartFocus })}
       />
       {settings.testDurationSeconds ? (
         <SettingsNote>
-          테스트 모드가 켜져 있어서 모든 세션이 {settings.testDurationSeconds}
-          초로 진행돼요.
+          {t("testMode", { seconds: settings.testDurationSeconds })}
         </SettingsNote>
       ) : status !== "idle" ? (
-        <SettingsNote>
-          바꾼 시간은 지금 세션이 끝난 뒤 다음 세션부터 적용돼요.
-        </SettingsNote>
+        <SettingsNote>{t("appliesNext")}</SettingsNote>
       ) : null}
     </Section>
   );

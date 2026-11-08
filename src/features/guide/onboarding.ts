@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { STORAGE_KEYS } from "@/lib/storage";
-import { ONBOARDING_SLIDES, type OnboardingSlide } from "./content.ko";
+import type { OnboardingSlide } from "./content";
 
 /**
  * 첫 방문 안내 (백로그 I-009).
@@ -52,10 +52,11 @@ export function shouldShowOnboarding({
 }
 
 /** 보여줄 장. 키보드가 없는 기기(휴대폰)는 단축키 장을 뺌 */
-export function onboardingSlides(hasKeyboard: boolean): OnboardingSlide[] {
-  return ONBOARDING_SLIDES.filter(
-    (slide) => hasKeyboard || !slide.keyboardOnly,
-  );
+export function onboardingSlides(
+  slides: OnboardingSlide[],
+  hasKeyboard: boolean,
+): OnboardingSlide[] {
+  return slides.filter((slide) => hasKeyboard || !slide.keyboardOnly);
 }
 
 type OnboardingStore = {

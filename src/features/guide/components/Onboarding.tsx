@@ -9,7 +9,7 @@ import { useTasksStore } from "@/features/tasks/store";
 import { STORAGE_KEYS } from "@/lib/storage";
 import { TOUCH_ONLY_QUERY, useMediaQuery } from "@/lib/useMediaQuery";
 import { useSwipe } from "@/lib/useSwipe";
-import { ONBOARDING } from "../content.ko";
+import { useGuideContent } from "../content";
 import {
   isOnboardingSeen,
   markOnboardingSeen,
@@ -58,7 +58,12 @@ export function Onboarding({ ready }: { ready: boolean }) {
 }
 
 function OnboardingDialog({ onClose }: { onClose: () => void }) {
-  const slides = onboardingSlides(!useMediaQuery(TOUCH_ONLY_QUERY));
+  const content = useGuideContent();
+  const text = content.onboarding;
+  const slides = onboardingSlides(
+    content.slides,
+    !useMediaQuery(TOUCH_ONLY_QUERY),
+  );
   const [index, setIndex] = useState(0);
   /** 마지막으로 넘긴 방향 (새 장이 어느 쪽에서 들어올지) */
   const [direction, setDirection] = useState<"next" | "prev" | null>(null);
@@ -110,11 +115,11 @@ function OnboardingDialog({ onClose }: { onClose: () => void }) {
       footer={
         <div className={styles.footer}>
           <Button variant="ghost" size="sm" onClick={onClose}>
-            {ONBOARDING.skip}
+            {text.skip}
           </Button>
           <ol
             className={styles.dots}
-            aria-label={ONBOARDING.progress(index + 1, slides.length)}
+            aria-label={text.progress(index + 1, slides.length)}
           >
             {slides.map((s, i) => (
               <li
@@ -127,16 +132,16 @@ function OnboardingDialog({ onClose }: { onClose: () => void }) {
           <div className={styles.nav}>
             {!first ? (
               <Button variant="secondary" size="sm" onClick={() => move(-1)}>
-                {ONBOARDING.prev}
+                {text.prev}
               </Button>
             ) : null}
             {last ? (
               <Button ref={primaryRef} size="sm" onClick={onClose}>
-                {ONBOARDING.done}
+                {text.done}
               </Button>
             ) : (
               <Button ref={primaryRef} size="sm" onClick={() => move(1)}>
-                {ONBOARDING.next}
+                {text.next}
               </Button>
             )}
           </div>
@@ -166,7 +171,7 @@ function OnboardingDialog({ onClose }: { onClose: () => void }) {
           </ul>
           {last ? (
             <Link href="/guide" className={styles.more} onClick={onClose}>
-              {ONBOARDING.moreGuide}
+              {text.moreGuide}
             </Link>
           ) : null}
         </div>

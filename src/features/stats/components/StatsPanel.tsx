@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, type CSSProperties } from "react";
+import { useTranslations } from "use-intl";
 import { FlameIcon } from "@/components/icons";
 import { Card, EmptyState, VisuallyHidden } from "@/components/ui";
 import {
@@ -33,6 +34,7 @@ type StatsPanelProps = {
 export function StatsPanel({ stats, today, className }: StatsPanelProps) {
   const titleId = useId();
   const all = sumDays(stats, -Infinity, Infinity);
+  const t = useTranslations("stats");
 
   return (
     <Card
@@ -41,10 +43,10 @@ export function StatsPanel({ stats, today, className }: StatsPanelProps) {
       aria-labelledby={titleId}
     >
       <h2 id={titleId} className={styles.title}>
-        통계
+        {t("title")}
       </h2>
       {all.focusCount === 0 ? (
-        <EmptyState>첫 집중을 마치면 여기에 기록이 쌓여요.</EmptyState>
+        <EmptyState>{t("empty")}</EmptyState>
       ) : (
         <StatsBody stats={stats} today={today} all={all} />
       )}
@@ -60,6 +62,9 @@ type StatsBodyProps = {
 };
 
 function StatsBody({ stats, today, all }: StatsBodyProps) {
+  const t = useTranslations("stats");
+  const common = useTranslations("common");
+  const duration = formatDuration;
   const streak = getStreak(stats, today);
   const week = getRecentComparison(stats, today, RECENT_DAYS);
   const month = sumDays(stats, startOfMonth(today), addDays(today, 1));
@@ -69,59 +74,59 @@ function StatsBody({ stats, today, all }: StatsBodyProps) {
   const diffMin = Math.round(
     (week.recent.focusMs - week.previous.focusMs) / MIN,
   );
-  const weekDiff = `${diffMin > 0 ? "+" : "−"}${formatDuration(Math.abs(diffMin) * MIN)}`;
+  const weekDiff = `${diffMin > 0 ? "+" : "−"}${duration(Math.abs(diffMin) * MIN)}`;
+  const weekdays = WEEKDAY_NAMES;
 
   return (
     <div className={styles.body}>
       <dl className={styles.tiles}>
         <div className={styles.tile}>
-          <dt>연속</dt>
+          <dt>{t("streak.title")}</dt>
           <dd className={styles.value}>
             <FlameIcon size={20} className={styles.flame} />
-            {streak.current}일
+            {t("streak.days", { count: streak.current })}
           </dd>
           <dd className={styles.note}>
             {streak.todayDone || streak.current === 0
-              ? `최고 ${streak.best}일`
-              : `오늘 집중하면 ${streak.current + 1}일째`}
+              ? t("streak.best", { count: streak.best })
+              : t("streak.keepGoing", { count: streak.current + 1 })}
           </dd>
         </div>
         <div className={styles.tile}>
-          <dt>최근 7일</dt>
+          <dt>{t("week.title")}</dt>
+          <dd className={styles.value}>{duration(week.recent.focusMs)}</dd>
+          <dd className={styles.note}>
+            {diffMin === 0
+              ? t("week.same")
+              : t.rich("week.diff", {
+                  diff: weekDiff,
+                  nowrap: (chunks) => (
+                    <span className={styles.nowrap}>{chunks}</span>
+                  ),
+                })}
+          </dd>
+        </div>
+        <div className={styles.tile}>
+          <dt>{t("month.title")}</dt>
+          <dd className={styles.value}>{duration(month.focusMs)}</dd>
+          <dd className={styles.note}>
+            {t("cycles", { count: month.cycles })}
+          </dd>
+        </div>
+        <div className={styles.tile}>
+          <dt>{t("all.title")}</dt>
           <dd className={styles.value}>
-            {formatDuration(week.recent.focusMs)}
+            {t("all.focusCount", { count: all.focusCount })}
           </dd>
           <dd className={styles.note}>
-            {diffMin === 0 ? (
-              "그 전 7일과 같아요"
-            ) : (
-              <>
-                그 전 7일보다 <span className={styles.nowrap}>{weekDiff}</span>
-              </>
-            )}
-          </dd>
-        </div>
-        <div className={styles.tile}>
-          <dt>이번 달</dt>
-          <dd className={styles.value}>{formatDuration(month.focusMs)}</dd>
-          <dd className={styles.note}>
-            사이클{"\u00a0"}
-            {month.cycles}개
-          </dd>
-        </div>
-        <div className={styles.tile}>
-          <dt>전체</dt>
-          <dd className={styles.value}>집중 {all.focusCount}번</dd>
-          <dd className={styles.note}>
-            {formatDuration(all.focusMs)} · 사이클{"\u00a0"}
-            {all.cycles}개
+            {duration(all.focusMs)} · {t("cycles", { count: all.cycles })}
           </dd>
         </div>
       </dl>
 
       <figure className={styles.chart}>
         <figcaption className={styles.chartTitle}>
-          최근 7일 집중 시간 (분)
+          {t("chart.title")}
         </figcaption>
         <div className={styles.bars} aria-hidden="true">
           {recent.map(({ day, focusMs }) => (
@@ -139,7 +144,9 @@ function StatsBody({ stats, today, all }: StatsBodyProps) {
                 />
               </span>
               <span className={styles.weekday}>
-                {day === today ? "오늘" : WEEKDAY_NAMES[new Date(day).getDay()]}
+                {day === today
+                  ? common("today")
+                  : weekdays[new Date(day).getDay()]}
               </span>
             </div>
           ))}
@@ -150,7 +157,7 @@ function StatsBody({ stats, today, all }: StatsBodyProps) {
             {recent.map(({ day, focusMs }) => (
               <tr key={day}>
                 <th scope="row">{formatLongDate(day)}</th>
-                <td>{focusMs ? formatDuration(focusMs) : "기록 없음"}</td>
+                <td>{focusMs ? duration(focusMs) : common("noRecords")}</td>
               </tr>
             ))}
           </tbody>

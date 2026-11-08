@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "use-intl";
 import { Badge } from "@/components/ui";
 import { useTimerStore } from "../store";
 import styles from "./TestModeBadge.module.scss";
@@ -14,6 +15,7 @@ const isDev = process.env.NODE_ENV !== "production";
  */
 export function TestModeBadge({ ready }: { ready: boolean }) {
   const seconds = useTimerStore((s) => s.settings.testDurationSeconds);
+  const t = useTranslations("timer.testMode");
 
   useEffect(() => {
     if (!isDev || !ready) return;
@@ -31,13 +33,13 @@ export function TestModeBadge({ ready }: { ready: boolean }) {
 
   return (
     <Badge variant="outline" className={styles.badge}>
-      테스트 모드 · {seconds}초
+      {t("badge", { seconds })}
       <button
         type="button"
         className={styles.off}
         onClick={() => setTestMode(null)}
       >
-        끄기
+        {t("off")}
       </button>
     </Badge>
   );

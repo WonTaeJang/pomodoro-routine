@@ -1,10 +1,5 @@
+import type { Translator } from "@/i18n";
 import type { TimerMode, TimerStatus } from "./types";
-
-export const MODE_LABELS: Record<TimerMode, string> = {
-  focus: "집중",
-  "short-break": "짧은 휴식",
-  "long-break": "긴 휴식",
-};
 
 /**
  * 사이클 아래 안내 문구.
@@ -12,27 +7,27 @@ export const MODE_LABELS: Record<TimerMode, string> = {
  * (짧은 휴식 중이면 다음 집중을 마쳐야 긴 휴식이므로 "1번 남았어요")
  */
 export function getCycleMessage(
+  t: Translator,
   mode: TimerMode,
   completedInCycle: number,
   interval: number,
 ): string {
-  if (mode === "long-break") return "긴 휴식 시간이에요";
+  if (mode === "long-break") return t("timer.cycle.longBreakNow");
   const left = interval - Math.min(completedInCycle, interval);
   if (mode === "short-break") {
-    return `긴 휴식까지 ${Math.max(1, left)}번 남았어요`;
+    return t("timer.cycle.untilLongBreak", { count: Math.max(1, left) });
   }
   return left === 0
-    ? "이번 휴식은 긴 휴식이에요"
-    : `긴 휴식까지 ${left}번 남았어요`;
+    ? t("timer.cycle.nextIsLong")
+    : t("timer.cycle.untilLongBreak", { count: left });
 }
 
-export function getStatusMessage(mode: TimerMode, status: TimerStatus): string {
-  if (status === "paused") return "잠시 멈췄어요";
-  if (mode === "focus") {
-    return status === "running" ? "집중하고 있어요" : "집중할 준비가 됐나요?";
-  }
-  const walk = mode === "short-break" ? "짧은 산책" : "긴 산책";
-  return status === "running"
-    ? `까미랑 ${walk} 중이에요`
-    : `까미랑 ${walk}할 시간이에요`;
+/** 타이머 아래 상태 문구 ("집중할 준비가 됐나요?", "까미랑 짧은 산책 중이에요" 등) */
+export function getStatusMessage(
+  t: Translator,
+  mode: TimerMode,
+  status: TimerStatus,
+): string {
+  if (status === "paused") return t("timer.status.paused");
+  return t(`timer.status.${mode}.${status === "running" ? "running" : "idle"}`);
 }

@@ -11,11 +11,7 @@ import { useTimerStore } from "@/features/timer/store";
 import { LOCALE_NAMES, LOCALES, setLocale } from "@/i18n";
 import { isWakeLockSupported } from "@/lib/useWakeLock";
 
-const themeOptions: { value: ThemeChoice; label: string }[] = [
-  { value: "system", label: "기기 설정" },
-  { value: "light", label: "라이트" },
-  { value: "dark", label: "다크" },
-];
+const THEMES: ThemeChoice[] = ["system", "light", "dark"];
 
 /** 언어 이름은 어느 화면에서든 그 언어로 ("한국어", "English") */
 const localeOptions = LOCALES.map((value) => ({
@@ -33,9 +29,13 @@ export function DisplaySection() {
   const update = useTimerStore.getState().updateSettings;
   const t = useTranslations("settings.display");
   const locale = useLocale();
+  const themeOptions = THEMES.map((value) => ({
+    value,
+    label: t(`theme.${value}`),
+  }));
 
   return (
-    <Section title="화면" headingLevel={3}>
+    <Section title={t("title")} headingLevel={3}>
       <FieldRow label={t("language")}>
         <SegmentedControl
           label={t("language")}
@@ -44,27 +44,27 @@ export function DisplaySection() {
           onChange={setLocale}
         />
       </FieldRow>
-      <FieldRow label="테마">
+      <FieldRow label={t("theme.label")}>
         <SegmentedControl
-          label="테마"
+          label={t("theme.label")}
           options={themeOptions}
           value={themeChoice}
           onChange={(choice) => setTheme(choice === "system" ? null : choice)}
         />
       </FieldRow>
       <Switch
-        label="띠 효과"
-        description="10%마다 발자국 도장, 마지막 1분 빛, 집중 완료 축하"
+        label={t("ringEffects.label")}
+        description={t("ringEffects.description")}
         checked={ringEffects}
         onCheckedChange={(on) => update({ ringEffects: on })}
       />
       <Switch
-        label="화면 켜두기"
-        description={
+        label={t("keepScreenOn.label")}
+        description={t(
           wakeLockSupported
-            ? "타이머가 도는 동안 화면이 꺼지지 않게 해요"
-            : "이 브라우저는 화면 켜두기를 지원하지 않아요"
-        }
+            ? "keepScreenOn.description"
+            : "keepScreenOn.unsupported",
+        )}
         checked={keepScreenOn && wakeLockSupported}
         disabled={!wakeLockSupported}
         onCheckedChange={(on) => update({ keepScreenOn: on })}
