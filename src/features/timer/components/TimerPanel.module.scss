@@ -23,7 +23,7 @@
 
 .time {
   margin-top: clamp(var(--space-1), 1.2dvh, var(--space-3));
-  font-size: clamp(3.5rem, min(20vw, 14dvh), 7.5rem);
+  font-size: var(--font-size-display);
   font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-tight);

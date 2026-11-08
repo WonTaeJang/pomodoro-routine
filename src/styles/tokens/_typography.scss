@@ -14,7 +14,11 @@
   --font-size-lg: 1.125rem; // 18px: 카드 제목
   --font-size-xl: 1.25rem; // 20px: 로고
   --font-size-2xl: 1.75rem; // 28px: 페이지 제목
-  --font-size-display: clamp(4.5rem, 20vw, 7.5rem); // 남은 시간
+  --font-size-display: clamp(
+    3.5rem,
+    min(20vw, 14dvh),
+    7.5rem
+  ); // 남은 시간 (화면 폭과 높이에 맞춰)
 
   // 굵기
   --font-weight-medium: 500;
