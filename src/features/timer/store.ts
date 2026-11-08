@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { STORAGE_KEYS } from "@/lib/storage";
+import { STORAGE_KEYS, tabSafeStorage } from "@/lib/storage";
 import { newSessions } from "@/features/history/sessions";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
@@ -139,7 +139,7 @@ export const useTimerStore = create<TimerStore>()(
     {
       name: STORAGE_KEYS.timer,
       version: 1,
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => tabSafeStorage(localStorage)),
       // 완료 팝업(lastCompleted)은 저장하지 않음
       partialize: ({ settings, timer }) => ({ settings, timer }),
       // 서버에서 그린 화면과 첫 화면이 같도록, 저장된 값은 화면이 뜬 뒤에 불러옵니다.

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { STORAGE_KEYS } from "@/lib/storage";
+import { STORAGE_KEYS, tabSafeStorage } from "@/lib/storage";
 import {
   addTask,
   archiveDone,
@@ -70,7 +70,7 @@ export const useTasksStore = create<TasksStore>()(
           activeTaskId: saved.activeTaskId ?? null,
         };
       },
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => tabSafeStorage(localStorage)),
       partialize: ({ tasks, activeTaskId }) => ({ tasks, activeTaskId }),
       skipHydration: true,
     },

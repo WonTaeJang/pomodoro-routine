@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import { STORAGE_KEYS } from "@/lib/storage";
+import { STORAGE_KEYS, tabSafeStorage } from "@/lib/storage";
 import type { CompletedSession } from "@/features/timer/types";
 
 type HistoryStore = {
@@ -24,7 +24,7 @@ export const useHistoryStore = create<HistoryStore>()(
     {
       name: STORAGE_KEYS.history,
       version: 1,
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => tabSafeStorage(localStorage)),
       skipHydration: true,
     },
   ),

@@ -71,4 +71,23 @@ describe("다른 탭과 함께 쓰기", () => {
     expect(useTasksStore.getState().tasks[0].completedPomodoros).toBe(1);
     expect(useTimerStore.getState().timer.mode).toBe("short-break");
   });
+
+  it("완료 팝업만 바뀌면 저장하지 않아서, 다른 탭이 방금 저장한 새 값을 덮어쓰지 않는다", () => {
+    useTimerStore.getState().start();
+    // 다른 탭이 휴식을 시작해서 저장함 (이 탭은 아직 그 값을 받지 못함)
+    saveTimerFromOtherTab({ mode: "short-break", status: "running" });
+    const saved = localStorage.getItem(STORAGE_KEYS.timer);
+
+    useTimerStore.getState().showCompleted({
+      mode: "focus",
+      endedAt: T0,
+      durationMs: 25 * MIN,
+    });
+    useTimerStore.getState().dismissCompleted();
+    expect(localStorage.getItem(STORAGE_KEYS.timer)).toBe(saved);
+
+    // 이 탭에서 실제로 바꾸면 저장함
+    useTimerStore.getState().pause();
+    expect(localStorage.getItem(STORAGE_KEYS.timer)).not.toBe(saved);
+  });
 });
