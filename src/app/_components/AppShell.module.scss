@@ -1,11 +1,18 @@
 @use "../../styles/mixins";
 
+// 세로로 헤더 → 페이지 → 맨 아래. 페이지가 짧아도 맨 아래는 화면 바닥에
 .screen {
-  min-height: 100%;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
   background: var(--color-accent-tint);
   transition: background-color var(--duration-slow);
 
   @include mixins.reduced-motion {
     transition: none;
   }
+}
+
+.page {
+  flex: 1 0 auto;
 }

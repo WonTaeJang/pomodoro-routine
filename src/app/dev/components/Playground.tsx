@@ -10,6 +10,7 @@ import {
   CloseIcon,
   CloudRainIcon,
   EditIcon,
+  ExternalLinkIcon,
   FlameIcon,
   GripIcon,
   HeadphonesIcon,
@@ -98,6 +99,7 @@ const icons = [
   { name: "Medal", Icon: MedalIcon },
   { name: "Menu", Icon: MenuIcon },
   { name: "Book", Icon: BookIcon },
+  { name: "ExternalLink", Icon: ExternalLinkIcon },
 ];
 
 /** 공통 컴포넌트를 한눈에 확인하는 개발용 페이지 */

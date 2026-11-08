@@ -1,3 +1,5 @@
+@use "breakpoints" as bp;
+
 // 화면에는 보이지 않지만 화면 낭독기는 읽는 텍스트
 @mixin visually-hidden {
   position: absolute;
@@ -79,4 +81,15 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   text-align: center;
+}
+
+// 페이지 본문 너비: 휴대폰은 좁게, 넓은 화면은 넓게. 가운데 정렬 (PageMain, AppFooter)
+@mixin page-width {
+  width: 100%;
+  max-width: var(--layout-narrow);
+  margin-inline: auto;
+
+  @include bp.up(lg) {
+    max-width: var(--layout-max);
+  }
 }

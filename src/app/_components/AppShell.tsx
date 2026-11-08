@@ -15,11 +15,17 @@ import styles from "./AppShell.module.scss";
 import { HeaderMenu } from "./HeaderMenu";
 
 /**
- * 모든 페이지의 틀: 저장된 값 불러오기, 다른 탭과 맞추기, 헤더(페이지 메뉴, 오늘 기록, ☰ 메뉴), 타이머 동작.
+ * 모든 페이지의 틀: 저장된 값 불러오기, 다른 탭과 맞추기, 헤더(페이지 메뉴, 오늘 기록, ☰ 메뉴), 맨 아래, 타이머 동작.
  * 페이지를 옮겨도 그대로 남아서 다른 페이지에 있어도 타이머 알림과 완료 팝업이 동작합니다.
  * 배경과 강조색은 지금 타이머 모드를 따릅니다.
  */
-export function AppShell({ children }: { children: ReactNode }) {
+type AppShellProps = {
+  children: ReactNode;
+  /** 맨 아래 (버전, GitHub). 서버에서 그려서 넘김 */
+  footer?: ReactNode;
+};
+
+export function AppShell({ children, footer }: AppShellProps) {
   const ready = useHydrateStores();
   useTabSync(ready);
   const mode = useTimerStore((s) => s.timer.mode);
@@ -34,7 +40,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           <FocusSoundButton ready={ready} />
           <HeaderMenu ready={ready} />
         </AppHeader>
-        {children}
+        <div className={styles.page}>{children}</div>
+        {footer}
         <TimerRuntime ready={ready} />
       </div>
     </StoresReadyContext>

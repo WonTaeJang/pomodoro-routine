@@ -4,6 +4,7 @@ import { themeInitScript } from "@/features/theme/themeScript";
 import { APP_NAME } from "@/lib/brand";
 import { migrateLegacyStorageScript } from "@/lib/storage";
 import "@/styles/globals.scss";
+import { AppFooter } from "@/components/layout/AppFooter";
 import { AppShell } from "./_components/AppShell";
 
 const pretendard = localFont({
@@ -33,7 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body>
-        <AppShell>{children}</AppShell>
+        <AppShell footer={<AppFooter />}>{children}</AppShell>
       </body>
     </html>
   );

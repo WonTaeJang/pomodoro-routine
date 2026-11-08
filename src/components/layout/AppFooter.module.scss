@@ -1,0 +1,33 @@
+@use "../../styles/mixins";
+
+// 페이지 내용 끝, 오른쪽에 작게. 본문(PageMain)과 같은 너비라 오른쪽 끝이 카드와 맞음
+.footer {
+  @include mixins.page-width;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1-5);
+  padding: 0 var(--space-4) var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border-radius: var(--radius-sm);
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-text);
+    text-decoration: underline;
+  }
+
+  @include mixins.focus-ring;
+}
+
+.srOnly {
+  @include mixins.visually-hidden;
+}

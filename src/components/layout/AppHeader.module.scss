@@ -3,6 +3,8 @@
 
 .header {
   display: flex;
+  // 앱 틀이 세로 flex라서, 가운데 맞춤(margin auto)이어도 내용만큼 줄어들지 않게
+  width: 100%;
   max-width: var(--layout-max);
   min-height: var(--header-height);
   align-items: center;
