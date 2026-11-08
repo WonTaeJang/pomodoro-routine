@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  AUTO_START_DELAY_MS,
+  beginAutoStart,
   createInitialState,
   DEFAULT_SETTINGS,
   pause,
@@ -224,14 +226,19 @@ describe("완료 처리", () => {
     expect(world.notifications).toEqual([]);
   });
 
-  it("자동 시작이면 다음 세션의 소리를 이어서 예약한다", () => {
+  it("자동 시작이면, 5초 카운트다운이 끝나 다음 세션이 시작될 때 그 끝 소리를 예약한다", () => {
     const { world, update, advance, complete } = setup({
       autoStartBreaks: true,
     });
     update(start(world.timer, T0));
     advance(25 * MIN);
     complete();
+    // 완료 팝업이 보이는 동안은 다음 세션 소리를 예약하지 않음
+    expect(world.sounds.map((s) => s.kind)).toEqual(["focus-end"]);
+    update(beginAutoStart(world.timer, world.now));
+    advance(AUTO_START_DELAY_MS);
+    complete();
     expect(world.sounds.map((s) => s.kind)).toEqual(["focus-end", "break-end"]);
-    expect(world.sounds[1].time).toBe(100 + 30 * 60);
+    expect(world.sounds[1].time).toBe(100 + 30 * 60 + 5);
   });
 });

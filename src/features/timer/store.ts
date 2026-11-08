@@ -5,6 +5,8 @@ import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import {
   applySettings,
+  beginAutoStart,
+  cancelAutoStart,
   createInitialState,
   DEFAULT_SETTINGS,
   pause,
@@ -27,6 +29,10 @@ type TimerStore = {
   /** 방금 끝난 세션. 완료 팝업을 띄우는 데 사용 (저장하지 않음) */
   lastCompleted: CompletedSession | null;
   dismissCompleted: () => void;
+  /** 완료 팝업이 보이기 시작했을 때 자동 시작 카운트다운을 시작 */
+  beginAutoStart: () => void;
+  /** 이번 자동 시작을 취소 (다음 세션은 시작 전 상태로) */
+  cancelAutoStart: () => void;
   start: () => void;
   pause: () => void;
   reset: () => void;
@@ -74,7 +80,12 @@ export const useTimerStore = create<TimerStore>()(
           .recordPomodoros(
             completed.flatMap((c) => (c.taskId ? [c.taskId] : [])),
           );
-        const lastCompleted = completed.at(-1) ?? get().lastCompleted;
+        // 자동 시작 카운트다운이 끝나 다음 세션이 시작됐으면 완료 팝업을 닫음
+        const autoStarted =
+          timer.status === "idle" && synced.state.status === "running";
+        const lastCompleted = autoStarted
+          ? null
+          : (completed.at(-1) ?? get().lastCompleted);
         set({ timer: action(synced.state, now), lastCompleted });
       }
 
@@ -83,6 +94,9 @@ export const useTimerStore = create<TimerStore>()(
         timer: createInitialState(DEFAULT_SETTINGS),
         lastCompleted: null,
         dismissCompleted: () => set({ lastCompleted: null }),
+        beginAutoStart: () =>
+          update((timer, now) => beginAutoStart(timer, now)),
+        cancelAutoStart: () => update((timer) => cancelAutoStart(timer)),
         start: () => update((timer, now) => start(timer, now)),
         pause: () => update((timer, now) => pause(timer, now)),
         reset: () => update((timer) => reset(timer, get().settings)),
@@ -112,7 +126,12 @@ export const useTimerStore = create<TimerStore>()(
       name: STORAGE_KEYS.timer,
       version: 1,
       storage: createJSONStorage(() => localStorage),
-      partialize: ({ settings, timer }) => ({ settings, timer }),
+      // 팝업을 아직 못 본 자동 시작 대기는 저장하지 않음 (새로고침하면 완료 팝업이 없어서 시작할 방법이 없음)
+      partialize: ({ settings, timer }) => ({
+        settings,
+        timer:
+          timer.autoStart?.at === null ? { ...timer, autoStart: null } : timer,
+      }),
       // 서버에서 그린 화면과 첫 화면이 같도록, 저장된 값은 화면이 뜬 뒤에 불러옵니다.
       skipHydration: true,
       // 예전에 저장된 설정에 새 항목이 없을 때 기본값으로 채움

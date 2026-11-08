@@ -44,6 +44,11 @@ export type TimerState = {
   endsAt: number | null;
   /** 이번 사이클에서 완료한 집중 횟수. 긴 휴식이 끝나면 0 */
   completedInCycle: number;
+  /**
+   * 자동 시작 대기 (시작 전 세션에만). 세션이 끝나고 자동 시작 차례면 생기고, 그동안 시간은 흐르지 않음.
+   * at: 다음 세션을 시작할 시각. 완료 팝업이 실제로 보인 순간 "지금 + 5초"로 정해짐 (그 전에는 null)
+   */
+  autoStart?: { at: number | null } | null;
 };
 
 /** 끝까지 마친 세션 기록 */

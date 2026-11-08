@@ -81,6 +81,9 @@ function breakAfterFocus(
     : "short-break";
 }
 
+/** 자동 시작 전에 완료 팝업에서 기다리는 시간 */
+export const AUTO_START_DELAY_MS = 5_000;
+
 function shouldAutoStart(mode: TimerMode, settings: TimerSettings): boolean {
   return mode === "focus" ? settings.autoStartFocus : settings.autoStartBreaks;
 }
@@ -88,7 +91,29 @@ function shouldAutoStart(mode: TimerMode, settings: TimerSettings): boolean {
 /** 시작하거나 일시정지에서 이어서 시작합니다. */
 export function start(state: TimerState, now: number): TimerState {
   if (state.status === "running") return state;
-  return { ...state, status: "running", endsAt: now + state.remainingMs };
+  return {
+    ...state,
+    status: "running",
+    endsAt: now + state.remainingMs,
+    autoStart: null,
+  };
+}
+
+/** 완료 팝업이 보이기 시작했을 때, 자동 시작까지 5초를 세기 시작합니다. */
+export function beginAutoStart(state: TimerState, now: number): TimerState {
+  if (
+    state.status !== "idle" ||
+    !state.autoStart ||
+    state.autoStart.at !== null
+  ) {
+    return state;
+  }
+  return { ...state, autoStart: { at: now + AUTO_START_DELAY_MS } };
+}
+
+/** 이번에는 자동으로 시작하지 않습니다. 다음 세션은 시작 전 상태로 남고, 자동 시작 설정은 그대로입니다. */
+export function cancelAutoStart(state: TimerState): TimerState {
+  return state.autoStart ? { ...state, autoStart: null } : state;
 }
 
 export function pause(state: TimerState, now: number): TimerState {
@@ -132,20 +157,31 @@ export function skip(state: TimerState, settings: TimerSettings): TimerState {
 /**
  * 진행 중인 세션이 끝났는지 확인하고, 끝났으면 완료 처리 후 다음 세션으로 넘어갑니다.
  *
+ * 자동 시작:
+ * - 자동 시작 차례면 다음 세션을 "자동 시작 대기"로 둡니다. 완료 팝업이 보이면 5초를 센 뒤,
+ *   그 시각부터 다음 세션이 시작됩니다. (팝업을 못 보는 동안, 즉 다른 탭이거나 자리를 비우면 기다림)
+ * - 사이클을 마친 순간(긴 휴식 차례, 수료증 시점)은 자동 시작이 켜져 있어도 긴 휴식을 시작 전 상태로 둡니다.
+ *
  * 자리를 비운 사이 끝난 경우:
  * - 끝난 세션 1개만 완료로 기록합니다.
- * - 다음 세션은 자동 시작이 켜져 있고 아직 끝나지 않았을 때만 이어서 진행합니다.
- *   (끝나는 시각은 이전 세션이 끝난 시각 기준이라 시간이 끊기지 않음)
- * - 다음 세션까지 이미 끝났을 시간이면 시작 전 상태로 둡니다.
+ * - 5초를 세는 중에 자리를 비워서 다음 세션 시간까지 다 지났으면 시작 전 상태로 둡니다.
  *   자리를 비운 동안 뽀모도로가 저절로 쌓이지 않게 하기 위함입니다.
- *
- * 사이클을 마친 순간(긴 휴식 차례, 수료증 시점)은 자동 시작이 켜져 있어도 긴 휴식을 시작 전 상태로 둡니다.
  */
 export function sync(
   state: TimerState,
   settings: TimerSettings,
   now: number,
 ): TimerTransition {
+  const autoStartAt = state.status === "idle" ? state.autoStart?.at : null;
+  if (autoStartAt != null && now >= autoStartAt) {
+    const endsAt = autoStartAt + state.remainingMs;
+    const started: TimerState =
+      now < endsAt
+        ? { ...state, status: "running", endsAt, autoStart: null }
+        : { ...state, autoStart: null };
+    return { state: started, completed: [] };
+  }
+
   if (
     state.status !== "running" ||
     state.endsAt === null ||
@@ -180,10 +216,7 @@ export function sync(
 
   // 사이클을 마친 순간(수료증 시점)은 자동 시작 설정과 상관없이 멈춤
   if (!completed.cycleCompleted && shouldAutoStart(next.mode, settings)) {
-    const nextEndsAt = endedAt + next.durationMs;
-    if (now < nextEndsAt) {
-      next = { ...next, status: "running", endsAt: nextEndsAt };
-    }
+    next = { ...next, autoStart: { at: null } };
   }
 
   return { state: next, completed: [completed] };
@@ -195,7 +228,10 @@ export function applySettings(
   settings: TimerSettings,
 ): TimerState {
   if (state.status !== "idle") return state;
-  return createSession(state.mode, state.completedInCycle, settings);
+  return {
+    ...createSession(state.mode, state.completedInCycle, settings),
+    autoStart: state.autoStart,
+  };
 }
 
 /** 남은 시간을 "mm:ss"로. 초는 올림해서 0초가 되는 순간 끝나 보이게 합니다. */

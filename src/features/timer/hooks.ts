@@ -23,20 +23,16 @@ export function useSessionState<T>(initial: T): [T, (value: T) => void] {
   return [value, (next) => setState({ key, value: next })];
 }
 
-/** 진행 중인 세션의 시간이 다 되면 다음 세션으로 넘깁니다. */
+/** 진행 중인 세션의 시간이 다 되거나, 자동 시작 카운트다운이 끝나면 다음으로 넘깁니다. */
 export function useCompleteWhenDue(timer: TimerState, now: number | null) {
-  const { status, endsAt } = timer;
+  const due =
+    timer.status === "running" ? timer.endsAt : (timer.autoStart?.at ?? null);
 
   useEffect(() => {
-    if (
-      status === "running" &&
-      endsAt !== null &&
-      now !== null &&
-      now >= endsAt
-    ) {
+    if (due !== null && now !== null && now >= due) {
       useTimerStore.getState().sync();
     }
-  }, [status, endsAt, now]);
+  }, [due, now]);
 }
 
 /** 브라우저 탭 제목에 남은 시간을 표시합니다. (예: "24:13 · 집중 | 까모도로") */

@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   applySettings,
+  AUTO_START_DELAY_MS,
+  beginAutoStart,
+  cancelAutoStart,
   createInitialState,
   DEFAULT_SETTINGS,
   formatRemaining,
@@ -153,69 +156,112 @@ describe("완료와 다음 세션", () => {
 
 describe("자동 시작", () => {
   const auto = { ...settings, autoStartBreaks: true, autoStartFocus: true };
+  const SEC = 1000;
 
-  it("켜져 있으면 다음 세션이 이전 세션이 끝난 시각부터 바로 진행된다", () => {
-    const running = start(createInitialState(auto), T0);
-    const { state } = sync(running, auto, T0 + 25 * MIN + 1000);
-    expect(state.status).toBe("running");
-    expect(state.mode).toBe("short-break");
-    expect(state.endsAt).toBe(T0 + 30 * MIN);
-  });
+  /** 집중을 마친 직후 (자동 시작 대기) */
+  function afterFocus(s: TimerSettings = auto, completedInCycle = 0) {
+    const running = start({ ...createInitialState(s), completedInCycle }, T0);
+    return sync(running, s, T0 + 25 * MIN);
+  }
 
-  it("휴식 자동 시작만 켜면 집중은 자동으로 시작하지 않는다", () => {
-    const breaksOnly = { ...settings, autoStartBreaks: true };
-    const afterFocus = sync(
-      start(createInitialState(breaksOnly), T0),
-      breaksOnly,
-      T0 + 25 * MIN,
-    );
-    expect(afterFocus.state.status).toBe("running");
-    const afterBreak = sync(afterFocus.state, breaksOnly, T0 + 30 * MIN);
-    expect(afterBreak.state).toMatchObject({ mode: "focus", status: "idle" });
-  });
-
-  it("사이클을 마치면 자동 시작이 켜져 있어도 긴 휴식은 시작 전 상태로 멈춘다", () => {
-    const lastFocus = start(
-      { ...createInitialState(auto), completedInCycle: 3 },
-      T0,
-    );
-    const { state, completed } = sync(lastFocus, auto, T0 + 25 * MIN);
-    expect(completed[0].cycleCompleted).toBe(true);
-    expect(state).toMatchObject({ mode: "long-break", status: "idle" });
-  });
-
-  it("멈춘 긴 휴식을 직접 시작하면, 끝난 뒤에는 다시 자동 시작을 따른다", () => {
-    const longBreak = start(
-      {
-        ...createInitialState(auto),
-        mode: "long-break",
-        durationMs: 15 * MIN,
-        remainingMs: 15 * MIN,
-        completedInCycle: 4,
-      },
-      T0,
-    );
-    const { state } = sync(longBreak, auto, T0 + 15 * MIN);
+  it("세션이 끝나면 다음 세션은 자동 시작 대기가 되고, 시간은 흐르지 않는다", () => {
+    const { state } = afterFocus();
     expect(state).toMatchObject({
-      mode: "focus",
+      mode: "short-break",
+      status: "idle",
+      autoStart: { at: null },
+    });
+    // 팝업이 보이기 전에는 아무리 기다려도 시작하지 않음 (다른 탭, 자리 비움)
+    expect(sync(state, auto, T0 + 60 * MIN).state.status).toBe("idle");
+  });
+
+  it("팝업이 보인 순간부터 5초 뒤에 시작하고, 그 시각을 기준으로 끝나는 시각을 정한다", () => {
+    const shownAt = T0 + 25 * MIN + 1 * SEC;
+    const counting = beginAutoStart(afterFocus().state, shownAt);
+    expect(counting.autoStart).toEqual({ at: shownAt + AUTO_START_DELAY_MS });
+    expect(sync(counting, auto, shownAt + 4 * SEC).state.status).toBe("idle");
+    // 화면 갱신이 늦게 와도(예: 7초 뒤) 시작 시각은 카운트다운이 끝난 시각
+    const { state, completed } = sync(counting, auto, shownAt + 7 * SEC);
+    expect(completed).toEqual([]);
+    expect(state).toMatchObject({
       status: "running",
-      completedInCycle: 0,
+      endsAt: shownAt + AUTO_START_DELAY_MS + 5 * MIN,
+      autoStart: null,
     });
   });
 
-  it("사이클 중간의 짧은 휴식은 그대로 자동 시작한다", () => {
-    const secondFocus = start(
-      { ...createInitialState(auto), completedInCycle: 1 },
-      T0,
-    );
-    const { state } = sync(secondFocus, auto, T0 + 25 * MIN);
-    expect(state).toMatchObject({ mode: "short-break", status: "running" });
+  it("카운트다운은 한 번만 정해진다 (팝업이 다시 그려져도 늘어나지 않음)", () => {
+    const counting = beginAutoStart(afterFocus().state, T0 + 25 * MIN);
+    expect(beginAutoStart(counting, T0 + 25 * MIN + 3 * SEC)).toBe(counting);
+  });
+
+  it("지금 시작: 기다리지 않고 바로 시작", () => {
+    const now = T0 + 25 * MIN + 2 * SEC;
+    const state = start(beginAutoStart(afterFocus().state, now), now);
+    expect(state).toMatchObject({
+      status: "running",
+      endsAt: now + 5 * MIN,
+      autoStart: null,
+    });
+  });
+
+  it("취소: 다음 세션은 처음 길이 그대로 시작 전 상태, 자동 시작 설정은 그대로", () => {
+    const counting = beginAutoStart(afterFocus().state, T0 + 25 * MIN);
+    const cancelled = cancelAutoStart(counting);
+    expect(cancelled).toMatchObject({
+      status: "idle",
+      remainingMs: 5 * MIN,
+      autoStart: null,
+    });
+    expect(sync(cancelled, auto, T0 + 26 * MIN).state.status).toBe("idle");
+  });
+
+  it("카운트다운 중 자리를 비워 다음 세션 시간까지 다 지났으면 시작 전 상태로 둔다", () => {
+    const counting = beginAutoStart(afterFocus().state, T0 + 25 * MIN);
+    const { state, completed } = sync(counting, auto, T0 + 60 * MIN);
+    expect(completed).toEqual([]);
+    expect(state).toMatchObject({ status: "idle", autoStart: null });
+  });
+
+  it("휴식 자동 시작만 켜면 휴식만 대기하고, 집중은 대기 없이 시작 전 상태", () => {
+    const breaksOnly = { ...settings, autoStartBreaks: true };
+    expect(afterFocus(breaksOnly).state.autoStart).toEqual({ at: null });
+    const breakRunning = start(afterFocus(breaksOnly).state, T0 + 25 * MIN);
+    const afterBreak = sync(breakRunning, breaksOnly, T0 + 30 * MIN);
+    expect(afterBreak.state).toMatchObject({ mode: "focus", status: "idle" });
+    expect(afterBreak.state.autoStart ?? null).toBeNull();
+  });
+
+  it("사이클을 마치면 자동 시작이 켜져 있어도 긴 휴식은 대기 없이 멈춘다", () => {
+    const { state, completed } = afterFocus(auto, 3);
+    expect(completed[0].cycleCompleted).toBe(true);
+    expect(state).toMatchObject({ mode: "long-break", status: "idle" });
+    expect(state.autoStart ?? null).toBeNull();
+  });
+
+  it("멈춘 긴 휴식을 직접 시작하면, 끝난 뒤에는 다시 자동 시작을 따른다", () => {
+    const longBreak = start(afterFocus(auto, 3).state, T0 + 26 * MIN);
+    const { state } = sync(longBreak, auto, T0 + 41 * MIN);
+    expect(state).toMatchObject({
+      mode: "focus",
+      status: "idle",
+      completedInCycle: 0,
+      autoStart: { at: null },
+    });
+  });
+
+  it("대기 중에 설정을 바꿔도 대기는 유지된다", () => {
+    const { state } = afterFocus();
+    expect(
+      applySettings(state, { ...auto, shortBreakMinutes: 10 }),
+    ).toMatchObject({ remainingMs: 10 * MIN, autoStart: { at: null } });
   });
 
   it("꺼져 있으면 다음 세션은 시작 전 상태로 기다린다", () => {
     const { state } = finishSession(createInitialState(settings), settings, T0);
     expect(state.status).toBe("idle");
     expect(state.endsAt).toBeNull();
+    expect(state.autoStart ?? null).toBeNull();
   });
 });
 
