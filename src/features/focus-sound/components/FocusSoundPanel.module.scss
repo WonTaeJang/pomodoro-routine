@@ -87,18 +87,28 @@
   }
 }
 
-// 끄기는 한 줄 전체: 아이콘, 이름, 설명을 나란히
-.off {
+// 맨 위 끄기 · 랜덤: 두 칸에 아이콘 왼쪽, 이름과 설명 오른쪽
+.wideRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1-5);
+}
+
+.wide {
   flex-direction: row;
   gap: var(--space-2-5);
   padding: var(--space-2) var(--space-3);
   text-align: start;
 
   .text {
-    flex-direction: row;
-    align-items: baseline;
-    gap: var(--space-2);
+    align-items: flex-start;
   }
+}
+
+// 랜덤일 때 이번(다음) 집중의 소리
+.randomNote {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
 }
 
 .icon {

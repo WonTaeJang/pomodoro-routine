@@ -33,8 +33,19 @@ export const FOCUS_SOUND_IDS = [
 ] as const;
 export type FocusSoundId = (typeof FOCUS_SOUND_IDS)[number];
 
-/** 설정값: 소리 종류 또는 끄기 */
-export type FocusSoundSetting = FocusSoundId | "off";
+/** 설정값: 소리 종류, 끄기, 또는 집중마다 랜덤 (random.ts) */
+export type FocusSoundSetting = FocusSoundId | "off" | "random";
+
+/** 저장된 값이 지금 앱에 있는 설정값인지 (예전에 있다가 빠진 소리면 false) */
+export function isFocusSoundSetting(
+  value: unknown,
+): value is FocusSoundSetting {
+  return (
+    value === "off" ||
+    value === "random" ||
+    FOCUS_SOUND_IDS.includes(value as FocusSoundId)
+  );
+}
 
 /** 브라우저에서 바로 만드는 소리 */
 export type SynthSound = {

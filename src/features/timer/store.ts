@@ -4,6 +4,7 @@ import { STORAGE_KEYS, tabSafeStorage } from "@/lib/storage";
 import { newSessions } from "@/features/history/sessions";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
+import { isFocusSoundSetting } from "@/features/focus-sound/sounds";
 import {
   applySettings,
   beginAutoStart,
@@ -150,9 +151,14 @@ export const useTimerStore = create<TimerStore>()(
           Pick<TimerStore, "settings" | "timer">
         >;
         const timer = saved.timer ?? current.timer;
+        const settings = { ...current.settings, ...saved.settings };
+        // 지금 앱에 없는 집중 소리(예: 새 버전에서 빠진 소리)면 끔
+        if (!isFocusSoundSetting(settings.focusSound)) {
+          settings.focusSound = "off";
+        }
         return {
           ...current,
-          settings: { ...current.settings, ...saved.settings },
+          settings,
           // 팝업을 아직 못 본 자동 시작 대기는 처음 불러올 때(새로고침) 버림. 완료 팝업이 없어서 시작할 방법이 없음.
           // 다른 탭이 저장한 것을 다시 불러올 때는 그대로 (그 탭과 이 탭의 완료 팝업이 함께 기다림)
           timer:

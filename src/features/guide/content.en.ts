@@ -72,6 +72,7 @@ const content: GuideContent = {
       title: "Focus sounds",
       points: [
         `Pick from ${soundCount} sounds (${soundGroups}) with {headphones} at the top.`,
+        "Choose 'Random' to get a different sound each focus session, never the same one twice in a row.",
         "Sounds play only while you're focusing, and turn off during breaks or when paused.",
         "Even with several tabs open, sound plays only in the tab you clicked last.",
       ],

@@ -179,12 +179,19 @@ const en: Messages = {
   focusSound: {
     title: "Focus sounds",
     buttonPlaying: "Focus sounds: {sound}",
+    buttonRandom: "Focus sounds: random ({sound})",
     hint: "Plays only while you focus.",
     hintWithPreview: "Plays only while you focus. Pick one to hear a preview.",
     kind: "Sound",
     off: {
       label: "Off",
       description: "Focus in silence",
+    },
+    random: {
+      label: "Random",
+      description: "New sound each session",
+      now: "This session: {sound}",
+      next: "Next session: {sound}",
     },
     groups: {
       noise: "Noise",

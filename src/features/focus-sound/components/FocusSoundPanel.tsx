@@ -3,6 +3,7 @@
 import { useTranslations } from "use-intl";
 import {
   HeadphonesIcon,
+  ShuffleIcon,
   VolumeHighIcon,
   VolumeLowIcon,
   VolumeOffIcon,
@@ -18,11 +19,21 @@ import {
   FOCUS_SOUNDS,
   type FocusSoundSetting,
 } from "../sounds";
+import { useFocusSoundChoice } from "../useFocusSoundChoice";
 import styles from "./FocusSoundPanel.module.scss";
 
-/** 집중 소리 고르기, 크기. 집중 중이 아닐 때 고르면 잠깐 미리 들려줍니다. */
+/** 맨 위 넓은 두 칸 (이름과 설명은 focusSound.<값>.label / description) */
+const WIDE_OPTIONS = [
+  { value: "off", icon: VolumeOffIcon },
+  { value: "random", icon: ShuffleIcon },
+] as const;
+
+/**
+ * 집중 소리 고르기, 크기. 집중 중이 아닐 때 고르면 잠깐 미리 들려줍니다.
+ * 랜덤을 고르면 이번(또는 다음) 집중의 소리를 알려주고, 집중 중이면 그 소리 칸에 재생 중 막대.
+ */
 export function FocusSoundPanel() {
-  const sound = useTimerStore((s) => s.settings.focusSound);
+  const { setting, sound, randomSound } = useFocusSoundChoice();
   const volume = useTimerStore((s) => s.settings.focusSoundVolume);
   const focusing = useFocusRunning();
   const update = useTimerStore.getState().updateSettings;
@@ -32,7 +43,9 @@ export function FocusSoundPanel() {
   function choose(value: FocusSoundSetting) {
     update({ focusSound: value });
     if (value === "off") stopPreview();
-    else if (!focusing) previewFocusSound(value, volume);
+    else if (!focusing) {
+      previewFocusSound(value === "random" ? randomSound : value, volume);
+    }
   }
 
   return (
@@ -49,16 +62,28 @@ export function FocusSoundPanel() {
 
       <fieldset className={styles.options}>
         <legend className={styles.legend}>{t("kind")}</legend>
-        <SoundOption
-          value="off"
-          label={t("off.label")}
-          description={t("off.description")}
-          icon={VolumeOffIcon}
-          checked={sound === "off"}
-          playing={false}
-          onChoose={choose}
-          className={styles.off}
-        />
+        <div className={styles.wideRow}>
+          {WIDE_OPTIONS.map(({ value, icon }) => (
+            <SoundOption
+              key={value}
+              value={value}
+              label={t(`${value}.label`)}
+              description={t(`${value}.description`)}
+              icon={icon}
+              checked={setting === value}
+              playing={false}
+              onChoose={choose}
+              className={styles.wide}
+            />
+          ))}
+        </div>
+        {setting === "random" && sound ? (
+          <p className={styles.randomNote} aria-live="polite">
+            {t(focusing ? "random.now" : "random.next", {
+              sound: t(`sounds.${sound}.label`),
+            })}
+          </p>
+        ) : null}
         {FOCUS_SOUND_GROUPS.map((group) => (
           <div key={group.id} className={styles.group}>
             <p className={styles.groupTitle}>{t(`groups.${group.id}`)}</p>
@@ -70,7 +95,7 @@ export function FocusSoundPanel() {
                   label={t(`sounds.${id}.label`)}
                   description={t(`sounds.${id}.description`)}
                   icon={FOCUS_SOUNDS[id].icon}
-                  checked={sound === id}
+                  checked={setting === id}
                   playing={focusing && sound === id}
                   onChoose={choose}
                 />
@@ -88,7 +113,7 @@ export function FocusSoundPanel() {
           setPreviewVolume(value / 100);
         }}
         format={(value) => `${value}%`}
-        disabled={sound === "off"}
+        disabled={setting === "off"}
         startIcon={<VolumeLowIcon size={18} />}
         endIcon={<VolumeHighIcon size={18} />}
       />

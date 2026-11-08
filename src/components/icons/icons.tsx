@@ -273,6 +273,17 @@ export function WavesIcon(props: IconProps) {
   );
 }
 
+/** 엇갈린 화살표 (랜덤) */
+export function ShuffleIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M3 7h3.5c2 0 3.2.8 4.3 2.4l2.4 5.2c1.1 1.6 2.3 2.4 4.3 2.4H21" />
+      <path d="M3 17h3.5c1.6 0 2.7-.5 3.6-1.5M14 8.5c.9-1 2-1.5 3.5-1.5H21" />
+      <path d="m18 4 3 3-3 3M18 14l3 3-3 3" />
+    </Icon>
+  );
+}
+
 /** 비행기 (위에서 본 모양) */
 export function AirplaneIcon(props: IconProps) {
   return (

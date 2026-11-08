@@ -5,21 +5,24 @@ import { useFocusRunning } from "@/features/timer/hooks";
 import { useTimerStore } from "@/features/timer/store";
 import { useIsSoundTab } from "@/lib/soundTab";
 import { resumeFocusSound, setFocusSound } from "./player";
+import { useFocusSoundChoice } from "./useFocusSoundChoice";
 
 /**
- * 집중이 진행 중일 때만 고른 집중 소리를 틀어 둡니다. 앱 틀(TimerRuntime)에서 한 번만 씁니다.
+ * 집중이 진행 중일 때만 고른 집중 소리를 틀어 둡니다 (랜덤이면 이번 집중의 소리). 앱 틀(TimerRuntime)에서 한 번만 씁니다.
  * 휴식, 일시정지, 끝나면 서서히 꺼집니다. 탭을 여러 개 열면 소리를 낼 탭 하나에서만 납니다.
  */
 export function useFocusSound(ready: boolean) {
-  const sound = useTimerStore((s) => s.settings.focusSound);
+  const { sound } = useFocusSoundChoice();
   const volume = useTimerStore((s) => s.settings.focusSoundVolume);
   const focusing = useFocusRunning();
   const soundTab = useIsSoundTab();
-  const on = ready && focusing && soundTab && sound !== "off";
+  // 지금 틀어야 할 소리 (틀지 않을 때는 null)
+  const playing = ready && focusing && soundTab ? sound : null;
+  const on = playing !== null;
 
   useEffect(() => {
-    setFocusSound(on ? { id: sound, volume } : null);
-  }, [on, sound, volume]);
+    setFocusSound(playing ? { id: playing, volume } : null);
+  }, [playing, volume]);
 
   // 새로고침 뒤 집중이 이어지는 중이면 처음 누를 때 소리를 깨우고,
   // 다른 탭·앱에 다녀오면 멈춘 소리를 다시 깨움

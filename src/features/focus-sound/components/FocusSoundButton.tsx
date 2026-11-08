@@ -4,8 +4,8 @@ import { useId } from "react";
 import { useTranslations } from "use-intl";
 import { HeadphonesIcon } from "@/components/icons";
 import { IconButton } from "@/components/ui";
-import { useTimerStore } from "@/features/timer/store";
 import { cx } from "@/lib/cx";
+import { useFocusSoundChoice } from "../useFocusSoundChoice";
 import styles from "./FocusSoundButton.module.scss";
 import { FocusSoundPanel } from "./FocusSoundPanel";
 
@@ -20,17 +20,20 @@ type FocusSoundButtonProps = {
  */
 export function FocusSoundButton({ ready }: FocusSoundButtonProps) {
   const panelId = useId();
-  const sound = useTimerStore((s) => s.settings.focusSound);
-  const on = ready && sound !== "off";
+  const { setting, sound } = useFocusSoundChoice();
+  const on = ready && sound !== null;
   const t = useTranslations("focusSound");
+  const soundName = sound ? t(`sounds.${sound}.label`) : "";
 
   return (
     <>
       <IconButton
         label={
-          on
-            ? t("buttonPlaying", { sound: t(`sounds.${sound}.label`) })
-            : t("title")
+          !on
+            ? t("title")
+            : t(setting === "random" ? "buttonRandom" : "buttonPlaying", {
+                sound: soundName,
+              })
         }
         icon={<HeadphonesIcon />}
         disabled={!ready}

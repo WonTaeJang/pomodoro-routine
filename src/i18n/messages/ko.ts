@@ -178,12 +178,19 @@ const ko = {
   focusSound: {
     title: "집중 소리",
     buttonPlaying: "집중 소리: {sound}",
+    buttonRandom: "집중 소리: 랜덤 ({sound})",
     hint: "집중할 때만 들려요.",
     hintWithPreview: "집중할 때만 들려요. 고르면 미리 들려줘요.",
     kind: "소리 종류",
     off: {
       label: "끄기",
       description: "소리 없이 집중",
+    },
+    random: {
+      label: "랜덤",
+      description: "집중마다 다른 소리",
+      now: "이번 집중: {sound}",
+      next: "다음 집중: {sound}",
     },
     groups: {
       noise: "노이즈",
