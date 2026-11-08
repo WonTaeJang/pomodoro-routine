@@ -42,6 +42,7 @@
 | `focus-ring` / `focus-outline` | 키보드 포커스 테두리 |
 | `disabled` | 사용할 수 없는 상태 (흐리게, 커서) |
 | `reduced-motion` | 기기에서 "움직임 줄이기"를 켰을 때 |
+| `stack($gap)` | 세로로 쌓기 (`display: flex` + `flex-direction: column` + `gap`) |
 
 ## 공통 컴포넌트 (`src/components/ui/`)
 
@@ -63,20 +64,21 @@ import { PawIcon } from "@/components/icons";
 | `SegmentedControl` | 여러 개 중 하나 선택 (모드 탭) | `label`, `options`, `value`, `onChange`. 방향키로 이동 |
 | `TextField` | 라벨 붙은 입력칸 | `label`, `hint`, `error`, `hideLabel` + input 속성 |
 | `Checkbox` | 체크박스 | `label` + input 속성 |
+| `Section` | 밑줄 있는 작은 제목 + 내용을 세로로 쌓은 묶음 (설정 창, 컴포넌트 미리보기) | `title`, `headingLevel`(2, 3), `children` |
 | `Slider` | 끌어서 값 고르기 (소리 크기) | `label`, `value`, `onChange`, `min`, `max`, `step`, `format`, `disabled`. 방향키로도 조절 |
 | `Stepper` | − 값 + 숫자 조절 | `label`, `value`, `onChange`, `min`, `max`, `format`, `prefix` |
 | `ProgressRing` | 원형 진행 띠 | `value`(남은 비율 0~1), `size`(기준 지름), `thickness`, `markers`, `glow`, `flashKey`, `overlay`, `children`. 화면 크기는 CSS 변수 `--ring-display-size`로 바꿀 수 있고 도장 위치·안쪽 크기가 같은 비율로 따라감 |
 
-아이콘(`src/components/icons/`): `Play`, `Pause`, `Reset`, `Skip`, `Settings`, `Plus`, `Minus`, `Check`, `Close`, `Trash`, `Edit`, `Sun`, `Moon`, `Paw`, `Medal` (+`Icon`)
+아이콘(`src/components/icons/`): `Play`, `Pause`, `Reset`, `Skip`, `Settings`, `Plus`, `Minus`, `Check`, `Close`, `Trash`, `Edit`, `Sun`, `Moon`, `Paw`, `Medal` (새 아이콘은 같은 폴더의 `Icon`으로 만듦)
 - 모든 아이콘은 `size`(기본 20), `title`을 받고, 색은 글자색을 따릅니다.
 - 새 아이콘은 `icons.tsx`에 24×24 격자, 선 두께 2 기준으로 그립니다.
 
 ### 기능별 컴포넌트
 특정 기능에서만 쓰는 컴포넌트는 `src/features/<기능>/components/`에 둡니다.
-- 타이머: `TimerPanel`(카드 조립), `ModeSwitcher`(모드 탭 + 전환 확인), `TimerRing`(진행 띠 + 효과), `KkamiPhoto`, `TimerControls`, `CycleProgress`, `CompletionDialog`, `Celebration`, `TestModeBadge`
+- 타이머: `TimerPanel`(카드 조립), `ModeSwitcher`(모드 탭 + 전환 확인), `TimerRing`(진행 띠 + 효과), `KkamiPhoto`, `TimerControls`, `CycleProgress`, `CompletionDialog`(+ `useCompletionDialog.ts`: 언제 보일지, 자동 시작 카운트다운), `Celebration`, `TestModeBadge`
 - 할 일: `TaskPanel`, `TaskForm`, `TaskItem`, `TaskDoneCheck`, `PawCount`(🐾 완료/예상)
-- 기록: `TodaySummary`
-- 설정: `SettingsButton`(헤더 버튼 + 창 열기), `SettingsDialog`, 묶음별 `TimerSection`, `AlertSection`, `DisplaySection`, `ShortcutSection`, `DataSection`. 한 줄 모양은 공통 `FieldRow`
+- 기록: `TodaySummary`, 오늘 기록 훅 `useTodayFocus()` (헤더의 오늘 기록, 🏅 메달 버튼이 같이 씀)
+- 설정: `SettingsButton`(헤더 버튼 + 창 열기), `SettingsDialog`, 묶음별 `TimerSection`, `AlertSection`, `DisplaySection`, `ShortcutSection`, `DataSection`, 안내 문구 `SettingsNote`. 묶음 모양은 공통 `Section`, 한 줄 모양은 공통 `FieldRow`
   - 설정 되돌리기, 모든 데이터 지우기는 여러 store를 함께 바꾸므로 `src/features/settings/resetData.ts`에 둠
 - 알림(`src/features/alerts/`, 화면 없음). 밖에서는 `index.ts`에서 내보낸 것만 씀 (`useAlerts`, `prepareAlerts`, 설정 화면용 `previewAlertSound`, 알림 권한 함수 등)
   - `alerts.ts`: 다음 알림 계산, 알림 문구 (순수 함수)
@@ -113,3 +115,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-07: 수료증 구조, 마스코트 추가
 - 2026-11-08: 타이머 화면 한 화면 맞춤 (ProgressRing 크기 조절, 헤더 메달 버튼)
 - 2026-11-08: 팝업 기다리기(popupHold), 탭 보임 여부(usePageVisible) 추가
+- 2026-11-08: 전체 리팩토링. `Section` 컴포넌트, `stack` mixin, `useTodayFocus` 추가, 완료 팝업 훅 분리, 남은 시간 글자 크기를 토큰(`--font-size-display`)으로
