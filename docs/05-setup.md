@@ -106,8 +106,8 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
 ```
 pomodoro-routine/
 ├── docs/                  기획 문서
-├── src/app/               페이지 (layout.tsx, page.tsx 타이머, calendar/ 캘린더)
-├── src/app/_components/   모든 페이지의 틀 AppShell (헤더, 저장값 불러오기, 타이머 동작)
+├── src/app/               페이지 (layout.tsx, page.tsx 타이머, calendar/ 캘린더, guide/ 사용법)
+├── src/app/_components/   모든 페이지의 틀 AppShell (헤더, ☰ 메뉴, 저장값 불러오기, 타이머 동작)
 ├── src/app/dev/components 컴포넌트 미리보기 (개발 중에만)
 ├── src/features/timer/    타이머 (로직, store, 화면)
 ├── src/features/history/  세션 기록, 오늘 기록, 기록 공통 계산(sessions.ts: 날짜별 요약, 할 일 제목)
@@ -117,6 +117,7 @@ pomodoro-routine/
 ├── src/features/theme/    다크 모드
 ├── src/features/alerts/   알림 소리, 브라우저 알림
 ├── src/features/focus-sound/ 집중 소리 (노이즈 만들기, 재생, 헤더 버튼과 펼침 창)
+├── src/features/guide/    사용법 페이지 (지금은 준비 중 안내)
 ├── src/features/settings/ 설정 창, 데이터 초기화
 ├── src/features/shortcuts/ 키보드 단축키
 ├── src/features/certificate/ 수료증 (내용 계산, 캔버스 그리기, 공유·저장, 팝업)
@@ -157,3 +158,4 @@ pomodoro-routine/
 - 2026-11-08: focus-sound 폴더, scripts/, public/sounds/ 추가
 - 2026-11-08: stats 폴더 추가
 - 2026-11-08: 다른 탭과 맞추기(`useTabSync`), `kkamodoro-sound-tab` 추가
+- 2026-11-08: guide 폴더, `/guide` 페이지, 헤더 메뉴(HeaderMenu) 추가

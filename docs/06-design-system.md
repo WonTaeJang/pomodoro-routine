@@ -43,6 +43,8 @@
 | `disabled` | 사용할 수 없는 상태 (흐리게, 커서) |
 | `reduced-motion` | 기기에서 "움직임 줄이기"를 켰을 때 |
 | `stack($gap)` | 세로로 쌓기 (`display: flex` + `flex-direction: column` + `gap`) |
+| `header-panel($width)` | 헤더 버튼 아래로 펼쳐지는 창 (집중 소리 창, ☰ 메뉴) |
+| `kbd` | 키보드 키 모양 (설정 창의 단축키 안내, 메뉴의 S) |
 
 ## 공통 컴포넌트 (`src/components/ui/`)
 
@@ -61,6 +63,7 @@ import { PawIcon } from "@/components/icons";
 | `ConfirmDialog` | "정말 할까요?" 확인 팝업 | `open`, `title`, `confirmLabel`, `tone`(primary, danger), `onConfirm`, `onClose` |
 | `FieldRow` | 왼쪽 이름·설명, 오른쪽 조작 요소인 한 줄. 좁으면 조작 요소가 다음 줄로 | `label`, `description`, `htmlFor`, `children`(조작 요소) |
 | `Switch` | 켜기/끄기 (`FieldRow` 모양) | `checked`, `onCheckedChange`, `label`, `description` |
+| `SwitchTrack` | 스위치 모양만 (줄 전체가 버튼인 메뉴 항목 안에서) | `checked` |
 | `SegmentedControl` | 여러 개 중 하나 선택 (모드 탭) | `label`, `options`, `value`, `onChange`. 방향키로 이동 |
 | `TextField` | 라벨 붙은 입력칸 | `label`, `hint`, `error`, `hideLabel` + input 속성 |
 | `Checkbox` | 체크박스 | `label` + input 속성 |
@@ -77,6 +80,7 @@ import { PawIcon } from "@/components/icons";
 - `AppHeader`: 로고 + `nav`(페이지 메뉴) + 오른쪽 버튼들. 좁은 휴대폰에서는 로고 글자를 숨김
 - `AppNav`: 타이머 / 캘린더 메뉴. 아이콘 + 이름, 휴대폰(480px 미만)은 아이콘만(이름은 화면 낭독기와 툴팁). 지금 페이지는 둥근 흰 배경 + 강조색, `aria-current="page"`
 - `PageMain`: 페이지 본문. 휴대폰은 위아래로 쌓고, 넓은 화면은 왼쪽(넓게)·오른쪽 두 칸 (타이머 | 할 일, 달력 | 날짜 상세)
+- `HeaderMenu`(`src/app/_components/`): 헤더 오른쪽 끝 ☰ 메뉴. 다크 모드 스위치, 설정(설정 창과 S 단축키도 여기서), 사용법
 - `AppShell`(`src/app/_components/`): 모든 페이지의 틀. 저장값 불러오기(`useStoresReady()`로 알려줌), 헤더, 모드별 배경색, `TimerRuntime`(어느 페이지에서든 완료 처리·알림·탭 제목·화면 켜두기·완료 팝업)
 
 ### 기능별 컴포넌트
@@ -87,7 +91,7 @@ import { PawIcon } from "@/components/icons";
 - 캘린더(`src/features/calendar/`): `calendar.ts`(보이는 달과 이동, 달력 칸, 그 달의 범위 `monthBounds`, 색 단계, 그날의 할 일. 순수 함수, 테스트), `CalendarScreen`(페이지), `MonthCalendar`(달력, 칸 하나는 `DayCell`), `DayDetail`(날짜 상세)
 - 통계(`src/features/stats/`): `stats.ts`(연속 일수 `getStreak`, 최근 n일과 그 전 n일 `getRecentComparison`, 최근 n일 막대 `getRecentDays`. 순수 함수, 테스트), `StatsPanel`(캘린더 맨 위 카드: 요약 4칸, CSS 막대 차트, 기록 없을 때 안내)
   - 날짜 도우미는 `src/lib/date.ts`: `startOfMonth`, 요일 이름 `WEEKDAY_NAMES`(달력과 막대 차트가 같이 씀)
-- 설정: `SettingsButton`(헤더 버튼 + 창 열기), `SettingsDialog`, 묶음별 `TimerSection`, `AlertSection`, `DisplaySection`, `ShortcutSection`, `DataSection`, 안내 문구 `SettingsNote`. 묶음 모양은 공통 `Section`, 한 줄 모양은 공통 `FieldRow`
+- 설정: `SettingsDialog`(☰ 메뉴나 S 키로 열림), 묶음별 `TimerSection`, `AlertSection`, `DisplaySection`, `ShortcutSection`, `DataSection`, 안내 문구 `SettingsNote`. 묶음 모양은 공통 `Section`, 한 줄 모양은 공통 `FieldRow`
   - 설정 되돌리기, 모든 데이터 지우기는 여러 store를 함께 바꾸므로 `src/features/settings/resetData.ts`에 둠
 - 알림(`src/features/alerts/`, 화면 없음). 밖에서는 `index.ts`에서 내보낸 것만 씀 (`useAlerts`, `prepareAlerts`, 설정 화면용 `previewAlertSound`, 알림 권한 함수 등)
   - `alerts.ts`: 다음 알림 계산, 알림 문구 (순수 함수)
@@ -139,3 +143,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: 백로그 I-005·I-006 아이콘 13개, `Slider` 양 끝 아이콘, 메뉴 아이콘·둥근 배경
 - 2026-11-08: 통계(`StatsPanel`), `sumDays`, `monthBounds`, `startOfMonth`, `WEEKDAY_NAMES`
 - 2026-11-08: 탭 여러 개 (`useTabSync`, `soundTab`, `newSessions`)
+- 2026-11-08: ☰ 메뉴(`HeaderMenu`), `Menu`·`Book` 아이콘, `SwitchTrack`(스위치 모양만), mixin `header-panel`·`kbd`. `ThemeToggle`, `SettingsButton` 삭제
