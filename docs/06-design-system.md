@@ -65,7 +65,7 @@ import { PawIcon } from "@/components/icons";
 | `Checkbox` | 체크박스 | `label` + input 속성 |
 | `Slider` | 끌어서 값 고르기 (소리 크기) | `label`, `value`, `onChange`, `min`, `max`, `step`, `format`, `disabled`. 방향키로도 조절 |
 | `Stepper` | − 값 + 숫자 조절 | `label`, `value`, `onChange`, `min`, `max`, `format`, `prefix` |
-| `ProgressRing` | 원형 진행 띠 | `value`(남은 비율 0~1), `size`, `thickness`, `markers`, `glow`, `flashKey`, `overlay`, `children` |
+| `ProgressRing` | 원형 진행 띠 | `value`(남은 비율 0~1), `size`(기준 지름), `thickness`, `markers`, `glow`, `flashKey`, `overlay`, `children`. 화면 크기는 CSS 변수 `--ring-display-size`로 바꿀 수 있고 도장 위치·안쪽 크기가 같은 비율로 따라감 |
 
 아이콘(`src/components/icons/`): `Play`, `Pause`, `Reset`, `Skip`, `Settings`, `Plus`, `Minus`, `Check`, `Close`, `Trash`, `Edit`, `Sun`, `Moon`, `Paw`, `Medal` (+`Icon`)
 - 모든 아이콘은 `size`(기본 20), `title`을 받고, 색은 글자색을 따릅니다.
@@ -84,7 +84,7 @@ import { PawIcon } from "@/components/icons";
   - `sound.ts` / `audio.ts` / `chime.ts` / `sounds.ts`: 브라우저 오디오 통로, 오디오 깨우기, 소리 만들기, 음 정의
   - `notify.ts`: 브라우저 알림과 권한, `prepare.ts`: 시작할 때 오디오 깨우기와 권한 요청, `preview.ts`: 설정의 미리 듣기
   - `useAlerts.ts`: 스케줄러를 타이머와 브라우저 기능에 연결하는 훅
-- 수료증(`src/features/certificate/`): 밖에서는 `CertificateLauncher`만 씀 (완료 팝업 버튼, 메달 배지)
+- 수료증(`src/features/certificate/`): 밖에서는 `CertificateLauncher`(완료 팝업의 버튼), `TodayCertificateButton`(헤더의 🏅 오늘 사이클 수 버튼)을 씀
   - `certificate.ts`: 최근 사이클 수료증 내용 계산, 시간 표기 (순수 함수, 테스트)
   - `render/layout.ts`: 이미지 크기, 색, 위치(위에서부터 차례로). 디자인을 고칠 때는 주로 여기만 바꿈
   - `render/drawCertificate.ts`: 1080×1920 캔버스에 그리기, `render/canvas.ts`: 글자 쓰기(`drawText`)·둥근 사각형·글자 줄이기·원형 글자·발자국 등 그리기 도우미
@@ -109,3 +109,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-07: Slider, ConfirmDialog, FieldRow, 설정 컴포넌트 추가
 - 2026-11-07: 단축키, 화면 꺼짐 방지 구조 추가
 - 2026-11-07: 수료증 구조, 마스코트 추가
+- 2026-11-08: 타이머 화면 한 화면 맞춤 (ProgressRing 크기 조절, 헤더 메달 버튼)
