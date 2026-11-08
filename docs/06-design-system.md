@@ -118,6 +118,7 @@ import { PawIcon } from "@/components/icons";
 - 저절로 뜨는 팝업 기다리기: `src/lib/popupHold.ts`. 사용자가 직접 연 창(설정, 수료증)은 `useHoldAutoPopups()`를 부르고, 완료 팝업은 `useAutoPopupsHeld()`가 false일 때 뜸. 새로 만드는 "사용자가 여는 창"도 같은 훅을 부르면 됨
 - 탭을 보고 있는지: `src/lib/usePageVisible.ts` (자동 시작 카운트다운은 탭을 보고 있을 때만 시작)
 - 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 어느 페이지든 "진행 중 + 설정 켜짐"일 때 켬 (`TimerRuntime`)
+- store 저장소: `src/lib/storage.ts`의 `tabSafeStorage(localStorage)`. 바뀐 것이 없으면 쓰지 않아 다른 탭의 새 값을 덮어쓰지 않음 (store를 새로 만들 때도 이것을 씀)
 - 다른 탭과 맞추기: `src/lib/useTabSync.ts`의 `useTabSync(ready)` (앱 틀에서 한 번). 다른 탭이 저장하면 다시 불러오고, 완료 팝업 닫힘을 다른 탭에 알림(`BroadcastChannel`)
 - 소리와 알림을 낼 탭: `src/lib/soundTab.ts`. 소리를 내는 코드는 `isSoundTab()` / `useIsSoundTab()`으로 확인 (알림 스케줄러, 집중 소리). 기록 중복 확인은 `sessions.ts`의 `newSessions`
 - 타이머 시작은 `startSession()`(`src/features/timer/startSession.ts`)으로 함. 알림 준비 + 시작을 한 번에 하므로 시작 버튼, 완료 팝업, 단축키가 같은 동작을 씀
@@ -147,3 +148,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: 탭 여러 개 (`useTabSync`, `soundTab`, `newSessions`)
 - 2026-11-08: ☰ 메뉴(`HeaderMenu`), `Menu`·`Book` 아이콘, `SwitchTrack`(스위치 모양만), mixin `header-panel`·`kbd`. `ThemeToggle`, `SettingsButton` 삭제
 - 2026-11-08: `AppFooter`, `ExternalLink` 아이콘, mixin `page-width`. `PageMain` 아래 여백을 줄임 (맨 아래가 이어서 채움)
+- 2026-11-08: `tabSafeStorage` (B-002)
