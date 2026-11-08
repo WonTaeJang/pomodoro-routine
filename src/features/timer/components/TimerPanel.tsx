@@ -1,7 +1,7 @@
 "use client";
 
+import { PawIcon } from "@/components/icons";
 import { Card } from "@/components/ui";
-import { getTodayFocus, useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { cx } from "@/lib/cx";
 import { useNow } from "@/lib/useNow";
@@ -27,7 +27,6 @@ export function TimerPanel({ ready }: TimerPanelProps) {
   const interval = useTimerStore((s) => s.settings.longBreakInterval);
   const ringEffects = useTimerStore((s) => s.settings.ringEffects);
   const lastCompleted = useTimerStore((s) => s.lastCompleted);
-  const sessions = useHistoryStore((s) => s.sessions);
   const activeTask = useTasksStore((s) =>
     s.tasks.find((t) => t.id === s.activeTaskId),
   );
@@ -36,8 +35,9 @@ export function TimerPanel({ ready }: TimerPanelProps) {
   const remainingMs =
     now === null ? timer.remainingMs : getRemainingMs(timer, now);
   const timeText = ready ? formatRemaining(remainingMs) : "--:--";
-  const todayCycles =
-    ready && now !== null ? getTodayFocus(sessions, now).cycles : 0;
+  // 집중 중 고른 할 일이 있으면 상태 문구 대신 할 일을 보여줌 (멈췄을 때는 멈춘 상태가 더 중요)
+  const showTask =
+    ready && activeTask && timer.mode === "focus" && timer.status !== "paused";
 
   useCompleteWhenDue(timer, now);
   useTimerTitle(ready, timer, timeText);
@@ -73,14 +73,19 @@ export function TimerPanel({ ready }: TimerPanelProps) {
       >
         {timeText}
       </p>
-      <p className={styles.status}>
-        {getStatusMessage(timer.mode, timer.status)}
-      </p>
-      {ready && activeTask && timer.mode === "focus" ? (
-        <p className={styles.currentTask}>
-          지금 할 일 <strong>{activeTask.title}</strong>
+      {showTask ? (
+        <p className={styles.status}>
+          <span className={styles.task} title={activeTask.title}>
+            <PawIcon size={14} />
+            <span className={styles.srOnly}>지금 할 일</span>
+            <span className={styles.taskTitle}>{activeTask.title}</span>
+          </span>
         </p>
-      ) : null}
+      ) : (
+        <p className={styles.status}>
+          {getStatusMessage(timer.mode, timer.status)}
+        </p>
+      )}
 
       <TimerControls
         mode={timer.mode}
@@ -92,7 +97,6 @@ export function TimerPanel({ ready }: TimerPanelProps) {
         mode={timer.mode}
         completedInCycle={timer.completedInCycle}
         interval={interval}
-        todayCycles={todayCycles}
       />
     </Card>
   );

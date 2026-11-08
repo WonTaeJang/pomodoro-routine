@@ -2,5 +2,5 @@
   display: flex;
   align-items: center;
   gap: var(--space-5);
-  margin-top: var(--space-7);
+  margin-top: clamp(var(--space-3), 3dvh, var(--space-7));
 }

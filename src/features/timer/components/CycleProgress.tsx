@@ -1,8 +1,4 @@
-"use client";
-
-import { MedalIcon, PawIcon } from "@/components/icons";
-import { Badge } from "@/components/ui";
-import { CertificateLauncher } from "@/features/certificate";
+import { PawIcon } from "@/components/icons";
 import { cx } from "@/lib/cx";
 import { getCycleMessage } from "../labels";
 import type { TimerMode } from "../types";
@@ -14,23 +10,18 @@ type CycleProgressProps = {
   completedInCycle: number;
   /** 긴 휴식 주기 (사이클 길이) */
   interval: number;
-  /** 오늘 완료한 사이클 수 */
-  todayCycles: number;
 };
 
-/** 이번 사이클 진행(발자국)과 오늘 완료한 사이클 수 */
+/** 이번 사이클 진행: 발자국과 안내 문구 ("긴 휴식까지 N번 남았어요") */
 export function CycleProgress({
   mode,
   completedInCycle,
   interval,
-  todayCycles,
 }: CycleProgressProps) {
   const done = Math.min(completedInCycle, interval);
-  const message = getCycleMessage(mode, completedInCycle, interval);
 
   return (
     <div className={styles.cycle}>
-      <span className={styles.label}>이번 사이클</span>
       <div
         className={styles.paws}
         role="img"
@@ -39,29 +30,12 @@ export function CycleProgress({
         {Array.from({ length: interval }, (_, i) => (
           <PawIcon
             key={i}
-            size={18}
+            size={16}
             className={cx(i < done && styles.pawDone)}
           />
         ))}
       </div>
-      <span>{message}</span>
-      {todayCycles > 0 ? (
-        <CertificateLauncher>
-          {(open) => (
-            <button
-              type="button"
-              className={styles.today}
-              title="수료증 만들기"
-              aria-label={`오늘 ${todayCycles}사이클 완료, 수료증 만들기`}
-              onClick={open}
-            >
-              <Badge variant="medal" icon={<MedalIcon size={16} />}>
-                오늘 {todayCycles}사이클 완료
-              </Badge>
-            </button>
-          )}
-        </CertificateLauncher>
-      ) : null}
+      <span>{getCycleMessage(mode, completedInCycle, interval)}</span>
     </div>
   );
 }

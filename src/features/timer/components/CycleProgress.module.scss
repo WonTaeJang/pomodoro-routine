@@ -1,54 +1,20 @@
-@use "../../../styles/mixins";
-
+// 발자국 한 줄, 안내 문구 한 줄
 .cycle {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-1-5);
-  margin-top: var(--space-6);
+  gap: var(--space-1);
+  margin-top: clamp(var(--space-3), 2.5dvh, var(--space-6));
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
 }
 
-.label {
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-semibold);
-  letter-spacing: var(--letter-spacing-wide);
-}
-
 .paws {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-1-5);
+  gap: var(--space-1);
   color: var(--color-border);
 }
 
 .pawDone {
   color: var(--color-accent);
-}
-
-// 메달 배지를 누르면 수료증 팝업
-.today {
-  margin-top: var(--space-1);
-  padding: 0;
-  border: none;
-  border-radius: var(--radius-full);
-  background: none;
-  cursor: pointer;
-  transition: transform var(--duration-fast);
-
-  @include mixins.focus-ring;
-
-  &:hover {
-    transform: scale(1.04);
-  }
-
-  @include mixins.reduced-motion {
-    transition: none;
-
-    &:hover {
-      transform: none;
-    }
-  }
 }

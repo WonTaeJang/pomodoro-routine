@@ -1,23 +1,29 @@
 @use "../../../styles/breakpoints" as bp;
+@use "../../../styles/mixins";
 
+// 세로 공간: 화면 높이(dvh)에 맞춰 사진, 시간 글자, 여백을 줄여서 한 화면에 들어가게
 .panel {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-6) var(--space-4) var(--space-7);
+  padding: clamp(var(--space-4), 3dvh, var(--space-8)) var(--space-4)
+    clamp(var(--space-4), 3dvh, var(--space-8));
 
   @include bp.up(md) {
-    padding: var(--space-8) var(--space-6) var(--space-9);
+    padding-inline: var(--space-6);
   }
 }
 
 .kkami {
-  margin-top: var(--space-6);
+  // 사진과 진행 띠 지름
+  --ring-display-size: clamp(132px, 26dvh, 192px);
+
+  margin-top: clamp(var(--space-3), 2.5dvh, var(--space-6));
 }
 
 .time {
-  margin-top: var(--space-3);
-  font-size: var(--font-size-display);
+  margin-top: clamp(var(--space-1), 1.2dvh, var(--space-3));
+  font-size: clamp(3.5rem, min(20vw, 14dvh), 7.5rem);
   font-variant-numeric: tabular-nums;
   font-weight: var(--font-weight-bold);
   letter-spacing: var(--letter-spacing-tight);
@@ -28,21 +34,42 @@
   color: var(--color-border);
 }
 
+// 상태 문구 또는 지금 할 일. 둘 중 하나만, 같은 높이로 보여서 바뀌어도 화면이 들썩이지 않음
 .status {
-  margin-top: var(--space-3);
+  display: flex;
+  max-width: 100%;
+  min-height: 28px;
+  align-items: center;
+  margin-top: clamp(var(--space-1), 1.2dvh, var(--space-3));
   color: var(--color-text-muted);
   font-weight: var(--font-weight-medium);
 }
 
-.currentTask {
+// 지금 할 일: 한 줄 칩, 길면 … 으로 줄임
+.task {
+  display: inline-flex;
   max-width: 100%;
-  margin-top: var(--space-1);
-  color: var(--color-text-muted);
+  align-items: center;
+  gap: var(--space-1-5);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-accent-subtle);
+  color: var(--color-text);
   font-size: var(--font-size-sm);
-  text-align: center;
+  font-weight: var(--font-weight-semibold);
 
-  strong {
-    margin-left: var(--space-1);
-    color: var(--color-text);
+  svg {
+    flex-shrink: 0;
+    color: var(--color-accent);
   }
+}
+
+.taskTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.srOnly {
+  @include mixins.visually-hidden;
 }

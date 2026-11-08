@@ -1,15 +1,10 @@
 @use "../../../styles/breakpoints" as bp;
 
-// 좁은 화면에서는 헤더 공간이 부족해 숨김 (타이머 아래에 사이클 수가 따로 보임)
+// 좁은 화면에서는 헤더 공간이 부족해 숨김 (오늘 사이클 수는 메달 버튼으로 따로 보임)
 .summary {
   display: none;
 
   @include bp.up(sm) {
     display: block;
   }
-}
-
-.medal {
-  margin-left: var(--space-1);
-  color: var(--color-medal);
 }

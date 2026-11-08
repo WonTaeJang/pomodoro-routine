@@ -1,0 +1,24 @@
+@use "../../../styles/mixins";
+
+.button {
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  cursor: pointer;
+  transition: transform var(--duration-fast);
+
+  @include mixins.focus-ring;
+
+  &:hover {
+    transform: scale(1.06);
+  }
+
+  @include mixins.reduced-motion {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}

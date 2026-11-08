@@ -2,6 +2,7 @@
 
 import { AppHeader } from "@/components/layout/AppHeader";
 import { useAlerts } from "@/features/alerts";
+import { TodayCertificateButton } from "@/features/certificate";
 import { TodaySummary } from "@/features/history/components/TodaySummary";
 import { SettingsButton } from "@/features/settings/components/SettingsButton";
 import { TaskPanel } from "@/features/tasks/components/TaskPanel";
@@ -29,6 +30,7 @@ export function TimerScreen() {
       <AppHeader>
         <TestModeBadge ready={ready} />
         {ready ? <TodaySummary /> : null}
+        {ready ? <TodayCertificateButton /> : null}
         <ThemeToggle />
         <SettingsButton ready={ready} />
       </AppHeader>
