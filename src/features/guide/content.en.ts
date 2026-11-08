@@ -1,4 +1,7 @@
-import { FOCUS_SOUND_GROUPS } from "@/features/focus-sound/sounds";
+import {
+  FOCUS_SOUND_GROUPS,
+  FOCUS_SOUND_IDS,
+} from "@/features/focus-sound/sounds";
 import { DEFAULT_SETTINGS as D } from "@/features/timer/timer";
 import { getTranslator } from "@/i18n";
 import type { GuideContent } from "./content";
@@ -6,11 +9,13 @@ import type { GuideContent } from "./content";
 /** 사용법 글 (영어). 한국어(content.ko.ts)와 같은 모양 */
 
 const t = getTranslator("en");
-/** 집중 소리 묶음 이름(소문자)과 소리 개수 */
-const [noise, nature] = FOCUS_SOUND_GROUPS.map((group) => ({
-  name: t(`focusSound.groups.${group.id}`).toLowerCase(),
-  count: group.ids.length,
-}));
+/** 집중 소리 개수와 묶음 이름 ("noise, nature sounds and places") */
+const soundCount = FOCUS_SOUND_IDS.length;
+const soundGroups = new Intl.ListFormat("en").format(
+  FOCUS_SOUND_GROUPS.map((group) =>
+    t(`focusSound.groups.${group.id}`).toLowerCase(),
+  ),
+);
 
 const content: GuideContent = {
   page: {
@@ -66,7 +71,7 @@ const content: GuideContent = {
       icon: "headphones",
       title: "Focus sounds",
       points: [
-        `Pick from ${noise.count} kinds of ${noise.name} and ${nature.count} ${nature.name} with {headphones} at the top.`,
+        `Pick from ${soundCount} sounds (${soundGroups}) with {headphones} at the top.`,
         "Sounds play only while you're focusing, and turn off during breaks or when paused.",
         "Even with several tabs open, sound plays only in the tab you clicked last.",
       ],

@@ -189,6 +189,7 @@ const en: Messages = {
     groups: {
       noise: "Noise",
       nature: "Nature sounds",
+      places: "Places",
     },
     sounds: {
       white: { label: "White noise", description: "Even hiss" },
@@ -202,6 +203,7 @@ const en: Messages = {
       fireplace: { label: "Fireplace", description: "Crackling logs" },
       forest: { label: "Forest", description: "Birds and leaves" },
       waves: { label: "Waves", description: "Calm sea" },
+      airplane: { label: "Airplane cabin", description: "Low engine hum" },
     },
     playing: "(playing)",
   },

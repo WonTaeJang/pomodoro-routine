@@ -1,4 +1,5 @@
 import {
+  AirplaneIcon,
   CloudRainIcon,
   FlameIcon,
   NoiseBrownIcon,
@@ -28,6 +29,7 @@ export const FOCUS_SOUND_IDS = [
   "fireplace",
   "forest",
   "waves",
+  "airplane",
 ] as const;
 export type FocusSoundId = (typeof FOCUS_SOUND_IDS)[number];
 
@@ -118,11 +120,16 @@ export const FOCUS_SOUNDS: Record<FocusSoundId, FocusSound> = {
     icon: WavesIcon,
     level: 0.85,
   },
+  airplane: {
+    ...recording("airplane"),
+    icon: AirplaneIcon,
+    level: 0.85,
+  },
 };
 
 /** 창에서 묶어 보여주는 순서. 묶음 이름은 focusSound.groups.<id> */
 export const FOCUS_SOUND_GROUPS: {
-  id: "noise" | "nature";
+  id: "noise" | "nature" | "places";
   ids: FocusSoundId[];
 }[] = [
   { id: "noise", ids: ["white", "pink", "brown"] },
@@ -130,4 +137,6 @@ export const FOCUS_SOUND_GROUPS: {
     id: "nature",
     ids: ["rain", "window-rain", "fireplace", "forest", "waves"],
   },
+  // 어떤 곳에 있는 듯한 소리 (나중에 카페, 기차 등도 여기에)
+  { id: "places", ids: ["airplane"] },
 ];

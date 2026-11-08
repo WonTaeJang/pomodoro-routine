@@ -273,6 +273,15 @@ export function WavesIcon(props: IconProps) {
   );
 }
 
+/** 비행기 (위에서 본 모양) */
+export function AirplaneIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 2.5c.9 0 1.5 1.1 1.5 2.5v4.3l7 4.2v2l-7-2.2v4.2l2.2 1.6v1.6L12 19.6l-3.7 1.1v-1.6l2.2-1.6v-4.2l-7 2.2v-2l7-4.2V5c0-1.4.6-2.5 1.5-2.5z" />
+    </Icon>
+  );
+}
+
 /** 스톱워치 (타이머 페이지) */
 export function TimerIcon(props: IconProps) {
   return (

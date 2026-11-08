@@ -6,11 +6,10 @@ import type { GuideContent } from "./content";
 /** 사용법 글 (한국어). 다른 언어 파일(content.en.ts)도 같은 모양 */
 
 const t = getTranslator("ko");
-/** 집중 소리 묶음 이름과 소리 개수 */
-const [noise, nature] = FOCUS_SOUND_GROUPS.map((group) => ({
-  name: t(`focusSound.groups.${group.id}`),
-  count: group.ids.length,
-}));
+/** 집중 소리 묶음마다 "노이즈 3가지" */
+const soundGroups = FOCUS_SOUND_GROUPS.map(
+  (group) => `${t(`focusSound.groups.${group.id}`)} ${group.ids.length}가지`,
+).join(", ");
 
 const content: GuideContent = {
   page: {
@@ -66,7 +65,7 @@ const content: GuideContent = {
       icon: "headphones",
       title: "집중 소리",
       points: [
-        `위쪽 {headphones}에서 ${noise.name} ${noise.count}가지, ${nature.name} ${nature.count}가지 중에 골라요.`,
+        `위쪽 {headphones}에서 ${soundGroups} 중에 골라요.`,
         "소리는 집중하는 동안에만 나고, 휴식이나 일시정지 때는 꺼져요.",
         "탭을 여러 개 열어도 마지막으로 누른 탭에서만 나요.",
       ],

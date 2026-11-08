@@ -188,6 +188,7 @@ const ko = {
     groups: {
       noise: "노이즈",
       nature: "자연의 소리",
+      places: "공간의 소리",
     },
     sounds: {
       white: { label: "백색소음", description: "고른 치이익" },
@@ -198,6 +199,7 @@ const ko = {
       fireplace: { label: "모닥불", description: "타닥타닥 장작" },
       forest: { label: "숲속", description: "새소리와 나뭇잎" },
       waves: { label: "파도", description: "잔잔한 바다" },
+      airplane: { label: "비행기 기내", description: "낮게 울리는 엔진" },
     },
     playing: "(재생 중)",
   },

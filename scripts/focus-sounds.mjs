@@ -1,6 +1,7 @@
 // 집중 소리 녹음 파일 만들기: design/sound/의 원본(저장소에 없음)을 잘라 public/sounds/에 저장합니다.
 // 필요한 것: ffmpeg (맥: brew install ffmpeg)
-// 실행: node scripts/focus-sounds.mjs [원본 폴더]
+// 실행: node scripts/focus-sounds.mjs [원본 폴더] [소리 id...]
+//   소리 id를 적으면 그 소리만 만듭니다 (예: 새 소리 하나를 추가할 때 airplane)
 //
 // 하는 일 (소리마다 아래 SOUNDS 값대로)
 // 1. 고르게 이어지는 구간을 자름 (반복 길이 + 이음매 겹칠 길이). 이음매는 앱이 재생할 때 겹쳐서 이음
@@ -14,6 +15,7 @@ import { join } from "node:path";
 import recordings from "../src/features/focus-sound/recordings.json" with { type: "json" };
 
 const SOURCE_DIR = process.argv[2] ?? "design/sound";
+const ONLY = new Set(process.argv.slice(3));
 const OUT_DIR = "public/sounds";
 
 /** 모든 소리를 맞추는 크기 (LUFS) */
@@ -28,7 +30,7 @@ const SAMPLE_RATE = 48000;
  * start, loop, fade: 자를 시작 위치, 반복 길이, 이음매를 겹칠 길이 (초)
  * lowCut: 이보다 낮은 소리를 걸러냄 (Hz)
  */
-const SOUNDS = recordings;
+const SOUNDS = recordings.filter((s) => ONLY.size === 0 || ONLY.has(s.id));
 
 /** ffmpeg 실행. 실패하면 멈추고, 결과 로그(stderr)를 돌려줌 */
 function ffmpeg(args) {
