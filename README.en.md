@@ -80,4 +80,7 @@ The docs are written in Korean.
 
 ## License
 
-Not decided yet.
+The code is under the [MIT License](./LICENSE). The following are not covered by it:
+
+- **Photos of Kkami** (`src/assets/kkami/`), **mascot illustrations** (`src/assets/mascot/`) and screenshots that include them (`docs/images/`): may not be used, modified or distributed without permission.
+- **Focus sound recordings** (`public/sounds/`): edited from Pixabay recordings, so they stay under the [Pixabay Content License](https://pixabay.com/service/terms/) and may not be redistributed as standalone files.

@@ -80,4 +80,7 @@ npm run dev
 
 ## 라이선스
 
-아직 정하지 않았어요.
+코드는 [MIT 라이선스](./LICENSE)예요. 아래는 MIT 라이선스에 들어가지 않아요.
+
+- **까미 사진**(`src/assets/kkami/`)과 **마스코트 그림**(`src/assets/mascot/`), 이것이 들어간 화면 캡처(`docs/images/`): 허락 없이 쓰거나 고치거나 배포할 수 없어요.
+- **집중 소리 녹음**(`public/sounds/`): Pixabay 녹음을 다듬은 것이라 [Pixabay Content License](https://pixabay.com/service/terms/)를 따라요. 파일만 따로 배포할 수 없어요.
