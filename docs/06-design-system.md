@@ -92,6 +92,8 @@ import { PawIcon } from "@/components/icons";
   - `components/useCertificateImage.ts`: 이미지를 미리 만들어 둠. 내용이 실제로 바뀔 때만 다시 그리고, 다 만들기 전에는 공유·저장을 막고, 쓰지 않는 이미지 주소는 정리
 - 마스코트(`src/assets/mascot/`): `kkami-graduate.svg`는 수료증, `kkami-basic.svg`·`kkami-icon.svg`는 로고·파비콘 등에 쓸 예정
 - 단축키(`src/features/shortcuts/`, 화면 없음): `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
+- 저절로 뜨는 팝업 기다리기: `src/lib/popupHold.ts`. 사용자가 직접 연 창(설정, 수료증)은 `useHoldAutoPopups()`를 부르고, 완료 팝업은 `useAutoPopupsHeld()`가 false일 때 뜸. 새로 만드는 "사용자가 여는 창"도 같은 훅을 부르면 됨
+- 탭을 보고 있는지: `src/lib/usePageVisible.ts` (자동 시작 카운트다운은 탭을 보고 있을 때만 시작)
 - 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 메인 화면에서 "진행 중 + 설정 켜짐"일 때 켬
 - 타이머 시작은 `startSession()`(`src/features/timer/startSession.ts`)으로 함. 알림 준비 + 시작을 한 번에 하므로 시작 버튼, 완료 팝업, 단축키가 같은 동작을 씀
 
@@ -110,3 +112,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-07: 단축키, 화면 꺼짐 방지 구조 추가
 - 2026-11-07: 수료증 구조, 마스코트 추가
 - 2026-11-08: 타이머 화면 한 화면 맞춤 (ProgressRing 크기 조절, 헤더 메달 버튼)
+- 2026-11-08: 팝업 기다리기(popupHold), 탭 보임 여부(usePageVisible) 추가
