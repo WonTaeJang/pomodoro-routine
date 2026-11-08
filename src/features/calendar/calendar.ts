@@ -1,8 +1,4 @@
-import {
-  focusSessions,
-  taskTitleOf,
-  type DayStats,
-} from "@/features/history/sessions";
+import { focusSessions, taskTitleOf } from "@/features/history/sessions";
 import type { Task } from "@/features/tasks/types";
 import type { CompletedSession } from "@/features/timer/types";
 import { addDays } from "@/lib/date";
@@ -39,21 +35,15 @@ export function getMonthWeeks(year: number, month: number): Week[] {
   );
 }
 
-/** 그 달(month는 0~11)의 집중 횟수와 마친 사이클 수 합계 */
-export function getMonthTotals(
-  stats: Map<number, DayStats>,
-  year: number,
-  month: number,
-): { focusCount: number; cycles: number } {
-  let focusCount = 0;
-  let cycles = 0;
-  for (const [day, s] of stats) {
-    const date = new Date(day);
-    if (date.getFullYear() !== year || date.getMonth() !== month) continue;
-    focusCount += s.focusCount;
-    cycles += s.cycleNumbers.length;
-  }
-  return { focusCount, cycles };
+/** 그 달의 첫날과 다음 달 첫날 (합계를 낼 때 from 이상 to 미만으로) */
+export function monthBounds({ year, month }: MonthView): {
+  from: number;
+  to: number;
+} {
+  return {
+    from: new Date(year, month, 1).getTime(),
+    to: new Date(year, month + 1, 1).getTime(),
+  };
 }
 
 /** 집중 횟수에 따른 달력 칸 색 단계 (0: 기록 없음 ~ 4: 가장 진함) */

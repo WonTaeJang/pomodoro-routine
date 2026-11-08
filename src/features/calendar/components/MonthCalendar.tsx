@@ -8,20 +8,18 @@ import {
 } from "@/components/icons";
 import { Button, Card, IconButton } from "@/components/ui";
 import { cx } from "@/lib/cx";
-import { formatLongDate } from "@/lib/date";
-import type { DayStats } from "@/features/history/sessions";
+import { formatLongDate, WEEKDAY_NAMES } from "@/lib/date";
+import { sumDays, type DayStats } from "@/features/history/sessions";
 import {
   FOCUS_LEVELS,
   getFocusLevel,
-  getMonthTotals,
   getMonthWeeks,
+  monthBounds,
   monthOf,
   shiftMonth,
   type MonthView,
 } from "../calendar";
 import styles from "./MonthCalendar.module.scss";
-
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
 type MonthCalendarProps = {
   view: MonthView;
@@ -45,7 +43,8 @@ export function MonthCalendar({
   const titleId = useId();
   const { year, month } = view;
   const weeks = getMonthWeeks(year, month);
-  const { focusCount, cycles } = getMonthTotals(stats, year, month);
+  const { from, to } = monthBounds(view);
+  const { focusCount, cycles } = sumDays(stats, from, to);
   const todayMonth = monthOf(today);
   const isThisMonth = todayMonth.year === year && todayMonth.month === month;
 
@@ -84,7 +83,7 @@ export function MonthCalendar({
       <table className={styles.grid}>
         <thead>
           <tr>
-            {WEEKDAYS.map((w) => (
+            {WEEKDAY_NAMES.map((w) => (
               <th key={w} scope="col" className={styles.weekday}>
                 {w}
               </th>

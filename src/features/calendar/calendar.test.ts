@@ -1,12 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { Task } from "@/features/tasks/types";
 import type { CompletedSession } from "@/features/timer/types";
-import { getDayStats } from "@/features/history/sessions";
 import {
   getDayTasks,
   getFocusLevel,
-  getMonthTotals,
   getMonthWeeks,
+  monthBounds,
   monthOf,
   shiftMonth,
 } from "./calendar";
@@ -74,17 +73,15 @@ describe("달력 칸", () => {
   });
 });
 
-describe("달 합계", () => {
-  it("그 달 합계 (다른 달 기록은 빼고)", () => {
-    const stats = getDayStats([
-      focus(at(30, 9), { cycleCompleted: true }),
-      focus(new Date(2026, 11, 1, 9).getTime()), // 12월
-      focus(new Date(2025, 10, 1, 9).getTime()), // 작년 11월
-    ]);
-    expect(getMonthTotals(stats, 2026, 10)).toEqual({
-      focusCount: 1,
-      cycles: 1,
+describe("달 범위", () => {
+  it("그 달 첫날부터 다음 달 첫날 전까지 (해가 바뀌어도)", () => {
+    expect(monthBounds({ year: 2026, month: 10 })).toEqual({
+      from: day(1),
+      to: new Date(2026, 11, 1).getTime(),
     });
+    expect(monthBounds({ year: 2026, month: 11 }).to).toBe(
+      new Date(2027, 0, 1).getTime(),
+    );
   });
 });
 

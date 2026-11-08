@@ -5,6 +5,9 @@ export function startOfDay(time: number): number {
   return date.getTime();
 }
 
+/** 요일 이름 (Date.getDay() 순서: 일요일부터) */
+export const WEEKDAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
+
 /** n일 뒤(앞이면 음수) 같은 시각. 서머타임이 있어도 날짜 기준으로 셈 */
 export function addDays(time: number, days: number): number {
   const date = new Date(time);

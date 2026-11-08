@@ -57,3 +57,22 @@ export function getDayStats(
   }
   return stats;
 }
+
+/** 여러 날의 합계 */
+export type Totals = { focusCount: number; focusMs: number; cycles: number };
+
+/** from 이상 to 미만인 날들의 합계 (날짜는 그날 시작 시각) */
+export function sumDays(
+  stats: Map<number, DayStats>,
+  from: number,
+  to: number,
+): Totals {
+  const totals: Totals = { focusCount: 0, focusMs: 0, cycles: 0 };
+  for (const [day, s] of stats) {
+    if (day < from || day >= to) continue;
+    totals.focusCount += s.focusCount;
+    totals.focusMs += s.focusMs;
+    totals.cycles += s.cycleNumbers.length;
+  }
+  return totals;
+}

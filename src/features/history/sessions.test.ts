@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Task } from "@/features/tasks/types";
 import type { CompletedSession } from "@/features/timer/types";
-import { focusSessions, getDayStats, taskTitleOf } from "./sessions";
+import { focusSessions, getDayStats, sumDays, taskTitleOf } from "./sessions";
 
 const MIN = 60_000;
 const at = (d: number, h: number, m = 0) =>
@@ -64,5 +64,21 @@ describe("날짜별 요약", () => {
       cycleNumbers: [2, 3],
     });
     expect(stats.has(day(9))).toBe(false);
+  });
+});
+
+describe("기간 합계", () => {
+  it("from 이상 to 미만인 날만 더함", () => {
+    const stats = getDayStats([
+      focus(at(1, 9), { cycleCompleted: true }),
+      focus(at(3, 9), { durationMs: 50 * MIN }),
+      focus(at(8, 9)),
+    ]);
+    expect(sumDays(stats, day(1), day(8))).toEqual({
+      focusCount: 2,
+      focusMs: 75 * MIN,
+      cycles: 1,
+    });
+    expect(sumDays(stats, -Infinity, Infinity).focusCount).toBe(3);
   });
 });
