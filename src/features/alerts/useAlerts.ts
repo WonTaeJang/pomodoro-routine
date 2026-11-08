@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useTimerStore } from "@/features/timer/store";
 import { getAudio, unlockAudio } from "@/lib/audio";
+import { isSoundTab, subscribeSoundTab } from "@/lib/soundTab";
 import { showNotification } from "./notify";
 import { createAlertScheduler } from "./scheduler";
 import { browserSound } from "./sound";
@@ -22,6 +23,7 @@ export function useAlerts(ready: boolean) {
       sound: browserSound,
       notify: showNotification,
       isHidden: () => document.visibilityState === "hidden",
+      isSoundTab,
       setTimer: (fn, ms) => window.setTimeout(fn, ms),
       clearTimer: (id) => window.clearTimeout(id as number),
     });
@@ -43,11 +45,14 @@ export function useAlerts(ready: boolean) {
     }
     window.addEventListener("pointerdown", onUserGesture);
     window.addEventListener("keydown", onUserGesture);
+    // 소리를 낼 탭이 바뀌면 예약한 소리를 옮김
+    const unsubscribeSoundTab = subscribeSoundTab(() => scheduler.plan());
 
     scheduler.plan();
 
     return () => {
       unsubscribe();
+      unsubscribeSoundTab();
       scheduler.dispose();
       window.removeEventListener("pointerdown", onUserGesture);
       window.removeEventListener("keydown", onUserGesture);

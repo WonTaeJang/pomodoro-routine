@@ -32,6 +32,8 @@ export type AlertEnv = {
   notify(kind: AlertKind): void;
   /** 탭이 숨겨져 있는지 */
   isHidden(): boolean;
+  /** 이 탭이 소리와 알림을 낼 탭인지 (탭을 여러 개 열면 한 탭만) */
+  isSoundTab(): boolean;
   /** 한 번만 실행되는 타이머 */
   setTimer(fn: () => void, ms: number): unknown;
   clearTimer(id: unknown): void;
@@ -88,8 +90,9 @@ export function createAlertScheduler(env: AlertEnv) {
     env.sound.setVolume(settings.soundVolume);
 
     const upcoming = getUpcomingAlert(timer, settings);
+    const soundTab = env.isSoundTab();
     const key = upcoming
-      ? `${upcoming.at}:${upcoming.kind}:${settings.soundEnabled}:${settings.notificationsEnabled}`
+      ? `${upcoming.at}:${upcoming.kind}:${settings.soundEnabled}:${settings.notificationsEnabled}:${soundTab}`
       : null;
     if (!force && key === (scheduled?.key ?? null)) return;
 
@@ -100,7 +103,9 @@ export function createAlertScheduler(env: AlertEnv) {
     const clock = env.sound.clock();
     let soundStart: number | null = null;
     let cancelSound: (() => void) | null = null;
+    // 세션을 넘기는 타이머는 모든 탭에 두고, 소리는 소리를 낼 탭에서만 예약
     if (
+      soundTab &&
       settings.soundEnabled &&
       clock !== null &&
       !soundPlayed.has(upcoming.at)
@@ -114,6 +119,7 @@ export function createAlertScheduler(env: AlertEnv) {
   }
 
   function onComplete(session: CompletedSession) {
+    if (!env.isSoundTab()) return;
     const at = session.endedAt;
     const kind = alertKindForSession(session);
     const { settings } = env.getState();

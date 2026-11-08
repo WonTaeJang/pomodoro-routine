@@ -3,17 +3,19 @@
 import { useEffect } from "react";
 import { useFocusRunning } from "@/features/timer/hooks";
 import { useTimerStore } from "@/features/timer/store";
+import { useIsSoundTab } from "@/lib/soundTab";
 import { resumeFocusSound, setFocusSound } from "./player";
 
 /**
  * 집중이 진행 중일 때만 고른 집중 소리를 틀어 둡니다. 앱 틀(TimerRuntime)에서 한 번만 씁니다.
- * 휴식, 일시정지, 끝나면 서서히 꺼집니다.
+ * 휴식, 일시정지, 끝나면 서서히 꺼집니다. 탭을 여러 개 열면 소리를 낼 탭 하나에서만 납니다.
  */
 export function useFocusSound(ready: boolean) {
   const sound = useTimerStore((s) => s.settings.focusSound);
   const volume = useTimerStore((s) => s.settings.focusSoundVolume);
   const focusing = useFocusRunning();
-  const on = ready && focusing && sound !== "off";
+  const soundTab = useIsSoundTab();
+  const on = ready && focusing && soundTab && sound !== "off";
 
   useEffect(() => {
     setFocusSound(on ? { id: sound, volume } : null);

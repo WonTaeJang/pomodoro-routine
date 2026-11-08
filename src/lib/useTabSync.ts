@@ -6,6 +6,7 @@ import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { applySavedTheme } from "@/features/theme/theme";
 import { reloadTimerFromOtherTab, useTimerStore } from "@/features/timer/store";
+import { startSoundTab } from "./soundTab";
 import { STORAGE_KEYS } from "./storage";
 
 /** 탭끼리 주고받는 알림 (저장하지 않는 것) */
@@ -80,6 +81,7 @@ function reloadTimer() {
  * 같은 브라우저에 열린 다른 탭과 맞춥니다. 앱 틀(AppShell)에서 저장값을 불러온 뒤 한 번만 씁니다.
  * - 다른 탭이 저장하면 할 일, 기록, 타이머, 설정, 테마를 다시 불러옴
  * - 완료 팝업을 한 탭에서 닫으면 다른 탭 팝업도 닫음
+ * - 소리와 알림을 낼 탭 정하기 (soundTab.ts)
  */
 export function useTabSync(ready: boolean) {
   useEffect(() => {
@@ -116,10 +118,13 @@ export function useTabSync(ready: boolean) {
       }
     });
 
+    const stopSoundTab = startSoundTab();
+
     return () => {
       window.removeEventListener("storage", onStorage);
       channel.close();
       unsubscribe();
+      stopSoundTab();
     };
   }, [ready]);
 }

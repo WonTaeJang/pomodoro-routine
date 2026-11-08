@@ -23,6 +23,7 @@ function setup(settingsPatch: Partial<TimerSettings> = {}) {
     clock: 100 as number | null, // 오디오 시계(초). null이면 오디오를 아직 깨우지 않음
     audioRunning: true,
     hidden: false,
+    soundTab: true, // 이 탭이 소리와 알림을 낼 탭인지
     syncs: 0,
     settings: { ...DEFAULT_SETTINGS, ...settingsPatch },
     timer: createInitialState(DEFAULT_SETTINGS) as TimerState,
@@ -50,6 +51,7 @@ function setup(settingsPatch: Partial<TimerSettings> = {}) {
     },
     notify: (kind) => world.notifications.push(kind),
     isHidden: () => world.hidden,
+    isSoundTab: () => world.soundTab,
     setTimer(fn, ms) {
       const id = nextTimerId++;
       world.timers.set(id, { fn, at: world.now + ms });
@@ -240,5 +242,39 @@ describe("완료 처리", () => {
     complete();
     expect(world.sounds.map((s) => s.kind)).toEqual(["focus-end", "break-end"]);
     expect(world.sounds[1].time).toBe(100 + 30 * 60 + 5);
+  });
+});
+
+describe("탭 여러 개", () => {
+  it("소리를 낼 탭이 아니면 소리와 알림 없이 세션을 넘길 타이머만 건다", () => {
+    const { world, update, advance, complete } = setup();
+    world.soundTab = false;
+    world.hidden = true;
+    update(start(world.timer, T0));
+    expect(world.sounds).toHaveLength(0);
+    expect(world.timers.size).toBe(1);
+    advance(25 * MIN);
+    expect(world.syncs).toBe(1);
+    complete();
+    expect(world.sounds).toHaveLength(0);
+    expect(world.notifications).toEqual([]);
+  });
+
+  it("소리를 낼 탭이 바뀌면 예약한 소리를 옮긴다", () => {
+    const { world, scheduler, update, advance } = setup();
+    update(start(world.timer, T0));
+    advance(10 * MIN);
+
+    world.soundTab = false; // 다른 탭이 맡음
+    scheduler.plan();
+    expect(world.sounds.map((s) => s.cancelled)).toEqual([true]);
+
+    world.soundTab = true; // 이 탭을 다시 누름
+    scheduler.plan();
+    expect(world.sounds[1]).toEqual({
+      kind: "focus-end",
+      time: 100 + 25 * 60,
+      cancelled: false,
+    });
   });
 });
