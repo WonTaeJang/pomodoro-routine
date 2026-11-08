@@ -68,21 +68,6 @@
   color: var(--color-text);
 }
 
-// 키보드 키 모양 (<kbd>). 단축키 안내에 사용
-@mixin kbd {
-  display: inline-block;
-  min-width: var(--control-sm);
-  padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  border-bottom-width: var(--border-width-thick);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  font-family: inherit;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-align: center;
-}
-
 // 페이지 본문 너비: 휴대폰은 좁게, 넓은 화면은 넓게. 가운데 정렬 (PageMain, AppFooter)
 @mixin page-width {
   width: 100%;

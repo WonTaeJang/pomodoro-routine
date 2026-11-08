@@ -1,7 +1,7 @@
 "use client";
 
 import { PawIcon } from "@/components/icons";
-import { Card } from "@/components/ui";
+import { Card, VisuallyHidden } from "@/components/ui";
 import { useTasksStore } from "@/features/tasks/store";
 import { cx } from "@/lib/cx";
 import { useNow } from "@/lib/useNow";
@@ -73,7 +73,7 @@ export function TimerPanel({ ready }: TimerPanelProps) {
         <p className={styles.status}>
           <span className={styles.task} title={activeTask.title}>
             <PawIcon size={14} />
-            <span className={styles.srOnly}>지금 할 일</span>
+            <VisuallyHidden>지금 할 일</VisuallyHidden>
             <span className={styles.taskTitle}>{activeTask.title}</span>
           </span>
         </p>

@@ -55,8 +55,6 @@
   }
 }
 
-// 설정 창의 단축키 안내와 같은 키 모양
 .key {
-  @include mixins.kbd;
   color: var(--color-text-muted);
 }

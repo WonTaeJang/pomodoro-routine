@@ -7,7 +7,7 @@ import {
   VolumeOffIcon,
   type IconComponent,
 } from "@/components/icons";
-import { Slider } from "@/components/ui";
+import { Slider, VisuallyHidden } from "@/components/ui";
 import { useFocusRunning } from "@/features/timer/hooks";
 import { useTimerStore } from "@/features/timer/store";
 import { cx } from "@/lib/cx";
@@ -137,7 +137,7 @@ function SoundOption({
       </span>
       {playing ? (
         <>
-          <span className={styles.srOnly}>(재생 중)</span>
+          <VisuallyHidden>(재생 중)</VisuallyHidden>
           <span className={styles.playing} aria-hidden="true">
             <span className={styles.bar} />
             <span className={styles.bar} />

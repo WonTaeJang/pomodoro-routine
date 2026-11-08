@@ -1,4 +1,5 @@
 import { ExternalLinkIcon } from "@/components/icons";
+import { VisuallyHidden } from "@/components/ui";
 import pkg from "../../../package.json";
 import styles from "./AppFooter.module.scss";
 
@@ -23,7 +24,7 @@ export function AppFooter() {
       >
         GitHub
         <ExternalLinkIcon size={14} />
-        <span className={styles.srOnly}>(새 탭에서 열림)</span>
+        <VisuallyHidden>(새 탭에서 열림)</VisuallyHidden>
       </a>
     </footer>
   );

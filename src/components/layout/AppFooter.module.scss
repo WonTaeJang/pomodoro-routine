@@ -27,7 +27,3 @@
 
   @include mixins.focus-ring;
 }
-
-.srOnly {
-  @include mixins.visually-hidden;
-}

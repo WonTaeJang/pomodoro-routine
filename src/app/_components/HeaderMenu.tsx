@@ -11,7 +11,7 @@ import {
   type RefObject,
 } from "react";
 import { BookIcon, MenuIcon, MoonIcon, SettingsIcon } from "@/components/icons";
-import { IconButton, SwitchTrack } from "@/components/ui";
+import { IconButton, Kbd, SwitchTrack } from "@/components/ui";
 import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 import { SHORTCUTS, useShortcuts } from "@/features/shortcuts";
 import { setTheme, useTheme } from "@/features/theme/theme";
@@ -86,7 +86,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
           }}
         >
           <ItemLabel icon={<SettingsIcon />}>설정</ItemLabel>
-          <kbd className={styles.key}>{SHORTCUTS.settings.key}</kbd>
+          <Kbd className={styles.key}>{SHORTCUTS.settings.key}</Kbd>
         </button>
         <Link
           href="/guide"

@@ -45,7 +45,9 @@ import {
   Checkbox,
   ConfirmDialog,
   Dialog,
+  EmptyState,
   IconButton,
+  Kbd,
   ProgressRing,
   SegmentedControl,
   Section,
@@ -192,6 +194,15 @@ export function Playground() {
           </Badge>
           <Badge variant="outline">테스트 모드 · 5초</Badge>
         </div>
+      </Section>
+
+      <Section title="Kbd · EmptyState">
+        <div className={styles.row}>
+          <Kbd>Space</Kbd>
+          <Kbd>R</Kbd>
+          <Kbd>S</Kbd>
+        </div>
+        <EmptyState>이날은 기록이 없어요.</EmptyState>
       </Section>
 
       <Section title="Card · ProgressRing">

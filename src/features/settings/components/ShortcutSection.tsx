@@ -1,4 +1,4 @@
-import { Section } from "@/components/ui";
+import { Kbd, Section } from "@/components/ui";
 import { SHORTCUT_ORDER, SHORTCUTS } from "@/features/shortcuts";
 import styles from "./Settings.module.scss";
 
@@ -12,7 +12,7 @@ export function ShortcutSection() {
             <div key={id} className={styles.shortcut}>
               <dt>{SHORTCUTS[id].description}</dt>
               <dd>
-                <kbd className={styles.kbd}>{SHORTCUTS[id].key}</kbd>
+                <Kbd>{SHORTCUTS[id].key}</Kbd>
               </dd>
             </div>
           ))}

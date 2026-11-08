@@ -1,10 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useId, useMemo } from "react";
-import kkami from "@/assets/mascot/kkami-basic.svg";
 import { CheckIcon, MedalIcon, PawIcon } from "@/components/icons";
-import { Badge, Button, Card, Section } from "@/components/ui";
+import { Badge, Button, Card, EmptyState, Section } from "@/components/ui";
 import { CertificateLauncher } from "@/features/certificate";
 import type { DayStats } from "@/features/history/sessions";
 import { useHistoryStore } from "@/features/history/store";
@@ -47,12 +45,9 @@ export function DayDetail({ day, today, stats }: DayDetailProps) {
       </div>
 
       {empty ? (
-        <div className={styles.empty}>
-          <Image src={kkami} alt="" width={72} height={72} />
-          <p>
-            {day > today ? "아직 오지 않은 날이에요." : "이날은 기록이 없어요."}
-          </p>
-        </div>
+        <EmptyState imageSize={72}>
+          {day > today ? "아직 오지 않은 날이에요." : "이날은 기록이 없어요."}
+        </EmptyState>
       ) : (
         <>
           <dl className={styles.stats}>

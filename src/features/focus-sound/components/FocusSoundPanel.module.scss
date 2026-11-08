@@ -31,10 +31,6 @@
 }
 
 .legend,
-.srOnly {
-  @include mixins.visually-hidden;
-}
-
 .group {
   @include mixins.stack(var(--space-1));
 }

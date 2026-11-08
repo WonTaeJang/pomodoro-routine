@@ -1,10 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useId, type CSSProperties } from "react";
-import kkami from "@/assets/mascot/kkami-basic.svg";
 import { FlameIcon } from "@/components/icons";
-import { Card } from "@/components/ui";
+import { Card, EmptyState, VisuallyHidden } from "@/components/ui";
 import {
   sumDays,
   type DayStats,
@@ -46,10 +44,7 @@ export function StatsPanel({ stats, today, className }: StatsPanelProps) {
         통계
       </h2>
       {all.focusCount === 0 ? (
-        <div className={styles.empty}>
-          <Image src={kkami} alt="" width={64} height={64} />
-          <p>첫 집중을 마치면 여기에 기록이 쌓여요.</p>
-        </div>
+        <EmptyState>첫 집중을 마치면 여기에 기록이 쌓여요.</EmptyState>
       ) : (
         <StatsBody stats={stats} today={today} all={all} />
       )}
@@ -150,7 +145,7 @@ function StatsBody({ stats, today, all }: StatsBodyProps) {
           ))}
         </div>
         {/* 화면 낭독기용 표 */}
-        <table className={styles.srOnly}>
+        <VisuallyHidden as="table">
           <tbody>
             {recent.map(({ day, focusMs }) => (
               <tr key={day}>
@@ -159,7 +154,7 @@ function StatsBody({ stats, today, all }: StatsBodyProps) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </VisuallyHidden>
       </figure>
     </div>
   );

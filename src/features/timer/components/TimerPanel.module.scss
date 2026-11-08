@@ -1,5 +1,4 @@
 @use "../../../styles/breakpoints" as bp;
-@use "../../../styles/mixins";
 
 // 세로 공간: 화면 높이(dvh)에 맞춰 사진, 시간 글자, 여백을 줄여서 한 화면에 들어가게
 .panel {
@@ -68,8 +67,4 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.srOnly {
-  @include mixins.visually-hidden;
 }

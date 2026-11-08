@@ -146,17 +146,3 @@ $amount-height: 18px;
     font-weight: var(--font-weight-bold);
   }
 }
-
-.empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-4) 0;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-md);
-}
-
-.srOnly {
-  @include mixins.visually-hidden;
-}
