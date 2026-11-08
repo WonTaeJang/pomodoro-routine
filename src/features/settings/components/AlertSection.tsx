@@ -7,10 +7,10 @@ import {
   getNotificationStatus,
   previewAlertSound,
   requestNotificationPermission,
-  unlockAudio,
   type NotificationStatus,
 } from "@/features/alerts";
 import { useTimerStore } from "@/features/timer/store";
+import { unlockAudio } from "@/lib/audio";
 import styles from "./Settings.module.scss";
 
 const NOTIFICATION_DESCRIPTIONS: Record<NotificationStatus, string> = {

@@ -1,6 +1,7 @@
 import mascot from "@/assets/mascot/kkami-graduate.svg";
 import { APP_NAME } from "@/lib/brand";
 import { formatDate, formatDuration, startOfDay } from "@/lib/date";
+import { seededRandom } from "@/lib/random";
 import {
   CERTIFICATE_TITLE,
   getCertificateMessage,
@@ -14,7 +15,6 @@ import {
   ellipsize,
   loadImage,
   roundRectPath,
-  seededRandom,
   setFont,
   type Ctx,
 } from "./canvas";

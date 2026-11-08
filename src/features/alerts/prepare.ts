@@ -1,5 +1,5 @@
 import { useTimerStore } from "@/features/timer/store";
-import { unlockAudio } from "./audio";
+import { unlockAudio } from "@/lib/audio";
 import { requestNotificationPermission } from "./notify";
 
 /**
