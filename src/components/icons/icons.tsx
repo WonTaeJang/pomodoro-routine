@@ -341,6 +341,36 @@ export function ExternalLinkIcon(props: IconProps) {
   );
 }
 
+/** 종 (알림) */
+export function BellIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z" />
+      <path d="M10 20a2 2 0 0 0 4 0" />
+    </Icon>
+  );
+}
+
+/** 키보드 (단축키) */
+export function KeyboardIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="2.5" y="6" width="19" height="12" rx="2" />
+      <path d="M6.5 10h.01M10 10h.01M14 10h.01M17.5 10h.01M8 14h8" />
+    </Icon>
+  );
+}
+
+/** 저장 (기록 보관) */
+export function SaveIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M5 4h11l3 3v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4z" />
+      <path d="M8 4v5h7V4M8 20v-6h8v6" />
+    </Icon>
+  );
+}
+
 /** 메달. 완료한 사이클 표시에 사용 */
 export function MedalIcon(props: IconProps) {
   return (

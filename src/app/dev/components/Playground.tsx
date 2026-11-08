@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  BellIcon,
   BookIcon,
   CalendarIcon,
   CheckIcon,
@@ -13,6 +14,7 @@ import {
   ExternalLinkIcon,
   FlameIcon,
   GripIcon,
+  KeyboardIcon,
   HeadphonesIcon,
   MedalIcon,
   MenuIcon,
@@ -25,6 +27,7 @@ import {
   PawIcon,
   PlayIcon,
   PlusIcon,
+  SaveIcon,
   ResetIcon,
   SettingsIcon,
   SkipIcon,
@@ -102,6 +105,9 @@ const icons = [
   { name: "Menu", Icon: MenuIcon },
   { name: "Book", Icon: BookIcon },
   { name: "ExternalLink", Icon: ExternalLinkIcon },
+  { name: "Bell", Icon: BellIcon },
+  { name: "Keyboard", Icon: KeyboardIcon },
+  { name: "Save", Icon: SaveIcon },
 ];
 
 /** 공통 컴포넌트를 한눈에 확인하는 개발용 페이지 */

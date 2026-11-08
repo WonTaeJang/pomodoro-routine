@@ -1,26 +1,125 @@
+@use "../../../styles/breakpoints" as bp;
 @use "../../../styles/mixins";
 
-.card {
-  @include mixins.stack(var(--space-3));
-  align-items: center;
-  padding-block: var(--space-10);
-  text-align: center;
-  // 넓은 화면에서도 두 칸 전체를 씀
+// 휴대폰: 제목 → 가로로 넘기는 목차 → 본문 / 넓은 화면: 왼쪽 고정 목차 | 제목, 본문
+.layout {
+  display: grid;
+  grid-template-areas: "head" "toc" "sections";
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
   grid-column: 1 / -1;
+
+  @include bp.up(lg) {
+    grid-template-areas: "toc head" "toc sections";
+    grid-template-columns: 220px minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--space-6);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding-top: var(--space-2);
+  grid-area: head;
+
+  // 좁은 화면에서 글 때문에 까미 그림이 줄어들지 않게
+  img {
+    flex-shrink: 0;
+  }
 }
 
 .title {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
 }
 
-.text {
+.intro {
+  margin-top: var(--space-1);
   color: var(--color-text-muted);
 }
 
-.link {
-  color: var(--color-accent);
-  font-weight: var(--font-weight-semibold);
+.toc {
+  grid-area: toc;
 
-  @include mixins.focus-ring;
+  ul {
+    display: flex;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: var(--font-size-sm);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      background: var(--color-accent-subtle);
+    }
+
+    @include mixins.focus-ring;
+
+    svg {
+      flex-shrink: 0;
+      color: var(--color-accent);
+    }
+  }
+
+  @include bp.up(lg) {
+    position: sticky;
+    top: var(--space-4);
+    padding-top: var(--space-2);
+
+    ul {
+      flex-direction: column;
+      gap: var(--space-0-5);
+      overflow: visible;
+    }
+
+    a {
+      border-radius: var(--radius-md);
+      background: none;
+    }
+  }
+}
+
+.sections {
+  @include mixins.stack(var(--space-4));
+  grid-area: sections;
+}
+
+.section {
+  @include mixins.stack(var(--space-3));
+  // 목차로 이동했을 때 제목이 화면 맨 위에 붙지 않게
+  scroll-margin-top: var(--space-4);
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.iconBadge {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-subtle);
+  color: var(--color-accent);
 }

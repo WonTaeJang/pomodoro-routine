@@ -1,0 +1,27 @@
+@use "../../../styles/mixins";
+
+.points {
+  @include mixins.stack(var(--space-2));
+  margin: 0;
+  padding-left: var(--space-5);
+  color: var(--color-text);
+  line-height: 1.6;
+  word-break: keep-all;
+
+  li::marker {
+    color: var(--color-accent);
+  }
+}
+
+// 글 속 아이콘: 글자 높이에 맞추고 강조색
+.inlineIcon {
+  display: inline-flex;
+  margin: 0 0.1em;
+  color: var(--color-accent);
+  vertical-align: -0.15em;
+}
+
+// 넓은 카드에서 키가 이름과 너무 멀어지지 않게
+.shortcuts {
+  max-width: 520px;
+}
