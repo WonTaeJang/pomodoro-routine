@@ -1,3 +1,5 @@
+import type { FocusSoundSetting } from "@/features/focus-sound/sounds";
+
 /** 타이머 모드 */
 export type TimerMode = "focus" | "short-break" | "long-break";
 
@@ -18,6 +20,10 @@ export type TimerSettings = {
   soundEnabled: boolean;
   /** 소리 크기 0~1 */
   soundVolume: number;
+  /** 집중하는 동안 들리는 소리 (백색소음 등). 끄기면 "off" */
+  focusSound: FocusSoundSetting;
+  /** 집중 소리 크기 0~1 (알림 소리 크기와 따로) */
+  focusSoundVolume: number;
   /** 다른 탭에 있을 때 브라우저 알림 */
   notificationsEnabled: boolean;
   /** 진행 띠의 발자국 도장, 마지막 구간 빛, 완료 축하 효과 */

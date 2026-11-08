@@ -154,6 +154,17 @@ export function ChevronRightIcon(props: IconProps) {
   );
 }
 
+/** 헤드폰. 집중 소리 */
+export function HeadphonesIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 15v-3a8 8 0 0 1 16 0v3" />
+      <rect x="3" y="14" width="4.5" height="6.5" rx="1.5" />
+      <rect x="16.5" y="14" width="4.5" height="6.5" rx="1.5" />
+    </Icon>
+  );
+}
+
 /** 라이트 모드 */
 export function SunIcon(props: IconProps) {
   return (

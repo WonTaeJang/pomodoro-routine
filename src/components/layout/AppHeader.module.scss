@@ -17,6 +17,11 @@
   min-width: 0;
   align-items: center;
   gap: var(--space-3);
+
+  // 아주 좁은 휴대폰에서 메뉴와 버튼이 겹치지 않게 간격을 줄임
+  @include bp.down(xs) {
+    gap: var(--space-1);
+  }
 }
 
 .brand {

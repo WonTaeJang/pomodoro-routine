@@ -23,6 +23,13 @@ export function useSessionState<T>(initial: T): [T, (value: T) => void] {
   return [value, (next) => setState({ key, value: next })];
 }
 
+/** 집중이 진행 중인지 (집중 소리를 틀지 정할 때) */
+export function useFocusRunning(): boolean {
+  return useTimerStore(
+    (s) => s.timer.mode === "focus" && s.timer.status === "running",
+  );
+}
+
 /** 진행 중인 세션의 시간이 다 되거나, 자동 시작 카운트다운이 끝나면 다음으로 넘깁니다. */
 export function useCompleteWhenDue(timer: TimerState, now: number | null) {
   const due =

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "rain",
+    "source": "boons_freak-rain-sound-188158.mp3",
+    "start": 8,
+    "loop": 75,
+    "fade": 2,
+    "lowCut": 60
+  },
+  {
+    "id": "window-rain",
+    "source": "eryliaa-gentle-rain-on-window-350529.mp3",
+    "start": 20,
+    "loop": 90,
+    "fade": 2,
+    "lowCut": 40
+  },
+  {
+    "id": "fireplace",
+    "source": "freesound_community-lit-fireplace-6307.mp3",
+    "start": 5,
+    "loop": 90,
+    "fade": 2,
+    "lowCut": 80
+  },
+  {
+    "id": "forest",
+    "source": "soundreality-nature-forest-sound-537925.mp3",
+    "start": 30,
+    "loop": 90,
+    "fade": 3,
+    "lowCut": 60
+  },
+  {
+    "id": "waves",
+    "source": "soundsforyou-ocean-sea-soft-waves-121349.mp3",
+    "start": 20,
+    "loop": 90,
+    "fade": 4,
+    "lowCut": 40
+  }
+]

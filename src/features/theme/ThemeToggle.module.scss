@@ -1,0 +1,8 @@
+@use "../../styles/breakpoints" as bp;
+
+// 아주 좁은 휴대폰(360px 미만)에서는 헤더 자리가 모자라 숨김 (설정 > 화면에서 바꿀 수 있음)
+.toggle {
+  @include bp.down(xs) {
+    display: none;
+  }
+}

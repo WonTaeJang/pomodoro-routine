@@ -1,3 +1,4 @@
+@use "../../styles/breakpoints" as bp;
 @use "../../styles/mixins";
 
 .list {
@@ -26,6 +27,11 @@
   }
 
   @include mixins.focus-ring;
+
+  // 아주 좁은 휴대폰에서는 좌우 여백을 줄임
+  @include bp.down(xs) {
+    padding: 0 var(--space-1-5);
+  }
 }
 
 .current {

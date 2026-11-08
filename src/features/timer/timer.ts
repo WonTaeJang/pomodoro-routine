@@ -23,6 +23,8 @@ export const DEFAULT_SETTINGS: TimerSettings = {
   autoStartFocus: false,
   soundEnabled: true,
   soundVolume: 0.7,
+  focusSound: "off",
+  focusSoundVolume: 0.5,
   notificationsEnabled: true,
   ringEffects: true,
   keepScreenOn: true,

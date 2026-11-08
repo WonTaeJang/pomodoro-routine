@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { AppHeader } from "@/components/layout/AppHeader";
 import { AppNav } from "@/components/layout/AppNav";
 import { TodayCertificateButton } from "@/features/certificate";
+import { FocusSoundButton } from "@/features/focus-sound";
 import { TodaySummary } from "@/features/history/components/TodaySummary";
 import { SettingsButton } from "@/features/settings/components/SettingsButton";
 import { ThemeToggle } from "@/features/theme/ThemeToggle";
@@ -29,6 +30,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <TestModeBadge ready={ready} />
           {ready ? <TodaySummary /> : null}
           {ready ? <TodayCertificateButton /> : null}
+          <FocusSoundButton ready={ready} />
           <ThemeToggle />
           <SettingsButton ready={ready} />
         </AppHeader>
