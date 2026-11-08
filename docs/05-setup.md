@@ -105,6 +105,7 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
 
 ```
 pomodoro-routine/
+├── CHANGELOG.md           버전별 바뀐 점 (버전 규칙은 docs/commit.md)
 ├── docs/                  기획 문서
 ├── src/app/               페이지 (layout.tsx, page.tsx 타이머, calendar/ 캘린더, guide/ 사용법)
 ├── src/app/_components/   모든 페이지의 틀 AppShell (헤더, ☰ 메뉴, 저장값 불러오기, 타이머 동작)
@@ -159,3 +160,4 @@ pomodoro-routine/
 - 2026-11-08: stats 폴더 추가
 - 2026-11-08: 다른 탭과 맞추기(`useTabSync`), `kkamodoro-sound-tab` 추가
 - 2026-11-08: guide 폴더, `/guide` 페이지, 헤더 메뉴(HeaderMenu) 추가
+- 2026-11-08: CHANGELOG.md, package.json `repository` 추가

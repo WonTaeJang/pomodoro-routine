@@ -106,7 +106,7 @@
 
 ## 4. 버전 (Version)
 
-`package.json`의 `version`을 올리는 규칙입니다.
+`package.json`의 `version`을 올리는 규칙입니다. 화면 맨 아래(`AppFooter`)에 이 버전이 보입니다.
 
 ### 언제 올리나
 
