@@ -8,6 +8,12 @@ export function startOfDay(time: number): number {
 /** 요일 이름 (Date.getDay() 순서: 일요일부터) */
 export const WEEKDAY_NAMES = ["일", "월", "화", "수", "목", "금", "토"];
 
+/** 그날이 속한 달의 첫날 (로컬 자정) */
+export function startOfMonth(time: number): number {
+  const date = new Date(time);
+  return new Date(date.getFullYear(), date.getMonth(), 1).getTime();
+}
+
 /** n일 뒤(앞이면 음수) 같은 시각. 서머타임이 있어도 날짜 기준으로 셈 */
 export function addDays(time: number, days: number): number {
   const date = new Date(time);

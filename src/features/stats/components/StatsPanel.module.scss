@@ -1,0 +1,162 @@
+@use "../../../styles/breakpoints" as bp;
+@use "../../../styles/mixins";
+
+.panel {
+  @include mixins.stack(var(--space-4));
+}
+
+.title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+// 휴대폰: 요약 칸 아래 차트 / 넓은 화면: 왼쪽 요약 칸, 오른쪽 차트
+.body {
+  display: grid;
+  gap: var(--space-5);
+
+  @include bp.up(md) {
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+  }
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.tile {
+  min-width: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-accent-subtle);
+
+  dt {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-0-5);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.note {
+  margin-top: var(--space-0-5);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  word-break: keep-all;
+}
+
+// "6시간 15분"이 두 줄로 나뉘지 않게
+.nowrap {
+  white-space: nowrap;
+}
+
+.flame {
+  color: var(--color-accent);
+}
+
+// 최근 7일 막대
+$chart-height: 120px;
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.chartTitle {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.bars {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+  min-height: $chart-height;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+// 막대가 자라는 칸. 숫자는 막대 바로 위에
+$amount-height: 18px;
+
+.track {
+  display: flex;
+  width: 100%;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.amount {
+  height: $amount-height;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+.bar {
+  width: 100%;
+  max-width: 28px;
+  height: calc((100% - #{$amount-height}) * var(--ratio));
+  min-height: 3px;
+  border-radius: var(--radius-sm) var(--radius-sm) 2px 2px;
+  background: color-mix(in srgb, var(--color-accent) 35%, var(--color-surface));
+}
+
+.weekday {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.today {
+  .bar {
+    background: var(--color-accent);
+  }
+
+  .amount,
+  .weekday {
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+  }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-md);
+}
+
+.srOnly {
+  @include mixins.visually-hidden;
+}

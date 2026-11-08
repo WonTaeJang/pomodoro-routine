@@ -5,6 +5,7 @@ import {
   formatDuration,
   formatLongDate,
   startOfDay,
+  startOfMonth,
 } from "./date";
 
 const MIN = 60_000;
@@ -16,6 +17,7 @@ describe("날짜", () => {
     expect(addDays(startOfDay(t), 1)).toBe(new Date(2026, 11, 1).getTime());
     expect(formatDate(t)).toBe("2026.11.30");
     expect(formatLongDate(t)).toBe("11월 30일 월요일");
+    expect(startOfMonth(t)).toBe(new Date(2026, 10, 1).getTime());
   });
 });
 
