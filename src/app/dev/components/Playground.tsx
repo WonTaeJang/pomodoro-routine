@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import {
   CheckIcon,
   CloseIcon,
@@ -28,6 +28,7 @@ import {
   IconButton,
   ProgressRing,
   SegmentedControl,
+  Section,
   Slider,
   Stepper,
   Switch,
@@ -287,14 +288,5 @@ export function Playground() {
         </div>
       </Section>
     </main>
-  );
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className={styles.section}>
-      <h2 className={styles.sectionTitle}>{title}</h2>
-      {children}
-    </section>
   );
 }

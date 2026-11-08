@@ -1,3 +1,5 @@
+@use "../../../styles/mixins";
+
 // 미리보기 크기: 스토리 비율(9:16)을 유지하면서 화면 높이에 맞춤
 $preview-max-height: 520px;
 
@@ -6,9 +8,7 @@ $preview-max-height: 520px;
 }
 
 .content {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
+  @include mixins.stack(var(--space-4));
 }
 
 .preview {

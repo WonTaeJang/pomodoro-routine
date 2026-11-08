@@ -1,9 +1,7 @@
 @use "../../../styles/mixins";
 
 .field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1-5);
+  @include mixins.stack(var(--space-1-5));
 }
 
 .label {

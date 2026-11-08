@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button, ConfirmDialog, FieldRow } from "@/components/ui";
+import { Button, ConfirmDialog, FieldRow, Section } from "@/components/ui";
 import { resetAllData, resetSettings } from "../resetData";
-import { SettingsSection } from "./SettingsSection";
 
 type Pending = "settings" | "all" | null;
 
@@ -13,7 +12,7 @@ export function DataSection() {
   const close = () => setPending(null);
 
   return (
-    <SettingsSection title="데이터">
+    <Section title="데이터" headingLevel={3}>
       <FieldRow
         label="설정 되돌리기"
         description="시간, 알림, 화면 설정을 처음 값으로"
@@ -56,6 +55,6 @@ export function DataSection() {
         이 브라우저에 저장된 할 일, 집중 기록, 설정이 모두 지워져요. 지운 뒤에는
         되돌릴 수 없어요.
       </ConfirmDialog>
-    </SettingsSection>
+    </Section>
   );
 }

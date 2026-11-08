@@ -19,9 +19,7 @@ $thumb-size: 20px;
 }
 
 .field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  @include mixins.stack(var(--space-1));
 }
 
 .header {

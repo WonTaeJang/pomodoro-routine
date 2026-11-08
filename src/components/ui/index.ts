@@ -7,6 +7,7 @@ export * from "./Dialog/Dialog";
 export * from "./FieldRow/FieldRow";
 export * from "./IconButton/IconButton";
 export * from "./ProgressRing/ProgressRing";
+export * from "./Section/Section";
 export * from "./SegmentedControl/SegmentedControl";
 export * from "./Slider/Slider";
 export * from "./Stepper/Stepper";

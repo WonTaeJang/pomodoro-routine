@@ -1,11 +1,11 @@
+@use "../../../styles/mixins";
+
 $photo-size: 140px;
 $medal-size: 48px;
 
 .content {
-  display: flex;
-  flex-direction: column;
+  @include mixins.stack(var(--space-4));
   align-items: center;
-  gap: var(--space-4);
   text-align: center;
 }
 

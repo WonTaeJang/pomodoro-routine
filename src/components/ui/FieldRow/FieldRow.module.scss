@@ -1,3 +1,5 @@
+@use "../../../styles/mixins";
+
 // 글자 영역이 이 폭보다 좁아질 상황이면 조작 요소를 다음 줄로 내림
 $text-min-width: 7rem;
 
@@ -10,10 +12,8 @@ $text-min-width: 7rem;
 }
 
 .text {
-  display: flex;
+  @include mixins.stack(var(--space-0-5));
   flex: 1 1 $text-min-width;
-  flex-direction: column;
-  gap: var(--space-0-5);
 }
 
 .label {

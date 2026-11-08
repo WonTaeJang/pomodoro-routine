@@ -1,6 +1,6 @@
 "use client";
 
-import { FieldRow, SegmentedControl, Switch } from "@/components/ui";
+import { FieldRow, Section, SegmentedControl, Switch } from "@/components/ui";
 import {
   setTheme,
   useThemeChoice,
@@ -8,7 +8,6 @@ import {
 } from "@/features/theme/theme";
 import { useTimerStore } from "@/features/timer/store";
 import { isWakeLockSupported } from "@/lib/useWakeLock";
-import { SettingsSection } from "./SettingsSection";
 
 const themeOptions: { value: ThemeChoice; label: string }[] = [
   { value: "system", label: "기기 설정" },
@@ -26,7 +25,7 @@ export function DisplaySection() {
   const update = useTimerStore.getState().updateSettings;
 
   return (
-    <SettingsSection title="화면">
+    <Section title="화면" headingLevel={3}>
       <FieldRow label="테마">
         <SegmentedControl
           label="테마"
@@ -52,6 +51,6 @@ export function DisplaySection() {
         disabled={!wakeLockSupported}
         onCheckedChange={(on) => update({ keepScreenOn: on })}
       />
-    </SettingsSection>
+    </Section>
   );
 }

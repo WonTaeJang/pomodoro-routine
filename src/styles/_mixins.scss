@@ -36,3 +36,10 @@
     @content;
   }
 }
+
+// 세로로 쌓기 (위에서 아래로, 사이 간격)
+@mixin stack($gap) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+}

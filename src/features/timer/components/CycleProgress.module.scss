@@ -1,9 +1,9 @@
+@use "../../../styles/mixins";
+
 // 발자국 한 줄, 안내 문구 한 줄
 .cycle {
-  display: flex;
-  flex-direction: column;
+  @include mixins.stack(var(--space-1));
   align-items: center;
-  gap: var(--space-1);
   margin-top: clamp(var(--space-3), 2.5dvh, var(--space-6));
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);

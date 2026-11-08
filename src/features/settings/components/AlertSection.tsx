@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { PlayIcon } from "@/components/icons";
-import { Button, Slider, Switch } from "@/components/ui";
+import { Button, Section, Slider, Switch } from "@/components/ui";
 import {
   getNotificationStatus,
   previewAlertSound,
@@ -11,7 +11,6 @@ import {
   type NotificationStatus,
 } from "@/features/alerts";
 import { useTimerStore } from "@/features/timer/store";
-import { SettingsSection } from "./SettingsSection";
 import styles from "./Settings.module.scss";
 
 const NOTIFICATION_DESCRIPTIONS: Record<NotificationStatus, string> = {
@@ -34,7 +33,7 @@ export function AlertSection() {
     permission === "denied" || permission === "unsupported";
 
   return (
-    <SettingsSection title="알림">
+    <Section title="알림" headingLevel={3}>
       <Switch
         label="알림 소리"
         description="세션이 끝나면 종소리로 알려줘요"
@@ -79,6 +78,6 @@ export function AlertSection() {
           }
         }}
       />
-    </SettingsSection>
+    </Section>
   );
 }

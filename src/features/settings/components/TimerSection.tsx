@@ -1,8 +1,8 @@
 "use client";
 
-import { FieldRow, Stepper, Switch } from "@/components/ui";
+import { FieldRow, Section, Stepper, Switch } from "@/components/ui";
 import { useTimerStore } from "@/features/timer/store";
-import { SettingsNote, SettingsSection } from "./SettingsSection";
+import { SettingsNote } from "./SettingsNote";
 import styles from "./Settings.module.scss";
 
 const minutes = (v: number) => `${v}분`;
@@ -14,7 +14,7 @@ export function TimerSection() {
   const update = useTimerStore.getState().updateSettings;
 
   return (
-    <SettingsSection title="타이머">
+    <Section title="타이머" headingLevel={3}>
       <FieldRow label="집중">
         <Stepper
           className={styles.stepper}
@@ -86,6 +86,6 @@ export function TimerSection() {
           바꾼 시간은 지금 세션이 끝난 뒤 다음 세션부터 적용돼요.
         </SettingsNote>
       ) : null}
-    </SettingsSection>
+    </Section>
   );
 }
