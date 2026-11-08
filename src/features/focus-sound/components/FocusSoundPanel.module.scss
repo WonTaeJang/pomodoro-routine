@@ -6,8 +6,15 @@
 }
 
 .title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
+}
+
+.titleIcon {
+  color: var(--color-accent);
 }
 
 .hint {
@@ -23,7 +30,8 @@
   border: 0;
 }
 
-.legend {
+.legend,
+.srOnly {
   @include mixins.visually-hidden;
 }
 
@@ -37,21 +45,25 @@
   font-weight: var(--font-weight-semibold);
 }
 
-// 두 칸씩
+// 세 칸씩
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-1-5);
 }
 
-// 소리 하나: 이름 + 짧은 설명. 고르면 강조색 테두리
+// 소리 하나: 아이콘 위, 이름 아래. 고르면 강조색 테두리와 아이콘
 .option {
   position: relative;
   display: flex;
+  min-width: 0;
   flex-direction: column;
-  padding: var(--space-1-5) var(--space-3);
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2-5) var(--space-1);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-md);
+  text-align: center;
   cursor: pointer;
   transition:
     background-color var(--duration-fast),
@@ -64,6 +76,10 @@
   &:has(:checked) {
     border-color: var(--color-accent);
     background: var(--color-accent-subtle);
+
+    .icon {
+      color: var(--color-accent);
+    }
   }
 
   &:has(:focus-visible) {
@@ -75,11 +91,31 @@
   }
 }
 
-// 끄기는 한 줄 전체, 이름과 설명을 나란히
+// 끄기는 한 줄 전체: 아이콘, 이름, 설명을 나란히
 .off {
   flex-direction: row;
-  align-items: baseline;
-  gap: var(--space-2);
+  gap: var(--space-2-5);
+  padding: var(--space-2) var(--space-3);
+  text-align: start;
+
+  .text {
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: color var(--duration-fast);
+}
+
+.text {
+  display: flex;
+  max-width: 100%;
+  flex-direction: column;
+  align-items: center;
 }
 
 // 동그라미 대신 칸 전체로 고른 것을 보여줌 (화면 낭독기와 키보드는 그대로 라디오 버튼)
@@ -87,14 +123,68 @@
   @include mixins.visually-hidden;
 }
 
+// 아주 좁은 화면에서 칸이 모자라면 띄어쓰기에서 줄바꿈 ("브라운 / 노이즈")
 .label {
   font-weight: var(--font-weight-semibold);
+  word-break: keep-all;
 }
 
 .description {
-  overflow: hidden;
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+// 세 칸 안에서는 설명을 숨김 (마우스를 올리면 툴팁, 화면 낭독기는 읽음)
+.grid .description {
+  @include mixins.visually-hidden;
+}
+
+.grid .label {
+  font-size: var(--font-size-md);
+}
+
+// 재생 중 표시: 오른쪽 위 작은 막대 3개가 오르내림
+$bar-height: 10px;
+
+.playing {
+  position: absolute;
+  top: var(--space-1-5);
+  right: var(--space-2);
+  display: flex;
+  height: $bar-height;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.bar {
+  width: 3px;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--color-accent);
+  transform-origin: bottom;
+  animation: bounce 0.9s ease-in-out infinite;
+
+  &:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: -0.6s;
+  }
+
+  @include mixins.reduced-motion {
+    animation: none;
+    transform: scaleY(0.6);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+
+  50% {
+    transform: scaleY(1);
+  }
 }

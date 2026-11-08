@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  HeadphonesIcon,
+  VolumeHighIcon,
+  VolumeLowIcon,
+  VolumeOffIcon,
+  type IconComponent,
+} from "@/components/icons";
 import { Slider } from "@/components/ui";
 import { useFocusRunning } from "@/features/timer/hooks";
 import { useTimerStore } from "@/features/timer/store";
@@ -28,7 +35,10 @@ export function FocusSoundPanel() {
   return (
     <div className={styles.panel}>
       <div>
-        <h2 className={styles.title}>집중 소리</h2>
+        <h2 className={styles.title}>
+          <HeadphonesIcon size={20} className={styles.titleIcon} />
+          집중 소리
+        </h2>
         <p className={styles.hint}>
           집중할 때만 들려요.
           {focusing ? null : " 고르면 미리 들려줘요."}
@@ -41,7 +51,9 @@ export function FocusSoundPanel() {
           value="off"
           label="끄기"
           description="소리 없이 집중"
+          icon={VolumeOffIcon}
           checked={sound === "off"}
+          playing={false}
           onChoose={choose}
           className={styles.off}
         />
@@ -55,7 +67,9 @@ export function FocusSoundPanel() {
                   value={id}
                   label={FOCUS_SOUNDS[id].label}
                   description={FOCUS_SOUNDS[id].description}
+                  icon={FOCUS_SOUNDS[id].icon}
                   checked={sound === id}
+                  playing={focusing && sound === id}
                   onChoose={choose}
                 />
               ))}
@@ -73,6 +87,8 @@ export function FocusSoundPanel() {
         }}
         format={(value) => `${value}%`}
         disabled={sound === "off"}
+        startIcon={<VolumeLowIcon size={18} />}
+        endIcon={<VolumeHighIcon size={18} />}
       />
     </div>
   );
@@ -82,22 +98,30 @@ type SoundOptionProps = {
   value: FocusSoundSetting;
   label: string;
   description: string;
+  icon: IconComponent;
   checked: boolean;
+  /** 집중 중이라 지금 들리는 소리 */
+  playing: boolean;
   onChoose: (value: FocusSoundSetting) => void;
   className?: string;
 };
 
-/** 소리 하나 (이름 + 짧은 설명). 칸 전체가 라디오 버튼 */
+/**
+ * 소리 하나: 아이콘과 이름. 짧은 설명은 마우스를 올리면 보이고 화면 낭독기도 읽음.
+ * 칸 전체가 라디오 버튼
+ */
 function SoundOption({
   value,
   label,
   description,
+  icon: SoundIcon,
   checked,
+  playing,
   onChoose,
   className,
 }: SoundOptionProps) {
   return (
-    <label className={cx(styles.option, className)}>
+    <label className={cx(styles.option, className)} title={description}>
       <input
         type="radio"
         name="focus-sound"
@@ -106,8 +130,21 @@ function SoundOption({
         onChange={() => onChoose(value)}
         className={styles.radio}
       />
-      <span className={styles.label}>{label}</span>
-      <span className={styles.description}>{description}</span>
+      <SoundIcon size={22} className={styles.icon} />
+      <span className={styles.text}>
+        <span className={styles.label}>{label}</span>
+        <span className={styles.description}>{description}</span>
+      </span>
+      {playing ? (
+        <>
+          <span className={styles.srOnly}>(재생 중)</span>
+          <span className={styles.playing} aria-hidden="true">
+            <span className={styles.bar} />
+            <span className={styles.bar} />
+            <span className={styles.bar} />
+          </span>
+        </>
+      ) : null}
     </label>
   );
 }

@@ -24,7 +24,7 @@
     var(--space-4),
     calc((100vw - var(--layout-max)) / 2 + var(--space-4))
   );
-  width: min(320px, calc(100vw - var(--space-4) * 2));
+  width: min(340px, calc(100vw - var(--space-4) * 2));
   // 화면이 낮으면 창 안에서 스크롤
   max-height: calc(100dvh - var(--header-height) - var(--space-4));
   overflow-y: auto;

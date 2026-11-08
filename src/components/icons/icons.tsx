@@ -165,6 +165,114 @@ export function HeadphonesIcon(props: IconProps) {
   );
 }
 
+/** 소리 끔 (스피커에 X) */
+export function VolumeOffIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M11 5 6 9H3v6h3l5 4z" />
+      <path d="m22 9-6 6M16 9l6 6" />
+    </Icon>
+  );
+}
+
+/** 작은 소리 */
+export function VolumeLowIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M11 5 6 9H3v6h3l5 4z" />
+      <path d="M15.5 9a4.5 4.5 0 0 1 0 6" />
+    </Icon>
+  );
+}
+
+/** 큰 소리 */
+export function VolumeHighIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M11 5 6 9H3v6h3l5 4z" />
+      <path d="M15.5 9a4.5 4.5 0 0 1 0 6M18.5 6a8.5 8.5 0 0 1 0 12" />
+    </Icon>
+  );
+}
+
+/** 백색소음: 촘촘하고 고르지 않은 파형 */
+export function NoiseWhiteIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M2 12l2-5 2 10 2-8 2 6 2-9 2 11 2-8 2 7 2-6 2 2" />
+    </Icon>
+  );
+}
+
+/** 핑크 노이즈: 부드러운 물결 파형 */
+export function NoisePinkIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M2 12c1.5-4.5 3.5-4.5 5 0s3.5 4.5 5 0 3.5-4.5 5 0 3.5 4.5 5 0" />
+    </Icon>
+  );
+}
+
+/** 브라운 노이즈: 낮고 넓은 파형 */
+export function NoiseBrownIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M2 15c3-7 7-7 10 0s7 7 10 0" />
+    </Icon>
+  );
+}
+
+/** 비구름 */
+export function CloudRainIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M7 15h10.5a3.5 3.5 0 0 0 .4-7A6 6 0 0 0 6.3 8.6 3.3 3.3 0 0 0 7 15z" />
+      <path d="m8.5 18-1 3M12.5 18l-1 3M16.5 18l-1 3" />
+    </Icon>
+  );
+}
+
+/** 빗방울 맺힌 창문 */
+export function WindowRainIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="3.5" y="3" width="17" height="18" rx="2" />
+      <path d="M12 3v18M3.5 12h17" />
+      <path d="M7.5 6.5v1.5M16 8v1.5M7.5 15.5V17M16 14.5V16" />
+    </Icon>
+  );
+}
+
+/** 불꽃 */
+export function FlameIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 3c.5 3.5 6 5.5 6 11a6 6 0 0 1-12 0c0-2.5 1.2-4.2 2.5-5.3.2 2.1 1.2 3.3 2.5 3.3 0-3.5-.7-6.2 1-9z" />
+    </Icon>
+  );
+}
+
+/** 나무 */
+export function TreeIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 2.5 18 10h-3l4 6H5l4-6H6z" />
+      <path d="M12 16v5.5" />
+    </Icon>
+  );
+}
+
+/** 물결 (파도) */
+export function WavesIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M2 8.5c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2" />
+      <path d="M2 13c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2" />
+      <path d="M2 17.5c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2" />
+    </Icon>
+  );
+}
+
 /** 라이트 모드 */
 export function SunIcon(props: IconProps) {
   return (

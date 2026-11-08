@@ -1,4 +1,15 @@
 import {
+  CloudRainIcon,
+  FlameIcon,
+  NoiseBrownIcon,
+  NoisePinkIcon,
+  NoiseWhiteIcon,
+  TreeIcon,
+  WavesIcon,
+  WindowRainIcon,
+  type IconComponent,
+} from "@/components/icons";
+import {
   brownNoise,
   pinkNoise,
   whiteNoise,
@@ -53,6 +64,8 @@ type FocusSound = (SynthSound | RecordedSound) & {
   label: string;
   /** 짧은 설명 (한 줄) */
   description: string;
+  /** 창의 칸에 그리는 아이콘 */
+  icon: IconComponent;
   /**
    * 같은 크기 설정에서 비슷하게 들리도록 맞추는 값.
    * 녹음은 파일을 만들 때 같은 크기(-20 LUFS)로 맞췄고, 노이즈는 그 크기에 맞춤
@@ -65,6 +78,7 @@ export const FOCUS_SOUNDS: Record<FocusSoundId, FocusSound> = {
     kind: "synth",
     label: "백색소음",
     description: "고른 치이익",
+    icon: NoiseWhiteIcon,
     seconds: 6,
     level: 0.21,
     generate: whiteNoise,
@@ -73,6 +87,7 @@ export const FOCUS_SOUNDS: Record<FocusSoundId, FocusSound> = {
     kind: "synth",
     label: "핑크 노이즈",
     description: "부드러운 쏴아",
+    icon: NoisePinkIcon,
     seconds: 6,
     level: 0.31,
     generate: pinkNoise,
@@ -81,6 +96,7 @@ export const FOCUS_SOUNDS: Record<FocusSoundId, FocusSound> = {
     kind: "synth",
     label: "브라운 노이즈",
     description: "묵직한 웅웅",
+    icon: NoiseBrownIcon,
     seconds: 8,
     level: 0.43,
     generate: brownNoise,
@@ -89,30 +105,35 @@ export const FOCUS_SOUNDS: Record<FocusSoundId, FocusSound> = {
     ...recording("rain"),
     label: "빗소리",
     description: "쏴아 내리는 비",
+    icon: CloudRainIcon,
     level: 0.85,
   },
   "window-rain": {
     ...recording("window-rain"),
     label: "창가 빗소리",
     description: "유리창에 톡톡",
+    icon: WindowRainIcon,
     level: 0.85,
   },
   fireplace: {
     ...recording("fireplace"),
     label: "모닥불",
     description: "타닥타닥 장작",
+    icon: FlameIcon,
     level: 0.85,
   },
   forest: {
     ...recording("forest"),
     label: "숲속",
     description: "새소리와 나뭇잎",
+    icon: TreeIcon,
     level: 0.85,
   },
   waves: {
     ...recording("waves"),
     label: "파도",
     description: "잔잔한 바다",
+    icon: WavesIcon,
     level: 0.85,
   },
 };

@@ -29,6 +29,24 @@ $thumb-size: 20px;
   gap: var(--space-4);
 }
 
+// 막대 + 양 끝 아이콘
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+}
+
+// 막대를 쓸 수 없으면 아이콘도 흐리게
+.row:has(:disabled) .icon {
+  opacity: var(--opacity-disabled);
+}
+
 .label {
   font-weight: var(--font-weight-medium);
 }
@@ -40,7 +58,9 @@ $thumb-size: 20px;
 }
 
 .range {
+  flex: 1;
   width: 100%;
+  min-width: 0;
   // 손가락으로 잡기 쉽게 높이를 넉넉히
   height: var(--control-sm);
   margin: 0;
