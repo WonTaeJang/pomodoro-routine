@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { STORAGE_KEYS } from "@/lib/storage";
+import { newSessions } from "@/features/history/sessions";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import {
@@ -28,6 +29,8 @@ type TimerStore = {
   timer: TimerState;
   /** 방금 끝난 세션. 완료 팝업을 띄우는 데 사용 (저장하지 않음) */
   lastCompleted: CompletedSession | null;
+  /** 다른 탭이 끝낸 세션의 완료 팝업을 이 탭에도 띄움 */
+  showCompleted: (session: CompletedSession) => void;
   dismissCompleted: () => void;
   /** 완료 팝업이 보이기 시작했을 때 자동 시작 카운트다운을 시작 */
   beginAutoStart: () => void;
@@ -65,6 +68,9 @@ function attachActiveTask(sessions: CompletedSession[]): CompletedSession[] {
   );
 }
 
+/** 다른 탭이 저장한 값을 다시 불러오는 중인지 (reloadTimerFromOtherTab) */
+let reloadingFromOtherTab = false;
+
 export const useTimerStore = create<TimerStore>()(
   persist(
     (set, get) => {
@@ -76,7 +82,11 @@ export const useTimerStore = create<TimerStore>()(
         const now = Date.now();
         const { settings, timer } = get();
         const synced = sync(timer, settings, now);
-        const completed = attachActiveTask(synced.completed);
+        // 다른 탭이 같은 세션을 먼저 기록했으면 기록과 🐾를 다시 더하지 않음
+        const completed = newSessions(
+          useHistoryStore.getState().sessions,
+          attachActiveTask(synced.completed),
+        );
         useHistoryStore.getState().addSessions(completed);
         useTasksStore
           .getState()
@@ -96,6 +106,7 @@ export const useTimerStore = create<TimerStore>()(
         settings: DEFAULT_SETTINGS,
         timer: createInitialState(DEFAULT_SETTINGS),
         lastCompleted: null,
+        showCompleted: (session) => set({ lastCompleted: session }),
         dismissCompleted: () => set({ lastCompleted: null }),
         beginAutoStart: () =>
           update((timer, now) => beginAutoStart(timer, now)),
@@ -129,12 +140,8 @@ export const useTimerStore = create<TimerStore>()(
       name: STORAGE_KEYS.timer,
       version: 1,
       storage: createJSONStorage(() => localStorage),
-      // 팝업을 아직 못 본 자동 시작 대기는 저장하지 않음 (새로고침하면 완료 팝업이 없어서 시작할 방법이 없음)
-      partialize: ({ settings, timer }) => ({
-        settings,
-        timer:
-          timer.autoStart?.at === null ? { ...timer, autoStart: null } : timer,
-      }),
+      // 완료 팝업(lastCompleted)은 저장하지 않음
+      partialize: ({ settings, timer }) => ({ settings, timer }),
       // 서버에서 그린 화면과 첫 화면이 같도록, 저장된 값은 화면이 뜬 뒤에 불러옵니다.
       skipHydration: true,
       // 예전에 저장된 설정에 새 항목이 없을 때 기본값으로 채움
@@ -142,12 +149,31 @@ export const useTimerStore = create<TimerStore>()(
         const saved = (persisted ?? {}) as Partial<
           Pick<TimerStore, "settings" | "timer">
         >;
+        const timer = saved.timer ?? current.timer;
         return {
           ...current,
           settings: { ...current.settings, ...saved.settings },
-          timer: saved.timer ?? current.timer,
+          // 팝업을 아직 못 본 자동 시작 대기는 처음 불러올 때(새로고침) 버림. 완료 팝업이 없어서 시작할 방법이 없음.
+          // 다른 탭이 저장한 것을 다시 불러올 때는 그대로 (그 탭과 이 탭의 완료 팝업이 함께 기다림)
+          timer:
+            timer.autoStart?.at === null && !reloadingFromOtherTab
+              ? { ...timer, autoStart: null }
+              : timer,
         };
       },
     },
   ),
 );
+
+/**
+ * 다른 탭이 저장한 타이머와 설정을 다시 불러옵니다. 그 탭의 자동 시작 대기도 그대로 가져옵니다.
+ * localStorage는 바로 읽히므로 merge까지 이 함수 안에서 끝납니다.
+ */
+export function reloadTimerFromOtherTab() {
+  reloadingFromOtherTab = true;
+  try {
+    void useTimerStore.persist.rehydrate();
+  } finally {
+    reloadingFromOtherTab = false;
+  }
+}

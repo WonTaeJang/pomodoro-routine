@@ -45,13 +45,23 @@ export function useThemeChoice(): ThemeChoice | null {
 
 /** 테마를 직접 고릅니다. null이면 기기 설정을 따릅니다. */
 export function setTheme(theme: Theme | null) {
-  const root = document.documentElement;
   try {
     if (theme) localStorage.setItem(STORAGE_KEYS.theme, theme);
     else localStorage.removeItem(STORAGE_KEYS.theme);
   } catch {
     // 저장이 막힌 환경(사생활 보호 모드 등)에서도 화면 전환은 되게 함
   }
+  applyTheme(theme);
+}
+
+/** 다른 탭이 저장한 테마를 이 탭에도 적용합니다. */
+export function applySavedTheme() {
+  const saved = localStorage.getItem(STORAGE_KEYS.theme);
+  applyTheme(saved === "light" || saved === "dark" ? saved : null);
+}
+
+function applyTheme(theme: Theme | null) {
+  const root = document.documentElement;
   if (theme) root.dataset.theme = theme;
   else delete root.dataset.theme;
   window.dispatchEvent(new Event(CHANGE_EVENT));

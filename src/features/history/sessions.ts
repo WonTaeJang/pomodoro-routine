@@ -11,6 +11,18 @@ export function focusSessions(
     .sort((a, b) => a.endedAt - b.endedAt);
 }
 
+/** 같은 세션인지 가리는 값. 여러 탭이 같은 세션을 함께 끝내도 하나로 봅니다. */
+const sessionId = (s: CompletedSession) => `${s.mode}:${s.endedAt}`;
+
+/** incoming 중 existing에 아직 없는 세션 (순서 유지) */
+export function newSessions(
+  existing: CompletedSession[],
+  incoming: CompletedSession[],
+): CompletedSession[] {
+  const seen = new Set(existing.map(sessionId));
+  return incoming.filter((s) => !seen.has(sessionId(s)));
+}
+
 /**
  * 집중 세션의 할 일 제목을 찾는 함수를 만듭니다.
  * 기록에 남긴 제목을 먼저 쓰고, 예전 기록(제목 없음)은 지금 남아 있는 할 일에서 찾습니다.

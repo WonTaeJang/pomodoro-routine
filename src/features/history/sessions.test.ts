@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import type { Task } from "@/features/tasks/types";
 import type { CompletedSession } from "@/features/timer/types";
-import { focusSessions, getDayStats, sumDays, taskTitleOf } from "./sessions";
+import {
+  focusSessions,
+  getDayStats,
+  newSessions,
+  sumDays,
+  taskTitleOf,
+} from "./sessions";
 
 const MIN = 60_000;
 const at = (d: number, h: number, m = 0) =>
@@ -80,5 +86,21 @@ describe("기간 합계", () => {
       cycles: 1,
     });
     expect(sumDays(stats, -Infinity, Infinity).focusCount).toBe(3);
+  });
+});
+
+describe("새 세션 고르기", () => {
+  it("모드와 끝난 시각이 같으면 같은 세션 (다른 탭이 이미 기록한 것)", () => {
+    const a = focus(at(8, 9));
+    const b = focus(at(8, 10));
+    const breakAtSameTime: CompletedSession = {
+      mode: "short-break",
+      endedAt: at(8, 9),
+      durationMs: 5 * MIN,
+    };
+    expect(
+      newSessions([a], [{ ...a, taskTitle: "다른 탭" }, b, breakAtSameTime]),
+    ).toEqual([b, breakAtSameTime]);
+    expect(newSessions([], [a])).toEqual([a]);
   });
 });
