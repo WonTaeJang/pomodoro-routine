@@ -118,7 +118,7 @@ import { PawIcon } from "@/components/icons";
   - `random.ts`: 랜덤일 때 n번째 집중의 소리 (`randomFocusSound`, 순수 함수, 테스트). `useFocusSoundChoice()`: 고른 설정과 실제로 틀 소리 (재생, 헤더 버튼, 창이 함께 씀)
   - `noise.ts`: 노이즈 만들기, 크기 맞추기, 끊김 없이 반복되게 잇기 (순수 함수, 테스트)
   - `player.ts`: "지금 들려야 할 소리"를 받아 서서히 켜고 끄고 바꿈, 녹음 받기, 미리 듣기
-  - `components/FocusSoundPanel`: 노이즈 / 자연의 소리를 세 칸씩(아이콘 위, 이름 아래, 설명은 툴팁), 집중 중이면 고른 칸에 재생 중 막대, 소리 크기(양쪽 스피커 아이콘)
+  - `components/FocusSoundPanel`: 위(제목) · 가운데(소리 목록, 넘치면 여기만 스크롤) · 아래(소리 크기). 맨 위 끄기·랜덤 두 칸, 묶음마다 세 칸씩(아이콘 위, 이름 아래, 설명은 툴팁), 집중 중이면 실제로 나오는 소리 칸에 재생 중 막대, 소리 크기(양쪽 스피커 아이콘)
 - 단축키(`src/features/shortcuts/`): `ShortcutList`(하는 일 | 키 목록. 설정 창과 사용법 페이지가 함께 씀), `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
 - 저절로 뜨는 팝업 기다리기: `src/lib/popupHold.ts`. 사용자가 직접 연 창(설정, 수료증)은 `useHoldAutoPopups()`를 부르고, 완료 팝업은 `useAutoPopupsHeld()`가 false일 때 뜸. 새로 만드는 "사용자가 여는 창"도 같은 훅을 부르면 됨
 - 다국어(`src/i18n/`): 화면에서는 use-intl의 `useTranslations("묶음")`, `useLocale()`. 화면 밖(브라우저 알림, 수료증 그림, 시간 계산 함수)은 `getTranslator()`나 `Translator`를 받는 함수로. 문구는 `messages/ko.ts`(기준)·`en.ts`에 기능별로 두고, 여러 기능이 같이 쓰는 말(취소, 닫기, 오늘, 기록 없음, 소리 크기 등)은 `common`에 하나만 둠. 언어 상태는 `locale.ts`(`setLocale`, 다른 탭 맞추기 `applySavedLocale`), 첫 화면 언어는 `locales.ts`의 시작 스크립트. 기능 쪽 목록에는 이름 대신 문구 키를 둠 (예: 집중 소리 `focusSound.sounds.<id>`, 단축키 `shortcuts.<id>`, 알림 `alerts.<종류>`)
@@ -126,6 +126,7 @@ import { PawIcon } from "@/components/icons";
 - 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 어느 페이지든 "진행 중 + 설정 켜짐"일 때 켬 (`TimerRuntime`)
 - store 저장소: `src/lib/storage.ts`의 `tabSafeStorage(localStorage)`. 바뀐 것이 없으면 쓰지 않아 다른 탭의 새 값을 덮어쓰지 않음 (store를 새로 만들 때도 이것을 씀)
 - 미디어 쿼리: `src/lib/useMediaQuery.ts`의 `useMediaQuery(query)`. 키보드 없는 기기 판단은 `TOUCH_ONLY_QUERY` (설정 창의 단축키 숨김 CSS와 같은 기준)
+- 스크롤 경계: `src/lib/useScrollEdges.ts`의 `useScrollEdges(ref)`. 스크롤 영역 위·아래에 가려진 내용이 있는지 (집중 소리 창의 경계선)
 - 밀어서 넘기기: `src/lib/useSwipe.ts`의 `useSwipe({ onNext, onPrev, canNext, canPrev })`. 터치만 받고 마우스는 무시, 붙인 요소에 `touch-action: pan-y` (첫 방문 안내)
 - 다른 탭과 맞추기: `src/lib/useTabSync.ts`의 `useTabSync(ready)` (앱 틀에서 한 번). 다른 탭이 저장하면 다시 불러오고, 완료 팝업 닫힘을 다른 탭에 알림(`BroadcastChannel`)
 - 소리와 알림을 낼 탭: `src/lib/soundTab.ts`. 소리를 내는 코드는 `isSoundTab()` / `useIsSoundTab()`으로 확인 (알림 스케줄러, 집중 소리). 기록 중복 확인은 `sessions.ts`의 `newSessions`
@@ -163,3 +164,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: 다국어(`src/i18n/`), ☰ 메뉴 언어 고르기, `Globe` 아이콘, `NewTabNote`, 날짜 표기 함수에 언어. `WEEKDAY_NAMES`는 `weekdayNames(locale)`로
 - 2026-11-08: 집중 소리 `Airplane` 아이콘, 공간의 소리 묶음
 - 2026-11-08: 집중 소리 랜덤(`random.ts`, `useFocusSoundChoice`), `Shuffle` 아이콘
+- 2026-11-08: 집중 소리 창 위·아래 고정, `useScrollEdges`
