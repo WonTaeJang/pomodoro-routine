@@ -114,6 +114,7 @@ pomodoro-routine/
 ├── src/features/tasks/    할 일 (로직, store, 화면)
 ├── src/features/theme/    다크 모드
 ├── src/features/alerts/   알림 소리, 브라우저 알림
+├── src/features/focus-sound/ 집중 소리 (노이즈 만들기, 재생, 헤더 버튼과 펼침 창)
 ├── src/features/settings/ 설정 창, 데이터 초기화
 ├── src/features/shortcuts/ 키보드 단축키
 ├── src/features/certificate/ 수료증 (내용 계산, 캔버스 그리기, 공유·저장, 팝업)
@@ -121,11 +122,13 @@ pomodoro-routine/
 ├── src/components/ui/     공통 컴포넌트
 ├── src/components/icons/  아이콘
 ├── src/styles/            토큰(tokens/), mixin, 브레이크포인트, 전체 기본 스타일
-├── src/lib/               공통 함수, 훅 (cx, date, useNow·useToday, useHydrateStores·useStoresReady, useWakeLock)
+├── src/lib/               공통 함수, 훅 (cx, date, random, audio, useNow·useToday, useHydrateStores·useStoresReady, useWakeLock)
 ├── src/assets/kkami/      까미 이미지 (정리된 것)
 ├── src/assets/mascot/     까미 마스코트 SVG (basic, graduate, icon)
-├── design/                원본 사진 등 (Git에 올리지 않음)
+├── design/                원본 사진, 원본 녹음(sound/) 등 (Git에 올리지 않음)
 ├── public/                파비콘 등 주소가 고정된 파일
+├── public/sounds/         다듬은 집중 소리 녹음 (scripts/focus-sounds.mjs로 만듦)
+├── scripts/               개발용 스크립트 (focus-sounds.mjs: 녹음 다듬기, ffmpeg 필요)
 ├── AGENTS.md              AI 코딩 도우미용 Next.js 안내
 └── package.json
 ```
@@ -149,3 +152,4 @@ pomodoro-routine/
 - 2026-11-07: shortcuts 폴더 추가
 - 2026-11-07: certificate 폴더, 마스코트 SVG 추가
 - 2026-11-08: calendar 폴더, 캘린더 페이지, 앱 틀(AppShell) 추가
+- 2026-11-08: focus-sound 폴더, scripts/, public/sounds/ 추가

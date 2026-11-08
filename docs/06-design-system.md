@@ -32,7 +32,7 @@
 
 ### 토큰 대신 직접 값을 써도 되는 경우
 - 한 컴포넌트 안에서만 의미 있는 크기나 효과 값은 파일 위쪽에 Sass 변수로 이름을 붙여 둡니다. (예: 스위치 크기 `$track-width`, 띠 효과 시간 `$breathe-duration`)
-- 브레이크포인트는 `_breakpoints.scss`의 Sass 값을 씁니다. (`@include bp.up(md)`, 모바일 우선으로 쓰기 어려운 경우에만 `bp.down(sm)`)
+- 브레이크포인트는 `_breakpoints.scss`의 Sass 값을 씁니다: `xs` 360px(아주 좁은 휴대폰), `sm` 480px, `md` 768px, `lg` 1024px. (`@include bp.up(md)`, 모바일 우선으로 쓰기 어려운 경우에만 `bp.down(xs)`)
 
 ## 공통 mixin (`src/styles/_mixins.scss`)
 
@@ -69,7 +69,7 @@ import { PawIcon } from "@/components/icons";
 | `Stepper` | − 값 + 숫자 조절 | `label`, `value`, `onChange`, `min`, `max`, `format`, `prefix` |
 | `ProgressRing` | 원형 진행 띠 | `value`(남은 비율 0~1), `size`(기준 지름), `thickness`, `markers`, `glow`, `flashKey`, `overlay`, `children`. 화면 크기는 CSS 변수 `--ring-display-size`로 바꿀 수 있고 도장 위치·안쪽 크기가 같은 비율로 따라감 |
 
-아이콘(`src/components/icons/`): `Play`, `Pause`, `Reset`, `Skip`, `Settings`, `Plus`, `Minus`, `Check`, `Close`, `Trash`, `Edit`, `Grip`(끌기 손잡이), `ChevronLeft`·`ChevronRight`(이전·다음), `Sun`, `Moon`, `Paw`, `Medal` (새 아이콘은 같은 폴더의 `Icon`으로 만듦)
+아이콘(`src/components/icons/`): `Play`, `Pause`, `Reset`, `Skip`, `Settings`, `Plus`, `Minus`, `Check`, `Close`, `Trash`, `Edit`, `Grip`(끌기 손잡이), `ChevronLeft`·`ChevronRight`(이전·다음), `Headphones`(집중 소리), `Sun`, `Moon`, `Paw`, `Medal` (새 아이콘은 같은 폴더의 `Icon`으로 만듦)
 - 모든 아이콘은 `size`(기본 20), `title`을 받고, 색은 글자색을 따릅니다.
 - 새 아이콘은 `icons.tsx`에 24×24 격자, 선 두께 2 기준으로 그립니다.
 
@@ -90,7 +90,7 @@ import { PawIcon } from "@/components/icons";
 - 알림(`src/features/alerts/`, 화면 없음). 밖에서는 `index.ts`에서 내보낸 것만 씀 (`useAlerts`, `prepareAlerts`, 설정 화면용 `previewAlertSound`, 알림 권한 함수 등)
   - `alerts.ts`: 다음 알림 계산, 알림 문구 (순수 함수)
   - `scheduler.ts`: 예약·취소·중복 방지 규칙. 시간, 소리, 알림을 바깥에서 끼워 넣어(`AlertEnv`) 테스트 가능
-  - `sound.ts` / `audio.ts` / `chime.ts` / `sounds.ts`: 브라우저 오디오 통로, 오디오 깨우기, 소리 만들기, 음 정의
+  - `sound.ts` / `output.ts` / `chime.ts` / `sounds.ts`: 브라우저 오디오 통로, 알림 소리 통로와 크기, 소리 만들기, 음 정의. 오디오 자체(만들기, 깨우기)는 집중 소리와 함께 쓰는 `src/lib/audio.ts`
   - `notify.ts`: 브라우저 알림과 권한, `prepare.ts`: 시작할 때 오디오 깨우기와 권한 요청, `preview.ts`: 설정의 미리 듣기
   - `useAlerts.ts`: 스케줄러를 타이머와 브라우저 기능에 연결하는 훅
 - 수료증(`src/features/certificate/`): 밖에서는 `CertificateLauncher`(완료 팝업의 버튼, 캘린더의 "제 N호 수료증", `number`로 사이클 지정), `TodayCertificateButton`(헤더의 🏅 오늘 사이클 수 버튼)을 씀
@@ -100,6 +100,12 @@ import { PawIcon } from "@/components/icons";
   - `share.ts`: 공유 창, 내려받기 / `components/CertificateDialog`: 미리보기, 할 일 보이기, 공유·저장
   - `components/useCertificateImage.ts`: 이미지를 미리 만들어 둠. 내용이 실제로 바뀔 때만 다시 그리고, 다 만들기 전에는 공유·저장을 막고, 쓰지 않는 이미지 주소는 정리
 - 마스코트(`src/assets/mascot/`): `kkami-graduate.svg`는 수료증, `kkami-basic.svg`는 캘린더의 기록 없는 날, `kkami-icon.svg`는 로고·파비콘 등에 쓸 예정
+- 집중 소리(`src/features/focus-sound/`): 밖에서는 `FocusSoundButton`(헤더 🎧 + 펼침 창), `useFocusSound`(앱 틀에서 한 번), `prepareFocusSound`(시작 버튼)를 씀
+  - `sounds.ts`: 소리 목록과 창의 묶음(`FOCUS_SOUND_GROUPS`). 노이즈는 만드는 함수, 녹음은 파일 주소와 이음매 길이, 크기 맞춤 값
+  - `recordings.json`: 녹음마다 원본 파일, 자를 구간, 이음매 길이 (다듬기 스크립트와 앱이 함께 읽음)
+  - `noise.ts`: 노이즈 만들기, 크기 맞추기, 끊김 없이 반복되게 잇기 (순수 함수, 테스트)
+  - `player.ts`: "지금 들려야 할 소리"를 받아 서서히 켜고 끄고 바꿈, 녹음 받기, 미리 듣기
+  - `components/FocusSoundPanel`: 노이즈 / 자연의 소리 두 칸 고르기, 소리 크기
 - 단축키(`src/features/shortcuts/`, 화면 없음): `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
 - 저절로 뜨는 팝업 기다리기: `src/lib/popupHold.ts`. 사용자가 직접 연 창(설정, 수료증)은 `useHoldAutoPopups()`를 부르고, 완료 팝업은 `useAutoPopupsHeld()`가 false일 때 뜸. 새로 만드는 "사용자가 여는 창"도 같은 훅을 부르면 됨
 - 탭을 보고 있는지: `src/lib/usePageVisible.ts` (자동 시작 카운트다운은 탭을 보고 있을 때만 시작)
@@ -125,3 +131,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: 전체 리팩토링. `Section` 컴포넌트, `stack` mixin, `useTodayFocus` 추가, 완료 팝업 훅 분리, 남은 시간 글자 크기를 토큰(`--font-size-display`)으로
 - 2026-11-08: `Grip` 아이콘, 할 일 끌어서 순서 바꾸기(`SortableTaskList`) 추가
 - 2026-11-08: 캘린더 페이지. 화면 틀(`AppShell`, `AppNav`, `PageMain`), `ChevronLeft`·`ChevronRight` 아이콘, `bp.down` 추가
+- 2026-11-08: 집중 소리 (`Headphones` 아이콘, 헤더 펼침 창), 공용 오디오 `src/lib/audio.ts`, 난수 `src/lib/random.ts`
