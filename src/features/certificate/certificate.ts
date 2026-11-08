@@ -1,3 +1,4 @@
+import { focusSessions, taskTitleOf } from "@/features/history/sessions";
 import type { Task } from "@/features/tasks/types";
 import type { CompletedSession } from "@/features/timer/types";
 import { APP_NAME } from "@/lib/brand";
@@ -32,9 +33,7 @@ export function getLatestCertificate(
   sessions: CompletedSession[],
   tasks: Task[],
 ): CertificateData | null {
-  const focus = sessions
-    .filter((s) => s.mode === "focus")
-    .sort((a, b) => a.endedAt - b.endedAt);
+  const focus = focusSessions(sessions);
   const ends = focus.flatMap((s, i) => (s.cycleCompleted ? [i] : []));
   if (ends.length === 0) return null;
 
@@ -45,11 +44,11 @@ export function getLatestCertificate(
 
   const durations = new Set(cycle.map((s) => s.durationMs));
   const dayStart = startOfDay(completedAt);
-  const titleById = new Map(tasks.map((t) => [t.id, t.title]));
+  const titleOf = taskTitleOf(tasks);
   const taskTitles = [
     ...new Set(
       cycle.flatMap((s) => {
-        const title = s.taskId ? titleById.get(s.taskId) : undefined;
+        const title = titleOf(s);
         return title ? [title] : [];
       }),
     ),

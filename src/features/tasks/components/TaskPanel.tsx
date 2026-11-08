@@ -4,7 +4,7 @@ import { useId } from "react";
 import { PawIcon } from "@/components/icons";
 import { Button, Card } from "@/components/ui";
 import { useTasksStore } from "../store";
-import { sortForDisplay } from "../tasks";
+import { sortForDisplay, visibleTasks } from "../tasks";
 import { SortableTaskList } from "./SortableTaskList";
 import { TaskForm } from "./TaskForm";
 import styles from "./TaskPanel.module.scss";
@@ -14,11 +14,11 @@ export function TaskPanel() {
   const titleId = useId();
   const tasks = useTasksStore((s) => s.tasks);
   const activeTaskId = useTasksStore((s) => s.activeTaskId);
-  const { add, clearDone } = useTasksStore.getState();
+  const { add, archiveDone } = useTasksStore.getState();
 
-  const sorted = sortForDisplay(tasks);
-  const openTasks = sorted.filter((t) => !t.done);
-  const doneTasks = sorted.filter((t) => t.done);
+  const visible = sortForDisplay(visibleTasks(tasks));
+  const openTasks = visible.filter((t) => !t.done);
+  const doneTasks = visible.filter((t) => t.done);
 
   return (
     <Card as="section" className={styles.panel} aria-labelledby={titleId}>
@@ -26,7 +26,7 @@ export function TaskPanel() {
         <h2 id={titleId} className={styles.title}>
           할 일
         </h2>
-        {tasks.length > 0 ? (
+        {visible.length > 0 ? (
           <span className={styles.count}>{openTasks.length}개 남음</span>
         ) : null}
         {doneTasks.length > 0 ? (
@@ -34,16 +34,17 @@ export function TaskPanel() {
             size="sm"
             variant="ghost"
             className={styles.clear}
-            onClick={clearDone}
+            onClick={archiveDone}
+            title="목록에서 숨겨요. 캘린더에는 남아요"
           >
-            완료한 할 일 지우기
+            완료한 할 일 정리
           </Button>
         ) : null}
       </div>
 
       <TaskForm submitLabel="추가" resetOnSubmit onSubmit={add} />
 
-      {tasks.length === 0 ? (
+      {visible.length === 0 ? (
         <p className={styles.empty}>
           할 일을 추가하고 집중해보세요.
           <br />

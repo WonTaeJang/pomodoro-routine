@@ -35,6 +35,7 @@ const task = (id: string, title: string): Task => ({
   order: 0,
   createdAt: 0,
   completedAt: null,
+  archivedAt: null,
 });
 
 /** 4번 집중으로 한 사이클 */
@@ -68,6 +69,17 @@ describe("수료증 내용", () => {
   it("그날 완료한 사이클 수 (전날 사이클은 빼고)", () => {
     const sessions = [...cycle(6, 9), ...cycle(7, 9), ...cycle(7, 14)];
     expect(getLatestCertificate(sessions, [])?.cyclesThatDay).toBe(2);
+  });
+
+  it("기록에 남은 제목을 먼저 쓰고, 지운 할 일도 제목이 남는다", () => {
+    const tasks = [task("a", "바뀐 제목")];
+    const sessions = cycle(7, 9, ["a", "deleted"]);
+    sessions[0] = { ...sessions[0], taskTitle: "처음 제목" };
+    sessions[2] = { ...sessions[2], taskTitle: "지운 할 일" };
+    expect(getLatestCertificate(sessions, tasks)?.taskTitles).toEqual([
+      "처음 제목",
+      "지운 할 일",
+    ]);
   });
 
   it("할 일 제목: 집중한 순서대로, 중복 없이, 지운 할 일은 빼고", () => {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   addTask,
-  clearDone,
+  archiveDone,
   ESTIMATE_MAX,
   initialTasksState,
   migrateTasks,
@@ -12,6 +12,7 @@ import {
   sortForDisplay,
   toggleDone,
   updateTask,
+  visibleTasks,
 } from "./tasks";
 import type { TasksState } from "./types";
 
@@ -120,13 +121,50 @@ describe("삭제", () => {
     expect(state.tasks).toHaveLength(1);
     expect(state.activeTaskId).toBe("t2");
   });
+});
 
-  it("완료한 할 일을 한꺼번에 지운다", () => {
-    const state = clearDone(
+describe("완료한 할 일 정리 (숨기기)", () => {
+  const ARCHIVED_AT = 20_000;
+  const archived = () =>
+    archiveDone(
       markDone(markDone(withTasks("A", "B", "C"), "t1"), "t3"),
+      ARCHIVED_AT,
     );
-    expect(state.tasks.map((t) => t.id)).toEqual(["t2"]);
+
+  it("완료한 할 일을 목록에서 숨기지만 지우지는 않는다", () => {
+    const state = archived();
+    expect(visibleTasks(state.tasks).map((t) => t.id)).toEqual(["t2"]);
+    expect(state.tasks).toHaveLength(3);
+    expect(state.tasks.map((t) => t.archivedAt)).toEqual([
+      ARCHIVED_AT,
+      null,
+      ARCHIVED_AT,
+    ]);
     expect(state.activeTaskId).toBe("t2");
+  });
+
+  it("숨길 할 일이 없으면 그대로", () => {
+    const state = withTasks("A");
+    expect(archiveDone(state, ARCHIVED_AT)).toBe(state);
+  });
+
+  it("완료를 취소하면 다시 보인다", () => {
+    const state = toggleDone(archived(), "t1", NOW);
+    expect(visibleTasks(state.tasks).map((t) => t.id)).toEqual(["t1", "t2"]);
+  });
+
+  it("숨긴 할 일은 순서 바꾸기에서 빠진다", () => {
+    // 보이는 완료 묶음: D / 숨긴 완료: A, C
+    const base = markDone(archived(), "t2");
+    const state = addTask(base, {
+      id: "t4",
+      title: "D",
+      estimate: 1,
+      now: NOW,
+    });
+    const done = markDone(state, "t4");
+    expect(moveTask(done, "t4", "t1")).toBe(done);
+    expect(moveTask(done, "t1", "t4")).toBe(done);
   });
 });
 
@@ -241,9 +279,11 @@ describe("예전 데이터 변환", () => {
         createdAt: 2,
       },
     ];
-    expect(migrateTasks(old).map((t) => [t.order, t.completedAt])).toEqual([
-      [0, null],
-      [1, null],
+    expect(
+      migrateTasks(old).map((t) => [t.order, t.completedAt, t.archivedAt]),
+    ).toEqual([
+      [0, null, null],
+      [1, null, null],
     ]);
   });
 });

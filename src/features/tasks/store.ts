@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import { STORAGE_KEYS } from "@/lib/storage";
 import {
   addTask,
-  clearDone,
+  archiveDone,
   initialTasksState,
   recordPomodoros,
   removeTask,
@@ -25,7 +25,8 @@ type TasksStore = TasksState & {
   setActive: (id: string | null) => void;
   /** 집중을 마친 할 일들에 뽀모도로 추가 (타이머 store가 호출) */
   recordPomodoros: (taskIds: string[]) => void;
-  clearDone: () => void;
+  /** 완료한 할 일을 목록에서 숨깁니다. (캘린더에는 남음) */
+  archiveDone: () => void;
   /** 할 일을 모두 지웁니다. (데이터 초기화) */
   clearAll: () => void;
 };
@@ -53,14 +54,15 @@ export const useTasksStore = create<TasksStore>()(
         move: (id, toId) => apply((s) => moveTask(s, id, toId)),
         setActive: (id) => apply((s) => setActiveTask(s, id)),
         recordPomodoros: (ids) => apply((s) => recordPomodoros(s, ids)),
-        clearDone: () => apply(clearDone),
+        archiveDone: () => apply((s) => archiveDone(s, Date.now())),
         clearAll: () => apply(() => initialTasksState),
       };
     },
     {
       name: STORAGE_KEYS.tasks,
       // v2: 할 일에 순서(order), 완료 시각(completedAt) 추가
-      version: 2,
+      // v3: 목록에서 숨긴 시각(archivedAt) 추가
+      version: 3,
       migrate: (persisted) => {
         const saved = (persisted ?? {}) as Partial<TasksState>;
         return {

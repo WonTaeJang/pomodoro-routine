@@ -23,6 +23,11 @@ function byOrder(a: Task, b: Task): number {
   return a.order - b.order;
 }
 
+/** 목록에 보이는 할 일 ("완료한 할 일 정리"로 숨긴 것 제외) */
+export function visibleTasks(tasks: Task[]): Task[] {
+  return tasks.filter((t) => t.archivedAt === null);
+}
+
 /** 완료하지 않은 할 일 중 목록에서 가장 위에 있는 것 (except는 제외) */
 function firstOpenTaskId(tasks: Task[], except?: string): string | null {
   return (
@@ -50,6 +55,7 @@ export function addTask(
     order: nextOrder(state.tasks),
     createdAt: input.now,
     completedAt: null,
+    archivedAt: null,
   };
   return {
     tasks: [...state.tasks, task],
@@ -90,6 +96,7 @@ export function removeTask(state: TasksState, id: string): TasksState {
 
 /**
  * 완료 체크를 바꿉니다. 완료하면 완료 시각을 기록하고, 취소하면 지웁니다.
+ * 완료를 취소하면 목록에서 숨겼던 할 일도 다시 보입니다.
  * 집중 중인 할 일을 완료하면 다음 할 일을 선택합니다.
  */
 export function toggleDone(
@@ -102,7 +109,9 @@ export function toggleDone(
   const done = !target.done;
   const completedAt = done ? now : null;
   const tasks = state.tasks.map((t) =>
-    t.id === id ? { ...t, done, completedAt } : t,
+    t.id === id
+      ? { ...t, done, completedAt, archivedAt: done ? t.archivedAt : null }
+      : t,
   );
 
   let activeTaskId = state.activeTaskId;
@@ -139,13 +148,18 @@ export function recordPomodoros(
   };
 }
 
-/** 완료한 할 일을 한꺼번에 지웁니다. */
-export function clearDone(state: TasksState): TasksState {
-  const tasks = state.tasks.filter((t) => !t.done);
-  const activeTaskId = tasks.some((t) => t.id === state.activeTaskId)
-    ? state.activeTaskId
-    : firstOpenTaskId(tasks);
-  return { tasks, activeTaskId };
+/**
+ * 완료한 할 일을 목록에서 한꺼번에 숨깁니다. (완료한 할 일 정리)
+ * 지우지 않고 보관해서 캘린더에서는 계속 보입니다.
+ */
+export function archiveDone(state: TasksState, now: number): TasksState {
+  if (!state.tasks.some((t) => t.done && t.archivedAt === null)) return state;
+  return {
+    ...state,
+    tasks: state.tasks.map((t) =>
+      t.done && t.archivedAt === null ? { ...t, archivedAt: now } : t,
+    ),
+  };
 }
 
 /** 화면 표시 순서: 할 일(순서대로) → 완료한 할 일(순서대로) */
@@ -167,9 +181,12 @@ export function moveTask(
   const target = state.tasks.find((t) => t.id === id);
   const destination = state.tasks.find((t) => t.id === toId);
   if (!target || !destination || id === toId) return state;
+  if (target.archivedAt !== null || destination.archivedAt !== null) {
+    return state;
+  }
   if (target.done !== destination.done) return state;
 
-  const group = [...state.tasks]
+  const group = visibleTasks(state.tasks)
     .sort(byOrder)
     .filter((t) => t.done === target.done);
   const moved = group.filter((t) => t.id !== id);
@@ -188,11 +205,12 @@ export function moveTask(
   };
 }
 
-/** 예전 형식(순서, 완료일 없음)으로 저장된 할 일을 새 형식으로 바꿉니다. */
+/** 예전 형식(순서, 완료일, 숨김 없음)으로 저장된 할 일을 새 형식으로 바꿉니다. */
 export function migrateTasks(tasks: Partial<Task>[]): Task[] {
   return tasks.map((t, index) => ({
     ...(t as Task),
     order: t.order ?? index,
     completedAt: t.completedAt ?? null,
+    archivedAt: t.archivedAt ?? null,
   }));
 }

@@ -59,6 +59,8 @@ export type CompletedSession = {
   durationMs: number;
   /** 집중 세션이면, 그때 선택돼 있던 할 일 */
   taskId?: string;
+  /** 그때 할 일 제목. 나중에 할 일을 지워도 기록(캘린더, 수료증)에 제목이 남게 함 */
+  taskTitle?: string;
   /** 이 집중으로 한 사이클(긴 휴식 주기만큼 집중)을 모두 마쳤으면 true */
   cycleCompleted?: boolean;
 };

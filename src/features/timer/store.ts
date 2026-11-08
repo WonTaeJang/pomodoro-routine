@@ -55,11 +55,14 @@ function defaultSettings(current: TimerSettings): TimerSettings {
   };
 }
 
-/** 끝난 집중 세션에 지금 선택된 할 일을 붙입니다. */
+/** 끝난 집중 세션에 지금 선택된 할 일(id와 제목)을 붙입니다. */
 function attachActiveTask(sessions: CompletedSession[]): CompletedSession[] {
-  const taskId = useTasksStore.getState().activeTaskId;
-  if (!taskId) return sessions;
-  return sessions.map((s) => (s.mode === "focus" ? { ...s, taskId } : s));
+  const { tasks, activeTaskId } = useTasksStore.getState();
+  const task = tasks.find((t) => t.id === activeTaskId);
+  if (!task) return sessions;
+  return sessions.map((s) =>
+    s.mode === "focus" ? { ...s, taskId: task.id, taskTitle: task.title } : s,
+  );
 }
 
 export const useTimerStore = create<TimerStore>()(

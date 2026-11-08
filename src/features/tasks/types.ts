@@ -12,6 +12,11 @@ export type Task = {
   createdAt: number;
   /** 완료한 시각(epoch ms). 완료하지 않았거나 완료를 취소하면 null */
   completedAt: number | null;
+  /**
+   * "완료한 할 일 정리"로 목록에서 숨긴 시각. 숨겨도 지우지 않아서 캘린더에는 남음.
+   * 숨기지 않았으면 null. 완료를 취소하면 다시 보임
+   */
+  archivedAt: number | null;
 };
 
 export type TasksState = {
