@@ -111,6 +111,7 @@ pomodoro-routine/
 ├── src/features/timer/    타이머 (로직, store, 화면)
 ├── src/features/history/  세션 기록, 오늘 기록, 기록 공통 계산(sessions.ts: 날짜별 요약, 할 일 제목)
 ├── src/features/calendar/ 캘린더 (날짜별 계산, 달력, 날짜 상세)
+├── src/features/stats/    통계 (연속 일수, 최근 7일 계산, 캘린더 위 통계 카드)
 ├── src/features/tasks/    할 일 (로직, store, 화면)
 ├── src/features/theme/    다크 모드
 ├── src/features/alerts/   알림 소리, 브라우저 알림
@@ -153,3 +154,4 @@ pomodoro-routine/
 - 2026-11-07: certificate 폴더, 마스코트 SVG 추가
 - 2026-11-08: calendar 폴더, 캘린더 페이지, 앱 틀(AppShell) 추가
 - 2026-11-08: focus-sound 폴더, scripts/, public/sounds/ 추가
+- 2026-11-08: stats 폴더 추가
