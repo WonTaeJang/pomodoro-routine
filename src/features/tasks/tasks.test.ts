@@ -178,35 +178,45 @@ describe("순서, 등록일, 완료일", () => {
 });
 
 describe("순서 바꾸기", () => {
-  it("한 칸 위로, 아래로 옮긴다", () => {
-    const up = moveTask(withTasks("A", "B", "C"), "t3", "up");
-    expect(sortForDisplay(up.tasks).map((t) => t.id)).toEqual([
-      "t1",
-      "t3",
-      "t2",
-    ]);
-    const down = moveTask(up, "t1", "down");
-    expect(sortForDisplay(down.tasks).map((t) => t.id)).toEqual([
-      "t3",
-      "t1",
-      "t2",
-    ]);
+  const ids = (state: TasksState) =>
+    sortForDisplay(state.tasks).map((t) => t.id);
+
+  it("아래 할 일을 위 할 일 자리로 옮긴다", () => {
+    const state = moveTask(withTasks("A", "B", "C", "D"), "t4", "t2");
+    expect(ids(state)).toEqual(["t1", "t4", "t2", "t3"]);
   });
 
-  it("맨 위에서 위로, 맨 아래에서 아래로는 움직이지 않는다", () => {
+  it("위 할 일을 아래 할 일 자리로 옮긴다", () => {
+    const state = moveTask(withTasks("A", "B", "C", "D"), "t1", "t3");
+    expect(ids(state)).toEqual(["t2", "t3", "t1", "t4"]);
+  });
+
+  it("제자리나 없는 할 일로는 움직이지 않는다", () => {
     const state = withTasks("A", "B");
-    expect(moveTask(state, "t1", "up")).toBe(state);
-    expect(moveTask(state, "t2", "down")).toBe(state);
+    expect(moveTask(state, "t1", "t1")).toBe(state);
+    expect(moveTask(state, "t1", "x")).toBe(state);
+    expect(moveTask(state, "x", "t1")).toBe(state);
   });
 
   it("완료한 할 일과 섞이지 않는다", () => {
     const state = markDone(withTasks("A", "B", "C"), "t2");
-    // 화면: A, C | B(완료) → C는 더 아래로 갈 곳이 없음
-    expect(moveTask(state, "t3", "down")).toBe(state);
+    // 화면: A, C | B(완료)
+    expect(moveTask(state, "t3", "t2")).toBe(state);
+    expect(moveTask(state, "t2", "t1")).toBe(state);
+  });
+
+  it("다른 묶음의 순서는 그대로 둔다", () => {
+    // 화면: B, D | A(완료), C(완료)
+    const state = markDone(markDone(withTasks("A", "B", "C", "D"), "t1"), "t3");
+    const moved = moveTask(state, "t4", "t2");
+    expect(ids(moved)).toEqual(["t4", "t2", "t1", "t3"]);
+    // 완료를 취소하면 원래 순서 번호 자리로 돌아감: A, D, B
+    const undone = toggleDone(moved, "t1", NOW);
+    expect(ids(undone).slice(0, 3)).toEqual(["t1", "t4", "t2"]);
   });
 
   it("집중 중인 할 일을 완료하면 바뀐 순서상 맨 위 할 일이 선택된다", () => {
-    const moved = moveTask(withTasks("A", "B", "C"), "t3", "up"); // A, C, B
+    const moved = moveTask(withTasks("A", "B", "C"), "t3", "t2"); // A, C, B
     expect(markDone(moved, "t1").activeTaskId).toBe("t3");
   });
 });

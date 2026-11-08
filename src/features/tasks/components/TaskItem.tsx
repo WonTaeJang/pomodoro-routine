@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { EditIcon, TrashIcon } from "@/components/icons";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { useState, type CSSProperties } from "react";
+import { EditIcon, GripIcon, TrashIcon } from "@/components/icons";
 import { Badge, Button, Checkbox, IconButton } from "@/components/ui";
 import { cx } from "@/lib/cx";
 import { useTasksStore } from "../store";
@@ -15,13 +17,37 @@ type TaskItemProps = {
   active: boolean;
 };
 
+/**
+ * 할 일 한 줄. 손잡이를 끌어서 옮깁니다. (SortableTaskList 안에서만 사용)
+ * 수정 중에는 손잡이가 없어 옮길 수 없습니다.
+ */
 export function TaskItem({ task, active }: TaskItemProps) {
   const [editing, setEditing] = useState(false);
   const { update, remove, toggleDone, setActive } = useTasksStore.getState();
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: task.id,
+    attributes: { roleDescription: "순서를 바꿀 수 있는 할 일" },
+  });
+  const style: CSSProperties = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+  };
 
   if (editing) {
     return (
-      <li className={cx(styles.item, styles.editing)}>
+      <li
+        ref={setNodeRef}
+        style={style}
+        className={cx(styles.item, styles.editing)}
+      >
         <TaskForm
           initialTitle={task.title}
           initialEstimate={task.estimate}
@@ -40,12 +66,26 @@ export function TaskItem({ task, active }: TaskItemProps) {
 
   return (
     <li
+      ref={setNodeRef}
+      style={style}
       className={cx(
         styles.item,
         active && styles.active,
         task.done && styles.done,
+        isDragging && styles.dragging,
       )}
     >
+      <button
+        type="button"
+        ref={setActivatorNodeRef}
+        className={styles.handle}
+        {...attributes}
+        {...listeners}
+        aria-label={`${task.title} 순서 바꾸기`}
+        title="끌어서 순서 바꾸기"
+      >
+        <GripIcon size={16} />
+      </button>
       <Checkbox
         label={task.title}
         checked={task.done}

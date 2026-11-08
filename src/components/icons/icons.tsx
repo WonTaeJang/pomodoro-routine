@@ -120,6 +120,22 @@ export function EditIcon(props: IconProps) {
   );
 }
 
+/** 끌어서 옮기기 손잡이 (점 6개) */
+export function GripIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <g fill="currentColor" stroke="none">
+        <circle cx="9" cy="6" r="1.6" />
+        <circle cx="15" cy="6" r="1.6" />
+        <circle cx="9" cy="12" r="1.6" />
+        <circle cx="15" cy="12" r="1.6" />
+        <circle cx="9" cy="18" r="1.6" />
+        <circle cx="15" cy="18" r="1.6" />
+      </g>
+    </Icon>
+  );
+}
+
 /** 라이트 모드 */
 export function SunIcon(props: IconProps) {
   return (

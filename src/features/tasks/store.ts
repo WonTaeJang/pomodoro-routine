@@ -20,7 +20,8 @@ type TasksStore = TasksState & {
   update: (id: string, patch: { title?: string; estimate?: number }) => void;
   remove: (id: string) => void;
   toggleDone: (id: string) => void;
-  move: (id: string, direction: "up" | "down") => void;
+  /** 할 일을 다른 할 일이 있던 자리로 옮깁니다. (같은 묶음 안에서만) */
+  move: (id: string, toId: string) => void;
   setActive: (id: string | null) => void;
   /** 집중을 마친 할 일들에 뽀모도로 추가 (타이머 store가 호출) */
   recordPomodoros: (taskIds: string[]) => void;
@@ -49,7 +50,7 @@ export const useTasksStore = create<TasksStore>()(
         update: (id, patch) => apply((s) => updateTask(s, id, patch)),
         remove: (id) => apply((s) => removeTask(s, id)),
         toggleDone: (id) => apply((s) => toggleDone(s, id, Date.now())),
-        move: (id, direction) => apply((s) => moveTask(s, id, direction)),
+        move: (id, toId) => apply((s) => moveTask(s, id, toId)),
         setActive: (id) => apply((s) => setActiveTask(s, id)),
         recordPomodoros: (ids) => apply((s) => recordPomodoros(s, ids)),
         clearDone: () => apply(clearDone),

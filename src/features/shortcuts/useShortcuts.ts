@@ -26,6 +26,8 @@ export function useShortcuts(handlers: Handlers, enabled = true) {
     trackFocusSource();
 
     function onKeyDown(event: KeyboardEvent) {
+      // 다른 곳에서 이미 쓴 키는 넘김 (예: 할 일 손잡이에서 Space로 끌기 시작)
+      if (event.defaultPrevented) return;
       const target = event.target instanceof Element ? event.target : null;
       const id = matchShortcut({
         code: event.code,

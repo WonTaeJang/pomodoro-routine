@@ -1,14 +1,60 @@
+@use "../../../styles/mixins";
+
 .item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-2);
-  padding: var(--space-2) var(--space-1-5) var(--space-2) var(--space-3-5);
+  padding: var(--space-2) var(--space-1-5) var(--space-2) var(--space-1);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-md);
+  // 끌 때 다른 할 일 위를 지나가도 비치지 않게
+  background: var(--color-surface);
   transition:
     border-color var(--duration-base),
     background-color var(--duration-base);
+}
+
+// 끌고 있는 할 일: 위로 띄워 보이게
+.dragging {
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-lg);
+
+  .handle {
+    cursor: grabbing;
+  }
+}
+
+// 끌어서 옮기는 손잡이. 터치로 끌 때 화면이 스크롤되지 않게 막음
+.handle {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--control-sm);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-text-muted);
+  cursor: grab;
+  touch-action: none;
+  transition: color var(--duration-base);
+
+  &:hover {
+    color: var(--color-text);
+  }
+
+  @include mixins.focus-ring;
+}
+
+// "움직임 줄이기": 다른 할 일이 미끄러지듯 비켜나지 않고 바로 자리를 바꿈
+// (dnd-kit이 style 속성으로 넣는 transition을 덮어써야 해서 !important)
+@include mixins.reduced-motion {
+  .item {
+    transition: none !important;
+  }
 }
 
 .active {
@@ -39,6 +85,7 @@
 
 .meta {
   display: flex;
+  margin-left: auto;
   flex-shrink: 0;
   align-items: center;
   gap: var(--space-0-5);

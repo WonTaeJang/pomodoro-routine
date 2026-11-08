@@ -155,28 +155,35 @@ export function sortForDisplay(tasks: Task[]): Task[] {
 }
 
 /**
- * 할 일을 위/아래로 한 칸 옮깁니다.
- * 화면에 보이는 순서 기준으로, 같은 묶음(할 일 / 완료한 할 일) 안에서만 움직입니다.
+ * 할 일(id)을 다른 할 일(toId)이 있던 자리로 옮깁니다. (끌어서 옮기기)
+ * 같은 묶음(할 일 / 완료한 할 일) 안에서만 움직이고, 묶음이 쓰던 순서 번호를
+ * 그대로 나눠 가져서 다른 묶음의 순서는 바뀌지 않습니다.
  */
 export function moveTask(
   state: TasksState,
   id: string,
-  direction: "up" | "down",
+  toId: string,
 ): TasksState {
   const target = state.tasks.find((t) => t.id === id);
-  if (!target) return state;
-  const group = sortForDisplay(state.tasks).filter(
-    (t) => t.done === target.done,
+  const destination = state.tasks.find((t) => t.id === toId);
+  if (!target || !destination || id === toId) return state;
+  if (target.done !== destination.done) return state;
+
+  const group = [...state.tasks]
+    .sort(byOrder)
+    .filter((t) => t.done === target.done);
+  const moved = group.filter((t) => t.id !== id);
+  moved.splice(
+    group.findIndex((t) => t.id === toId),
+    0,
+    target,
   );
-  const index = group.findIndex((t) => t.id === id);
-  const neighbor = group[direction === "up" ? index - 1 : index + 1];
-  if (!neighbor) return state;
+  const orders = new Map(moved.map((t, i) => [t.id, group[i].order]));
   return {
     ...state,
     tasks: state.tasks.map((t) => {
-      if (t.id === target.id) return { ...t, order: neighbor.order };
-      if (t.id === neighbor.id) return { ...t, order: target.order };
-      return t;
+      const order = orders.get(t.id);
+      return order === undefined ? t : { ...t, order };
     }),
   };
 }

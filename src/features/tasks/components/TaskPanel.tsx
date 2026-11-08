@@ -5,8 +5,8 @@ import { PawIcon } from "@/components/icons";
 import { Button, Card } from "@/components/ui";
 import { useTasksStore } from "../store";
 import { sortForDisplay } from "../tasks";
+import { SortableTaskList } from "./SortableTaskList";
 import { TaskForm } from "./TaskForm";
-import { TaskItem } from "./TaskItem";
 import styles from "./TaskPanel.module.scss";
 
 /** 할 일 목록 카드 */
@@ -16,8 +16,9 @@ export function TaskPanel() {
   const activeTaskId = useTasksStore((s) => s.activeTaskId);
   const { add, clearDone } = useTasksStore.getState();
 
-  const openCount = tasks.filter((t) => !t.done).length;
-  const doneCount = tasks.length - openCount;
+  const sorted = sortForDisplay(tasks);
+  const openTasks = sorted.filter((t) => !t.done);
+  const doneTasks = sorted.filter((t) => t.done);
 
   return (
     <Card as="section" className={styles.panel} aria-labelledby={titleId}>
@@ -26,9 +27,9 @@ export function TaskPanel() {
           할 일
         </h2>
         {tasks.length > 0 ? (
-          <span className={styles.count}>{openCount}개 남음</span>
+          <span className={styles.count}>{openTasks.length}개 남음</span>
         ) : null}
-        {doneCount > 0 ? (
+        {doneTasks.length > 0 ? (
           <Button
             size="sm"
             variant="ghost"
@@ -51,13 +52,8 @@ export function TaskPanel() {
         </p>
       ) : (
         <ul className={styles.list}>
-          {sortForDisplay(tasks).map((task) => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              active={task.id === activeTaskId}
-            />
-          ))}
+          <SortableTaskList tasks={openTasks} activeTaskId={activeTaskId} />
+          <SortableTaskList tasks={doneTasks} activeTaskId={activeTaskId} />
         </ul>
       )}
     </Card>
