@@ -321,6 +321,16 @@ export function MenuIcon(props: IconProps) {
   );
 }
 
+/** 지구본 (언어) */
+export function GlobeIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9c-2.4-2.5-3.6-5.5-3.6-9S9.6 5.5 12 3z" />
+    </Icon>
+  );
+}
+
 /** 펼친 책 (사용법) */
 export function BookIcon(props: IconProps) {
   return (

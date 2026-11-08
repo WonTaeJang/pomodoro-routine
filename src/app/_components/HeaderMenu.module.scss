@@ -1,7 +1,7 @@
 @use "../../styles/mixins";
 
 .menu {
-  @include mixins.header-panel(240px);
+  @include mixins.header-panel(264px);
   padding: var(--space-1-5);
 
   // 펼쳐졌을 때만 세로로 (닫혀 있을 때는 브라우저가 숨김)
@@ -42,6 +42,53 @@
   &:disabled {
     @include mixins.disabled;
   }
+}
+
+// 언어: 왼쪽 이름, 오른쪽에 고르는 버튼 두 개 (줄 전체가 버튼은 아님)
+.row {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+  font-size: var(--font-size-md);
+}
+
+.choices {
+  display: flex;
+  gap: var(--space-0-5);
+  padding: var(--space-0-5);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-hover);
+}
+
+.choice {
+  padding: var(--space-1) var(--space-2-5);
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-text);
+  }
+
+  &:focus-visible {
+    @include mixins.focus-outline;
+  }
+}
+
+// 설정 창의 고르기 버튼(SegmentedControl)과 같은 모양
+.chosen,
+.chosen:hover {
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
 }
 
 .label {

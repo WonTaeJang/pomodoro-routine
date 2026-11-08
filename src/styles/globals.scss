@@ -50,3 +50,16 @@ select {
 button {
   cursor: pointer;
 }
+
+// 서버는 한국어로 그리므로, 다른 언어로 정해진 첫 화면은 그 언어로 다시 그릴 때까지 숨김
+// (I18nProvider가 data-i18n-ready를 붙임). 스크립트가 늦거나 실패해도 잠시 뒤에는 보이게 함
+html:not([lang="ko"]):not([data-i18n-ready]) body {
+  visibility: hidden;
+  animation: reveal-page 0s 2s forwards;
+}
+
+@keyframes reveal-page {
+  to {
+    visibility: visible;
+  }
+}

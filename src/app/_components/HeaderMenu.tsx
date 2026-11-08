@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale, useTranslations } from "use-intl";
 import {
   useEffect,
   useId,
@@ -12,6 +13,7 @@ import {
 } from "react";
 import {
   BookIcon,
+  GlobeIcon,
   InfoIcon,
   MenuIcon,
   MoonIcon,
@@ -22,6 +24,8 @@ import { ONBOARDING, useOnboardingStore } from "@/features/guide";
 import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 import { SHORTCUTS, useShortcuts } from "@/features/shortcuts";
 import { setTheme, useTheme } from "@/features/theme/theme";
+import { LOCALE_NAMES, LOCALES, setLocale } from "@/i18n";
+import { cx } from "@/lib/cx";
 import styles from "./HeaderMenu.module.scss";
 
 type HeaderMenuProps = {
@@ -30,7 +34,7 @@ type HeaderMenuProps = {
 };
 
 /**
- * 헤더 오른쪽 끝의 메뉴(☰). 누르면 아래로 목록이 펼쳐집니다: 다크 모드, 설정, 사용법, 안내 다시 보기.
+ * 헤더 오른쪽 끝의 메뉴(☰). 누르면 아래로 목록이 펼쳐집니다: 다크 모드, 언어, 설정, 사용법, 안내 다시 보기.
  * 바깥을 누르거나 ESC로 닫히고, 위·아래 화살표로 항목을 옮겨 다닙니다.
  * 설정 창은 S 키로도 바로 열립니다.
  */
@@ -43,6 +47,8 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
 
   const theme = useTheme();
   const isDark = theme === "dark";
+  const t = useTranslations("app.menu");
+  const locale = useLocale();
 
   const close = () => menuRef.current?.hidePopover();
 
@@ -81,6 +87,25 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
           <ItemLabel icon={<MoonIcon />}>다크 모드</ItemLabel>
           <SwitchTrack checked={isDark} />
         </button>
+        {/* 언어도 메뉴를 연 채로 바뀜. 언어 이름은 그 언어로 */}
+        <div role="group" aria-label={t("language")} className={styles.row}>
+          <ItemLabel icon={<GlobeIcon />}>{t("language")}</ItemLabel>
+          <span className={styles.choices}>
+            {LOCALES.map((value) => (
+              <button
+                key={value}
+                type="button"
+                role="menuitemradio"
+                aria-checked={value === locale}
+                lang={value}
+                className={cx(styles.choice, value === locale && styles.chosen)}
+                onClick={() => setLocale(value)}
+              >
+                {LOCALE_NAMES[value]}
+              </button>
+            ))}
+          </span>
+        </div>
         <button
           type="button"
           role="menuitem"
