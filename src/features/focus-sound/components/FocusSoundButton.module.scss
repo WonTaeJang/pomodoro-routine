@@ -1,3 +1,5 @@
+@use "../../../styles/mixins";
+
 // 소리를 켜 두면 버튼 오른쪽 위에 강조색 점
 .button {
   position: relative;
@@ -15,24 +17,7 @@
   content: "";
 }
 
-// 헤더 오른쪽 아래에 펼쳐지는 창 (헤더 오른쪽 끝에 맞춤)
+// 헤더 오른쪽 아래에 펼쳐지는 창
 .panel {
-  position: fixed;
-  inset: auto;
-  top: calc(var(--header-height) - var(--space-1));
-  right: max(
-    var(--space-4),
-    calc((100vw - var(--layout-max)) / 2 + var(--space-4))
-  );
-  width: min(340px, calc(100vw - var(--space-4) * 2));
-  // 화면이 낮으면 창 안에서 스크롤
-  max-height: calc(100dvh - var(--header-height) - var(--space-4));
-  overflow-y: auto;
-  margin: 0;
-  padding: 0;
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-lg);
-  color: var(--color-text);
+  @include mixins.header-panel(340px);
 }

@@ -43,3 +43,40 @@
   flex-direction: column;
   gap: $gap;
 }
+
+// 헤더 버튼 아래로 펼쳐지는 창 (popover). 헤더 오른쪽 끝에 맞춤
+@mixin header-panel($width) {
+  position: fixed;
+  inset: auto;
+  top: calc(var(--header-height) - var(--space-1));
+  right: max(
+    var(--space-4),
+    calc((100vw - var(--layout-max)) / 2 + var(--space-4))
+  );
+  width: min(#{$width}, calc(100vw - var(--space-4) * 2));
+  // 화면이 낮으면 창 안에서 스크롤
+  max-height: calc(100dvh - var(--header-height) - var(--space-4));
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  color: var(--color-text);
+}
+
+// 키보드 키 모양 (<kbd>). 단축키 안내에 사용
+@mixin kbd {
+  display: inline-block;
+  min-width: var(--control-sm);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width) solid var(--color-border);
+  border-bottom-width: var(--border-width-thick);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-family: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-align: center;
+}

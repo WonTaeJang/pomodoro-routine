@@ -55,15 +55,5 @@
 }
 
 .kbd {
-  display: inline-block;
-  min-width: var(--control-sm);
-  padding: var(--space-1) var(--space-2);
-  border: var(--border-width) solid var(--color-border);
-  border-bottom-width: var(--border-width-thick);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  font-family: inherit;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-align: center;
+  @include mixins.kbd;
 }
