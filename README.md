@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+**한국어** | [English](./README.en.md)
 
-## Getting Started
+# 까모도로 (Kkamodoro)
 
-First, run the development server:
+까만 푸들 **까미**와 함께하는 뽀모도로 타이머예요.
+25분 집중하고 5분 쉬는 걸 반복하고, 집중을 4번 마치면 까미 수료증을 받아요.
+
+> 아직 배포한 사이트는 없어요. 지금은 [내 컴퓨터에서 실행](#실행하기)해서 쓸 수 있어요.
+
+<!--
+화면 미리보기: 이미지를 docs/images/에 넣고 아래 주석을 풀면 됩니다.
+<p>
+  <img src="./docs/images/timer.ko.png" alt="타이머 화면" width="640" />
+  <img src="./docs/images/calendar.ko.png" alt="캘린더와 통계" width="640" />
+  <img src="./docs/images/certificate.ko.png" alt="까미 수료증" width="240" />
+</p>
+-->
+
+## 주요 기능
+
+- **타이머**: 집중 · 짧은 휴식 · 긴 휴식. 시간과 긴 휴식 주기는 설정에서 바꿀 수 있어요. 자동 시작(5초 뒤 시작, 사이클을 마치면 멈춤), 남은 시간을 보여주는 진행 띠와 발자국 도장, 브라우저 탭 제목에 남은 시간을 보여줘요.
+- **할 일**: 할 일마다 집중 몇 번이면 끝날지 예상 🐾를 정하고, 집중을 마칠 때마다 🐾가 쌓여요. 끌어서 순서 바꾸기(마우스 · 터치 · 키보드), 완료한 할 일 정리를 할 수 있어요.
+- **집중 소리**: 노이즈 3가지(백색 · 핑크 · 브라운)와 자연의 소리 5가지(빗소리, 창가 빗소리, 모닥불, 숲속, 파도). 집중하는 동안에만 들려요.
+- **캘린더와 통계**: 날짜별 집중 횟수 · 시간 · 한 일, 연속 일수, 최근 7일, 이번 달, 전체 기록.
+- **까미 수료증**: 사이클을 마치면 그날의 수료증을 이미지(1080×1920, 인스타그램 스토리 크기)로 저장하거나 공유해요.
+- **알림**: 세션이 끝나면 알림 소리, 다른 탭을 보고 있으면 브라우저 알림.
+- **단축키**: `Space` 시작 / 일시정지, `R` 리셋, `N` 다음 세션, `S` 설정.
+- **그 밖에**: 다크 모드, 한국어 / English, 첫 방문 안내와 사용법 페이지(`/guide`), 타이머가 도는 동안 화면 켜두기, 탭을 여러 개 열어도 같은 타이머.
+
+### 기록은 어디에 저장되나요?
+
+할 일, 기록, 설정은 **지금 쓰는 브라우저(localStorage)에만** 저장돼요. 서버로 보내지 않고, 다른 기기와는 아직 이어지지 않아요. 브라우저 데이터를 지우면 기록도 함께 사라져요.
+
+## 실행하기
+
+[Node.js](https://nodejs.org) **22.12 이상**이 필요해요.
 
 ```bash
+git clone https://github.com/WonTaeJang/pomodoro-routine.git
+cd pomodoro-routine
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 http://localhost:3000 을 열어요.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| 명령                         | 하는 일                   |
+| ---------------------------- | ------------------------- |
+| `npm run dev`                | 개발 서버                 |
+| `npm run build`, `npm start` | 배포용으로 만들고 실행    |
+| `npm run test:run`           | 테스트 (Vitest)           |
+| `npm run lint`               | 코드 검사 (ESLint)        |
+| `npm run format:check`       | 코드 모양 확인 (Prettier) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+개발 중에는 주소 뒤에 `?test=5`를 붙이면 모든 세션이 5초가 돼요 (`?test=off`로 끔). 자세한 내용은 [개발 환경 설정](./docs/05-setup.md)을 봐 주세요.
 
-## Learn More
+## 기술 스택
 
-To learn more about Next.js, take a look at the following resources:
+| 분야       | 사용한 것                                                                                   |
+| ---------- | ------------------------------------------------------------------------------------------- |
+| 프레임워크 | Next.js 16 (App Router), React 19, TypeScript                                               |
+| 스타일     | SCSS Modules + 디자인 토큰, [Pretendard](https://github.com/orioncactus/pretendard) 글꼴    |
+| 상태       | Zustand (localStorage에 저장, 탭끼리 맞추기)                                                |
+| 다국어     | use-intl (한국어 · 영어)                                                                    |
+| 그 밖에    | dnd-kit (끌어서 순서 바꾸기), Web Audio API (알림 소리 · 집중 소리), Canvas (수료증 이미지) |
+| 테스트     | Vitest                                                                                      |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 문서
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [문서 목록](./docs/README.md): 기획, 결정 기록, 개발 환경, 디자인 시스템
+- [바뀐 점 (CHANGELOG)](./CHANGELOG.md)
+- [버그 · 개선 백로그](./docs/backlog.md)
+- [커밋 · 버전 규칙](./docs/commit.md)
 
-## Deploy on Vercel
+문서는 한국어로 쓰여 있어요.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 출처
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- 자연의 소리 녹음: [Pixabay](https://pixabay.com) ([Pixabay Content License](https://pixabay.com/service/terms/)). 소리별 원본은 [결정 기록의 "집중 소리"](./docs/03-decisions.md#집중-소리-2026-11-08)에 있어요.
+
+## 라이선스
+
+아직 정하지 않았어요.

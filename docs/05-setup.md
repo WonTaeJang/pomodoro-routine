@@ -65,6 +65,7 @@ npm run format:check  # 정리 안 된 파일이 있는지 확인만
 | `design/kkami/` | **원본 사진**을 넣는 곳. 크기, 형식 상관없음 | 올리지 않음 (`.gitignore`) |
 | `src/assets/kkami/` | 화면에 쓰는 **정리된 이미지** | 올림 |
 | `public/` | 파비콘, 공유 미리보기 이미지처럼 주소가 고정되어야 하는 파일 | 올림 |
+| `docs/images/` | README에 넣는 화면 캡처 (`timer.ko.png`, `timer.en.png` 등) | 올림 |
 
 - 원본은 `design/kkami/`에 넣고, 정리(크기 줄이기, 위치 정보 등 메타데이터 제거, WebP 변환)한 뒤 `src/assets/kkami/`에 둡니다.
   - 저장소가 공개라서 휴대폰 사진의 **촬영 위치(GPS) 정보가 함께 올라가지 않도록** 반드시 메타데이터를 지웁니다.
@@ -166,3 +167,4 @@ pomodoro-routine/
 - 2026-11-08: 사용법 페이지 내용, `content.ko.ts`
 - 2026-11-08: 첫 방문 안내, `kkamodoro-onboarding` 추가
 - 2026-11-08: 다국어 `src/i18n/`, `kkamodoro-locale`, 화면 글자 쓰는 법 추가
+- 2026-11-08: README 화면 캡처 위치 `docs/images/` 추가
