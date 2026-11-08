@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, type CSSProperties } from "react";
-import { useTranslations } from "use-intl";
+import { useLocale, useTranslations } from "use-intl";
 import { FlameIcon } from "@/components/icons";
 import { Card, EmptyState, VisuallyHidden } from "@/components/ui";
 import {
@@ -15,7 +15,7 @@ import {
   formatDuration,
   formatLongDate,
   startOfMonth,
-  WEEKDAY_NAMES,
+  weekdayNames,
 } from "@/lib/date";
 import { getRecentComparison, getRecentDays, getStreak } from "../stats";
 import styles from "./StatsPanel.module.scss";
@@ -64,7 +64,8 @@ type StatsBodyProps = {
 function StatsBody({ stats, today, all }: StatsBodyProps) {
   const t = useTranslations("stats");
   const common = useTranslations("common");
-  const duration = formatDuration;
+  const locale = useLocale();
+  const duration = (ms: number) => formatDuration(ms, locale);
   const streak = getStreak(stats, today);
   const week = getRecentComparison(stats, today, RECENT_DAYS);
   const month = sumDays(stats, startOfMonth(today), addDays(today, 1));
@@ -75,7 +76,7 @@ function StatsBody({ stats, today, all }: StatsBodyProps) {
     (week.recent.focusMs - week.previous.focusMs) / MIN,
   );
   const weekDiff = `${diffMin > 0 ? "+" : "−"}${duration(Math.abs(diffMin) * MIN)}`;
-  const weekdays = WEEKDAY_NAMES;
+  const weekdays = weekdayNames(locale);
 
   return (
     <div className={styles.body}>
@@ -156,7 +157,7 @@ function StatsBody({ stats, today, all }: StatsBodyProps) {
           <tbody>
             {recent.map(({ day, focusMs }) => (
               <tr key={day}>
-                <th scope="row">{formatLongDate(day)}</th>
+                <th scope="row">{formatLongDate(day, locale)}</th>
                 <td>{focusMs ? duration(focusMs) : common("noRecords")}</td>
               </tr>
             ))}

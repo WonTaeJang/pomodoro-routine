@@ -38,7 +38,8 @@ export const LAYOUT = {
   /** "제 12호 · 2026.11.07" */
   badge: { y: 866, h: 50 },
   title: { y: 920, maxWidth: 820 },
-  message: { y: 1070, lineHeight: 61 },
+  /** 본문 두 줄. 영어처럼 긴 줄은 maxWidth에 맞춰 줄여서 그림 */
+  message: { y: 1070, lineHeight: 61, maxWidth: 820 },
   stats: { x: 150, y: 1210, w: 780, h: 140, gap: 20 },
   tasks: {
     x: 160,
@@ -50,6 +51,7 @@ export const LAYOUT = {
   },
   /** 할 일이 없거나 숨겼을 때의 한 줄 */
   noTasksY: 1462,
-  stamp: { x: 730, y: 1385, size: 230 },
+  /** textWidth: 가운데 글("까미 인증")이 이보다 길면 줄여서 그림 */
+  stamp: { x: 730, y: 1385, size: 230, textWidth: 150 },
   brand: { y: 1776, pawSize: 44 },
 };

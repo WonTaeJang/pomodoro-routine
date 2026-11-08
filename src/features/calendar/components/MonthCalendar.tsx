@@ -1,7 +1,7 @@
 "use client";
 
 import { useId } from "react";
-import { useTranslations } from "use-intl";
+import { useLocale, useTranslations } from "use-intl";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -9,7 +9,7 @@ import {
 } from "@/components/icons";
 import { Button, Card, IconButton } from "@/components/ui";
 import { cx } from "@/lib/cx";
-import { formatLongDate, WEEKDAY_NAMES } from "@/lib/date";
+import { formatLongDate, formatMonth, weekdayNames } from "@/lib/date";
 import { sumDays, type DayStats } from "@/features/history/sessions";
 import {
   FOCUS_LEVELS,
@@ -44,6 +44,7 @@ export function MonthCalendar({
   const titleId = useId();
   const t = useTranslations("calendar");
   const common = useTranslations("common");
+  const locale = useLocale();
   const { year, month } = view;
   const weeks = getMonthWeeks(year, month);
   const { from, to } = monthBounds(view);
@@ -56,7 +57,7 @@ export function MonthCalendar({
       <div className={styles.header}>
         <div>
           <h2 id={titleId} className={styles.title}>
-            {year}년 {month + 1}월
+            {formatMonth(year, month, locale)}
           </h2>
           <p className={styles.summary}>
             {t("monthSummary", { focusCount, cycles })}
@@ -86,7 +87,7 @@ export function MonthCalendar({
       <table className={styles.grid}>
         <thead>
           <tr>
-            {WEEKDAY_NAMES.map((w) => (
+            {weekdayNames(locale).map((w) => (
               <th key={w} scope="col" className={styles.weekday}>
                 {w}
               </th>
@@ -154,8 +155,9 @@ function DayCell({
   const cycleCount = stats?.cycleNumbers.length ?? 0;
   const t = useTranslations("calendar.cell");
   const common = useTranslations("common");
+  const locale = useLocale();
   const label = [
-    formatLongDate(day),
+    formatLongDate(day, locale),
     count ? t("focusCount", { count }) : common("noRecords"),
     cycleCount ? t("cycleCount", { count: cycleCount }) : null,
   ]

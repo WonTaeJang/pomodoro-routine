@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useMemo } from "react";
-import { useTranslations } from "use-intl";
+import { useLocale, useTranslations } from "use-intl";
 import { CheckIcon, MedalIcon, PawIcon } from "@/components/icons";
 import { Badge, Button, Card, EmptyState, Section } from "@/components/ui";
 import { CertificateLauncher } from "@/features/certificate";
@@ -25,6 +25,7 @@ export function DayDetail({ day, today, stats }: DayDetailProps) {
   const titleId = useId();
   const t = useTranslations("calendar.day");
   const common = useTranslations("common");
+  const locale = useLocale();
   const sessions = useHistoryStore((s) => s.sessions);
   const tasks = useTasksStore((s) => s.tasks);
   const { completed, inProgress } = useMemo(
@@ -38,7 +39,7 @@ export function DayDetail({ day, today, stats }: DayDetailProps) {
     <Card as="section" className={styles.panel} aria-labelledby={titleId}>
       <div className={styles.header}>
         <h2 id={titleId} className={styles.title}>
-          {formatLongDate(day)}
+          {formatLongDate(day, locale)}
         </h2>
         {day === today ? (
           <Badge variant="soft" size="sm">
@@ -63,7 +64,7 @@ export function DayDetail({ day, today, stats }: DayDetailProps) {
             </div>
             <div className={styles.stat}>
               <dt>{t("focusTime")}</dt>
-              <dd>{formatDuration(stats.focusMs)}</dd>
+              <dd>{formatDuration(stats.focusMs, locale)}</dd>
             </div>
             <div className={styles.stat}>
               <dt>{t("cycles")}</dt>

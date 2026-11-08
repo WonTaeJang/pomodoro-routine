@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocale } from "use-intl";
 import type { CertificateData } from "../certificate";
 import { renderCertificate } from "../render/drawCertificate";
 
@@ -14,7 +15,7 @@ type State = { key: string; image: CertificateImage } | null;
 
 /**
  * 수료증 이미지를 만들어 둡니다.
- * - 내용(data, showTasks)이 실제로 바뀔 때만 다시 그립니다. (같은 내용이면 그대로)
+ * - 내용(data, showTasks, 언어)이 실제로 바뀔 때만 다시 그립니다. (같은 내용이면 그대로)
  * - 새 이미지가 나오기 전까지는 예전 이미지를 미리보기로 두되, 공유·저장은 막습니다.
  * - 쓰지 않게 된 이미지 주소는 바로 정리합니다.
  */
@@ -22,20 +23,21 @@ export function useCertificateImage(
   data: CertificateData | null,
   showTasks: boolean,
 ) {
-  const key = data ? `${JSON.stringify(data)}:${showTasks}` : null;
+  const locale = useLocale();
+  const key = data ? `${JSON.stringify(data)}:${showTasks}:${locale}` : null;
   const [state, setState] = useState<State>(null);
   const [failedKey, setFailedKey] = useState<string | null>(null);
   // 그릴 때 쓸 최신 값. 다시 그릴지는 key(내용)로만 정함
-  const latest = useRef({ data, showTasks });
+  const latest = useRef({ data, showTasks, locale });
   useEffect(() => {
-    latest.current = { data, showTasks };
+    latest.current = { data, showTasks, locale };
   });
 
   useEffect(() => {
-    const { data, showTasks } = latest.current;
+    const { data, showTasks, locale } = latest.current;
     if (key === null || data === null) return;
     let cancelled = false;
-    renderCertificate(data, { showTasks })
+    renderCertificate(data, { showTasks, locale })
       .then((blob) => {
         if (cancelled) return;
         const image = {

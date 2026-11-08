@@ -304,6 +304,28 @@ const en: Messages = {
       label: "Show tasks",
       description: "Add the tasks from this cycle to the certificate",
     },
+    message: {
+      withLength:
+        "For completing {count, plural, one {# focus session} other {# focus sessions}} of {length},",
+      withoutLength:
+        "For completing {count, plural, one {# focus session} other {# focus sessions}},",
+      award: "this certificate is proudly awarded.",
+    },
+    image: {
+      header: "Cycle complete!",
+      badge: "No. {number} · {date}",
+      focusTime: "Focus time",
+      pomodoros: "Pomodoros",
+      pomodoroCount: "{count}",
+      cycleCount: "{count, plural, one {# cycle} other {# cycles}}",
+      doneToday: "Done today",
+      doneThatDay: "Done that day",
+      tasks: "What I worked on",
+      moreTasks: "+{count} more",
+      tasksHidden: "One more step forward today",
+      noTasks: "Pure focus, no task list needed",
+      stamp: "By Kkami",
+    },
   },
   settings: {
     title: "Settings",

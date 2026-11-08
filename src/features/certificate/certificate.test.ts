@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Task } from "@/features/tasks/types";
 import type { CompletedSession } from "@/features/timer/types";
+import { getTranslator } from "@/i18n";
 import { getCertificateMessage, getCertificate } from "./certificate";
 
 const MIN = 60_000;
@@ -126,12 +127,27 @@ describe("본문", () => {
       cyclesThatDay: 1,
       taskTitles: [],
     };
-    expect(getCertificateMessage({ ...base, focusEachMs: 25 * MIN })).toEqual([
-      "25분 집중을 4번 해내었기에",
-      "이 수료증을 드립니다.",
+    const ko = getTranslator("ko");
+    expect(
+      getCertificateMessage(ko, "ko", { ...base, focusEachMs: 25 * MIN }),
+    ).toEqual(["25분 집중을 4번 해내었기에", "이 수료증을 드립니다."]);
+    expect(
+      getCertificateMessage(ko, "ko", { ...base, focusEachMs: null })[0],
+    ).toBe("집중을 4번 해내었기에");
+
+    const en = getTranslator("en");
+    expect(
+      getCertificateMessage(en, "en", { ...base, focusEachMs: 25 * MIN }),
+    ).toEqual([
+      "For completing 4 focus sessions of 25 min,",
+      "this certificate is proudly awarded.",
     ]);
-    expect(getCertificateMessage({ ...base, focusEachMs: null })[0]).toBe(
-      "집중을 4번 해내었기에",
-    );
+    expect(
+      getCertificateMessage(en, "en", {
+        ...base,
+        focusCount: 1,
+        focusEachMs: null,
+      })[0],
+    ).toBe("For completing 1 focus session,");
   });
 });

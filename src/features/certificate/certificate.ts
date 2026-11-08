@@ -1,11 +1,8 @@
 import { focusSessions, taskTitleOf } from "@/features/history/sessions";
 import type { Task } from "@/features/tasks/types";
 import type { CompletedSession } from "@/features/timer/types";
-import { APP_NAME } from "@/lib/brand";
+import type { Locale, Translator } from "@/i18n";
 import { formatDuration, startOfDay } from "@/lib/date";
-
-/** "까모도로 수료증" */
-export const CERTIFICATE_TITLE = `${APP_NAME} 수료증`;
 
 /** 수료증에 들어가는 값 */
 export type CertificateData = {
@@ -69,11 +66,19 @@ export function getCertificate(
   };
 }
 
-/** 수료증 본문. 예: "25분 집중을 4번 해내었기에" / "이 수료증을 드립니다." */
-export function getCertificateMessage(data: CertificateData): [string, string] {
-  const what =
+/** 수료증 본문 두 줄. 예: "25분 집중을 4번 해내었기에" / "이 수료증을 드립니다." */
+export function getCertificateMessage(
+  t: Translator,
+  locale: Locale,
+  data: CertificateData,
+): [string, string] {
+  const count = data.focusCount;
+  const first =
     data.focusEachMs === null
-      ? `집중을 ${data.focusCount}번`
-      : `${formatDuration(data.focusEachMs)} 집중을 ${data.focusCount}번`;
-  return [`${what} 해내었기에`, "이 수료증을 드립니다."];
+      ? t("certificate.message.withoutLength", { count })
+      : t("certificate.message.withLength", {
+          count,
+          length: formatDuration(data.focusEachMs, locale),
+        });
+  return [first, t("certificate.message.award")];
 }

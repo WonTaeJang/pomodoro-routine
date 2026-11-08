@@ -1,12 +1,8 @@
 import mascot from "@/assets/mascot/kkami-graduate.svg";
-import { APP_NAME } from "@/lib/brand";
+import { getTranslator, type Locale, type Translator } from "@/i18n";
 import { formatDate, formatDuration, startOfDay } from "@/lib/date";
 import { seededRandom } from "@/lib/random";
-import {
-  CERTIFICATE_TITLE,
-  getCertificateMessage,
-  type CertificateData,
-} from "../certificate";
+import { getCertificateMessage, type CertificateData } from "../certificate";
 import {
   drawCircleText,
   drawPaw,
@@ -23,14 +19,23 @@ import { CENTER_X, COLOR, LAYOUT, SIZE } from "./layout";
 type CertificateOptions = {
   /** 이번 사이클에 한 할 일을 보여줄지 */
   showTasks: boolean;
+  /** 수료증 글의 언어 */
+  locale: Locale;
 };
+
+/** 글을 쓰는 함수들이 함께 쓰는 값: 글꼴 이름, 문구, 언어 */
+type TextKit = { family: string; t: Translator; locale: Locale };
 
 /** 수료증을 그려서 PNG로 돌려줍니다. 브라우저에서만 동작합니다. 크기와 위치는 layout.ts */
 export async function renderCertificate(
   data: CertificateData,
   options: CertificateOptions,
 ): Promise<Blob> {
-  const family = await loadFont();
+  const text: TextKit = {
+    family: await loadFont(),
+    t: getTranslator(options.locale),
+    locale: options.locale,
+  };
   const image = await loadImage(
     typeof mascot === "string" ? mascot : mascot.src,
   );
@@ -42,18 +47,18 @@ export async function renderCertificate(
   if (!ctx) throw new Error("캔버스를 쓸 수 없어요");
 
   drawBackground(ctx, data.number);
-  drawHeader(ctx, family);
+  drawHeader(ctx, text);
   drawCard(ctx);
   drawMascot(ctx, image);
-  drawTitle(ctx, family, data);
-  drawStats(ctx, family, data);
+  drawTitle(ctx, text, data);
+  drawStats(ctx, text, data);
   if (options.showTasks && data.taskTitles.length > 0) {
-    drawTasks(ctx, family, data.taskTitles);
+    drawTasks(ctx, text, data.taskTitles);
   } else {
-    drawNoTasks(ctx, family, data.taskTitles.length > 0);
+    drawNoTasks(ctx, text, data.taskTitles.length > 0);
   }
-  drawStamp(ctx, family);
-  drawBrand(ctx, family);
+  drawStamp(ctx, text);
+  drawBrand(ctx, text);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -135,9 +140,9 @@ function drawBackground(ctx: Ctx, seed: number) {
   ctx.restore();
 }
 
-function drawHeader(ctx: Ctx, family: string) {
+function drawHeader(ctx: Ctx, { family, t }: TextKit) {
   const { titleY, subtitleY } = LAYOUT.header;
-  drawText(ctx, family, "한 사이클 완료!", CENTER_X, titleY, {
+  drawText(ctx, family, t("certificate.image.header"), CENTER_X, titleY, {
     size: 44,
     weight: 800,
     color: COLOR.white,
@@ -175,8 +180,15 @@ function drawMascot(ctx: Ctx, image: HTMLImageElement) {
 }
 
 /** 번호·날짜 배지, 제목, 본문 */
-function drawTitle(ctx: Ctx, family: string, data: CertificateData) {
-  const badge = `제 ${data.number}호 · ${formatDate(data.completedAt)}`;
+function drawTitle(
+  ctx: Ctx,
+  { family, t, locale }: TextKit,
+  data: CertificateData,
+) {
+  const badge = t("certificate.image.badge", {
+    number: data.number,
+    date: formatDate(data.completedAt, locale),
+  });
   const { y: badgeY, h: badgeH } = LAYOUT.badge;
   setFont(ctx, family, 28, 800);
   const badgeW = ctx.measureText(badge).width + 52;
@@ -190,7 +202,7 @@ function drawTitle(ctx: Ctx, family: string, data: CertificateData) {
     align: "center",
   });
 
-  drawText(ctx, family, CERTIFICATE_TITLE, CENTER_X, LAYOUT.title.y, {
+  drawText(ctx, family, t("certificate.title"), CENTER_X, LAYOUT.title.y, {
     size: 104,
     weight: 900,
     color: COLOR.ink,
@@ -200,24 +212,40 @@ function drawTitle(ctx: Ctx, family: string, data: CertificateData) {
   });
 
   const { y, lineHeight } = LAYOUT.message;
-  getCertificateMessage(data).forEach((line, i) => {
+  getCertificateMessage(t, locale, data).forEach((line, i) => {
     drawText(ctx, family, line, CENTER_X, y + i * lineHeight, {
       size: 38,
       weight: 500,
       color: COLOR.body,
       align: "center",
       baseline: "top",
+      fitWidth: LAYOUT.message.maxWidth,
     });
   });
 }
 
 /** 숫자 칸 3개: 집중한 시간 / 뽀모도로 / 오늘(지난 사이클이면 이날) 완료 */
-function drawStats(ctx: Ctx, family: string, data: CertificateData) {
+function drawStats(
+  ctx: Ctx,
+  { family, t, locale }: TextKit,
+  data: CertificateData,
+) {
   const today = startOfDay(Date.now()) === startOfDay(data.completedAt);
   const stats = [
-    [formatDuration(data.focusTotalMs), "집중한 시간"],
-    [`${data.focusCount}번`, "뽀모도로"],
-    [`${data.cyclesThatDay}사이클`, today ? "오늘 완료" : "이날 완료"],
+    [
+      formatDuration(data.focusTotalMs, locale),
+      t("certificate.image.focusTime"),
+    ],
+    [
+      t("certificate.image.pomodoroCount", { count: data.focusCount }),
+      t("certificate.image.pomodoros"),
+    ],
+    [
+      t("certificate.image.cycleCount", { count: data.cyclesThatDay }),
+      t(
+        today ? "certificate.image.doneToday" : "certificate.image.doneThatDay",
+      ),
+    ],
   ];
   const { x: left, y: top, w: total, h, gap } = LAYOUT.stats;
   const w = (total - gap * (stats.length - 1)) / stats.length;
@@ -238,13 +266,14 @@ function drawStats(ctx: Ctx, family: string, data: CertificateData) {
       weight: 600,
       color: COLOR.muted,
       align: "center",
+      fitWidth: w - 24,
     });
   });
 }
 
-function drawTasks(ctx: Ctx, family: string, titles: string[]) {
+function drawTasks(ctx: Ctx, { family, t }: TextKit, titles: string[]) {
   const { x, labelY, firstY, lineHeight, max, maxWidth } = LAYOUT.tasks;
-  drawText(ctx, family, "이번 사이클에 한 일", x, labelY, {
+  drawText(ctx, family, t("certificate.image.tasks"), x, labelY, {
     size: 28,
     weight: 700,
     color: COLOR.faint,
@@ -267,7 +296,7 @@ function drawTasks(ctx: Ctx, family: string, titles: string[]) {
     drawText(
       ctx,
       family,
-      `그 밖에 ${rest}개`,
+      t("certificate.image.moreTasks", { count: rest }),
       textX,
       firstY + max * lineHeight - 6,
       { size: 28, weight: 600, color: COLOR.faint },
@@ -276,10 +305,10 @@ function drawTasks(ctx: Ctx, family: string, titles: string[]) {
 }
 
 /** 할 일이 없거나 숨겼을 때 */
-function drawNoTasks(ctx: Ctx, family: string, hidden: boolean) {
-  const text = hidden
-    ? "오늘도 한 걸음 성장했어요"
-    : "할 일 없이 오롯이 집중했어요";
+function drawNoTasks(ctx: Ctx, { family, t }: TextKit, hidden: boolean) {
+  const text = t(
+    hidden ? "certificate.image.tasksHidden" : "certificate.image.noTasks",
+  );
   drawText(ctx, family, text, LAYOUT.tasks.x, LAYOUT.noTasksY, {
     size: 36,
     weight: 600,
@@ -288,7 +317,7 @@ function drawNoTasks(ctx: Ctx, family: string, hidden: boolean) {
 }
 
 /** 빨간 "까미 인증" 원형 도장 */
-function drawStamp(ctx: Ctx, family: string) {
+function drawStamp(ctx: Ctx, { family, t }: TextKit) {
   const r = LAYOUT.stamp.size / 2;
   ctx.save();
   ctx.translate(LAYOUT.stamp.x + r, LAYOUT.stamp.y + r);
@@ -314,23 +343,25 @@ function drawStamp(ctx: Ctx, family: string) {
     82,
   );
   drawPaw(ctx, 0, -10, 83, COLOR.stamp);
-  drawText(ctx, family, "까미 인증", 0, 47, {
+  drawText(ctx, family, t("certificate.image.stamp"), 0, 47, {
     size: 26,
     weight: 900,
     color: COLOR.stamp,
     align: "center",
+    fitWidth: LAYOUT.stamp.textWidth,
   });
   ctx.restore();
 }
 
 /** 맨 아래 발자국 + 까모도로 */
-function drawBrand(ctx: Ctx, family: string) {
+function drawBrand(ctx: Ctx, { family, t }: TextKit) {
   const { y, pawSize } = LAYOUT.brand;
+  const name = t("app.name");
   setFont(ctx, family, 40, 900);
   const gap = 12;
-  const x = CENTER_X - (pawSize + gap + ctx.measureText(APP_NAME).width) / 2;
+  const x = CENTER_X - (pawSize + gap + ctx.measureText(name).width) / 2;
   drawPaw(ctx, x + pawSize / 2, y, pawSize, COLOR.white);
-  drawText(ctx, family, APP_NAME, x + pawSize + gap, y + 2, {
+  drawText(ctx, family, name, x + pawSize + gap, y + 2, {
     size: 40,
     weight: 900,
     color: COLOR.white,

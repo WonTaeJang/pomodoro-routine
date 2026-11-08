@@ -297,6 +297,28 @@ const ko = {
       label: "할 일 보이기",
       description: "이번 사이클에 한 할 일을 수료증에 넣어요",
     },
+    /** 수료증 본문 두 줄 */
+    message: {
+      withLength: "{length} 집중을 {count}번 해내었기에",
+      withoutLength: "집중을 {count}번 해내었기에",
+      award: "이 수료증을 드립니다.",
+    },
+    /** 수료증 이미지에 그리는 글 */
+    image: {
+      header: "한 사이클 완료!",
+      badge: "제 {number}호 · {date}",
+      focusTime: "집중한 시간",
+      pomodoros: "뽀모도로",
+      pomodoroCount: "{count}번",
+      cycleCount: "{count}사이클",
+      doneToday: "오늘 완료",
+      doneThatDay: "이날 완료",
+      tasks: "이번 사이클에 한 일",
+      moreTasks: "그 밖에 {count}개",
+      tasksHidden: "오늘도 한 걸음 성장했어요",
+      noTasks: "할 일 없이 오롯이 집중했어요",
+      stamp: "까미 인증",
+    },
   },
   settings: {
     title: "설정",
