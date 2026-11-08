@@ -19,7 +19,8 @@ $knob-gap: ($track-height - $knob-size) * 0.5;
 
   @include mixins.focus-ring;
 
-  &[aria-checked="true"] {
+  &[aria-checked="true"],
+  &[data-checked="true"] {
     background: var(--color-accent);
   }
 
@@ -39,7 +40,8 @@ $knob-gap: ($track-height - $knob-size) * 0.5;
   box-shadow: var(--shadow-knob);
   transition: transform var(--duration-fast);
 
-  .switch[aria-checked="true"] & {
+  .switch[aria-checked="true"] &,
+  .switch[data-checked="true"] & {
     transform: translateX($track-width - $knob-size - $knob-gap * 2);
   }
 }

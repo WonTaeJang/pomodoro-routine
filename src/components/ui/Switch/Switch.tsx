@@ -13,6 +13,18 @@ export type SwitchProps = Omit<
   description?: string;
 };
 
+/**
+ * 스위치 모양만 (누를 수 없음). 메뉴 항목처럼 줄 전체가 버튼일 때 상태를 보여줍니다.
+ * 상태는 그 줄의 aria-checked로 알리고, 이 모양은 화면 낭독기에서 숨깁니다.
+ */
+export function SwitchTrack({ checked }: { checked: boolean }) {
+  return (
+    <span className={styles.switch} data-checked={checked} aria-hidden="true">
+      <span className={styles.thumb} />
+    </span>
+  );
+}
+
 /** 켜기/끄기 토글. 라벨을 눌러도 바뀝니다. */
 export function Switch({
   checked,

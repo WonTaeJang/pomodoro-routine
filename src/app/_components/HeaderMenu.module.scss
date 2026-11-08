@@ -1,0 +1,62 @@
+@use "../../styles/mixins";
+
+.menu {
+  @include mixins.header-panel(240px);
+  padding: var(--space-1-5);
+
+  // 펼쳐졌을 때만 세로로 (닫혀 있을 때는 브라우저가 숨김)
+  &:popover-open {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-0-5);
+  }
+}
+
+// 한 줄 전체가 버튼: 왼쪽 아이콘 + 이름, 오른쪽 스위치·단축키
+.item {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-md);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: var(--color-accent-subtle);
+  }
+
+  &:focus-visible {
+    @include mixins.focus-outline;
+    outline-offset: -2px;
+  }
+
+  &:disabled {
+    @include mixins.disabled;
+  }
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+
+  svg {
+    flex-shrink: 0;
+    color: var(--color-text-muted);
+  }
+}
+
+// 설정 창의 단축키 안내와 같은 키 모양
+.key {
+  @include mixins.kbd;
+  color: var(--color-text-muted);
+}

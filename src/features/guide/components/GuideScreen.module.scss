@@ -1,0 +1,26 @@
+@use "../../../styles/mixins";
+
+.card {
+  @include mixins.stack(var(--space-3));
+  align-items: center;
+  padding-block: var(--space-10);
+  text-align: center;
+  // 넓은 화면에서도 두 칸 전체를 씀
+  grid-column: 1 / -1;
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.text {
+  color: var(--color-text-muted);
+}
+
+.link {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+
+  @include mixins.focus-ring;
+}

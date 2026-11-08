@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  BookIcon,
   CalendarIcon,
   CheckIcon,
   ChevronLeftIcon,
@@ -13,6 +14,7 @@ import {
   GripIcon,
   HeadphonesIcon,
   MedalIcon,
+  MenuIcon,
   MinusIcon,
   MoonIcon,
   NoiseBrownIcon,
@@ -51,7 +53,6 @@ import {
   Switch,
   TextField,
 } from "@/components/ui";
-import { ThemeToggle } from "@/features/theme/ThemeToggle";
 import styles from "./Playground.module.scss";
 
 type Mode = "focus" | "short-break" | "long-break";
@@ -95,6 +96,8 @@ const icons = [
   { name: "Moon", Icon: MoonIcon },
   { name: "Paw", Icon: PawIcon },
   { name: "Medal", Icon: MedalIcon },
+  { name: "Menu", Icon: MenuIcon },
+  { name: "Book", Icon: BookIcon },
 ];
 
 /** 공통 컴포넌트를 한눈에 확인하는 개발용 페이지 */
@@ -113,7 +116,6 @@ export function Playground() {
     <main className={styles.page} data-mode={mode}>
       <header className={styles.header}>
         <h1 className={styles.title}>컴포넌트 미리보기</h1>
-        <ThemeToggle />
       </header>
 
       <Section title="SegmentedControl · 모드를 바꾸면 강조색이 바뀝니다">
