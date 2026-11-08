@@ -273,6 +273,26 @@ export function WavesIcon(props: IconProps) {
   );
 }
 
+/** 스톱워치 (타이머 페이지) */
+export function TimerIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="13.5" r="7.5" />
+      <path d="M12 13.5V9.5M10 2.5h4M12 2.5V6M18.5 6.5l1.5-1.5" />
+    </Icon>
+  );
+}
+
+/** 달력 (캘린더 페이지) */
+export function CalendarIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2" />
+      <path d="M3.5 10h17M8 3v4M16 3v4" />
+    </Icon>
+  );
+}
+
 /** 라이트 모드 */
 export function SunIcon(props: IconProps) {
   return (

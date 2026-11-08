@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import {
+  CalendarIcon,
   CheckIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -25,6 +26,7 @@ import {
   SettingsIcon,
   SkipIcon,
   SunIcon,
+  TimerIcon,
   TrashIcon,
   TreeIcon,
   VolumeHighIcon,
@@ -87,6 +89,8 @@ const icons = [
   { name: "Flame", Icon: FlameIcon },
   { name: "Tree", Icon: TreeIcon },
   { name: "Waves", Icon: WavesIcon },
+  { name: "Timer", Icon: TimerIcon },
+  { name: "Calendar", Icon: CalendarIcon },
   { name: "Sun", Icon: SunIcon },
   { name: "Moon", Icon: MoonIcon },
   { name: "Paw", Icon: PawIcon },
