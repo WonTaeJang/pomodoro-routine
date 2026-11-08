@@ -15,7 +15,7 @@
 
 | 문서 | 내용 |
 |---|---|
-| [commit.md](./commit.md) | Git 커밋 규칙 |
+| [commit.md](./commit.md) | Git 커밋 규칙, 버전 올리기 규칙 |
 | [backlog.md](./backlog.md) | 버그·개선 요청 목록 (접수 → 처리 상태 관리) |
 
 ## 작성 규칙
