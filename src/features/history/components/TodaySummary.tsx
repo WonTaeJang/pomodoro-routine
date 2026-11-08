@@ -2,17 +2,15 @@
 
 import { PawIcon } from "@/components/icons";
 import { Badge } from "@/components/ui";
-import { getTodayFocus, useHistoryStore } from "@/features/history/store";
-import { useNow } from "@/lib/useNow";
+import { useTodayFocus } from "../useTodayFocus";
 import styles from "./TodaySummary.module.scss";
 
 /** 오늘 완료한 뽀모도로 수와 집중한 시간 */
 export function TodaySummary() {
-  const sessions = useHistoryStore((s) => s.sessions);
-  const now = useNow();
-  if (now === null) return null;
+  const today = useTodayFocus();
+  if (today === null) return null;
 
-  const { count, minutes } = getTodayFocus(sessions, now);
+  const { count, minutes } = today;
   return (
     <p className={styles.summary}>
       <Badge variant="soft" size="lg" icon={<PawIcon size={16} />}>
