@@ -10,8 +10,15 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
-import { BookIcon, MenuIcon, MoonIcon, SettingsIcon } from "@/components/icons";
+import {
+  BookIcon,
+  InfoIcon,
+  MenuIcon,
+  MoonIcon,
+  SettingsIcon,
+} from "@/components/icons";
 import { IconButton, Kbd, SwitchTrack } from "@/components/ui";
+import { ONBOARDING, useOnboardingStore } from "@/features/guide";
 import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 import { SHORTCUTS, useShortcuts } from "@/features/shortcuts";
 import { setTheme, useTheme } from "@/features/theme/theme";
@@ -23,7 +30,7 @@ type HeaderMenuProps = {
 };
 
 /**
- * 헤더 오른쪽 끝의 메뉴(☰). 누르면 아래로 목록이 펼쳐집니다: 다크 모드, 설정, 사용법.
+ * 헤더 오른쪽 끝의 메뉴(☰). 누르면 아래로 목록이 펼쳐집니다: 다크 모드, 설정, 사용법, 안내 다시 보기.
  * 바깥을 누르거나 ESC로 닫히고, 위·아래 화살표로 항목을 옮겨 다닙니다.
  * 설정 창은 S 키로도 바로 열립니다.
  */
@@ -96,6 +103,17 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
         >
           <ItemLabel icon={<BookIcon />}>사용법</ItemLabel>
         </Link>
+        <button
+          type="button"
+          role="menuitem"
+          className={styles.item}
+          onClick={() => {
+            close();
+            useOnboardingStore.getState().show();
+          }}
+        >
+          <ItemLabel icon={<InfoIcon />}>{ONBOARDING.replay}</ItemLabel>
+        </button>
       </div>
       {/* 열 때만 그려서, 열 때마다 알림 권한 같은 현재 상태를 새로 읽음 */}
       {settingsOpen ? (

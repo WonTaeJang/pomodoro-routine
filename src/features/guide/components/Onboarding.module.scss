@@ -1,0 +1,106 @@
+@use "../../../styles/mixins";
+
+.dialog {
+  width: min(100% - var(--space-8), 440px);
+}
+
+// 밀어 넘기는 영역: 위아래 스크롤은 브라우저에 맡기고 좌우만 받음
+.swipeArea {
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+.slide {
+  @include mixins.stack(var(--space-4));
+  // 덜 밀고 놓으면 제자리로 부드럽게
+  transition: transform var(--duration-fast) var(--ease-out);
+
+  // 새 장이 넘긴 쪽에서 들어옴
+  &[data-direction="next"] {
+    animation: slide-from-right var(--duration-enter) var(--ease-out);
+  }
+
+  &[data-direction="prev"] {
+    animation: slide-from-left var(--duration-enter) var(--ease-out);
+  }
+
+  // 미는 동안에는 손가락을 바로 따라감
+  &[data-dragging] {
+    animation: none;
+    transition: none;
+  }
+
+  @include mixins.reduced-motion {
+    animation: none !important;
+    transition: none;
+  }
+}
+
+@keyframes slide-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+}
+
+@keyframes slide-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+}
+
+.points {
+  @include mixins.stack(var(--space-2));
+  margin: 0;
+  padding-left: var(--space-5);
+  line-height: 1.6;
+  word-break: keep-all;
+
+  li::marker {
+    color: var(--color-accent);
+  }
+}
+
+.more {
+  align-self: flex-start;
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+
+  @include mixins.focus-ring;
+}
+
+// 아래: 건너뛰기 | 점 | 이전·다음
+.footer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.dots {
+  display: flex;
+  gap: var(--space-1-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+
+  &[aria-current="step"] {
+    background: var(--color-accent);
+  }
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-2);
+}

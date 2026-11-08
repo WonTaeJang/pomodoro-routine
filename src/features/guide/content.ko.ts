@@ -24,6 +24,8 @@ export type GuideIcon =
  */
 export const INLINE_ICON_LABELS = {
   paw: "발자국",
+  calendar: "캘린더",
+  menu: "메뉴",
   play: "시작 버튼",
   reset: "처음부터 버튼",
   skip: "다음 세션 버튼",
@@ -135,5 +137,59 @@ export const GUIDE_SECTIONS: GuideSection[] = [
       "브라우저 데이터를 지우면 기록도 함께 사라져요.",
       "설정의 '데이터'에서 설정을 되돌리거나 모든 데이터를 지울 수 있어요.",
     ],
+  },
+];
+
+/** 첫 방문 안내 (백로그 I-009). 사용법 페이지를 짧게 줄인 것 */
+export const ONBOARDING = {
+  skip: "건너뛰기",
+  prev: "이전",
+  next: "다음",
+  done: "시작하기",
+  moreGuide: "자세한 사용법 보기",
+  replay: "안내 다시 보기",
+  progress: (current: number, total: number) => `${total}장 중 ${current}장`,
+} as const;
+
+export type OnboardingSlide = {
+  /** 그림을 고르는 이름 */
+  id: "welcome" | "start" | "more" | "shortcuts";
+  title: string;
+  points: string[];
+  /** 키보드가 있는 기기에서만 보여줌 */
+  keyboardOnly?: boolean;
+};
+
+export const ONBOARDING_SLIDES: OnboardingSlide[] = [
+  {
+    id: "welcome",
+    title: "까모도로에 온 걸 환영해요",
+    points: [
+      `${D.focusMinutes}분 집중하고 ${D.shortBreakMinutes}분 쉬는 걸 반복해요.`,
+      `집중을 ${D.longBreakInterval}번 마치면 ${D.longBreakMinutes}분 길게 쉬고, 까미 수료증을 받아요.`,
+    ],
+  },
+  {
+    id: "start",
+    title: "할 일을 적고 시작해요",
+    points: [
+      "무엇에 집중할지 적고, 집중 몇 번이면 끝날지 예상 {paw}를 정해요.",
+      "{play}를 누르면 시작해요. 집중을 마칠 때마다 할 일에 {paw}가 쌓여요.",
+    ],
+  },
+  {
+    id: "more",
+    title: "이런 것도 있어요",
+    points: [
+      "{headphones} 집중 소리: 빗소리, 모닥불 같은 소리를 들으며 집중해요.",
+      "{calendar} 캘린더: 날짜별 기록과 연속 일수를 봐요.",
+      "{menu} 메뉴: 다크 모드, 설정, 사용법이 있어요.",
+    ],
+  },
+  {
+    id: "shortcuts",
+    title: "키보드로 더 빠르게",
+    points: ["입력칸 밖에서 누르면 바로 동작해요."],
+    keyboardOnly: true,
   },
 ];

@@ -4,6 +4,7 @@ import { PageMain } from "@/components/layout/PageMain";
 import { Card } from "@/components/ui";
 import { GUIDE, GUIDE_SECTIONS } from "../content.ko";
 import { SectionBody, SectionIcon } from "./GuideParts";
+import { ReplayOnboardingButton } from "./ReplayOnboardingButton";
 import styles from "./GuideScreen.module.scss";
 
 /**
@@ -16,9 +17,10 @@ export function GuideScreen() {
       <div className={styles.layout}>
         <div className={styles.head}>
           <Image src={kkami} alt="" width={64} height={64} />
-          <div>
+          <div className={styles.headText}>
             <h1 className={styles.title}>{GUIDE.title}</h1>
             <p className={styles.intro}>{GUIDE.intro}</p>
+            <ReplayOnboardingButton className={styles.replay} />
           </div>
         </div>
         <nav aria-label={GUIDE.tocLabel} className={styles.toc}>

@@ -14,6 +14,7 @@ import {
   ExternalLinkIcon,
   FlameIcon,
   GripIcon,
+  InfoIcon,
   KeyboardIcon,
   HeadphonesIcon,
   MedalIcon,
@@ -108,6 +109,7 @@ const icons = [
   { name: "Bell", Icon: BellIcon },
   { name: "Keyboard", Icon: KeyboardIcon },
   { name: "Save", Icon: SaveIcon },
+  { name: "Info", Icon: InfoIcon },
 ];
 
 /** 공통 컴포넌트를 한눈에 확인하는 개발용 페이지 */

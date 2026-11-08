@@ -8,6 +8,8 @@ export const STORAGE_KEYS = {
   history: "kkamodoro-history",
   tasks: "kkamodoro-tasks",
   theme: "kkamodoro-theme",
+  /** 첫 방문 안내를 봤는지 (src/features/guide/onboarding.ts) */
+  onboarding: "kkamodoro-onboarding",
   /** 데이터가 아니라 탭끼리 정하는 값: 소리와 알림을 낼 탭 (src/lib/soundTab.ts) */
   soundTab: "kkamodoro-sound-tab",
 } as const;

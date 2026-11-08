@@ -30,6 +30,18 @@
   }
 }
 
+.headText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+// 제목·소개와 "안내 다시 보기" 사이
+.replay {
+  margin-top: var(--space-2);
+}
+
 .title {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);

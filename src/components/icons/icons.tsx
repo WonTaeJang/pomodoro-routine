@@ -371,6 +371,16 @@ export function SaveIcon(props: IconProps) {
   );
 }
 
+/** 동그라미 안 느낌표 i (안내) */
+export function InfoIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11v5M12 8h.01" />
+    </Icon>
+  );
+}
+
 /** 메달. 완료한 사이클 표시에 사용 */
 export function MedalIcon(props: IconProps) {
   return (

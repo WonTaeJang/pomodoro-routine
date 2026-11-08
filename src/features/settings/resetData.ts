@@ -1,3 +1,4 @@
+import { resetOnboarding } from "@/features/guide";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { setTheme } from "@/features/theme/theme";
@@ -9,10 +10,11 @@ export function resetSettings() {
   setTheme(null);
 }
 
-/** 이 브라우저에 저장된 까모도로 데이터(설정, 타이머, 기록, 할 일, 테마)를 모두 지웁니다. */
+/** 이 브라우저에 저장된 까모도로 데이터(설정, 타이머, 기록, 할 일, 테마)를 모두 지웁니다. 첫 방문 안내도 다시 뜨게 */
 export function resetAllData() {
   useTimerStore.getState().resetAll();
   useHistoryStore.getState().clear();
   useTasksStore.getState().clearAll();
   setTheme(null);
+  resetOnboarding();
 }

@@ -5,6 +5,7 @@ import { AppHeader } from "@/components/layout/AppHeader";
 import { AppNav } from "@/components/layout/AppNav";
 import { TodayCertificateButton } from "@/features/certificate";
 import { FocusSoundButton } from "@/features/focus-sound";
+import { Onboarding } from "@/features/guide";
 import { TodaySummary } from "@/features/history/components/TodaySummary";
 import { TestModeBadge } from "@/features/timer/components/TestModeBadge";
 import { TimerRuntime } from "@/features/timer/components/TimerRuntime";
@@ -43,6 +44,7 @@ export function AppShell({ children, footer }: AppShellProps) {
         <div className={styles.page}>{children}</div>
         {footer}
         <TimerRuntime ready={ready} />
+        <Onboarding ready={ready} />
       </div>
     </StoresReadyContext>
   );

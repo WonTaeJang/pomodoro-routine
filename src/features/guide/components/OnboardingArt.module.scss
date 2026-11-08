@@ -1,0 +1,136 @@
+// 실제 화면을 작게 흉내 낸 그림: 연한 강조색 바탕 위에 가운데 정렬
+.art {
+  display: grid;
+  min-height: 120px;
+  place-items: center;
+  padding: var(--space-5) var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  // 앱 화면 배경과 같은 색 (어두운 테마에서도 창과 구분되게 테두리)
+  background: var(--color-accent-tint);
+}
+
+// 집중 4번 → 수료증
+.cycle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.cycleStep {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+
+.focus,
+.medal {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-accent);
+  box-shadow: var(--shadow-raised);
+}
+
+.medal {
+  color: var(--color-medal);
+}
+
+.rest {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.arrow {
+  color: var(--color-text-muted);
+}
+
+// 할 일 입력칸 + 시작 버튼
+.start {
+  display: flex;
+  width: 100%;
+  max-width: 340px;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.taskRow {
+  display: flex;
+  width: 100%;
+  gap: var(--space-2);
+}
+
+.input,
+.stepper {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.input {
+  flex: 1;
+}
+
+.stepper {
+  gap: var(--space-1-5);
+  border-radius: var(--radius-full);
+  color: var(--color-text);
+  font-weight: var(--font-weight-semibold);
+
+  svg:nth-child(2) {
+    color: var(--color-accent);
+  }
+}
+
+.play {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-accent-contrast);
+  box-shadow: var(--shadow-raised);
+}
+
+// 헤더의 버튼들
+.header {
+  display: flex;
+  gap: var(--space-5);
+}
+
+.headerItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1-5);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
+.round {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: var(--shadow-raised);
+}
+
+.shortcuts {
+  width: 100%;
+}

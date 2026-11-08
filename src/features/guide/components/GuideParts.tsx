@@ -7,6 +7,7 @@ import {
   HeadphonesIcon,
   KeyboardIcon,
   MedalIcon,
+  MenuIcon,
   PawIcon,
   PlayIcon,
   ResetIcon,
@@ -39,6 +40,8 @@ const SECTION_ICONS: Record<GuideIcon, ComponentType<IconProps>> = {
 
 const INLINE_ICONS: Record<InlineIcon, ComponentType<IconProps>> = {
   paw: PawIcon,
+  calendar: CalendarIcon,
+  menu: MenuIcon,
   play: PlayIcon,
   reset: ResetIcon,
   skip: SkipIcon,
@@ -61,7 +64,7 @@ export function SectionIcon({
 const isInlineIcon = (name: string): name is InlineIcon => name in INLINE_ICONS;
 
 /** 문구 속 `{paw}` 같은 자리에 앱 아이콘을 넣음. 화면 낭독기는 아이콘 대신 이름을 읽음 */
-function GuideText({ text }: { text: string }) {
+export function GuideText({ text }: { text: string }) {
   // split에 괄호 묶음을 쓰면 홀수 자리에 아이콘 이름이 들어옴
   const parts = text.split(/\{(\w+)\}/);
   return parts.map((part, i) => {
