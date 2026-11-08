@@ -96,8 +96,9 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
   - `store.ts`는 순수 함수를 불러 상태를 바꾸고 localStorage에 저장합니다.
   - `components/`는 store를 읽어 화면을 그립니다.
 - 저장된 값은 화면이 뜬 뒤 앱 틀(`AppShell`)이 `useHydrateStores()`로 한 번 불러옵니다. 서버에서 그린 화면과 첫 화면이 달라 생기는 오류(hydration 불일치)를 막기 위함입니다. 각 화면은 `useStoresReady()`로 다 불러왔는지 확인합니다.
+- 다른 탭이 저장하면 `useTabSync()`(`src/lib/useTabSync.ts`)가 다시 불러옵니다. 소리와 알림을 낼 탭은 `src/lib/soundTab.ts`에서 정합니다.
 - 렌더링 중에 `Date.now()`를 직접 부르지 않고 `useNow()` 시계를 씁니다. 날짜만 필요하면 `useToday()` (날짜가 바뀔 때만 다시 그림).
-- localStorage 키는 `src/lib/storage.ts`의 `STORAGE_KEYS`에서 관리: `kkamodoro-timer`(설정, 타이머), `kkamodoro-history`(세션 기록), `kkamodoro-tasks`(할 일), `kkamodoro-theme`(테마)
+- localStorage 키는 `src/lib/storage.ts`의 `STORAGE_KEYS`에서 관리: `kkamodoro-timer`(설정, 타이머), `kkamodoro-history`(세션 기록), `kkamodoro-tasks`(할 일), `kkamodoro-theme`(테마), `kkamodoro-sound-tab`(소리를 낼 탭. 데이터 아님)
 - 서비스 이름은 `src/lib/brand.ts`의 `APP_NAME`에서 관리
 
 ## 폴더 구조
@@ -155,3 +156,4 @@ pomodoro-routine/
 - 2026-11-08: calendar 폴더, 캘린더 페이지, 앱 틀(AppShell) 추가
 - 2026-11-08: focus-sound 폴더, scripts/, public/sounds/ 추가
 - 2026-11-08: stats 폴더 추가
+- 2026-11-08: 다른 탭과 맞추기(`useTabSync`), `kkamodoro-sound-tab` 추가

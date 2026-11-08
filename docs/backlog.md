@@ -472,6 +472,8 @@
 - 관련 코드: `src/lib/useHydrateStores.ts`(저장값 불러오기), `src/features/timer/store.ts`(세션 완료 처리), `src/features/alerts/`, `src/features/focus-sound/useFocusSound.ts`, `src/features/theme/theme.ts`
 - 처리 메모:
   - 나중에 서버 동기화를 붙여도 같은 브라우저의 탭끼리는 저장소를 함께 쓰고 로그인 없이도 쓰므로 필요한 수정. 저장 형식은 바꾸지 않음.
+  - 3번의 "마지막으로 보고 있던 탭"은 **마지막으로 누르거나 입력한 탭**으로 만듦. 브라우저는 사용자가 누른 적 있는 탭에서만 소리를 낼 수 있어서, 보기만 한 탭으로 넘기면 소리가 끊김.
+  - 같은 세션 판단은 "모드 + 끝난 시각". 새 버전 앱이 저장한 값은 예전 탭이 불러오지 않음.
 
 <!--
 항목 양식 (복사해서 사용)

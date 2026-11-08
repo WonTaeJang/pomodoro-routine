@@ -112,6 +112,8 @@ import { PawIcon } from "@/components/icons";
 - 저절로 뜨는 팝업 기다리기: `src/lib/popupHold.ts`. 사용자가 직접 연 창(설정, 수료증)은 `useHoldAutoPopups()`를 부르고, 완료 팝업은 `useAutoPopupsHeld()`가 false일 때 뜸. 새로 만드는 "사용자가 여는 창"도 같은 훅을 부르면 됨
 - 탭을 보고 있는지: `src/lib/usePageVisible.ts` (자동 시작 카운트다운은 탭을 보고 있을 때만 시작)
 - 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 어느 페이지든 "진행 중 + 설정 켜짐"일 때 켬 (`TimerRuntime`)
+- 다른 탭과 맞추기: `src/lib/useTabSync.ts`의 `useTabSync(ready)` (앱 틀에서 한 번). 다른 탭이 저장하면 다시 불러오고, 완료 팝업 닫힘을 다른 탭에 알림(`BroadcastChannel`)
+- 소리와 알림을 낼 탭: `src/lib/soundTab.ts`. 소리를 내는 코드는 `isSoundTab()` / `useIsSoundTab()`으로 확인 (알림 스케줄러, 집중 소리). 기록 중복 확인은 `sessions.ts`의 `newSessions`
 - 타이머 시작은 `startSession()`(`src/features/timer/startSession.ts`)으로 함. 알림 준비 + 시작을 한 번에 하므로 시작 버튼, 완료 팝업, 단축키가 같은 동작을 씀
 
 ### 공통으로 뺄지 정하는 기준
@@ -136,3 +138,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: 집중 소리 (`Headphones` 아이콘, 헤더 펼침 창), 공용 오디오 `src/lib/audio.ts`, 난수 `src/lib/random.ts`
 - 2026-11-08: 백로그 I-005·I-006 아이콘 13개, `Slider` 양 끝 아이콘, 메뉴 아이콘·둥근 배경
 - 2026-11-08: 통계(`StatsPanel`), `sumDays`, `monthBounds`, `startOfMonth`, `WEEKDAY_NAMES`
+- 2026-11-08: 탭 여러 개 (`useTabSync`, `soundTab`, `newSessions`)
