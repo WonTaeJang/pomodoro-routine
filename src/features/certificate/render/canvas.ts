@@ -39,7 +39,7 @@ export function setFont(
   ctx.font = `${weight} ${size}px ${family}`;
 }
 
-export type TextStyle = {
+type TextStyle = {
   size: number;
   weight: number;
   color: string;
@@ -70,7 +70,7 @@ export function drawText(
 }
 
 /** 폭 안에 들어갈 때까지 글자 크기를 줄입니다. 정한 글자 크기를 돌려줌 */
-export function fitFont(
+function fitFont(
   ctx: Ctx,
   family: string,
   text: string,

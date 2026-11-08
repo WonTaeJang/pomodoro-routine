@@ -6,7 +6,7 @@
 
 export type ShortcutId = "toggle" | "reset" | "skip" | "settings";
 
-export type Shortcut = {
+type Shortcut = {
   /** KeyboardEvent.code */
   code: string;
   /** 화면에 보여줄 키 이름 (aria-keyshortcuts 값으로도 씀) */

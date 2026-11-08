@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type { CertificateData } from "../certificate";
 import { renderCertificate } from "../render/drawCertificate";
 
-export type CertificateImage = {
+type CertificateImage = {
   file: File;
   /** 미리보기, 내려받기에 쓰는 주소 (blob:) */
   url: string;

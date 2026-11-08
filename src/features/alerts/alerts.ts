@@ -37,7 +37,7 @@ export function alertKindForSession(
   return session.cycleCompleted ? "cycle-done" : "focus-end";
 }
 
-export type UpcomingAlert = {
+type UpcomingAlert = {
   /** 알릴 시각(epoch ms) = 지금 세션이 끝나는 시각 */
   at: number;
   kind: AlertKind;
