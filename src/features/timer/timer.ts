@@ -138,6 +138,8 @@ export function skip(state: TimerState, settings: TimerSettings): TimerState {
  *   (끝나는 시각은 이전 세션이 끝난 시각 기준이라 시간이 끊기지 않음)
  * - 다음 세션까지 이미 끝났을 시간이면 시작 전 상태로 둡니다.
  *   자리를 비운 동안 뽀모도로가 저절로 쌓이지 않게 하기 위함입니다.
+ *
+ * 사이클을 마친 순간(긴 휴식 차례, 수료증 시점)은 자동 시작이 켜져 있어도 긴 휴식을 시작 전 상태로 둡니다.
  */
 export function sync(
   state: TimerState,
@@ -176,7 +178,8 @@ export function sync(
     next = createSession("focus", completedInCycle, settings);
   }
 
-  if (shouldAutoStart(next.mode, settings)) {
+  // 사이클을 마친 순간(수료증 시점)은 자동 시작 설정과 상관없이 멈춤
+  if (!completed.cycleCompleted && shouldAutoStart(next.mode, settings)) {
     const nextEndsAt = endedAt + next.durationMs;
     if (now < nextEndsAt) {
       next = { ...next, status: "running", endsAt: nextEndsAt };

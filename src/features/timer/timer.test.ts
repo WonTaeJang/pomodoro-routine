@@ -174,6 +174,44 @@ describe("자동 시작", () => {
     expect(afterBreak.state).toMatchObject({ mode: "focus", status: "idle" });
   });
 
+  it("사이클을 마치면 자동 시작이 켜져 있어도 긴 휴식은 시작 전 상태로 멈춘다", () => {
+    const lastFocus = start(
+      { ...createInitialState(auto), completedInCycle: 3 },
+      T0,
+    );
+    const { state, completed } = sync(lastFocus, auto, T0 + 25 * MIN);
+    expect(completed[0].cycleCompleted).toBe(true);
+    expect(state).toMatchObject({ mode: "long-break", status: "idle" });
+  });
+
+  it("멈춘 긴 휴식을 직접 시작하면, 끝난 뒤에는 다시 자동 시작을 따른다", () => {
+    const longBreak = start(
+      {
+        ...createInitialState(auto),
+        mode: "long-break",
+        durationMs: 15 * MIN,
+        remainingMs: 15 * MIN,
+        completedInCycle: 4,
+      },
+      T0,
+    );
+    const { state } = sync(longBreak, auto, T0 + 15 * MIN);
+    expect(state).toMatchObject({
+      mode: "focus",
+      status: "running",
+      completedInCycle: 0,
+    });
+  });
+
+  it("사이클 중간의 짧은 휴식은 그대로 자동 시작한다", () => {
+    const secondFocus = start(
+      { ...createInitialState(auto), completedInCycle: 1 },
+      T0,
+    );
+    const { state } = sync(secondFocus, auto, T0 + 25 * MIN);
+    expect(state).toMatchObject({ mode: "short-break", status: "running" });
+  });
+
   it("꺼져 있으면 다음 세션은 시작 전 상태로 기다린다", () => {
     const { state } = finishSession(createInitialState(settings), settings, T0);
     expect(state.status).toBe("idle");
