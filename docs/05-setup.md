@@ -118,7 +118,7 @@ pomodoro-routine/
 ├── src/features/theme/    다크 모드
 ├── src/features/alerts/   알림 소리, 브라우저 알림
 ├── src/features/focus-sound/ 집중 소리 (노이즈 만들기, 재생, 헤더 버튼과 펼침 창)
-├── src/features/guide/    사용법 페이지 (지금은 준비 중 안내)
+├── src/features/guide/    사용법 페이지 (문구는 content.ko.ts)
 ├── src/features/settings/ 설정 창, 데이터 초기화
 ├── src/features/shortcuts/ 키보드 단축키
 ├── src/features/certificate/ 수료증 (내용 계산, 캔버스 그리기, 공유·저장, 팝업)
@@ -161,3 +161,4 @@ pomodoro-routine/
 - 2026-11-08: 다른 탭과 맞추기(`useTabSync`), `kkamodoro-sound-tab` 추가
 - 2026-11-08: guide 폴더, `/guide` 페이지, 헤더 메뉴(HeaderMenu) 추가
 - 2026-11-08: CHANGELOG.md, package.json `repository` 추가
+- 2026-11-08: 사용법 페이지 내용, `content.ko.ts`

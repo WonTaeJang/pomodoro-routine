@@ -44,7 +44,6 @@
 | `reduced-motion` | 기기에서 "움직임 줄이기"를 켰을 때 |
 | `stack($gap)` | 세로로 쌓기 (`display: flex` + `flex-direction: column` + `gap`) |
 | `header-panel($width)` | 헤더 버튼 아래로 펼쳐지는 창 (집중 소리 창, ☰ 메뉴) |
-| `kbd` | 키보드 키 모양 (설정 창의 단축키 안내, 메뉴의 S) |
 | `page-width` | 페이지 본문 너비: 휴대폰은 좁게, 넓은 화면은 넓게, 가운데 (`PageMain`, `AppFooter`) |
 
 ## 공통 컴포넌트 (`src/components/ui/`)
@@ -65,6 +64,9 @@ import { PawIcon } from "@/components/icons";
 | `FieldRow` | 왼쪽 이름·설명, 오른쪽 조작 요소인 한 줄. 좁으면 조작 요소가 다음 줄로 | `label`, `description`, `htmlFor`, `children`(조작 요소) |
 | `Switch` | 켜기/끄기 (`FieldRow` 모양) | `checked`, `onCheckedChange`, `label`, `description` |
 | `SwitchTrack` | 스위치 모양만 (줄 전체가 버튼인 메뉴 항목 안에서) | `checked` |
+| `Kbd` | 키보드 키 모양 (단축키 안내, 메뉴의 S) | `children`(키 이름), `className` |
+| `EmptyState` | 기록이 없을 때 가운데 까미와 흐린 안내 문구 (통계, 날짜 상세) | `children`(문구), `imageSize`(기본 64) |
+| `VisuallyHidden` | 화면에는 안 보이고 화면 낭독기만 읽는 내용 | `as`(span, div, table), `children` |
 | `SegmentedControl` | 여러 개 중 하나 선택 (모드 탭) | `label`, `options`, `value`, `onChange`. 방향키로 이동 |
 | `TextField` | 라벨 붙은 입력칸 | `label`, `hint`, `error`, `hideLabel` + input 속성 |
 | `Checkbox` | 체크박스 | `label` + input 속성 |
@@ -82,6 +84,7 @@ import { PawIcon } from "@/components/icons";
 - `AppNav`: 타이머 / 캘린더 메뉴. 아이콘 + 이름, 휴대폰(480px 미만)은 아이콘만(이름은 화면 낭독기와 툴팁). 지금 페이지는 둥근 흰 배경 + 강조색, `aria-current="page"`
 - `AppFooter`: 모든 페이지 맨 아래 오른쪽에 작게 버전과 GitHub 링크. 너비는 `PageMain`과 같아서(`page-width`) 오른쪽 끝이 카드와 맞음. 서버 컴포넌트라 `layout.tsx`에서 그려 `AppShell`의 `footer`로 넘김. 페이지가 짧으면 화면 바닥에 붙음
 - `PageMain`: 페이지 본문. 휴대폰은 위아래로 쌓고, 넓은 화면은 왼쪽(넓게)·오른쪽 두 칸 (타이머 | 할 일, 달력 | 날짜 상세)
+- 사용법(`src/features/guide/`): `content.ko.ts`(문구, 섹션 목록, 글 속 아이콘 이름), `GuideScreen`(목차 + 섹션 카드), `GuideParts`(섹션 아이콘, 글 속 `{paw}` 같은 자리를 앱 아이콘으로 바꾸기, 단축키 섹션에는 `ShortcutList`)
 - `HeaderMenu`(`src/app/_components/`): 헤더 오른쪽 끝 ☰ 메뉴. 다크 모드 스위치, 설정(설정 창과 S 단축키도 여기서), 사용법
 - `AppShell`(`src/app/_components/`): 모든 페이지의 틀. 저장값 불러오기(`useStoresReady()`로 알려줌), 헤더, 모드별 배경색, `TimerRuntime`(어느 페이지에서든 완료 처리·알림·탭 제목·화면 켜두기·완료 팝업)
 
@@ -114,7 +117,7 @@ import { PawIcon } from "@/components/icons";
   - `noise.ts`: 노이즈 만들기, 크기 맞추기, 끊김 없이 반복되게 잇기 (순수 함수, 테스트)
   - `player.ts`: "지금 들려야 할 소리"를 받아 서서히 켜고 끄고 바꿈, 녹음 받기, 미리 듣기
   - `components/FocusSoundPanel`: 노이즈 / 자연의 소리를 세 칸씩(아이콘 위, 이름 아래, 설명은 툴팁), 집중 중이면 고른 칸에 재생 중 막대, 소리 크기(양쪽 스피커 아이콘)
-- 단축키(`src/features/shortcuts/`, 화면 없음): `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
+- 단축키(`src/features/shortcuts/`): `ShortcutList`(하는 일 | 키 목록. 설정 창과 사용법 페이지가 함께 씀), `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
 - 저절로 뜨는 팝업 기다리기: `src/lib/popupHold.ts`. 사용자가 직접 연 창(설정, 수료증)은 `useHoldAutoPopups()`를 부르고, 완료 팝업은 `useAutoPopupsHeld()`가 false일 때 뜸. 새로 만드는 "사용자가 여는 창"도 같은 훅을 부르면 됨
 - 탭을 보고 있는지: `src/lib/usePageVisible.ts` (자동 시작 카운트다운은 탭을 보고 있을 때만 시작)
 - 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 어느 페이지든 "진행 중 + 설정 켜짐"일 때 켬 (`TimerRuntime`)
@@ -149,3 +152,5 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: ☰ 메뉴(`HeaderMenu`), `Menu`·`Book` 아이콘, `SwitchTrack`(스위치 모양만), mixin `header-panel`·`kbd`. `ThemeToggle`, `SettingsButton` 삭제
 - 2026-11-08: `AppFooter`, `ExternalLink` 아이콘, mixin `page-width`. `PageMain` 아래 여백을 줄임 (맨 아래가 이어서 채움)
 - 2026-11-08: `tabSafeStorage` (B-002)
+- 2026-11-08: 사용법 페이지(`GuideScreen`, `GuideParts`), `Bell`·`Keyboard`·`Save` 아이콘
+- 2026-11-08: 공통 컴포넌트 `Kbd`, `EmptyState`, `VisuallyHidden`, 단축키 `ShortcutList`. mixin `kbd`는 `Kbd`로 옮김
