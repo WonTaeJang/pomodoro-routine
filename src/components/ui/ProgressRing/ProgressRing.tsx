@@ -11,7 +11,10 @@ export type ProgressRingMarker = {
 export type ProgressRingProps = {
   /** 남은 비율 0~1. 1이면 띠가 가득 차 있고, 0이면 모두 지나감 */
   value: number;
-  /** 전체 지름(px) */
+  /**
+   * 기준 지름(px). 화면에 그리는 크기는 CSS 변수 --ring-display-size로 줄이거나 늘릴 수 있음
+   * (띠 두께, 도장 위치도 같은 비율로 따라감)
+   */
   size?: number;
   /** 띠 두께(px) */
   thickness?: number;
@@ -53,6 +56,8 @@ export function ProgressRing({
   const offset = -elapsed * circumference;
   // 남은 띠의 시작점(= 지금 위치). SVG를 -90도 돌려 두었으므로 0도가 12시
   const tipAngle = elapsed * 2 * Math.PI;
+  // 기준 크기 대비 % (화면 크기가 바뀌어도 같은 위치)
+  const percent = (value: number) => `${(value / size) * 100}%`;
 
   return (
     <div
@@ -61,6 +66,8 @@ export function ProgressRing({
         {
           "--ring-size": `${size}px`,
           "--ring-thickness": `${thickness}px`,
+          // 띠 안쪽 가운데 내용의 크기 비율 (띠 두께와 간격 12px을 뺌)
+          "--ring-content": percent(size - thickness * 2 - 12),
         } as CSSProperties
       }
     >
@@ -110,8 +117,8 @@ export function ProgressRing({
             className={styles.marker}
             aria-hidden="true"
             style={{
-              left: center + radius * Math.sin(angle),
-              top: center - radius * Math.cos(angle),
+              left: percent(center + radius * Math.sin(angle)),
+              top: percent(center - radius * Math.cos(angle)),
             }}
           >
             {marker.content}

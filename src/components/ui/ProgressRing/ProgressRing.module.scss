@@ -15,8 +15,8 @@ $glow-tip: 12px;
 .ring {
   position: relative;
   display: inline-flex;
-  width: var(--ring-size);
-  height: var(--ring-size);
+  width: var(--ring-display-size, var(--ring-size));
+  height: var(--ring-display-size, var(--ring-size));
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
@@ -26,6 +26,8 @@ $glow-tip: 12px;
   position: absolute;
   inset: 0;
   overflow: visible;
+  width: 100%;
+  height: 100%;
   // 12시 방향에서 시작
   transform: rotate(-90deg);
 }
@@ -49,8 +51,8 @@ $glow-tip: 12px;
 // 띠와 가운데 내용 사이에 간격을 둠
 .content {
   display: flex;
-  width: calc(var(--ring-size) - var(--ring-thickness) * 2 - var(--space-3));
-  height: calc(var(--ring-size) - var(--ring-thickness) * 2 - var(--space-3));
+  width: var(--ring-content);
+  height: var(--ring-content);
   align-items: center;
   justify-content: center;
 }
