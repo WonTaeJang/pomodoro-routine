@@ -20,7 +20,7 @@ Screenshots: put the images in docs/images/ and uncomment the lines below.
 
 - **Timer**: focus, short break and long break. Change the durations and how often long breaks come in Settings. Auto-start (starts after 5 seconds, stops at the end of a cycle), a progress ring with paw stamps, and the time left in the browser tab title.
 - **Tasks**: set how many focus sessions you expect a task to take with 🐾, and each finished session adds one. Reorder by dragging (mouse, touch or keyboard) and clear completed tasks.
-- **Focus sounds**: 3 kinds of noise (white, pink, brown), 5 nature sounds (rain, rain on window, fireplace, forest, waves) and a place sound (airplane cabin). They play only while you focus.
+- **Focus sounds**: 3 kinds of noise (white, pink, brown), 5 nature sounds (rain, rain on window, fireplace, forest, waves) and a place sound (airplane cabin). They play only while you focus, and "Random" picks a different one each session.
 - **Calendar and stats**: daily focus count, time and finished tasks, plus your streak, the last 7 days, this month and all-time totals.
 - **Kkami certificate**: finish a cycle and save or share that day's certificate as an image (1080×1920, Instagram story size).
 - **Alerts**: a chime when a session ends, and a browser notification if you're in another tab.

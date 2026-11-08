@@ -113,8 +113,9 @@ import { PawIcon } from "@/components/icons";
   - `components/useCertificateImage.ts`: 이미지를 미리 만들어 둠. 내용이 실제로 바뀔 때만 다시 그리고, 다 만들기 전에는 공유·저장을 막고, 쓰지 않는 이미지 주소는 정리
 - 마스코트(`src/assets/mascot/`): `kkami-graduate.svg`는 수료증, `kkami-basic.svg`는 캘린더의 기록 없는 날, `kkami-icon.svg`는 로고·파비콘 등에 쓸 예정
 - 집중 소리(`src/features/focus-sound/`): 밖에서는 `FocusSoundButton`(헤더 🎧 + 펼침 창), `useFocusSound`(앱 틀에서 한 번), `prepareFocusSound`(시작 버튼)를 씀
-  - `sounds.ts`: 소리 목록과 창의 묶음(`FOCUS_SOUND_GROUPS`: 노이즈, 자연의 소리, 공간의 소리). 노이즈는 만드는 함수, 녹음은 파일 주소와 이음매 길이, 크기 맞춤 값
+  - `sounds.ts`: 소리 목록과 창의 묶음(`FOCUS_SOUND_GROUPS`: 노이즈, 자연의 소리, 공간의 소리). 설정값은 소리 id, `"off"`, `"random"`. 노이즈는 만드는 함수, 녹음은 파일 주소와 이음매 길이, 크기 맞춤 값
   - `recordings.json`: 녹음마다 원본 파일, 자를 구간, 이음매 길이 (다듬기 스크립트와 앱이 함께 읽음). 새 녹음은 여기에 넣고 `node scripts/focus-sounds.mjs design/sound <id>`로 그 소리만 만듦
+  - `random.ts`: 랜덤일 때 n번째 집중의 소리 (`randomFocusSound`, 순수 함수, 테스트). `useFocusSoundChoice()`: 고른 설정과 실제로 틀 소리 (재생, 헤더 버튼, 창이 함께 씀)
   - `noise.ts`: 노이즈 만들기, 크기 맞추기, 끊김 없이 반복되게 잇기 (순수 함수, 테스트)
   - `player.ts`: "지금 들려야 할 소리"를 받아 서서히 켜고 끄고 바꿈, 녹음 받기, 미리 듣기
   - `components/FocusSoundPanel`: 노이즈 / 자연의 소리를 세 칸씩(아이콘 위, 이름 아래, 설명은 툴팁), 집중 중이면 고른 칸에 재생 중 막대, 소리 크기(양쪽 스피커 아이콘)
@@ -161,3 +162,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: 첫 방문 안내(`Onboarding`, `OnboardingArt`), `Info` 아이콘, `useSwipe`, `useMediaQuery`
 - 2026-11-08: 다국어(`src/i18n/`), ☰ 메뉴 언어 고르기, `Globe` 아이콘, `NewTabNote`, 날짜 표기 함수에 언어. `WEEKDAY_NAMES`는 `weekdayNames(locale)`로
 - 2026-11-08: 집중 소리 `Airplane` 아이콘, 공간의 소리 묶음
+- 2026-11-08: 집중 소리 랜덤(`random.ts`, `useFocusSoundChoice`), `Shuffle` 아이콘
