@@ -84,8 +84,8 @@ import { PawIcon } from "@/components/icons";
 - `AppNav`: 타이머 / 캘린더 메뉴. 아이콘 + 이름, 휴대폰(480px 미만)은 아이콘만(이름은 화면 낭독기와 툴팁). 지금 페이지는 둥근 흰 배경 + 강조색, `aria-current="page"`
 - `AppFooter`: 모든 페이지 맨 아래 오른쪽에 작게 버전과 GitHub 링크. 너비는 `PageMain`과 같아서(`page-width`) 오른쪽 끝이 카드와 맞음. 서버 컴포넌트라 `layout.tsx`에서 그려 `AppShell`의 `footer`로 넘김. 페이지가 짧으면 화면 바닥에 붙음
 - `PageMain`: 페이지 본문. 휴대폰은 위아래로 쌓고, 넓은 화면은 왼쪽(넓게)·오른쪽 두 칸 (타이머 | 할 일, 달력 | 날짜 상세)
-- 사용법(`src/features/guide/`): `content.ko.ts`(문구, 섹션 목록, 글 속 아이콘 이름), `GuideScreen`(목차 + 섹션 카드), `GuideParts`(섹션 아이콘, 글 속 `{paw}` 같은 자리를 앱 아이콘으로 바꾸기, 단축키 섹션에는 `ShortcutList`)
-- `HeaderMenu`(`src/app/_components/`): 헤더 오른쪽 끝 ☰ 메뉴. 다크 모드 스위치, 설정(설정 창과 S 단축키도 여기서), 사용법
+- 사용법(`src/features/guide/`, 밖에서는 `index.ts`로): `content.ko.ts`(문구, 섹션 목록, 첫 방문 안내 장, 글 속 아이콘 이름), `onboarding.ts`(안내를 띄울지, 장 고르기, 열림 상태 `useOnboardingStore`), `Onboarding`(앱 틀에서 한 번: 자동으로 띄우기 + 안내 창), `OnboardingArt`(장마다 실제 버튼을 흉내 낸 그림), `ReplayOnboardingButton`(사용법 페이지의 "안내 다시 보기"), `GuideScreen`(목차 + 섹션 카드), `GuideParts`(섹션 아이콘, 글 속 `{paw}` 같은 자리를 앱 아이콘으로 바꾸기, 단축키 섹션에는 `ShortcutList`)
+- `HeaderMenu`(`src/app/_components/`): 헤더 오른쪽 끝 ☰ 메뉴. 다크 모드 스위치, 설정(설정 창과 S 단축키도 여기서), 사용법, 안내 다시 보기
 - `AppShell`(`src/app/_components/`): 모든 페이지의 틀. 저장값 불러오기(`useStoresReady()`로 알려줌), 헤더, 모드별 배경색, `TimerRuntime`(어느 페이지에서든 완료 처리·알림·탭 제목·화면 켜두기·완료 팝업)
 
 ### 기능별 컴포넌트
@@ -122,6 +122,8 @@ import { PawIcon } from "@/components/icons";
 - 탭을 보고 있는지: `src/lib/usePageVisible.ts` (자동 시작 카운트다운은 탭을 보고 있을 때만 시작)
 - 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 어느 페이지든 "진행 중 + 설정 켜짐"일 때 켬 (`TimerRuntime`)
 - store 저장소: `src/lib/storage.ts`의 `tabSafeStorage(localStorage)`. 바뀐 것이 없으면 쓰지 않아 다른 탭의 새 값을 덮어쓰지 않음 (store를 새로 만들 때도 이것을 씀)
+- 미디어 쿼리: `src/lib/useMediaQuery.ts`의 `useMediaQuery(query)`. 키보드 없는 기기 판단은 `TOUCH_ONLY_QUERY` (설정 창의 단축키 숨김 CSS와 같은 기준)
+- 밀어서 넘기기: `src/lib/useSwipe.ts`의 `useSwipe({ onNext, onPrev, canNext, canPrev })`. 터치만 받고 마우스는 무시, 붙인 요소에 `touch-action: pan-y` (첫 방문 안내)
 - 다른 탭과 맞추기: `src/lib/useTabSync.ts`의 `useTabSync(ready)` (앱 틀에서 한 번). 다른 탭이 저장하면 다시 불러오고, 완료 팝업 닫힘을 다른 탭에 알림(`BroadcastChannel`)
 - 소리와 알림을 낼 탭: `src/lib/soundTab.ts`. 소리를 내는 코드는 `isSoundTab()` / `useIsSoundTab()`으로 확인 (알림 스케줄러, 집중 소리). 기록 중복 확인은 `sessions.ts`의 `newSessions`
 - 타이머 시작은 `startSession()`(`src/features/timer/startSession.ts`)으로 함. 알림 준비 + 시작을 한 번에 하므로 시작 버튼, 완료 팝업, 단축키가 같은 동작을 씀
@@ -154,3 +156,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: `tabSafeStorage` (B-002)
 - 2026-11-08: 사용법 페이지(`GuideScreen`, `GuideParts`), `Bell`·`Keyboard`·`Save` 아이콘
 - 2026-11-08: 공통 컴포넌트 `Kbd`, `EmptyState`, `VisuallyHidden`, 단축키 `ShortcutList`. mixin `kbd`는 `Kbd`로 옮김
+- 2026-11-08: 첫 방문 안내(`Onboarding`, `OnboardingArt`), `Info` 아이콘, `useSwipe`, `useMediaQuery`
