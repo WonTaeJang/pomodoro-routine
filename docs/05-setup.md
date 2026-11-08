@@ -98,8 +98,9 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
 - 저장된 값은 화면이 뜬 뒤 앱 틀(`AppShell`)이 `useHydrateStores()`로 한 번 불러옵니다. 서버에서 그린 화면과 첫 화면이 달라 생기는 오류(hydration 불일치)를 막기 위함입니다. 각 화면은 `useStoresReady()`로 다 불러왔는지 확인합니다.
 - 다른 탭이 저장하면 `useTabSync()`(`src/lib/useTabSync.ts`)가 다시 불러옵니다. 소리와 알림을 낼 탭은 `src/lib/soundTab.ts`에서 정합니다.
 - 렌더링 중에 `Date.now()`를 직접 부르지 않고 `useNow()` 시계를 씁니다. 날짜만 필요하면 `useToday()` (날짜가 바뀔 때만 다시 그림).
-- localStorage 키는 `src/lib/storage.ts`의 `STORAGE_KEYS`에서 관리: `kkamodoro-timer`(설정, 타이머), `kkamodoro-history`(세션 기록), `kkamodoro-tasks`(할 일), `kkamodoro-theme`(테마), `kkamodoro-onboarding`(첫 방문 안내를 봤는지), `kkamodoro-sound-tab`(소리를 낼 탭. 데이터 아님)
-- 서비스 이름은 `src/lib/brand.ts`의 `APP_NAME`에서 관리
+- localStorage 키는 `src/lib/storage.ts`의 `STORAGE_KEYS`에서 관리: `kkamodoro-timer`(설정, 타이머), `kkamodoro-history`(세션 기록), `kkamodoro-tasks`(할 일), `kkamodoro-theme`(테마), `kkamodoro-onboarding`(첫 방문 안내를 봤는지), `kkamodoro-locale`(직접 고른 화면 언어), `kkamodoro-sound-tab`(소리를 낼 탭. 데이터 아님)
+- 서비스 이름은 화면 문구 사전의 `app.name` ("까모도로" / "Kkamodoro"). 서버가 그리는 첫 탭 제목만 `src/lib/brand.ts`의 `APP_NAME`
+- 화면 글자는 코드에 바로 쓰지 않고 `src/i18n/messages/ko.ts`(기준)와 `en.ts`에 넣고 `useTranslations("묶음")`으로 읽음. 화면 밖(알림, 수료증 그림)은 `getTranslator()`. 날짜·시간 표기는 `src/lib/date.ts`에 언어(`useLocale()`)를 넘김
 
 ## 폴더 구조
 
@@ -118,10 +119,11 @@ pomodoro-routine/
 ├── src/features/theme/    다크 모드
 ├── src/features/alerts/   알림 소리, 브라우저 알림
 ├── src/features/focus-sound/ 집중 소리 (노이즈 만들기, 재생, 헤더 버튼과 펼침 창)
-├── src/features/guide/    사용법 페이지, 첫 방문 안내 (문구는 content.ko.ts)
+├── src/features/guide/    사용법 페이지, 첫 방문 안내 (글은 content.ko.ts, content.en.ts)
 ├── src/features/settings/ 설정 창, 데이터 초기화
 ├── src/features/shortcuts/ 키보드 단축키
 ├── src/features/certificate/ 수료증 (내용 계산, 캔버스 그리기, 공유·저장, 팝업)
+├── src/i18n/              다국어 (언어 정하기, 화면 문구 사전 messages/, I18nProvider)
 ├── src/components/layout/ 헤더, 페이지 메뉴, 페이지 본문 틀
 ├── src/components/ui/     공통 컴포넌트
 ├── src/components/icons/  아이콘
@@ -163,3 +165,4 @@ pomodoro-routine/
 - 2026-11-08: CHANGELOG.md, package.json `repository` 추가
 - 2026-11-08: 사용법 페이지 내용, `content.ko.ts`
 - 2026-11-08: 첫 방문 안내, `kkamodoro-onboarding` 추가
+- 2026-11-08: 다국어 `src/i18n/`, `kkamodoro-locale`, 화면 글자 쓰는 법 추가
