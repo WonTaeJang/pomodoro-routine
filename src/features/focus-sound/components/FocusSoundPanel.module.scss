@@ -1,8 +1,46 @@
 @use "../../../styles/mixins";
 
+// 위(제목) · 가운데(소리 목록) · 아래(소리 크기). 창이 화면보다 길면 가운데만 스크롤
+// (창 높이 제한은 바깥 펼침 창 FocusSoundButton .panel)
 .panel {
-  @include mixins.stack(var(--space-3-5));
-  padding: var(--space-4) var(--space-5);
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.head {
+  padding: var(--space-4) var(--space-5) var(--space-3-5);
+  border-bottom: var(--border-width) solid transparent;
+}
+
+.body {
+  // 아주 낮은 화면에서도 목록이 몇 줄은 보이게. 이보다 낮으면 창 전체가 스크롤됨
+  min-height: 7.5rem;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  // 고른 칸의 포커스 테두리가 잘리지 않게 안쪽 여백
+  padding: var(--space-0-5) var(--space-5);
+}
+
+.foot {
+  padding: var(--space-3-5) var(--space-5) var(--space-4);
+  border-top: var(--border-width) solid transparent;
+}
+
+// 가운데 목록이 위·아래로 더 있으면 경계에 얇은 선
+.head,
+.foot {
+  transition: border-color var(--duration-fast);
+
+  @include mixins.reduced-motion {
+    transition: none;
+  }
+}
+
+.edge {
+  border-color: var(--color-border);
 }
 
 .title {
