@@ -65,17 +65,17 @@ import { PawIcon } from "@/components/icons";
 | `TextField` | 라벨 붙은 입력칸 | `label`, `hint`, `error`, `hideLabel` + input 속성 |
 | `Checkbox` | 체크박스 | `label` + input 속성 |
 | `Section` | 밑줄 있는 작은 제목 + 내용을 세로로 쌓은 묶음 (설정 창, 컴포넌트 미리보기) | `title`, `headingLevel`(2, 3), `children` |
-| `Slider` | 끌어서 값 고르기 (소리 크기) | `label`, `value`, `onChange`, `min`, `max`, `step`, `format`, `disabled`. 방향키로도 조절 |
+| `Slider` | 끌어서 값 고르기 (소리 크기) | `label`, `value`, `onChange`, `min`, `max`, `step`, `format`, `disabled`, `startIcon`·`endIcon`(막대 양 끝 장식). 방향키로도 조절 |
 | `Stepper` | − 값 + 숫자 조절 | `label`, `value`, `onChange`, `min`, `max`, `format`, `prefix` |
 | `ProgressRing` | 원형 진행 띠 | `value`(남은 비율 0~1), `size`(기준 지름), `thickness`, `markers`, `glow`, `flashKey`, `overlay`, `children`. 화면 크기는 CSS 변수 `--ring-display-size`로 바꿀 수 있고 도장 위치·안쪽 크기가 같은 비율로 따라감 |
 
-아이콘(`src/components/icons/`): `Play`, `Pause`, `Reset`, `Skip`, `Settings`, `Plus`, `Minus`, `Check`, `Close`, `Trash`, `Edit`, `Grip`(끌기 손잡이), `ChevronLeft`·`ChevronRight`(이전·다음), `Headphones`(집중 소리), `Sun`, `Moon`, `Paw`, `Medal` (새 아이콘은 같은 폴더의 `Icon`으로 만듦)
-- 모든 아이콘은 `size`(기본 20), `title`을 받고, 색은 글자색을 따릅니다.
+아이콘(`src/components/icons/`): `Play`, `Pause`, `Reset`, `Skip`, `Settings`, `Plus`, `Minus`, `Check`, `Close`, `Trash`, `Edit`, `Grip`(끌기 손잡이), `ChevronLeft`·`ChevronRight`(이전·다음), `Headphones`(집중 소리), `VolumeOff`·`VolumeLow`·`VolumeHigh`(스피커), `NoiseWhite`·`NoisePink`·`NoiseBrown`(노이즈 파형), `CloudRain`·`WindowRain`·`Flame`·`Tree`·`Waves`(자연의 소리), `Timer`·`Calendar`(페이지 메뉴), `Sun`, `Moon`, `Paw`, `Medal` (새 아이콘은 같은 폴더의 `Icon`으로 만듦)
+- 모든 아이콘은 `size`(기본 20), `title`을 받고, 색은 글자색을 따릅니다. 목록에 아이콘을 담아 둘 때는 `IconComponent` 타입을 씁니다 (예: 집중 소리 `FOCUS_SOUNDS`의 `icon`).
 - 새 아이콘은 `icons.tsx`에 24×24 격자, 선 두께 2 기준으로 그립니다.
 
 ### 화면 틀 (`src/components/layout/`, `src/app/_components/`)
 - `AppHeader`: 로고 + `nav`(페이지 메뉴) + 오른쪽 버튼들. 좁은 휴대폰에서는 로고 글자를 숨김
-- `AppNav`: 타이머 / 캘린더 글자 탭 (지금 페이지에 `aria-current="page"`)
+- `AppNav`: 타이머 / 캘린더 메뉴. 아이콘 + 이름, 휴대폰(480px 미만)은 아이콘만(이름은 화면 낭독기와 툴팁). 지금 페이지는 둥근 흰 배경 + 강조색, `aria-current="page"`
 - `PageMain`: 페이지 본문. 휴대폰은 위아래로 쌓고, 넓은 화면은 왼쪽(넓게)·오른쪽 두 칸 (타이머 | 할 일, 달력 | 날짜 상세)
 - `AppShell`(`src/app/_components/`): 모든 페이지의 틀. 저장값 불러오기(`useStoresReady()`로 알려줌), 헤더, 모드별 배경색, `TimerRuntime`(어느 페이지에서든 완료 처리·알림·탭 제목·화면 켜두기·완료 팝업)
 
@@ -105,7 +105,7 @@ import { PawIcon } from "@/components/icons";
   - `recordings.json`: 녹음마다 원본 파일, 자를 구간, 이음매 길이 (다듬기 스크립트와 앱이 함께 읽음)
   - `noise.ts`: 노이즈 만들기, 크기 맞추기, 끊김 없이 반복되게 잇기 (순수 함수, 테스트)
   - `player.ts`: "지금 들려야 할 소리"를 받아 서서히 켜고 끄고 바꿈, 녹음 받기, 미리 듣기
-  - `components/FocusSoundPanel`: 노이즈 / 자연의 소리 두 칸 고르기, 소리 크기
+  - `components/FocusSoundPanel`: 노이즈 / 자연의 소리를 세 칸씩(아이콘 위, 이름 아래, 설명은 툴팁), 집중 중이면 고른 칸에 재생 중 막대, 소리 크기(양쪽 스피커 아이콘)
 - 단축키(`src/features/shortcuts/`, 화면 없음): `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
 - 저절로 뜨는 팝업 기다리기: `src/lib/popupHold.ts`. 사용자가 직접 연 창(설정, 수료증)은 `useHoldAutoPopups()`를 부르고, 완료 팝업은 `useAutoPopupsHeld()`가 false일 때 뜸. 새로 만드는 "사용자가 여는 창"도 같은 훅을 부르면 됨
 - 탭을 보고 있는지: `src/lib/usePageVisible.ts` (자동 시작 카운트다운은 탭을 보고 있을 때만 시작)
@@ -132,3 +132,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: `Grip` 아이콘, 할 일 끌어서 순서 바꾸기(`SortableTaskList`) 추가
 - 2026-11-08: 캘린더 페이지. 화면 틀(`AppShell`, `AppNav`, `PageMain`), `ChevronLeft`·`ChevronRight` 아이콘, `bp.down` 추가
 - 2026-11-08: 집중 소리 (`Headphones` 아이콘, 헤더 펼침 창), 공용 오디오 `src/lib/audio.ts`, 난수 `src/lib/random.ts`
+- 2026-11-08: 백로그 I-005·I-006 아이콘 13개, `Slider` 양 끝 아이콘, 메뉴 아이콘·둥근 배경
