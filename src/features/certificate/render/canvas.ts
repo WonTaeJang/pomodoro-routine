@@ -21,6 +21,12 @@ export function roundRectPath(
   ctx.closePath();
 }
 
+/** 원 경로 (채우기, 테두리, 자르기에 같이 씀) */
+export function circlePath(ctx: Ctx, cx: number, cy: number, r: number) {
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+}
+
 export function setFont(
   ctx: Ctx,
   family: string,

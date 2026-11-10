@@ -21,6 +21,9 @@ export const COLOR = {
   task: "#3d332d",
   accent: "#f2546b",
   paw: "#e5533d",
+  /** 까미 사진 바깥 테두리 */
+  photoRing: "#e5533d",
+  photoShadow: "rgba(80, 0, 40, 0.3)",
   statBg: "#fff0ea",
   gold: "#f5c542",
   stamp: "#d6453a",
@@ -31,9 +34,10 @@ export const LAYOUT = {
   header: { titleY: 250, subtitleY: 312 },
   /** 이 높이 아래의 카드 둘레에는 색종이를 뿌리지 않음 */
   confettiFreeTop: 330,
-  mascot: { x: 340, y: 360, w: 400, h: 494 },
-  /** 까미 뒤의 은은한 빛 */
-  halo: { cx: 540, cy: 660, r: 260 },
+  /** 동그란 까미 사진. r는 테두리까지 포함한 바깥 반지름, ring은 바깥 테두리 두께, gap은 사진과 테두리 사이 띠 두께 */
+  photo: { cx: 540, cy: 600, r: 225, ring: 16, gap: 12 },
+  /** 까미 사진 뒤의 은은한 빛 */
+  halo: { cx: 540, cy: 600, r: 330 },
   card: { x: 90, y: 560, w: 900, h: 1140, r: 56 },
   /** "제 12호 · 2026.11.07" */
   badge: { y: 866, h: 50 },

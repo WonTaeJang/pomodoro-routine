@@ -1,9 +1,10 @@
-import mascot from "@/assets/mascot/kkami-graduate.svg";
+import kkamiPhoto from "@/assets/kkami/kkami-certificate.webp";
 import { getTranslator, type Locale, type Translator } from "@/i18n";
 import { formatDate, formatDuration, startOfDay } from "@/lib/date";
 import { seededRandom } from "@/lib/random";
 import { getCertificateMessage, type CertificateData } from "../certificate";
 import {
+  circlePath,
   drawCircleText,
   drawPaw,
   drawSpacedText,
@@ -36,9 +37,7 @@ export async function renderCertificate(
     t: getTranslator(options.locale),
     locale: options.locale,
   };
-  const image = await loadImage(
-    typeof mascot === "string" ? mascot : mascot.src,
-  );
+  const image = await loadImage(kkamiPhoto.src);
 
   const canvas = document.createElement("canvas");
   canvas.width = SIZE.width;
@@ -49,7 +48,7 @@ export async function renderCertificate(
   drawBackground(ctx, data.number);
   drawHeader(ctx, text);
   drawCard(ctx);
-  drawMascot(ctx, image);
+  drawPhoto(ctx, image);
   drawTitle(ctx, text, data);
   drawStats(ctx, text, data);
   if (options.showTasks && data.taskTitles.length > 0) {
@@ -127,8 +126,7 @@ function drawBackground(ctx: Ctx, seed: number) {
     ctx.translate(x, y);
     ctx.rotate(random() * Math.PI);
     if (kind < 0.25) {
-      ctx.beginPath();
-      ctx.arc(0, 0, 10, 0, Math.PI * 2);
+      circlePath(ctx, 0, 0, 10);
       ctx.fill();
     } else {
       const [w, h] = kind < 0.6 ? [18, 36] : [14, 30];
@@ -168,15 +166,42 @@ function drawCard(ctx: Ctx) {
   ctx.restore();
 }
 
-function drawMascot(ctx: Ctx, image: HTMLImageElement) {
-  const { cx, cy, r } = LAYOUT.halo;
-  const halo = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-  halo.addColorStop(0, `rgba(${COLOR.halo}, 0.85)`);
-  halo.addColorStop(0.65, `rgba(${COLOR.halo}, 0)`);
-  ctx.fillStyle = halo;
-  ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
-  const { x, y, w, h } = LAYOUT.mascot;
-  ctx.drawImage(image, x, y, w, h);
+/** 은은한 빛 위에 동그란 까미 사진 (바깥 테두리 → 밝은 띠 → 사진) */
+function drawPhoto(ctx: Ctx, image: HTMLImageElement) {
+  const halo = LAYOUT.halo;
+  const glow = ctx.createRadialGradient(
+    halo.cx,
+    halo.cy,
+    0,
+    halo.cx,
+    halo.cy,
+    halo.r,
+  );
+  glow.addColorStop(0, `rgba(${COLOR.halo}, 0.85)`);
+  glow.addColorStop(0.65, `rgba(${COLOR.halo}, 0)`);
+  ctx.fillStyle = glow;
+  ctx.fillRect(halo.cx - halo.r, halo.cy - halo.r, halo.r * 2, halo.r * 2);
+
+  const { cx, cy, r, ring, gap } = LAYOUT.photo;
+  ctx.save();
+  ctx.shadowColor = COLOR.photoShadow;
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 14;
+  ctx.fillStyle = COLOR.photoRing;
+  circlePath(ctx, cx, cy, r);
+  ctx.fill();
+  ctx.restore();
+  ctx.fillStyle = COLOR.card;
+  circlePath(ctx, cx, cy, r - ring);
+  ctx.fill();
+
+  // 사진은 정사각형이라 원에 꽉 차게 그대로 그림
+  const photoR = r - ring - gap;
+  ctx.save();
+  circlePath(ctx, cx, cy, photoR);
+  ctx.clip();
+  ctx.drawImage(image, cx - photoR, cy - photoR, photoR * 2, photoR * 2);
+  ctx.restore();
 }
 
 /** 번호·날짜 배지, 제목, 본문 */
@@ -330,8 +355,7 @@ function drawStamp(ctx: Ctx, { family, t }: TextKit) {
     [96, 2.5],
   ]) {
     ctx.lineWidth = width;
-    ctx.beginPath();
-    ctx.arc(0, 0, radius, 0, Math.PI * 2);
+    circlePath(ctx, 0, 0, radius);
     ctx.stroke();
   }
   setFont(ctx, family, 22, 800);
