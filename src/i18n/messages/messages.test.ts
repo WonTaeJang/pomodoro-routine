@@ -32,6 +32,8 @@ const SAMPLE_VALUES = {
   date: "2026.11.07",
   length: "25분",
   diff: "+10분",
+  name: "까미",
+  max: 20,
   paw: () => "🐾",
   nowrap: (chunks: string) => chunks,
 };

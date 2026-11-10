@@ -364,6 +364,36 @@ export function GlobeIcon(props: IconProps) {
   );
 }
 
+/** 사람 (프로필 사진이 없을 때) */
+export function UserIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M5 20c.8-3.6 3.6-5.5 7-5.5s6.2 1.9 7 5.5" />
+    </Icon>
+  );
+}
+
+/** 문으로 들어가는 화살표 (로그인) */
+export function LogInIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />
+      <path d="M3 12h11M10 8l4 4-4 4" />
+    </Icon>
+  );
+}
+
+/** 문에서 나가는 화살표 (로그아웃) */
+export function LogOutIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" />
+      <path d="M10 12h11M17 8l4 4-4 4" />
+    </Icon>
+  );
+}
+
 /** 펼친 책 (사용법) */
 export function BookIcon(props: IconProps) {
   return (

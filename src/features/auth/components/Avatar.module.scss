@@ -1,0 +1,13 @@
+.avatar {
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+}

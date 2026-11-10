@@ -1,0 +1,30 @@
+@use "../../../styles/mixins";
+
+// 로그인·프로필·돌아오는 화면이 같이 쓰는 가운데 카드
+.page {
+  display: flex;
+  justify-content: center;
+  grid-column: 1 / -1;
+  padding-top: var(--space-6);
+}
+
+.card {
+  @include mixins.stack(var(--space-5));
+  width: 100%;
+  max-width: 420px;
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.muted {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}

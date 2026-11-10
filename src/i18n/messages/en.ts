@@ -61,6 +61,8 @@ const en: Messages = {
       language: "Language",
       settings: "Settings",
       guide: "How to use",
+      login: "Log in",
+      profile: "My profile: {name}",
     },
   },
   kkami: {
@@ -465,6 +467,46 @@ const en: Messages = {
     reset: "Reset",
     skip: "Next session",
     settings: "Open settings",
+  },
+  auth: {
+    login: {
+      title: "Log in",
+      intro: "You can keep using every feature without logging in.",
+      google: "Continue with Google",
+      redirecting: "Taking you to Google…",
+      failed: "Couldn’t start logging in. Please try again in a moment.",
+      notConfigured: "Logging in isn’t available on this site yet.",
+      note: "For now, your tasks and history stay in this browser even when you’re logged in.",
+    },
+    callback: {
+      working: "Logging you in…",
+      failed: "Couldn’t log you in. Please try again.",
+      retry: "Try again",
+    },
+    profile: {
+      title: "My profile",
+      loading: "Loading…",
+      signedOut: "You’re not logged in.",
+      login: "Log in",
+      avatarAlt: "Profile photo of {name}",
+      nickname: "Nickname",
+      nicknameHint:
+        "Up to {max} characters. Leave it empty to use your Google name.",
+      save: "Save",
+      saved: "Nickname updated.",
+      errors: {
+        tooLong: "Nicknames can be up to {max} characters.",
+        failed: "Couldn’t save. Please try again in a moment.",
+      },
+      email: "Email",
+      provider: "Logged in with",
+      providers: {
+        google: "Google",
+        kakao: "Kakao",
+      },
+      joined: "Joined",
+      logout: "Log out",
+    },
   },
 };
 

@@ -15,11 +15,13 @@ import {
   BookIcon,
   GlobeIcon,
   InfoIcon,
+  LogInIcon,
   MenuIcon,
   MoonIcon,
   SettingsIcon,
 } from "@/components/icons";
 import { IconButton, Kbd, SwitchTrack } from "@/components/ui";
+import { Avatar, profileOf, useAuth } from "@/features/auth";
 import { useGuideContent, useOnboardingStore } from "@/features/guide";
 import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
 import { SHORTCUTS, useShortcuts } from "@/features/shortcuts";
@@ -34,7 +36,8 @@ type HeaderMenuProps = {
 };
 
 /**
- * 헤더 오른쪽 끝의 메뉴(☰). 누르면 아래로 목록이 펼쳐집니다: 다크 모드, 언어, 설정, 사용법, 안내 다시 보기.
+ * 헤더 오른쪽 끝의 메뉴(☰). 누르면 아래로 목록이 펼쳐집니다:
+ * 로그인(로그인했으면 내 프로필), 다크 모드, 언어, 설정, 사용법, 안내 다시 보기.
  * 바깥을 누르거나 ESC로 닫히고, 위·아래 화살표로 항목을 옮겨 다닙니다.
  * 설정 창은 S 키로도 바로 열립니다.
  */
@@ -76,6 +79,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
         }}
         onKeyDown={(e) => moveFocus(e)}
       >
+        <AccountItem onNavigate={close} />
         {/* 테마는 메뉴를 연 채로 바뀜 */}
         <button
           type="button"
@@ -180,11 +184,47 @@ function useSettingsOpen(
   return [open, setSettingsOpen];
 }
 
+/**
+ * 맨 위 계정 항목: 로그인했으면 프로필 사진과 닉네임(→ 내 프로필), 아니면 로그인.
+ * 로그인 정보를 읽는 중이거나 로그인을 쓸 수 없는 사이트면 그리지 않음.
+ */
+function AccountItem({ onNavigate }: { onNavigate: () => void }) {
+  const t = useTranslations("app.menu");
+  const { status, user } = useAuth();
+  if (status === "signedIn" && user) {
+    const { nickname, avatarUrl } = profileOf(user);
+    return (
+      <Link
+        href="/profile"
+        role="menuitem"
+        aria-label={t("profile", { name: nickname })}
+        className={styles.item}
+        onClick={onNavigate}
+      >
+        <ItemLabel icon={<Avatar src={avatarUrl} alt="" size={20} />}>
+          {nickname}
+        </ItemLabel>
+      </Link>
+    );
+  }
+  if (status !== "signedOut") return null;
+  return (
+    <Link
+      href="/login"
+      role="menuitem"
+      className={styles.item}
+      onClick={onNavigate}
+    >
+      <ItemLabel icon={<LogInIcon />}>{t("login")}</ItemLabel>
+    </Link>
+  );
+}
+
 function ItemLabel({ icon, children }: { icon: ReactNode; children: string }) {
   return (
     <span className={styles.label}>
       {icon}
-      {children}
+      <span className={styles.labelText}>{children}</span>
     </span>
   );
 }

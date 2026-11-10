@@ -61,6 +61,8 @@ const ko = {
       language: "언어",
       settings: "설정",
       guide: "사용법",
+      login: "로그인",
+      profile: "내 프로필: {name}",
     },
   },
   /** 까미 사진 설명 (화면 낭독기) */
@@ -456,6 +458,46 @@ const ko = {
     reset: "리셋",
     skip: "다음 세션",
     settings: "설정 열기",
+  },
+  /** 로그인 (Supabase Auth) */
+  auth: {
+    login: {
+      title: "로그인",
+      intro: "로그인하지 않아도 지금처럼 모든 기능을 쓸 수 있어요.",
+      google: "Google로 로그인",
+      redirecting: "Google로 이동하는 중…",
+      failed: "로그인을 시작하지 못했어요. 잠시 뒤 다시 해 주세요.",
+      notConfigured: "이 사이트에서는 아직 로그인을 쓸 수 없어요.",
+      note: "지금은 로그인해도 할 일과 기록은 이 브라우저에만 저장돼요.",
+    },
+    callback: {
+      working: "로그인하는 중…",
+      failed: "로그인하지 못했어요. 다시 해 주세요.",
+      retry: "다시 로그인",
+    },
+    profile: {
+      title: "내 프로필",
+      loading: "불러오는 중…",
+      signedOut: "로그인하지 않았어요.",
+      login: "로그인하기",
+      avatarAlt: "{name}의 프로필 사진",
+      nickname: "닉네임",
+      nicknameHint: "{max}자까지. 비우면 Google 이름을 써요.",
+      save: "저장",
+      saved: "닉네임을 바꿨어요.",
+      errors: {
+        tooLong: "{max}자까지 쓸 수 있어요.",
+        failed: "저장하지 못했어요. 잠시 뒤 다시 해 주세요.",
+      },
+      email: "이메일",
+      provider: "로그인 방법",
+      providers: {
+        google: "Google",
+        kakao: "카카오",
+      },
+      joined: "가입한 날",
+      logout: "로그아웃",
+    },
   },
 };
 
