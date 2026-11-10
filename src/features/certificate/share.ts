@@ -1,10 +1,20 @@
-/** 이 브라우저가 이미지 파일을 공유 창으로 보낼 수 있는지 (주로 휴대폰) */
-export function canShareFile(file: File): boolean {
-  return (
-    typeof navigator !== "undefined" &&
-    typeof navigator.canShare === "function" &&
-    navigator.canShare({ files: [file] })
-  );
+let shareSupport: boolean | undefined;
+
+/**
+ * 이 브라우저가 PNG 이미지를 공유 창으로 보낼 수 있는지 (주로 휴대폰).
+ * 브라우저는 파일 종류로 판단하므로, 수료증 이미지가 다 만들어지기 전에 빈 PNG로 미리 확인해 둡니다.
+ * (이미지가 나온 뒤에야 알면 버튼 모양이 그때 바뀌어 깜빡여 보임)
+ */
+export function canShareImages(): boolean {
+  if (shareSupport === undefined) {
+    shareSupport =
+      typeof navigator !== "undefined" &&
+      typeof navigator.canShare === "function" &&
+      navigator.canShare({
+        files: [new File([], "check.png", { type: "image/png" })],
+      });
+  }
+  return shareSupport;
 }
 
 /**

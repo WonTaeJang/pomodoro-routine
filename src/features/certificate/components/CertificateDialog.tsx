@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { useTranslations } from "use-intl";
 import { Button, Dialog, Switch } from "@/components/ui";
 import { useHistoryStore } from "@/features/history/store";
@@ -8,9 +8,12 @@ import { useTasksStore } from "@/features/tasks/store";
 import { useTimerStore } from "@/features/timer/store";
 import { useHoldAutoPopups } from "@/lib/popupHold";
 import { getCertificate } from "../certificate";
-import { canShareFile, downloadFile, shareFile } from "../share";
+import { canShareImages, downloadFile, shareFile } from "../share";
 import styles from "./CertificateDialog.module.scss";
 import { useCertificateImage } from "./useCertificateImage";
+
+/** 공유 지원 여부는 바뀌지 않으므로 구독할 것이 없음 */
+const subscribeNever = () => () => {};
 
 type CertificateDialogProps = {
   /** 몇 번째 사이클의 수료증인지 (제 N호). 없으면 가장 최근 사이클 */
@@ -34,7 +37,12 @@ export function CertificateDialog({ number, onClose }: CertificateDialogProps) {
   );
   const { preview, current, failed } = useCertificateImage(data, showTasks);
   const [shareFailed, setShareFailed] = useState(false);
-  const canShare = current !== null && canShareFile(current.file);
+  // 이미지가 나오기 전부터 정해 두어, 만드는 동안에도 버튼이 최종 모양 그대로 보이게 (B-006)
+  const canShare = useSyncExternalStore(
+    subscribeNever,
+    canShareImages,
+    () => false,
+  );
   const t = useTranslations("certificate");
   const title = t("title");
 
@@ -69,7 +77,9 @@ export function CertificateDialog({ number, onClose }: CertificateDialogProps) {
             {t("save")}
           </Button>
           {canShare ? (
-            <Button onClick={handleShare}>{t("share")}</Button>
+            <Button disabled={!current} onClick={handleShare}>
+              {t("share")}
+            </Button>
           ) : null}
         </>
       }
