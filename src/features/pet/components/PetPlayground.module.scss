@@ -4,9 +4,6 @@
 
 $page-max: 780px;
 $action-width: 208px;
-$hint-max: 240px;
-$keyboard-max: 250px;
-$status-max: 110px;
 
 .page {
   max-width: $page-max;
@@ -14,10 +11,7 @@ $status-max: 110px;
   padding: var(--space-5) var(--space-3-5) var(--space-8);
 }
 .topline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
+  margin-bottom: var(--space-6);
 }
 .back {
   display: inline-flex;
@@ -27,37 +21,9 @@ $status-max: 110px;
   font-size: var(--font-size-xs);
   text-decoration: none;
   @include mixins.focus-ring;
-}
-.back:hover {
-  color: var(--color-text);
-}
-.heading {
-  text-align: center;
-  margin: var(--space-7) 0;
-}
-.eyebrow {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--space-1-5);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-2xs);
-  letter-spacing: var(--letter-spacing-wide);
-  margin-bottom: var(--space-3);
-}
-.eyebrow svg {
-  color: var(--color-short-break);
-}
-.heading h1 {
-  font-size: var(--font-size-2xl);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-base);
-  margin-bottom: var(--space-3);
-}
-.heading > p:last-child {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
+  &:hover {
+    color: var(--color-text);
+  }
 }
 .card {
   border: var(--border-width) solid var(--color-border);
@@ -67,144 +33,74 @@ $status-max: 110px;
   padding: var(--space-5);
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--space-4);
-}
-.cardHeader h2 {
-  display: flex;
   align-items: center;
-  gap: var(--space-2-5);
-  font-size: var(--font-size-xl);
-  letter-spacing: var(--letter-spacing-tight);
-}
-.cardHeader h2 span {
-  font-size: var(--font-size-2xs);
-  color: var(--color-text-muted);
-  border: var(--border-width) solid var(--color-border);
-  padding: var(--space-0-5) var(--space-1);
-  border-radius: var(--radius-sm);
-  letter-spacing: normal;
-}
-.cardHeader p {
-  margin-top: var(--space-1);
-  font-size: var(--font-size-2xs);
-  color: var(--color-text-muted);
+  gap: var(--space-4);
+  h1 {
+    font-size: var(--font-size-xl);
+    letter-spacing: var(--letter-spacing-tight);
+  }
 }
 .status {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  max-width: $status-max;
-  padding-top: var(--space-1-5);
-  font-size: var(--font-size-2xs);
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
-}
-.status i {
-  width: var(--space-1-5);
-  height: var(--space-1-5);
-  flex: 0 0 auto;
-  background: var(--color-short-break);
-  border-radius: var(--radius-full);
+  i {
+    width: var(--space-1-5);
+    height: var(--space-1-5);
+    background: var(--color-short-break);
+    border-radius: var(--radius-full);
+  }
 }
 .controls {
   text-align: center;
-  padding: var(--space-6) var(--space-5);
-}
-.hint {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-  max-width: $hint-max;
-  margin: 0 auto var(--space-5);
+  padding: var(--space-5);
 }
 .petButton {
   --color-accent: var(--color-short-break);
   --color-accent-hover: color-mix(in srgb, var(--color-short-break) 86%, black);
   min-width: $action-width;
 }
-.keyboard {
-  margin: var(--space-3-5) auto 0;
-  max-width: $keyboard-max;
-  font-size: var(--font-size-2xs);
-  color: var(--color-text-muted);
-}
 .metrics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border-top: var(--border-width) solid var(--color-border);
-  padding: var(--space-5) 0;
-}
-.metrics > div {
-  @include mixins.stack(var(--space-1));
-  justify-content: center;
-  align-items: center;
-}
-.metrics > div + div {
-  border-left: var(--border-width) solid var(--color-border);
-}
-.metrics span {
-  font-size: var(--font-size-2xs);
-  color: var(--color-text-muted);
-}
-.metrics strong {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-  line-height: var(--line-height-base);
-}
-.metrics .mood {
-  font-size: var(--font-size-md);
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
   align-items: center;
-  gap: var(--space-2);
-  min-height: var(--control-tab);
+  justify-content: space-between;
+  border-top: var(--border-width) solid var(--color-border);
+  padding: var(--space-4) var(--space-5);
+  > div {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+  span {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+  }
+  strong {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    font-variant-numeric: tabular-nums;
+  }
 }
-.mood svg {
-  width: var(--space-3);
-  height: var(--space-3);
-  color: var(--color-text-muted);
+.storageIssue {
+  margin-top: var(--space-3);
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+  button {
+    margin-left: var(--space-2);
+  }
 }
-[data-happy="true"] .mood svg,
 [data-happy="true"] .status {
   color: var(--color-short-break);
-}
-.footnote {
-  text-align: center;
-  padding-top: var(--space-7);
-  color: var(--color-text-muted);
-}
-.footnote p {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  margin-bottom: var(--space-1);
-}
-.footnote span {
-  font-size: var(--font-size-2xs);
-  display: block;
-}
-.footnote button {
-  margin-block: var(--space-3);
-}
-.footnote small {
-  display: block;
-  font-size: var(--font-size-2xs);
 }
 @include bp.up(sm) {
   .page {
     padding: var(--space-7) var(--space-6) var(--space-12);
   }
-  .heading {
-    margin-top: var(--space-9);
-  }
   .cardHeader {
     padding: var(--space-6) var(--space-7) var(--space-5);
-    align-items: center;
-  }
-  .status {
-    max-width: none;
-    padding-top: 0;
-  }
-  .hint,
-  .keyboard {
-    max-width: none;
   }
 }

@@ -14,9 +14,11 @@ import {
 } from "@rive-app/react-webgl2";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 
-import { Badge, Button, Card } from "@/components/ui";
-import { PixelHeartIcon, PawIcon, ChevronLeftIcon } from "@/components/icons";
+import { Button, Card, VisuallyHidden } from "@/components/ui";
+import { PixelHeartIcon, ChevronLeftIcon } from "@/components/icons";
 import { usePetCare } from "../usePetCare";
+import { petStore, usePetStore } from "../store";
+import { useStoresReady } from "@/lib/useHydrateStores";
 import styles from "./PetPlayground.module.scss";
 
 // Ship the WASM that matches the installed runtime, with no CDN dependency.
@@ -32,6 +34,12 @@ export function PetPlayground() {
 
 function PetRoom({ retry }: { retry: () => void }) {
   const t = useTranslations("pet");
+  const storesReady = useStoresReady();
+  const hydrated = usePetStore((s) => s.hydrated);
+  const storageIssue = usePetStore((s) => s.issue);
+  useEffect(() => {
+    if (storesReady) void petStore.getState().meet();
+  }, [storesReady]);
   const [failed, setFailed] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
   const { rive, RiveComponent } = useRive({
@@ -59,7 +67,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     onTrigger: () => setSceneReady(true),
   });
   const loaded = Boolean(rive?.viewModelInstance) && !failed;
-  const ready = loaded && sceneReady;
+  const ready = loaded && sceneReady && storesReady && hydrated;
 
   useEffect(() => {
     if (ready || failed) return;
@@ -78,9 +86,9 @@ function PetRoom({ retry }: { retry: () => void }) {
     endStroke,
     clickPet,
   } = usePetCare(ready);
-
   const sleeping = phase === "sleeping";
   const startled = phase === "startled";
+
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   useEffect(() => {
@@ -112,17 +120,8 @@ function PetRoom({ retry }: { retry: () => void }) {
         <Link href="/" className={styles.back}>
           <ChevronLeftIcon size={16} /> {t("back")}
         </Link>
-        <Badge size="sm" variant="outline">
-          {t("prototype")}
-        </Badge>
       </div>
-      <header className={styles.heading}>
-        <p className={styles.eyebrow}>
-          <PawIcon size={16} /> {t("label")}
-        </p>
-        <h1>{t("title")}</h1>
-        <p>{t("intro")}</p>
-      </header>
+      <VisuallyHidden id="pet-keyboard-help">{t("keyboard")}</VisuallyHidden>
 
       <Card
         as="section"
@@ -133,13 +132,9 @@ function PetRoom({ retry }: { retry: () => void }) {
       >
         <div className={styles.cardHeader}>
           <div>
-            <h2>
-              {t("name")}
-              <span>01</span>
-            </h2>
-            <p>{t("subtitle")}</p>
+            <h1>{t("name")}</h1>
           </div>
-          <span className={styles.status}>
+          <span className={styles.status} role="status">
             <i />
             {startled
               ? t("startled")
@@ -175,6 +170,7 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
           <button
             className={styles.petTarget}
+            aria-describedby="pet-keyboard-help"
             data-sleeping={sleeping || startled}
             aria-label={
               startled
@@ -210,10 +206,10 @@ function PetRoom({ retry }: { retry: () => void }) {
           </span>
         </div>
         <div className={styles.controls}>
-          <p className={styles.hint}>{t("hint")}</p>
           <Button
             icon={<PixelHeartIcon />}
             className={styles.petButton}
+            aria-describedby="pet-keyboard-help"
             onClick={pet}
             disabled={!ready || startled}
             onKeyDown={(event) => {
@@ -223,36 +219,33 @@ function PetRoom({ retry }: { retry: () => void }) {
           >
             {startled ? t("startled") : sleeping ? t("wake") : t("pet")}
           </Button>
-          <p className={styles.keyboard}>{t("keyboard")}</p>
+          {storageIssue && (
+            <div className={styles.storageIssue} role="alert">
+              <span>{t(`storageIssue.${storageIssue}`)}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  void petStore.getState().retry();
+                }}
+              >
+                {t("retrySave")}
+              </Button>
+            </div>
+          )}
         </div>
         <div className={styles.metrics}>
           <div>
             <span>{t("count")}</span>
-            <strong>{t("patCount", { count: pats })}</strong>
-          </div>
-          <div>
-            <span>{t("mood")}</span>
-            <strong className={styles.mood} role="status">
-              {startled
-                ? t("startled")
-                : sleeping
-                  ? t("sleeping")
-                  : happy
-                    ? t("moodHappy")
-                    : t("moodIdle")}
-              <PixelHeartIcon />
+            <strong>
+              {storesReady && hydrated ? t("patCount", { count: pats }) : "—"}
             </strong>
           </div>
+          <Button variant="ghost" size="sm" onClick={reset} disabled={!ready}>
+            {t("reset")}
+          </Button>
         </div>
       </Card>
-      <footer className={styles.footnote}>
-        <p>{t("note")}</p>
-        <span>{t("detail")}</span>
-        <Button variant="ghost" size="sm" onClick={reset} disabled={!ready}>
-          {t("reset")}
-        </Button>
-        <small>{t("session")}</small>
-      </footer>
     </main>
   );
 }

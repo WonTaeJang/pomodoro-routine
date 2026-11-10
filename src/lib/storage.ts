@@ -7,6 +7,7 @@ export const STORAGE_KEYS = {
   timer: "kkamodoro-timer",
   history: "kkamodoro-history",
   tasks: "kkamodoro-tasks",
+  pet: "kkamodoro-pet",
   theme: "kkamodoro-theme",
   /** 직접 고른 화면 언어. 고르지 않았으면 없음 (src/i18n/locale.ts) */
   locale: "kkamodoro-locale",

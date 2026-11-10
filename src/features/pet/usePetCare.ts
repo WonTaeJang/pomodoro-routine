@@ -2,16 +2,26 @@
 
 import {
   useEffect,
-  useReducer,
+  useState,
   useRef,
   type PointerEvent,
   type MouseEvent,
 } from "react";
-import { createPetState, petReducer, PET_STROKE_DISTANCE } from "./pet";
+import { useStore } from "zustand";
+import { PET_STROKE_DISTANCE } from "./pet";
+import { createPetCareStore } from "./careStore";
+import { petStore, usePetStore } from "./store";
 
-/** 포인터·타이머를 페이지별 돌봄 규칙에 연결. */
+/** 포인터·타이머는 페이지별 상태, 인정된 쓰담은 영구 기록으로 전달. */
 export function usePetCare(ready: boolean) {
-  const [state, dispatch] = useReducer(petReducer, undefined, createPetState);
+  const [careStore] = useState(() =>
+    createPetCareStore(() => {
+      void petStore.getState().recordPat();
+    }),
+  );
+  const state = useStore(careStore, (s) => s.state);
+  const dispatch = careStore.getState().dispatch;
+  const pats = usePetStore((s) => s.pet?.totalPats ?? 0);
   const stroke = useRef<{ id: number; x: number; y: number } | null>(null);
   const dragged = useRef(false);
 
@@ -89,7 +99,7 @@ export function usePetCare(ready: boolean) {
   return {
     phase: state.phase,
     happy: state.happyUntil !== null,
-    pats: state.pats,
+    pats,
     pet,
     reset,
     startStroke,

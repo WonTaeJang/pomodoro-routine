@@ -1,0 +1,260 @@
+import { describe, expect, it } from "vitest";
+import { STORAGE_KEYS } from "@/lib/storage";
+import { createPetCareStore } from "./careStore";
+import { createPetStore } from "./store";
+import {
+  createLocalPetRepository,
+  decodePet,
+  PetStorageError,
+} from "./repository";
+
+function fixture() {
+  const data = new Map<string, string>();
+  let readFailure = false,
+    writeFailure = false,
+    clock = 1000,
+    sequence = 0;
+  const storage: Storage = {
+    get length() {
+      return data.size;
+    },
+    key: (index) => [...data.keys()][index] ?? null,
+    clear: () => data.clear(),
+    getItem: (key) => {
+      if (readFailure) throw Error("blocked");
+      return data.get(key) ?? null;
+    },
+    setItem: (key, value) => {
+      if (writeFailure) throw Error("quota");
+      data.set(key, value);
+    },
+    removeItem: (key) => {
+      if (writeFailure) throw Error("blocked");
+      data.delete(key);
+    },
+  };
+  // Shared, exclusive lock models navigator.locks across two tabs.
+  let queue: Promise<unknown> = Promise.resolve();
+  const lock = <T>(run: () => Promise<T>): Promise<T> => {
+    const result = queue.then(run);
+    queue = result.catch(() => {});
+    return result;
+  };
+  const repository = createLocalPetRepository(() => storage, lock);
+  return {
+    storage,
+    repository,
+    store: () =>
+      createPetStore(
+        repository,
+        () => ++clock,
+        () => `pet-${++sequence}`,
+      ),
+    blockRead: (value: boolean) => {
+      readFailure = value;
+    },
+    blockWrite: (value: boolean) => {
+      writeFailure = value;
+    },
+  };
+}
+
+describe("돌봄 로컬 저장", () => {
+  it("불러오기 전 입력은 저장하지 않고 첫 방문에 기록을 생성", async () => {
+    const f = fixture(),
+      store = f.store();
+    await store.getState().recordPat();
+    await store.getState().meet();
+    expect(f.storage.length).toBe(0);
+    await store.getState().hydrate();
+    await store.getState().meet();
+    expect(store.getState().pet).toMatchObject({
+      id: "pet-1",
+      totalPats: 0,
+      lastPettedAt: null,
+    });
+    expect(await f.repository.load()).toEqual(store.getState().pet);
+  });
+
+  it("새 store에서 ID·첫 만남·누적 횟수를 복원하며 일시 상태는 저장하지 않음", async () => {
+    const f = fixture(),
+      first = f.store();
+    await first.getState().hydrate();
+    await first.getState().meet();
+    const created = first.getState().pet!;
+    await first.getState().recordPat();
+    await first.getState().recordPat();
+    const second = f.store();
+    await second.getState().hydrate();
+    expect(second.getState().pet).toMatchObject({
+      id: created.id,
+      createdAt: created.createdAt,
+      totalPats: 2,
+    });
+    expect(
+      Object.keys(
+        JSON.parse(f.storage.getItem(STORAGE_KEYS.pet)!).state.pet,
+      ).sort(),
+    ).toEqual(["createdAt", "id", "lastPettedAt", "totalPats", "updatedAt"]);
+    expect(second.getState().pet!.lastPettedAt).toBe(
+      second.getState().pet!.updatedAt,
+    );
+  });
+
+  it("깨우기·연속 입력·재생은 기록을 늘리거나 지우지 않고 인정된 쓰담만 저장", async () => {
+    const f = fixture(),
+      saved = f.store();
+    await saved.getState().hydrate();
+    await saved.getState().meet();
+    const pending: Promise<void>[] = [];
+    const care = createPetCareStore(() => {
+      pending.push(saved.getState().recordPat());
+    });
+    const send = care.getState().dispatch;
+    send({ type: "start", now: 0 });
+    send({ type: "pet", now: 10 }); // wake only
+    send({ type: "pet", now: 500 }); // startled
+    send({ type: "advanceIntro", now: 1010 });
+    send({ type: "pet", now: 1020 });
+    send({ type: "pet", now: 1030 }); // cooldown
+    send({ type: "reset" });
+    send({ type: "start", now: 2000 });
+    await Promise.all(pending);
+    expect(pending).toHaveLength(1);
+    expect(saved.getState().pet!.totalPats).toBe(1);
+    expect(care.getState().state.phase).toBe("sleeping");
+    expect((await f.repository.load())!.totalPats).toBe(1);
+  });
+
+  it("두 탭이 동시에 처음 만나거나 쓰다듬어도 같은 ID에 횟수를 합산", async () => {
+    const f = fixture(),
+      a = f.store(),
+      b = f.store();
+    await Promise.all([a.getState().hydrate(), b.getState().hydrate()]);
+    await Promise.all([a.getState().meet(), b.getState().meet()]);
+    expect(a.getState().pet!.id).toBe(b.getState().pet!.id);
+    await Promise.all([
+      a.getState().recordPat(),
+      b.getState().recordPat(),
+      a.getState().recordPat(),
+    ]);
+    await b.getState().hydrate();
+    expect(b.getState().pet!.totalPats).toBe(3);
+    expect((await f.repository.load())!.totalPats).toBe(3);
+  });
+
+  it("저장 실패도 메모리에 유지하고 다른 탭의 쓰담에 미저장 횟수를 더해 재시도", async () => {
+    const f = fixture(),
+      a = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    f.blockWrite(true);
+    await a.getState().recordPat();
+    await a.getState().recordPat();
+    expect(a.getState()).toMatchObject({
+      issue: "save",
+      pendingPats: 2,
+      pet: { totalPats: 2 },
+    });
+    f.blockWrite(false);
+    const b = f.store();
+    await b.getState().hydrate();
+    await b.getState().recordPat();
+    await a.getState().hydrate();
+    expect(a.getState().pet!.totalPats).toBe(3);
+    await a.getState().retry();
+    await a.getState().retry();
+    expect(a.getState()).toMatchObject({ issue: null, pendingPats: 0 });
+    expect((await f.repository.load())!.totalPats).toBe(3);
+  });
+
+  it("읽기 제한이 있어도 초기 로딩이 끝나며 기록은 메모리에 유지", async () => {
+    const f = fixture(),
+      store = f.store();
+    f.blockRead(true);
+    await store.getState().hydrate();
+    await store.getState().meet();
+    await store.getState().recordPat();
+    expect(store.getState()).toMatchObject({
+      hydrated: true,
+      issue: "load",
+      pet: { totalPats: 1 },
+    });
+    f.blockRead(false);
+    await store.getState().retry();
+    expect((await f.repository.load())!.totalPats).toBe(1);
+  });
+
+  it.each([
+    ['{"version":99}', "newer"],
+    ["broken-json", "invalid"],
+    ['{"version":1,"state":"invalid"}', "invalid"],
+  ])("손상/미래 버전은 덮어쓰지 않음: %s", async (raw, issue) => {
+    const f = fixture(),
+      store = f.store();
+    f.storage.setItem(STORAGE_KEYS.pet, raw);
+    await store.getState().hydrate();
+    await store.getState().meet();
+    await store.getState().recordPat();
+    expect(store.getState().issue).toBe(issue);
+    expect(f.storage.getItem(STORAGE_KEYS.pet)).toBe(raw);
+  });
+
+  it("전체 초기화와 다른 탭의 삭제가 이전 기록을 되살리지 않음", async () => {
+    const f = fixture(),
+      a = f.store(),
+      b = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    await a.getState().recordPat();
+    await b.getState().hydrate();
+    const previousId = b.getState().pet!.id;
+    await a.getState().clear();
+    expect(await f.repository.load()).toBeNull();
+    // b has not received the storage event yet.
+    await b.getState().recordPat();
+    expect(b.getState().pet!.id).not.toBe(previousId);
+    expect(b.getState().pet!.totalPats).toBe(1);
+    await b.getState().clear();
+    await a.getState().hydrate();
+    expect(a.getState().pet).toBeNull();
+  });
+
+  it("음수·비정상 횟수는 유효한 기록으로 읽지 않음", () => {
+    expect(() =>
+      decodePet(
+        JSON.stringify({
+          version: 1,
+          state: {
+            pet: {
+              id: "a",
+              createdAt: 1,
+              updatedAt: 1,
+              lastPettedAt: null,
+              totalPats: -1,
+            },
+          },
+        }),
+      ),
+    ).toThrow(PetStorageError);
+  });
+
+  it("초기화 실패의 재시도는 옛 기록 저장이 아니라 삭제를 다시 수행", async () => {
+    const f = fixture(),
+      store = f.store();
+    await store.getState().hydrate();
+    await store.getState().meet();
+    await store.getState().recordPat();
+    f.blockWrite(true);
+    await store.getState().clear();
+    expect(store.getState().issue).toBe("save");
+    f.blockWrite(false);
+    await store.getState().retry();
+    expect(await f.repository.load()).toBeNull();
+    expect(store.getState()).toMatchObject({
+      pet: null,
+      pendingPats: 0,
+      issue: null,
+    });
+  });
+});

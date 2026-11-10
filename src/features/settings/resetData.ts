@@ -1,6 +1,7 @@
 import { resetOnboarding } from "@/features/guide";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
+import { petStore } from "@/features/pet/store";
 import { setTheme } from "@/features/theme/theme";
 import { useTimerStore } from "@/features/timer/store";
 import { setLocale } from "@/i18n";
@@ -15,11 +16,12 @@ export function resetSettings() {
   setLocale(null);
 }
 
-/** 이 브라우저에 저장된 까모도로 데이터(설정, 타이머, 기록, 할 일, 테마, 언어)를 모두 지웁니다. 첫 방문 안내도 다시 뜨게 */
+/** 이 브라우저에 저장된 까모도로 데이터(설정, 타이머, 기록, 할 일, 돌봄 기록, 테마, 언어)를 모두 지웁니다. 첫 방문 안내도 다시 뜨게 */
 export function resetAllData() {
   useTimerStore.getState().resetAll();
   useHistoryStore.getState().clear();
   useTasksStore.getState().clearAll();
+  void petStore.getState().clear();
   setTheme(null);
   setLocale(null);
   resetOnboarding();

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { newSessions } from "@/features/history/sessions";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
+import { petStore } from "@/features/pet/store";
 import { applySavedTheme } from "@/features/theme/theme";
 import { reloadTimerFromOtherTab, useTimerStore } from "@/features/timer/store";
 import { applySavedLocale } from "@/i18n";
@@ -94,6 +95,7 @@ export function useTabSync(ready: boolean) {
       // 기록 → 할 일 → 타이머 순서 (세션을 끝낸 탭이 저장하는 순서와 같게)
       if (all || e.key === STORAGE_KEYS.history) reloadHistory();
       if (all || e.key === STORAGE_KEYS.tasks) reload(useTasksStore);
+      if (all || e.key === STORAGE_KEYS.pet) void petStore.getState().hydrate();
       if (all || e.key === STORAGE_KEYS.timer) reloadTimer();
       if (all || e.key === STORAGE_KEYS.theme) applySavedTheme();
       if (all || e.key === STORAGE_KEYS.locale) applySavedLocale();

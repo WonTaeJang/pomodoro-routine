@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { useTimerStore } from "@/features/timer/store";
+import { petStore } from "@/features/pet/store";
 
 /** 저장된 값을 다 불러왔는지. 앱 틀(AppShell)이 한 번 불러오고 아래 화면에 알려줍니다. */
 export const StoresReadyContext = createContext(false);
@@ -26,6 +27,7 @@ export function useHydrateStores(): boolean {
       useTimerStore.persist.rehydrate(),
       useHistoryStore.persist.rehydrate(),
       useTasksStore.persist.rehydrate(),
+      petStore.getState().hydrate(),
     ]).then(() => {
       if (cancelled) return;
       // 자리를 비운 사이 끝난 세션 처리
