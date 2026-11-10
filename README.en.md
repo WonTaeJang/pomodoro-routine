@@ -24,12 +24,13 @@ Screenshots: put the images in docs/images/ and uncomment the lines below.
 - **Calendar and stats**: daily focus count, time and finished tasks, plus your streak, the last 7 days, this month and all-time totals.
 - **Kkami certificate**: finish a cycle and save or share that day's certificate as an image (1080×1920, Instagram story size).
 - **Alerts**: a chime when a session ends, and a browser notification if you're in another tab.
+- **Sign-in (optional)**: sign in with Google and change your nickname on your profile. Everything works without signing in. Kakao sign-in is coming later.
 - **Keyboard shortcuts**: `Space` start / pause, `R` reset, `N` next session, `S` settings.
 - **Also**: dark mode, Korean / English, a first-visit intro and a guide page (`/guide`), keep screen on while the timer runs, and one shared timer across tabs.
 
 ### Where is my data saved?
 
-Your tasks, history, pet records and settings are saved **only in this browser (localStorage)**. Nothing is sent to a server, and there's no sync between devices yet. Clearing your browser data also deletes your history.
+Your tasks, history, pet records and settings are saved **only in this browser (localStorage)**. Your history isn't sent to a server even when you sign in (only your account lives in Supabase), and there's no sync between devices yet. Clearing your browser data also deletes your history.
 
 The pet care prototype is available at `/pet` on the development server. Pet pixel Kkami to see a happy reaction before returning to idle. Total pats are saved in this browser; timer rewards aren't connected yet. [Implementation and asset guide (Korean)](./docs/07-pet-prototype.md)
 
@@ -56,6 +57,8 @@ Then open http://localhost:3000 in your browser.
 
 During development, add `?test=5` to the address to make every session 5 seconds long (`?test=off` turns it off). See the [setup guide](./docs/05-setup.md) (in Korean) for more.
 
+To try sign-in, create a Supabase project and put its URL and publishable key in `.env.local`. Without them, only the sign-in menu is hidden and everything else works. ([Sign-in setup, in Korean](./docs/05-setup.md#로그인-supabase-설정))
+
 ## Tech stack
 
 | Area      | What's used                                                                                 |
@@ -63,6 +66,7 @@ During development, add `?test=5` to the address to make every session 5 seconds
 | Framework | Next.js 16 (App Router), React 19, TypeScript                                               |
 | Styling   | SCSS Modules + design tokens, [Pretendard](https://github.com/orioncactus/pretendard) font  |
 | State     | Zustand (saved to localStorage, synced across tabs)                                         |
+| Sign-in   | Supabase Auth (Google)                                                                      |
 | i18n      | use-intl (Korean, English)                                                                  |
 | Other     | dnd-kit (drag to reorder), Web Audio API (alerts, focus sounds), Canvas (certificate image) |
 | Tests     | Vitest                                                                                      |
