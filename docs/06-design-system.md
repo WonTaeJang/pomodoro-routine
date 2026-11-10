@@ -91,7 +91,7 @@ import { PawIcon } from "@/components/icons";
 
 ### 기능별 컴포넌트
 특정 기능에서만 쓰는 컴포넌트는 `src/features/<기능>/components/`에 둡니다.
-- 돌봄(`src/features/pet/`): `components/PetPlayground`는 Rive 연결과 화면, `pet.ts`는 시각을 인자로 받는 순수 돌봄 규칙, `usePetCare`는 포인터·타이머 연결. 문구는 `pet` 사전, UI는 `Button`·`Card`·`Badge`와 `PixelHeartIcon`을 사용합니다. `_room-art.scss`의 이름 붙인 Sass 값은 방 일러스트 전용 좌표·팔레트이며 일반 UI 토큰과 구분합니다.
+- 돌봄(`src/features/pet/`): `components/PetPlayground`는 화면 조합, `usePetRive`·`usePetRivePose`는 Rive 로드·구독·재생, `pet.ts`는 시각을 인자로 받는 순수 돌봄 규칙, `usePetCare`는 포인터·타이머 연결. 문구는 `pet` 사전, UI는 `Button`·`Card`·`VisuallyHidden`과 `PixelHeartIcon`을 사용합니다. `_room-art.scss`의 이름 붙인 Sass 값은 방 일러스트 전용 좌표·팔레트이며 일반 UI 토큰과 구분합니다.
 - 타이머: `TimerScreen`(페이지), `TimerRuntime`(앱 틀에서 한 번), `TimerPanel`(카드 조립), `ModeSwitcher`(모드 탭 + 전환 확인), `TimerRing`(진행 띠 + 효과), `KkamiPhoto`, `TimerControls`, `CycleProgress`, `CompletionDialog`(+ `useCompletionDialog.ts`: 언제 보일지, 자동 시작 카운트다운), `Celebration`, `TestModeBadge`
 - 할 일: `TaskPanel`, `SortableTaskList`(끌어서 순서 바꾸기, 묶음마다 하나), `TaskForm`, `TaskItem`, `TaskDoneCheck`, `PawCount`(🐾 완료/예상)
 - 기록: `TodaySummary`, 오늘 기록 훅 `useTodayFocus()` (헤더의 오늘 기록, 🏅 메달 버튼이 같이 씀). `sessions.ts`: 집중 세션만 고르기(`focusSessions`), 기록의 할 일 제목 찾기(`taskTitleOf`), 날짜별 요약(`getDayStats`: 집중 횟수·시간·사이클 번호), 기간 합계(`sumDays`). 헤더의 오늘 기록, 수료증, 캘린더, 통계가 같이 씀
@@ -125,7 +125,7 @@ import { PawIcon } from "@/components/icons";
 - 다국어(`src/i18n/`): 화면에서는 use-intl의 `useTranslations("묶음")`, `useLocale()`. 화면 밖(브라우저 알림, 수료증 그림, 시간 계산 함수)은 `getTranslator()`나 `Translator`를 받는 함수로. 문구는 `messages/ko.ts`(기준)·`en.ts`에 기능별로 두고, 여러 기능이 같이 쓰는 말(취소, 닫기, 오늘, 기록 없음, 소리 크기 등)은 `common`에 하나만 둠. 언어 상태는 `locale.ts`(`setLocale`, 다른 탭 맞추기 `applySavedLocale`), 첫 화면 언어는 `locales.ts`의 시작 스크립트. 기능 쪽 목록에는 이름 대신 문구 키를 둠 (예: 집중 소리 `focusSound.sounds.<id>`, 단축키 `shortcuts.<id>`, 알림 `alerts.<종류>`)
 - 탭을 보고 있는지: `src/lib/usePageVisible.ts` (자동 시작 카운트다운은 탭을 보고 있을 때만 시작)
 - 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 어느 페이지든 "진행 중 + 설정 켜짐"일 때 켬 (`TimerRuntime`)
-- store 저장소: `src/lib/storage.ts`의 `tabSafeStorage(localStorage)`. 바뀐 것이 없으면 쓰지 않아 다른 탭의 새 값을 덮어쓰지 않음 (store를 새로 만들 때도 이것을 씀)
+- store 저장소: `src/lib/storage.ts`의 `tabSafeStorage(localStorage)`. 바뀐 것이 없으면 쓰지 않아 다른 탭의 새 값을 덮어쓰지 않음 (일반적인 persist store를 새로 만들 때도 이것을 씀). 돌봄 기록은 실패 재시도와 원자적 합산을 위해 `features/pet/repository.ts`에서 명시적으로 저장하며, 같은 값은 쓰지 않음
 - 미디어 쿼리: `src/lib/useMediaQuery.ts`의 `useMediaQuery(query)`. 키보드 없는 기기 판단은 `TOUCH_ONLY_QUERY` (설정 창의 단축키 숨김 CSS와 같은 기준)
 - 스크롤 경계: `src/lib/useScrollEdges.ts`의 `useScrollEdges(ref)`. 스크롤 영역 위·아래에 가려진 내용이 있는지 (집중 소리 창의 경계선)
 - 밀어서 넘기기: `src/lib/useSwipe.ts`의 `useSwipe({ onNext, onPrev, canNext, canPrev })`. 터치만 받고 마우스는 무시, 붙인 요소에 `touch-action: pan-y` (첫 방문 안내)
@@ -142,6 +142,10 @@ import { PawIcon } from "@/components/icons";
 `npm run dev` 실행 후 http://localhost:3000/dev/components 에서 모든 공통 컴포넌트, 아이콘, 다크 모드, 모드별 색을 확인할 수 있습니다. 배포 환경에서는 열리지 않습니다.
 
 ## 변경 이력
+
+- 2026-11-10: I-024 Rive 전용 훅 분리와 현재 돌봄 UI 구성 반영.
+
+- 2026-11-10: 돌봄 기록의 재시도·누적 합산을 위한 저장 계층 예외 명시.
 
 - 2026-11-10: 돌봄 화면의 공통 컴포넌트·문구·로직 분리, 도트 아트 전용 값과 `PixelHeartIcon` 추가 (I-020).
 

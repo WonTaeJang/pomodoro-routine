@@ -103,11 +103,12 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
 - 기능별로 `src/features/<기능>/` 아래에 로직, store, 화면을 모읍니다.
   - `timer.ts`처럼 **규칙은 순수 함수**로 두고 현재 시각을 인자로 받습니다. → 테스트에서 시간을 마음대로 넣어 검증
   - `store.ts`는 순수 함수를 불러 상태를 바꾸고 localStorage에 저장합니다.
+  - 돌봄 기록은 `PetRepository`를 통해 명시적으로 저장합니다. 실패 재시도·버전 검증·여러 탭의 누적 합산을 처리하며, 기존 앱의 초기 복원·탭 동기화·전체 초기화에 연결합니다. 자세한 계약은 [07-pet-prototype.md](./07-pet-prototype.md)를 따릅니다.
   - `components/`는 store를 읽어 화면을 그립니다.
 - 저장된 값은 화면이 뜬 뒤 앱 틀(`AppShell`)이 `useHydrateStores()`로 한 번 불러옵니다. 서버에서 그린 화면과 첫 화면이 달라 생기는 오류(hydration 불일치)를 막기 위함입니다. 각 화면은 `useStoresReady()`로 다 불러왔는지 확인합니다.
 - 다른 탭이 저장하면 `useTabSync()`(`src/lib/useTabSync.ts`)가 다시 불러옵니다. 소리와 알림을 낼 탭은 `src/lib/soundTab.ts`에서 정합니다.
 - 렌더링 중에 `Date.now()`를 직접 부르지 않고 `useNow()` 시계를 씁니다. 날짜만 필요하면 `useToday()` (날짜가 바뀔 때만 다시 그림).
-- localStorage 키는 `src/lib/storage.ts`의 `STORAGE_KEYS`에서 관리: `kkamodoro-timer`(설정, 타이머), `kkamodoro-history`(세션 기록), `kkamodoro-tasks`(할 일), `kkamodoro-theme`(테마), `kkamodoro-onboarding`(첫 방문 안내를 봤는지), `kkamodoro-locale`(직접 고른 화면 언어), `kkamodoro-sound-tab`(소리를 낼 탭. 데이터 아님)
+- localStorage 키는 `src/lib/storage.ts`의 `STORAGE_KEYS`에서 관리: `kkamodoro-timer`(설정, 타이머), `kkamodoro-history`(세션 기록), `kkamodoro-tasks`(할 일), `kkamodoro-pet`(돌봄 기록), `kkamodoro-theme`(테마), `kkamodoro-onboarding`(첫 방문 안내를 봤는지), `kkamodoro-locale`(직접 고른 화면 언어), `kkamodoro-sound-tab`(소리를 낼 탭. 데이터 아님)
 - 서비스 이름은 화면 문구 사전의 `app.name` ("까모도로" / "Kkamodoro"). 서버가 그리는 첫 탭 제목만 `src/lib/brand.ts`의 `APP_NAME`
 - 화면 글자는 코드에 바로 쓰지 않고 `src/i18n/messages/ko.ts`(기준)와 `en.ts`에 넣고 `useTranslations("묶음")`으로 읽음. 화면 밖(알림, 수료증 그림)은 `getTranslator()`. 날짜·시간 표기는 `src/lib/date.ts`에 언어(`useLocale()`)를 넘김
 
@@ -149,6 +150,8 @@ pomodoro-routine/
 ```
 
 ## 변경 이력
+
+- 2026-11-10: 돌봄 저장 키와 명시적 저장 계층, 앱 복원·동기화 연결 안내 추가.
 
 - 2026-11-10: 돌봄 기능·Rive 에셋 및 WASM 준비 절차 추가 (I-020).
 
