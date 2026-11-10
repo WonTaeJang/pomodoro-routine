@@ -13,6 +13,7 @@ type PetStore = {
   hydrated: boolean;
   issue: PetStorageIssue | null;
   pendingPats: number;
+  retryOperation: "save" | "clear" | null;
   hydrate(): Promise<void>;
   meet(): Promise<void>;
   recordPat(): Promise<void>;
@@ -33,12 +34,13 @@ export function createPetStore(
   };
   return createStore<PetStore>()((set, get) => {
     let persistedId: string | null = null;
-    let clearPending = false;
     const fail = (error: unknown) =>
       set({ issue: error instanceof PetStorageError ? error.issue : "save" });
     async function flush() {
       const { pet, pendingPats } = get();
       if (!pet) return;
+      // A new save supersedes a previously failed deletion.
+      set({ retryOperation: "save" });
       try {
         const saved = await repository.update((current) => {
           const base =
@@ -48,19 +50,18 @@ export function createPetStore(
               : { ...pet, totalPats: pet.totalPats - pendingPats });
           return pendingPats ? addPats(base, pendingPats, pet.updatedAt) : base;
         });
-        set({ pet: saved, pendingPats: 0, issue: null });
+        set({ pet: saved, pendingPats: 0, retryOperation: null, issue: null });
         persistedId = saved?.id ?? null;
       } catch (error) {
         fail(error);
       }
     }
     async function clearRecord() {
-      clearPending = true;
+      set({ retryOperation: "clear" });
       try {
         await repository.clear();
         persistedId = null;
-        clearPending = false;
-        set({ pet: null, pendingPats: 0, issue: null });
+        set({ pet: null, pendingPats: 0, retryOperation: null, issue: null });
       } catch (error) {
         fail(error);
       }
@@ -68,19 +69,30 @@ export function createPetStore(
     async function restore() {
       try {
         const saved = await repository.load();
-        const { pet, pendingPats } = get();
-        if (
-          pendingPats &&
-          pet &&
-          (persistedId === null || saved?.id === persistedId)
-        ) {
-          const base = saved ?? {
-            ...pet,
-            totalPats: pet.totalPats - pendingPats,
-          };
-          set({ pet: addPats(base, pendingPats, pet.updatedAt) });
+        const { pet, pendingPats, retryOperation, issue } = get();
+        // Only a previously observed identity can prove a remote reset.
+        // A temporary ID created during a read failure is not such evidence.
+        const remotelyReset = persistedId !== null && saved?.id !== persistedId;
+        const deletionCompleted = retryOperation === "clear" && saved === null;
+        if (remotelyReset || deletionCompleted || retryOperation === null) {
+          set({
+            pet: saved,
+            pendingPats: 0,
+            retryOperation: null,
+            issue: null,
+          });
         } else {
-          set({ pet: saved, pendingPats: 0, issue: null });
+          const base =
+            saved ??
+            (pet && { ...pet, totalPats: pet.totalPats - pendingPats });
+          set({
+            pet:
+              base && pet && pendingPats
+                ? addPats(base, pendingPats, pet.updatedAt)
+                : base,
+            // Reading successfully does not mean pending writes/deletion succeeded.
+            issue: issue ?? "save",
+          });
         }
         persistedId = saved?.id ?? null;
       } catch (error) {
@@ -93,6 +105,7 @@ export function createPetStore(
       hydrated: false,
       issue: null,
       pendingPats: 0,
+      retryOperation: null,
       hydrate: () => enqueue(restore),
       meet: () =>
         enqueue(async () => {
@@ -110,7 +123,11 @@ export function createPetStore(
           });
           await flush();
         }),
-      retry: () => enqueue(() => (clearPending ? clearRecord() : flush())),
+      retry: () =>
+        enqueue(() => {
+          if (get().retryOperation === "clear") return clearRecord();
+          return get().pet ? flush() : restore();
+        }),
       clear: () => enqueue(clearRecord),
     };
   });

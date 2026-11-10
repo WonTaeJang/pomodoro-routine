@@ -85,6 +85,24 @@ describe("돌봄 로컬 저장", () => {
     expect((await f.repository.load())!.totalPats).toBe(3);
   });
 
+  it("삭제 실패 후 새 저장을 재시도하면 삭제가 아닌 저장을 수행", async () => {
+    const f = fixture(),
+      store = f.store();
+    await store.getState().hydrate();
+    await store.getState().meet();
+    await store.getState().recordPat();
+    f.blockWrite(true);
+    await store.getState().clear();
+    f.blockWrite(false);
+    await store.getState().recordPat();
+    expect(store.getState().pet!.totalPats).toBe(2);
+    f.blockWrite(true);
+    await store.getState().recordPat();
+    f.blockWrite(false);
+    await store.getState().retry();
+    expect((await f.repository.load())?.totalPats).toBe(3);
+  });
+
   it("최초 저장 실패 후 빈 저장소를 다시 읽어도 미저장 쓰담 유지", async () => {
     const f = fixture(),
       store = f.store();
@@ -95,12 +113,33 @@ describe("돌봄 로컬 저장", () => {
     await store.getState().hydrate();
     expect(store.getState()).toMatchObject({
       pendingPats: 1,
+      retryOperation: "save",
       issue: "save",
       pet: { totalPats: 1 },
     });
     f.blockWrite(false);
     await store.getState().retry();
     expect((await f.repository.load())!.totalPats).toBe(1);
+  });
+
+  it("삭제 실패 중 다른 탭을 복원해도 삭제 재시도 상태 유지", async () => {
+    const f = fixture(),
+      a = f.store(),
+      b = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    f.blockWrite(true);
+    await a.getState().clear();
+    f.blockWrite(false);
+    await b.getState().hydrate();
+    await b.getState().recordPat();
+    await a.getState().hydrate();
+    expect(a.getState()).toMatchObject({
+      retryOperation: "clear",
+      issue: "save",
+    });
+    await a.getState().retry();
+    expect(await f.repository.load()).toBeNull();
   });
 
   it.each([false, true])(
@@ -122,6 +161,7 @@ describe("돌봄 로컬 저장", () => {
       expect(a.getState()).toMatchObject({
         pendingPats: 0,
         issue: null,
+        retryOperation: null,
       });
       expect(await f.repository.load()).toEqual(b.getState().pet);
     },
