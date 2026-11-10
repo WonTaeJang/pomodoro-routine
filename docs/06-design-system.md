@@ -108,11 +108,11 @@ import { PawIcon } from "@/components/icons";
   - `useAlerts.ts`: 스케줄러를 타이머와 브라우저 기능에 연결하는 훅
 - 수료증(`src/features/certificate/`): 밖에서는 `CertificateLauncher`(완료 팝업의 버튼, 캘린더의 "제 N호 수료증", `number`로 사이클 지정), `TodayCertificateButton`(헤더의 🏅 오늘 사이클 수 버튼)을 씀
   - `certificate.ts`: N번째(없으면 최근) 사이클 수료증 내용 계산 (순수 함수, 테스트). 시간 표기 `formatDuration`은 `src/lib/date.ts`
-  - `render/layout.ts`: 이미지 크기, 색, 위치(위에서부터 차례로). 디자인을 고칠 때는 주로 여기만 바꿈
-  - `render/drawCertificate.ts`: 1080×1920 캔버스에 그리기, `render/canvas.ts`: 글자 쓰기(`drawText`)·둥근 사각형·글자 줄이기·원형 글자·발자국 등 그리기 도우미
+  - `render/layout.ts`: 이미지 크기, 색, 위치(위에서부터 차례로). 디자인을 고칠 때는 주로 여기만 바꿈. 위쪽 까미는 `src/assets/kkami/kkami-certificate.webp`를 동그랗게 그림(`LAYOUT.photo`: 바깥 테두리 → 밝은 띠 → 사진)
+  - `render/drawCertificate.ts`: 1080×1920 캔버스에 그리기, `render/canvas.ts`: 글자 쓰기(`drawText`)·둥근 사각형·원 경로(`circlePath`)·글자 줄이기·원형 글자·발자국 등 그리기 도우미
   - `share.ts`: 공유 창, 내려받기 / `components/CertificateDialog`: 미리보기, 할 일 보이기, 공유·저장
   - `components/useCertificateImage.ts`: 이미지를 미리 만들어 둠. 내용이 실제로 바뀔 때만 다시 그리고, 다 만들기 전에는 공유·저장을 막고, 쓰지 않는 이미지 주소는 정리
-- 마스코트(`src/assets/mascot/`): `kkami-graduate.svg`(학사모)는 수료증과 사용법 페이지 머리, `kkami-basic.svg`는 캘린더의 기록 없는 날, `kkami-icon.svg`는 로고·파비콘 등에 쓸 예정
+- 마스코트(`src/assets/mascot/`): `kkami-graduate.svg`(학사모)는 사용법 페이지 머리, `kkami-basic.svg`는 캘린더의 기록 없는 날, `kkami-icon.svg`는 로고·파비콘 등에 쓸 예정
 - 집중 소리(`src/features/focus-sound/`): 밖에서는 `FocusSoundButton`(헤더 🎧 + 펼침 창), `useFocusSound`(앱 틀에서 한 번), `prepareFocusSound`(시작 버튼)를 씀
   - `sounds.ts`: 소리 목록과 창의 묶음(`FOCUS_SOUND_GROUPS`: 노이즈, 자연의 소리, 공간의 소리). 설정값은 소리 id, `"off"`, `"random"`. 노이즈는 만드는 함수, 녹음은 파일 주소와 이음매 길이, 크기 맞춤 값
   - `recordings.json`: 녹음마다 원본 파일, 자를 구간, 이음매 길이 (다듬기 스크립트와 앱이 함께 읽음). 새 녹음은 여기에 넣고 `node scripts/focus-sounds.mjs design/sound <id>`로 그 소리만 만듦
@@ -149,6 +149,7 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-10: 돌봄 기록의 재시도·누적 합산을 위한 저장 계층 예외 명시.
 
 - 2026-11-10: 돌봄 화면의 공통 컴포넌트·문구·로직 분리, 도트 아트 전용 값과 `PixelHeartIcon` 추가 (I-020).
+- 2026-11-11: 수료증 위쪽 까미를 학사모 그림에서 동그란 까미 사진으로 바꿈 (I-026).
 
 - 2026-11-07: 작성. 디자인 토큰 도입, Card·Badge 추가, `05-setup.md`의 스타일·컴포넌트 내용을 옮김
 - 2026-11-07: Slider, ConfirmDialog, FieldRow, 설정 컴포넌트 추가

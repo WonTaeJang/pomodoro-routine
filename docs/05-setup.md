@@ -91,8 +91,10 @@ npm run format:check  # 정리 안 된 파일이 있는지 확인만
 | `kkami-short-break.webp` | 짧은 휴식 |
 | `kkami-long-break.webp` | 긴 휴식 |
 | `kkami-done.webp` | 완료 팝업 |
+| `kkami-certificate.webp` | 수료증 이미지의 동그란 사진 (800x800) |
 
 - 정리 기준: 얼굴 중심 정사각형으로 자르기 → 480x480 → WebP(품질 82), 메타데이터 없음
+- 수료증 사진은 1080×1920에 크게 그리므로 800x800. 머리부터 리본까지 들어가게 정사각형으로 자름
 
 - 화면에서는 `import`해서 `next/image`로 씁니다. 크기 정보가 자동으로 들어가고, 파일이 바뀌면 캐시도 자동으로 새로 받습니다.
 
