@@ -1,5 +1,44 @@
 import { writeFileSync } from "node:fs";
 
+// Stable RML identities. Preserve the numbers when adding or rearranging artwork.
+const ID = {
+  artboard: 2,
+  artboardStyle: 5,
+  stateMachine: 7,
+  moodLayer: 8,
+  dog: 10,
+  idleState: 12,
+  happyState: 13,
+  sleepingState: 14,
+  bootState: 16,
+  startledState: 17,
+  head: 20,
+  eyes: 21,
+  happyFace: 22,
+  tail: 23,
+  sleepingEyes: 24,
+  leftHeart: 30,
+  rightHeart: 31,
+  sleepZ: 32,
+  viewModel: 40,
+  defaultInstance: 41,
+  isHappy: 42,
+  isSleeping: 43,
+  isStartled: 44,
+  sceneReady: 45,
+  idleAnimation: 50,
+  happyAnimation: 51,
+  sleepingAnimation: 52,
+  startledAnimation: 53,
+  restingDog: 60,
+  restingHead: 61,
+  restingClosedEyes: 62,
+  restingOpenEyes: 63,
+  wakeExclamation: 64,
+};
+// BindablePropertyBoolean.propertyValue (verified with rive schema).
+const BOOLEAN_VALUE_KEY = 634;
+
 // Original Kkami artwork: rectangles on a four-unit grid, no external assets.
 // Rive draws its first child on top, so author back-to-front then reverse.
 const rect = (x, y, width, height, color) =>
@@ -35,7 +74,7 @@ const head = [
   rect(-8, 16, 16, 4, ink),
   rect(-8, 8, 8, 4, "797B83"),
   rect(-4, 20, 8, 8, ink),
-  node("Eyes", 21, [
+  node("Eyes", ID.eyes, [
     rect(-32, -12, 16, 20, ink),
     rect(16, -12, 16, 20, ink),
     rect(-28, -12, 8, 8, cream),
@@ -45,7 +84,7 @@ const head = [
   ]),
   node(
     "Sleeping eyes",
-    24,
+    ID.sleepingEyes,
     [
       rect(-32, 0, 16, 4, cream),
       rect(-28, 4, 8, 4, cream),
@@ -56,7 +95,7 @@ const head = [
   ),
   node(
     "Happy face",
-    22,
+    ID.happyFace,
     [
       rect(-32, -8, 16, 4, cream),
       rect(-28, -12, 8, 4, cream),
@@ -71,7 +110,7 @@ const head = [
   ),
 ];
 const dog = [
-  node("Tail", 23, [
+  node("Tail", ID.tail, [
     rect(36, 28, 28, 12, ink),
     rect(56, 16, 12, 20, ink),
     rect(60, 8, 12, 12, fur),
@@ -86,7 +125,7 @@ const dog = [
   rect(16, 60, 20, 8, fur),
   rect(-28, 12, 56, 8, "D98770"),
   rect(-4, 20, 8, 8, "E5B95B"),
-  node("Head", 20, head, 'y="-28"'),
+  node("Head", ID.head, head, 'y="-28"'),
 ];
 // A separate prone silhouette: long body behind the face, chin on front paws.
 // Its geometry is authored directly, rather than squashing the upright dog.
@@ -103,7 +142,7 @@ const restingHead = [
   rect(-40, -16, 8, 20, light),
   rect(12, -28, 12, 8, light),
   rect(40, -12, 8, 24, fur),
-  node("Resting closed eyes", 62, [
+  node("Resting closed eyes", ID.restingClosedEyes, [
     rect(-28, -4, 16, 4, cream),
     rect(-24, 0, 8, 4, cream),
     rect(12, -4, 16, 4, cream),
@@ -111,7 +150,7 @@ const restingHead = [
   ]),
   node(
     "Resting open eyes",
-    63,
+    ID.restingOpenEyes,
     [
       rect(-28, -12, 16, 20, ink),
       rect(12, -12, 16, 20, ink),
@@ -141,7 +180,7 @@ const restingDog = [
   rect(60, -8, 12, 24, fur),
   rect(40, 12, 36, 16, ink),
   rect(48, 16, 24, 8, light),
-  node("Resting head", 61, restingHead, 'x="-28" y="-8"'),
+  node("Resting head", ID.restingHead, restingHead, 'x="-28" y="-8"'),
   // Two front paws remain visible just below the resting chin.
   rect(-76, 20, 36, 12, ink),
   rect(-20, 20, 36, 12, ink),
@@ -172,20 +211,20 @@ const keys = (id, properties) =>
         `<KeyedProperty property="${property}">${frames.map(([frame, value]) => `<KeyFrameDouble frame="${frame}" value="${value}" interpolationType="hold"/>`).join("")}</KeyedProperty>`,
     )
     .join("")}</KeyedObject>`;
-const transition = (to, value, property = 42) =>
-  `<StateTransition stateToId="0:${to}" duration="0"><TransitionViewModelCondition><TransitionPropertyViewModelComparator><BindablePropertyBoolean><DataBindContext sourcePathIds="0:40-0:${property}" propertyKey="634"/></BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="${value}"/></TransitionViewModelCondition></StateTransition>`;
+const transition = (to, value, property = ID.isHappy) =>
+  `<StateTransition stateToId="0:${to}" duration="0"><TransitionViewModelCondition><TransitionPropertyViewModelComparator><BindablePropertyBoolean><DataBindContext sourcePathIds="0:${ID.viewModel}-0:${property}" propertyKey="${BOOLEAN_VALUE_KEY}"/></BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="${value}"/></TransitionViewModelCondition></StateTransition>`;
 const awakePose = [
-  keys(64, { opacity: [[0, 0]] }),
-  keys(60, { opacity: [[0, 0]] }),
-  keys(24, { opacity: [[0, 0]] }),
-  keys(32, { opacity: [[0, 0]] }),
+  keys(ID.wakeExclamation, { opacity: [[0, 0]] }),
+  keys(ID.restingDog, { opacity: [[0, 0]] }),
+  keys(ID.sleepingEyes, { opacity: [[0, 0]] }),
+  keys(ID.sleepZ, { opacity: [[0, 0]] }),
 ];
 const sleeping = [
-  keys(62, { opacity: [[0, 1]] }),
-  keys(63, { opacity: [[0, 0]] }),
-  keys(64, { opacity: [[0, 0]] }),
-  keys(10, { opacity: [[0, 0]] }),
-  keys(60, {
+  keys(ID.restingClosedEyes, { opacity: [[0, 1]] }),
+  keys(ID.restingOpenEyes, { opacity: [[0, 0]] }),
+  keys(ID.wakeExclamation, { opacity: [[0, 0]] }),
+  keys(ID.dog, { opacity: [[0, 0]] }),
+  keys(ID.restingDog, {
     opacity: [[0, 1]],
     y: [
       [0, 208],
@@ -193,21 +232,21 @@ const sleeping = [
       [24, 208],
     ],
   }),
-  keys(61, {
+  keys(ID.restingHead, {
     y: [
       [0, -8],
       [12, -10],
       [24, -8],
     ],
   }),
-  keys(20, { y: [[0, -22]] }),
-  keys(21, { opacity: [[0, 0]], scaleY: [[0, 1]] }),
-  keys(22, { opacity: [[0, 0]] }),
-  keys(24, { opacity: [[0, 1]] }),
-  keys(23, { y: [[0, 4]] }),
-  keys(30, { opacity: [[0, 0]] }),
-  keys(31, { opacity: [[0, 0]] }),
-  keys(32, {
+  keys(ID.head, { y: [[0, -22]] }),
+  keys(ID.eyes, { opacity: [[0, 0]], scaleY: [[0, 1]] }),
+  keys(ID.happyFace, { opacity: [[0, 0]] }),
+  keys(ID.sleepingEyes, { opacity: [[0, 1]] }),
+  keys(ID.tail, { y: [[0, 4]] }),
+  keys(ID.leftHeart, { opacity: [[0, 0]] }),
+  keys(ID.rightHeart, { opacity: [[0, 0]] }),
+  keys(ID.sleepZ, {
     opacity: [
       [0, 1],
       [20, 0],
@@ -222,19 +261,19 @@ const sleeping = [
 ];
 // Hold the prone pose with open eyes; no breathing or Z while startled.
 const startled = [
-  keys(10, { opacity: [[0, 0]] }),
-  keys(60, { opacity: [[0, 1]], y: [[0, 208]] }),
-  keys(61, { y: [[0, -8]] }),
-  keys(62, { opacity: [[0, 0]] }),
-  keys(63, { opacity: [[0, 1]] }),
-  keys(64, { opacity: [[0, 1]] }),
-  keys(30, { opacity: [[0, 0]] }),
-  keys(31, { opacity: [[0, 0]] }),
-  keys(32, { opacity: [[0, 0]] }),
+  keys(ID.dog, { opacity: [[0, 0]] }),
+  keys(ID.restingDog, { opacity: [[0, 1]], y: [[0, 208]] }),
+  keys(ID.restingHead, { y: [[0, -8]] }),
+  keys(ID.restingClosedEyes, { opacity: [[0, 0]] }),
+  keys(ID.restingOpenEyes, { opacity: [[0, 1]] }),
+  keys(ID.wakeExclamation, { opacity: [[0, 1]] }),
+  keys(ID.leftHeart, { opacity: [[0, 0]] }),
+  keys(ID.rightHeart, { opacity: [[0, 0]] }),
+  keys(ID.sleepZ, { opacity: [[0, 0]] }),
 ];
 const idle = [
   ...awakePose,
-  keys(10, {
+  keys(ID.dog, {
     opacity: [[0, 1]],
     scaleX: [[0, 1]],
     scaleY: [[0, 1]],
@@ -244,13 +283,13 @@ const idle = [
       [32, 164],
     ],
   }),
-  keys(20, {
+  keys(ID.head, {
     y: [
       [0, -28],
       [16, -28],
     ],
   }),
-  keys(21, {
+  keys(ID.eyes, {
     opacity: [[0, 1]],
     scaleY: [
       [0, 1],
@@ -258,20 +297,20 @@ const idle = [
       [28, 1],
     ],
   }),
-  keys(22, { opacity: [[0, 0]] }),
-  keys(23, {
+  keys(ID.happyFace, { opacity: [[0, 0]] }),
+  keys(ID.tail, {
     y: [
       [0, 0],
       [16, -4],
       [32, 0],
     ],
   }),
-  keys(30, { opacity: [[0, 0]] }),
-  keys(31, { opacity: [[0, 0]] }),
+  keys(ID.leftHeart, { opacity: [[0, 0]] }),
+  keys(ID.rightHeart, { opacity: [[0, 0]] }),
 ];
 const happy = [
   ...awakePose,
-  keys(10, {
+  keys(ID.dog, {
     opacity: [[0, 1]],
     scaleX: [[0, 1]],
     scaleY: [[0, 1]],
@@ -287,7 +326,7 @@ const happy = [
       [16, 164],
     ],
   }),
-  keys(20, {
+  keys(ID.head, {
     y: [
       [0, -28],
       [4, -32],
@@ -296,9 +335,9 @@ const happy = [
       [16, -28],
     ],
   }),
-  keys(21, { opacity: [[0, 0]], scaleY: [[0, 1]] }),
-  keys(22, { opacity: [[0, 1]] }),
-  keys(23, {
+  keys(ID.eyes, { opacity: [[0, 0]], scaleY: [[0, 1]] }),
+  keys(ID.happyFace, { opacity: [[0, 1]] }),
+  keys(ID.tail, {
     y: [
       [0, -8],
       [2, 4],
@@ -311,7 +350,7 @@ const happy = [
       [16, -8],
     ],
   }),
-  keys(30, {
+  keys(ID.leftHeart, {
     opacity: [
       [0, 1],
       [14, 0],
@@ -324,7 +363,7 @@ const happy = [
       [16, 92],
     ],
   }),
-  keys(31, {
+  keys(ID.rightHeart, {
     opacity: [
       [0, 0],
       [4, 1],
@@ -340,31 +379,31 @@ const happy = [
   }),
 ];
 const scene = `<Rive version="1" kind="fragment">
-<Artboard width="360" height="280" name="Kkami" id="0:2" styleId="0:5" defaultStateMachineId="0:7" viewModelId="0:40" viewModelInstanceId="0:41">
-<LayoutComponentStyle name="Artboard Style" id="0:5"/>
-${node("Sleep Z", 32, [rect(0, 0, 20, 4, "A18C72"), rect(12, 4, 8, 4, "A18C72"), rect(8, 8, 8, 4, "A18C72"), rect(4, 12, 8, 4, "A18C72"), rect(0, 16, 20, 4, "A18C72")], 'x="244" y="128" opacity="0"')}
-${node("Wake exclamation", 64, [rect(-8, -32, 16, 28, ink), rect(-4, -28, 8, 20, "E5B95B"), rect(-8, 0, 16, 12, ink), rect(-4, 4, 8, 4, "E5B95B")], 'x="152" y="136" opacity="0"')}
-${heart(92, 92, 30)}${heart(244, 72, 31)}
-${node("Resting Kkami", 60, restingDog, 'x="180" y="208" opacity="0"')}
-${node("Kkami", 10, dog, 'x="180" y="164"')}
+<Artboard width="360" height="280" name="Kkami" id="0:${ID.artboard}" styleId="0:${ID.artboardStyle}" defaultStateMachineId="0:${ID.stateMachine}" viewModelId="0:${ID.viewModel}" viewModelInstanceId="0:${ID.defaultInstance}">
+<LayoutComponentStyle name="Artboard Style" id="0:${ID.artboardStyle}"/>
+${node("Sleep Z", ID.sleepZ, [rect(0, 0, 20, 4, "A18C72"), rect(12, 4, 8, 4, "A18C72"), rect(8, 8, 8, 4, "A18C72"), rect(4, 12, 8, 4, "A18C72"), rect(0, 16, 20, 4, "A18C72")], 'x="244" y="128" opacity="0"')}
+${node("Wake exclamation", ID.wakeExclamation, [rect(-8, -32, 16, 28, ink), rect(-4, -28, 8, 20, "E5B95B"), rect(-8, 0, 16, 12, ink), rect(-4, 4, 8, 4, "E5B95B")], 'x="152" y="136" opacity="0"')}
+${heart(92, 92, ID.leftHeart)}${heart(244, 72, ID.rightHeart)}
+${node("Resting Kkami", ID.restingDog, restingDog, 'x="180" y="208" opacity="0"')}
+${node("Kkami", ID.dog, dog, 'x="180" y="164"')}
 ${rect(124, 240, 112, 8, "D9C6A8")}${rect(136, 248, 88, 4, "E6D5BA")}
-<StateMachine name="Pet" id="0:7"><StateMachineLayer name="Mood" id="0:8">
+<StateMachine name="Pet" id="0:${ID.stateMachine}"><StateMachineLayer name="Mood" id="0:${ID.moodLayer}">
 <AnyState x="0" y="-120"/><ExitState x="440" y="-120"/>
-<EntryState x="0" y="0"><StateTransition stateToId="0:16"/></EntryState>
-<AnimationState x="180" y="-220" animationId="0:52" reset="true" id="0:16"><StateTransition stateToId="0:14" enableExitTime="true" exitTime="100"/></AnimationState>
-<AnimationState x="180" y="0" animationId="0:52" reset="true" id="0:14"><StateMachineFireTrigger viewModelPathIds="0:40-0:45" occursValue="atStart"/>${transition(17, true, 44)}${transition(12, false, 43)}</AnimationState>
-<AnimationState x="400" y="0" animationId="0:53" reset="true" id="0:17">${transition(14, true, 43)}${transition(12, false, 44)}</AnimationState>
-<AnimationState x="400" y="220" animationId="0:50" reset="true" id="0:12">${transition(14, true, 43)}${transition(13, true)}</AnimationState>
-<AnimationState x="180" y="220" animationId="0:51" reset="true" id="0:13">${transition(14, true, 43)}${transition(12, false)}</AnimationState>
+<EntryState x="0" y="0"><StateTransition stateToId="0:${ID.bootState}"/></EntryState>
+<AnimationState x="180" y="-220" animationId="0:${ID.sleepingAnimation}" reset="true" id="0:${ID.bootState}"><StateTransition stateToId="0:${ID.sleepingState}" enableExitTime="true" exitTime="100"/></AnimationState>
+<AnimationState x="180" y="0" animationId="0:${ID.sleepingAnimation}" reset="true" id="0:${ID.sleepingState}"><StateMachineFireTrigger viewModelPathIds="0:${ID.viewModel}-0:${ID.sceneReady}" occursValue="atStart"/>${transition(ID.startledState, true, ID.isStartled)}${transition(ID.idleState, false, ID.isSleeping)}</AnimationState>
+<AnimationState x="400" y="0" animationId="0:${ID.startledAnimation}" reset="true" id="0:${ID.startledState}">${transition(ID.sleepingState, true, ID.isSleeping)}${transition(ID.idleState, false, ID.isStartled)}</AnimationState>
+<AnimationState x="400" y="220" animationId="0:${ID.idleAnimation}" reset="true" id="0:${ID.idleState}">${transition(ID.sleepingState, true, ID.isSleeping)}${transition(ID.happyState, true)}</AnimationState>
+<AnimationState x="180" y="220" animationId="0:${ID.happyAnimation}" reset="true" id="0:${ID.happyState}">${transition(ID.sleepingState, true, ID.isSleeping)}${transition(ID.idleState, false)}</AnimationState>
 </StateMachineLayer></StateMachine>
-<LinearAnimation name="Sleeping" id="0:52" fps="12" duration="24" loopValue="loop" quantize="true">${sleeping.join("")}</LinearAnimation>
-<LinearAnimation name="Startled" id="0:53" fps="12" duration="5" loopValue="oneShot" quantize="true">${startled.join("")}</LinearAnimation>
-<LinearAnimation name="Idle" id="0:50" fps="12" duration="36" loopValue="loop" quantize="true">${idle.join("")}</LinearAnimation>
-<LinearAnimation name="Happy" id="0:51" fps="12" duration="16" loopValue="loop" quantize="true">${happy.join("")}</LinearAnimation>
+<LinearAnimation name="Sleeping" id="0:${ID.sleepingAnimation}" fps="12" duration="24" loopValue="loop" quantize="true">${sleeping.join("")}</LinearAnimation>
+<LinearAnimation name="Startled" id="0:${ID.startledAnimation}" fps="12" duration="5" loopValue="oneShot" quantize="true">${startled.join("")}</LinearAnimation>
+<LinearAnimation name="Idle" id="0:${ID.idleAnimation}" fps="12" duration="36" loopValue="loop" quantize="true">${idle.join("")}</LinearAnimation>
+<LinearAnimation name="Happy" id="0:${ID.happyAnimation}" fps="12" duration="16" loopValue="loop" quantize="true">${happy.join("")}</LinearAnimation>
 </Artboard>
-<ViewModel name="PetModel" id="0:40" defaultInstanceId="0:41">
-<ViewModelPropertyBoolean name="isHappy" id="0:42"/><ViewModelPropertyBoolean name="isSleeping" id="0:43"/><ViewModelPropertyBoolean name="isStartled" id="0:44"/><ViewModelPropertyTrigger name="sceneReady" id="0:45"/>
-<ViewModelInstance name="Default" id="0:41" exports="true"><ViewModelInstanceBoolean viewModelPropertyId="0:42" propertyValue="false"/><ViewModelInstanceBoolean viewModelPropertyId="0:43" propertyValue="true"/><ViewModelInstanceBoolean viewModelPropertyId="0:44" propertyValue="false"/><ViewModelInstanceTrigger viewModelPropertyId="0:45"/></ViewModelInstance>
+<ViewModel name="PetModel" id="0:${ID.viewModel}" defaultInstanceId="0:${ID.defaultInstance}">
+<ViewModelPropertyBoolean name="isHappy" id="0:${ID.isHappy}"/><ViewModelPropertyBoolean name="isSleeping" id="0:${ID.isSleeping}"/><ViewModelPropertyBoolean name="isStartled" id="0:${ID.isStartled}"/><ViewModelPropertyTrigger name="sceneReady" id="0:${ID.sceneReady}"/>
+<ViewModelInstance name="Default" id="0:${ID.defaultInstance}" exports="true"><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isHappy}" propertyValue="false"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isSleeping}" propertyValue="true"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isStartled}" propertyValue="false"/><ViewModelInstanceTrigger viewModelPropertyId="0:${ID.sceneReady}"/></ViewModelInstance>
 </ViewModel>
 </Rive>`;
 writeFileSync(
