@@ -85,7 +85,7 @@ import { PawIcon } from "@/components/icons";
 - `AppFooter`: 모든 페이지 맨 아래 오른쪽에 작게 버전과 GitHub 링크. 너비는 `PageMain`과 같아서(`page-width`) 오른쪽 끝이 카드와 맞음. 서버 컴포넌트라 `layout.tsx`에서 그려 `AppShell`의 `footer`로 넘김. 페이지가 짧으면 화면 바닥에 붙음
 - `PageMain`: 페이지 본문. 휴대폰은 위아래로 쌓고, 넓은 화면은 왼쪽(넓게)·오른쪽 두 칸 (타이머 | 할 일, 달력 | 날짜 상세)
 - 사용법(`src/features/guide/`, 밖에서는 `index.ts`로): `content.ts`(글의 모양과 지금 언어의 글 `useGuideContent()`), `content.ko.ts`·`content.en.ts`(언어별 글: 섹션 목록, 첫 방문 안내 장, 글 속 아이콘 이름), `onboarding.ts`(안내를 띄울지, 장 고르기, 열림 상태 `useOnboardingStore`), `Onboarding`(앱 틀에서 한 번: 자동으로 띄우기 + 안내 창), `OnboardingArt`(장마다 실제 버튼을 흉내 낸 그림), `ReplayOnboardingButton`(사용법 페이지의 "안내 다시 보기"), `GuideScreen`(목차 + 섹션 카드), `GuideParts`(섹션 아이콘, 글 속 `{paw}` 같은 자리를 앱 아이콘으로 바꾸기, 단축키 섹션에는 `ShortcutList`)
-- `HeaderMenu`(`src/app/_components/`): 헤더 오른쪽 끝 ☰ 메뉴. 다크 모드 스위치, 언어(한국어 / English, 메뉴를 연 채로 바뀜), 설정(설정 창과 S 단축키도 여기서), 사용법, 안내 다시 보기
+- `HeaderMenu`(`src/app/_components/`): 헤더 오른쪽 끝 ☰ 메뉴. 맨 위 계정 항목(로그인, 로그인하면 프로필 사진과 닉네임 → 내 프로필. 로그인을 쓸 수 없으면 숨김), 다크 모드 스위치, 언어(한국어 / English, 메뉴를 연 채로 바뀜), 설정(설정 창과 S 단축키도 여기서), 사용법, 안내 다시 보기
 - `NewTabNote`(`src/components/layout/`): 새 탭 링크 뒤의 "(새 탭에서 열림)". 서버 컴포넌트(`AppFooter`) 안에서 번역하려고 따로 둔 작은 클라이언트 컴포넌트
 - `AppShell`(`src/app/_components/`): 모든 페이지의 틀. 저장값 불러오기(`useStoresReady()`로 알려줌), 헤더, 모드별 배경색, `TimerRuntime`(어느 페이지에서든 완료 처리·알림·탭 제목·화면 켜두기·완료 팝업)
 
@@ -122,6 +122,7 @@ import { PawIcon } from "@/components/icons";
   - `components/FocusSoundPanel`: 위(제목) · 가운데(소리 목록, 넘치면 여기만 스크롤) · 아래(소리 크기). 맨 위 끄기·랜덤 두 칸, 묶음마다 세 칸씩(아이콘 위, 이름 아래, 설명은 툴팁), 집중 중이면 실제로 나오는 소리 칸에 재생 중 막대, 소리 크기(양쪽 스피커 아이콘)
 - 단축키(`src/features/shortcuts/`): `ShortcutList`(하는 일 | 키 목록. 설정 창과 사용법 페이지가 함께 씀), `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
 - 저절로 뜨는 팝업 기다리기: `src/lib/popupHold.ts`. 사용자가 직접 연 창(설정, 수료증)은 `useHoldAutoPopups()`를 부르고, 완료 팝업은 `useAutoPopupsHeld()`가 false일 때 뜸. 새로 만드는 "사용자가 여는 창"도 같은 훅을 부르면 됨
+- 로그인(`src/features/auth/`, 밖에서는 `index.ts`로): `supabase.ts`(브라우저용 Supabase 연결 `getSupabase()`, 설정 여부 `isAuthConfigured`), `session.ts`(로그인 상태 `useAuth()`: disabled · loading · signedOut · signedIn, `signInWithGoogle`, `finishSignIn`, `signOut`, `updateNickname`), `profile.ts`(순수 함수: `profileOf`, `checkNickname`, `safeNextPath`, 테스트), `components/`(`LoginScreen`, `ProfileScreen`, `AuthCallback`, 세 화면이 같이 쓰는 가운데 카드 `AuthCard`, 동그란 프로필 사진 `Avatar`). 지금 기능(할 일·기록 등)과는 아직 연결하지 않음
 - 다국어(`src/i18n/`): 화면에서는 use-intl의 `useTranslations("묶음")`, `useLocale()`. 화면 밖(브라우저 알림, 수료증 그림, 시간 계산 함수)은 `getTranslator()`나 `Translator`를 받는 함수로. 문구는 `messages/ko.ts`(기준)·`en.ts`에 기능별로 두고, 여러 기능이 같이 쓰는 말(취소, 닫기, 오늘, 기록 없음, 소리 크기 등)은 `common`에 하나만 둠. 언어 상태는 `locale.ts`(`setLocale`, 다른 탭 맞추기 `applySavedLocale`), 첫 화면 언어는 `locales.ts`의 시작 스크립트. 기능 쪽 목록에는 이름 대신 문구 키를 둠 (예: 집중 소리 `focusSound.sounds.<id>`, 단축키 `shortcuts.<id>`, 알림 `alerts.<종류>`)
 - 탭을 보고 있는지: `src/lib/usePageVisible.ts` (자동 시작 카운트다운은 탭을 보고 있을 때만 시작)
 - 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 어느 페이지든 "진행 중 + 설정 켜짐"일 때 켬 (`TimerRuntime`)
@@ -172,3 +173,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: 집중 소리 `Airplane` 아이콘, 공간의 소리 묶음
 - 2026-11-08: 집중 소리 랜덤(`random.ts`, `useFocusSoundChoice`), `Shuffle` 아이콘
 - 2026-11-08: 집중 소리 창 위·아래 고정, `useScrollEdges`
+- 2026-11-10: 로그인(`src/features/auth/`: `useAuth`, `Avatar`, 로그인·프로필·돌아오는 화면), `User`·`LogIn`·`LogOut` 아이콘, ☰ 메뉴 계정 항목
