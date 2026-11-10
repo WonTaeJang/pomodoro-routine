@@ -60,6 +60,73 @@ function fixture() {
 }
 
 describe("돌봄 로컬 저장", () => {
+  it("최초 읽기 실패 후 다른 ID를 복원해도 미저장 쓰담을 한 번 합산", async () => {
+    const f = fixture(),
+      a = f.store(),
+      b = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    await a.getState().recordPat();
+    const original = a.getState().pet!;
+    f.blockRead(true);
+    await b.getState().hydrate();
+    await b.getState().meet();
+    await b.getState().recordPat();
+    f.blockRead(false);
+    await a.getState().recordPat();
+    await b.getState().hydrate();
+    await b.getState().hydrate();
+    expect(b.getState()).toMatchObject({
+      pendingPats: 1,
+      pet: { id: original.id, createdAt: original.createdAt, totalPats: 3 },
+    });
+    await b.getState().retry();
+    await b.getState().retry();
+    expect((await f.repository.load())!.totalPats).toBe(3);
+  });
+
+  it("최초 저장 실패 후 빈 저장소를 다시 읽어도 미저장 쓰담 유지", async () => {
+    const f = fixture(),
+      store = f.store();
+    await store.getState().hydrate();
+    f.blockWrite(true);
+    await store.getState().meet();
+    await store.getState().recordPat();
+    await store.getState().hydrate();
+    expect(store.getState()).toMatchObject({
+      pendingPats: 1,
+      issue: "save",
+      pet: { totalPats: 1 },
+    });
+    f.blockWrite(false);
+    await store.getState().retry();
+    expect((await f.repository.load())!.totalPats).toBe(1);
+  });
+
+  it.each([false, true])(
+    "확인한 기록이 다른 탭에서 삭제/교체되면 미저장 옛 쓰담을 폐기: %s",
+    async (replace) => {
+      const f = fixture(),
+        a = f.store(),
+        b = f.store();
+      await a.getState().hydrate();
+      await a.getState().meet();
+      f.blockWrite(true);
+      await a.getState().recordPat();
+      f.blockWrite(false);
+      await b.getState().hydrate();
+      await b.getState().clear();
+      if (replace) await b.getState().recordPat();
+      await a.getState().hydrate();
+      await a.getState().retry();
+      expect(a.getState()).toMatchObject({
+        pendingPats: 0,
+        issue: null,
+      });
+      expect(await f.repository.load()).toEqual(b.getState().pet);
+    },
+  );
+
   it("불러오기 전 입력은 저장하지 않고 첫 방문에 기록을 생성", async () => {
     const f = fixture(),
       store = f.store();

@@ -68,13 +68,21 @@ export function createPetStore(
     async function restore() {
       try {
         const saved = await repository.load();
-        persistedId = saved?.id ?? null;
         const { pet, pendingPats } = get();
-        if (pendingPats && pet && saved?.id === pet.id) {
-          set({ pet: addPats(saved, pendingPats, pet.updatedAt) });
+        if (
+          pendingPats &&
+          pet &&
+          (persistedId === null || saved?.id === persistedId)
+        ) {
+          const base = saved ?? {
+            ...pet,
+            totalPats: pet.totalPats - pendingPats,
+          };
+          set({ pet: addPats(base, pendingPats, pet.updatedAt) });
         } else {
           set({ pet: saved, pendingPats: 0, issue: null });
         }
+        persistedId = saved?.id ?? null;
       } catch (error) {
         fail(error);
       }
