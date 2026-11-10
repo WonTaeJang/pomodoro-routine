@@ -6,6 +6,12 @@
  */
 const ko = {
   pet: {
+    sleeping: "자는 중",
+    sleepBubble: "쿨쿨…",
+    wake: "살며시 깨우기",
+    wakeLabel: "까미 깨우기",
+    startled: "깜짝!",
+    startleBubble: "앗, 왔구나!",
     back: "타이머로 돌아가기",
     label: "까미의 작은 방",
     title: "잠깐, 쓰담쓰담.",

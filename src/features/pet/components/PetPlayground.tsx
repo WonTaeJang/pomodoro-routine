@@ -10,8 +10,10 @@ import {
   RuntimeLoader,
   useRive,
   useViewModelInstanceBoolean,
+  useViewModelInstanceTrigger,
 } from "@rive-app/react-webgl2";
 import { useMediaQuery } from "@/lib/useMediaQuery";
+
 import { Badge, Button, Card } from "@/components/ui";
 import { PixelHeartIcon, PawIcon, ChevronLeftIcon } from "@/components/icons";
 import { usePetCare } from "../usePetCare";
@@ -31,22 +33,42 @@ export function PetPlayground() {
 function PetRoom({ retry }: { retry: () => void }) {
   const t = useTranslations("pet");
   const [failed, setFailed] = useState(false);
-  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const [sceneReady, setSceneReady] = useState(false);
   const { rive, RiveComponent } = useRive({
     src: "/rive/kkami-pet.riv",
     artboard: "Kkami",
     stateMachine: "Pet",
-    autoplay: true,
+    autoplay: false,
     autoBind: true,
     layout: new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
     onLoadError: () => setFailed(true),
   });
-  const { setValue: setRiveHappy } = useViewModelInstanceBoolean(
+  const { setValue: setHappy } = useViewModelInstanceBoolean(
     "isHappy",
     rive?.viewModelInstance,
   );
-  const ready = Boolean(rive?.viewModelInstance) && !failed;
+  const { setValue: setSleeping } = useViewModelInstanceBoolean(
+    "isSleeping",
+    rive?.viewModelInstance,
+  );
+  const { setValue: setStartled } = useViewModelInstanceBoolean(
+    "isStartled",
+    rive?.viewModelInstance,
+  );
+  useViewModelInstanceTrigger("sceneReady", rive?.viewModelInstance, {
+    onTrigger: () => setSceneReady(true),
+  });
+  const loaded = Boolean(rive?.viewModelInstance) && !failed;
+  const ready = loaded && sceneReady;
+
+  useEffect(() => {
+    if (ready || failed) return;
+    const timeout = setTimeout(() => setFailed(true), 15000);
+    return () => clearTimeout(timeout);
+  }, [ready, failed]);
+
   const {
+    phase,
     happy,
     pats,
     pet,
@@ -57,22 +79,32 @@ function PetRoom({ retry }: { retry: () => void }) {
     clickPet,
   } = usePetCare(ready);
 
+  const sleeping = phase === "sleeping";
+  const startled = phase === "startled";
+  const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+
   useEffect(() => {
-    setRiveHappy(happy);
+    setHappy(happy);
+    setStartled(startled);
+    setSleeping(sleeping);
     if (!rive) return;
     rive.play();
-    // Let the state machine apply the new pose, then hold it for reduced motion.
-    if (reducedMotion) {
+    // Apply the new pose before freezing; the startup splash still plays.
+    if (reducedMotion && sceneReady) {
       const freeze = setTimeout(() => rive.pause(), 80);
       return () => clearTimeout(freeze);
     }
-  }, [happy, reducedMotion, rive, setRiveHappy]);
-
-  useEffect(() => {
-    if (ready || failed) return;
-    const timeout = setTimeout(() => setFailed(true), 15000);
-    return () => clearTimeout(timeout);
-  }, [ready, failed]);
+  }, [
+    happy,
+    sleeping,
+    startled,
+    sceneReady,
+    reducedMotion,
+    rive,
+    setHappy,
+    setSleeping,
+    setStartled,
+  ]);
 
   return (
     <main className={styles.page}>
@@ -109,7 +141,13 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
           <span className={styles.status}>
             <i />
-            {happy ? t("happy") : t("idle")}
+            {startled
+              ? t("startled")
+              : sleeping
+                ? t("sleeping")
+                : happy
+                  ? t("happy")
+                  : t("idle")}
           </span>
         </div>
         <div className={styles.room}>
@@ -123,7 +161,13 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
           <div className={styles.rug} aria-hidden="true" />
           <div className={styles.bubble} aria-hidden="true">
-            {happy ? t("happyBubble") : t("bubble")}
+            {startled
+              ? t("startleBubble")
+              : sleeping
+                ? t("sleepBubble")
+                : happy
+                  ? t("happyBubble")
+                  : t("bubble")}
             <PixelHeartIcon />
           </div>
           <div className={styles.dog} aria-hidden="true">
@@ -131,8 +175,15 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
           <button
             className={styles.petTarget}
-            aria-label={t("petLabel")}
-            disabled={!ready}
+            data-sleeping={sleeping || startled}
+            aria-label={
+              startled
+                ? t("startled")
+                : sleeping
+                  ? t("wakeLabel")
+                  : t("petLabel")
+            }
+            disabled={!ready || startled}
             onPointerDown={startStroke}
             onPointerMove={moveStroke}
             onPointerUp={endStroke}
@@ -144,7 +195,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                 event.stopPropagation();
             }}
           />
-          {!ready && (
+          {!loaded && (
             <div className={styles.loading} role={failed ? "alert" : "status"}>
               <p>{failed ? t("error") : t("loading")}</p>
               {failed && (
@@ -164,13 +215,13 @@ function PetRoom({ retry }: { retry: () => void }) {
             icon={<PixelHeartIcon />}
             className={styles.petButton}
             onClick={pet}
-            disabled={!ready}
+            disabled={!ready || startled}
             onKeyDown={(event) => {
               if (event.key === " " || event.key === "Enter")
                 event.stopPropagation();
             }}
           >
-            {t("pet")}
+            {startled ? t("startled") : sleeping ? t("wake") : t("pet")}
           </Button>
           <p className={styles.keyboard}>{t("keyboard")}</p>
         </div>
@@ -182,7 +233,13 @@ function PetRoom({ retry }: { retry: () => void }) {
           <div>
             <span>{t("mood")}</span>
             <strong className={styles.mood} role="status">
-              {happy ? t("moodHappy") : t("moodIdle")}
+              {startled
+                ? t("startled")
+                : sleeping
+                  ? t("sleeping")
+                  : happy
+                    ? t("moodHappy")
+                    : t("moodIdle")}
               <PixelHeartIcon />
             </strong>
           </div>
@@ -191,7 +248,7 @@ function PetRoom({ retry }: { retry: () => void }) {
       <footer className={styles.footnote}>
         <p>{t("note")}</p>
         <span>{t("detail")}</span>
-        <Button variant="ghost" size="sm" onClick={reset} disabled={pats === 0}>
+        <Button variant="ghost" size="sm" onClick={reset} disabled={!ready}>
           {t("reset")}
         </Button>
         <small>{t("session")}</small>

@@ -85,6 +85,10 @@ $petTarget-width: 164px;
 $petTarget-height: 200px;
 $petTarget-bottom: 46px;
 $petTarget-left: calc(50% - 82px);
+$sleep-target-width: 240px;
+$sleep-target-height: 112px;
+$small-sleep-target-width: 200px;
+$small-sleep-target-height: 96px;
 $petTarget-focus-visible-outline: 3px dashed #986e50;
 $petTarget-focus-visible-outline-offset: 8px;
 $bubble-top: 24px;
@@ -270,6 +274,12 @@ $loading-background: #f4efdfed;
   cursor: grabbing;
 }
 
+.petTarget[data-sleeping="true"] {
+  width: $sleep-target-width;
+  height: $sleep-target-height;
+  left: calc(50% - #{$sleep-target-width * 0.5});
+}
+
 .petTarget:focus-visible {
   outline: $petTarget-focus-visible-outline;
   outline-offset: $petTarget-focus-visible-outline-offset;
@@ -349,6 +359,11 @@ $loading-background: #f4efdfed;
     height: $small-target-height;
     left: calc(50% - #{$small-target-width * 0.5});
     bottom: $small-target-bottom;
+  }
+  .petTarget[data-sleeping="true"] {
+    width: $small-sleep-target-width;
+    height: $small-sleep-target-height;
+    left: calc(50% - #{$small-sleep-target-width * 0.5});
   }
   .window {
     left: 7%;

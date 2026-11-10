@@ -9,11 +9,24 @@ import {
 } from "react";
 import { createPetState, petReducer, PET_STROKE_DISTANCE } from "./pet";
 
-/** 포인터 제스처와 종료 예약만 연결. 쓰담 횟수는 페이지 안에서만 유지. */
+/** 포인터·타이머를 페이지별 돌봄 규칙에 연결. */
 export function usePetCare(ready: boolean) {
   const [state, dispatch] = useReducer(petReducer, undefined, createPetState);
   const stroke = useRef<{ id: number; x: number; y: number } | null>(null);
   const dragged = useRef(false);
+
+  useEffect(() => {
+    if (ready) dispatch({ type: "start", now: performance.now() });
+  }, [ready, state.phase, state.introUntil, dispatch]);
+
+  useEffect(() => {
+    if (!ready || state.introUntil === null) return;
+    const timer = setTimeout(
+      () => dispatch({ type: "advanceIntro", now: performance.now() }),
+      Math.ceil(Math.max(0, state.introUntil - performance.now())),
+    );
+    return () => clearTimeout(timer);
+  }, [ready, state.introUntil, dispatch]);
 
   useEffect(() => {
     if (state.happyUntil === null) return;
@@ -23,7 +36,7 @@ export function usePetCare(ready: boolean) {
       Math.ceil(Math.max(0, state.happyUntil - performance.now())),
     );
     return () => clearTimeout(timer);
-  }, [state.happyUntil]);
+  }, [state.happyUntil, dispatch]);
 
   function pet() {
     if (ready) dispatch({ type: "pet", now: performance.now() });
@@ -74,6 +87,7 @@ export function usePetCare(ready: boolean) {
   }
 
   return {
+    phase: state.phase,
     happy: state.happyUntil !== null,
     pats: state.pats,
     pet,

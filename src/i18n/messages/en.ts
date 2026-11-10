@@ -6,6 +6,12 @@ import type { Messages } from "./ko";
  */
 const en: Messages = {
   pet: {
+    sleeping: "Sleeping",
+    sleepBubble: "Zzz…",
+    wake: "Gently wake Kkami",
+    wakeLabel: "Wake Kkami",
+    startled: "Surprised!",
+    startleBubble: "Oh, hello there!",
     back: "Back to timer",
     label: "Kkami’s little room",
     title: "A little pause. A little pat.",
