@@ -92,6 +92,14 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
 
 ## 코드 구조 원칙
 
+### 돌봄 프로토타입 개발
+
+- `/pet` 실행과 Rive 에셋 제작은 [07-pet-prototype.md](./07-pet-prototype.md)를 참고합니다.
+- `npm run dev`와 `npm run build`는 설치된 Rive 런타임의 WASM을 `public/rive/rive.wasm`에 먼저 복사합니다. 이 파일은 생성물이라 Git에서 제외합니다.
+- 편집 가능한 RML·제작 설정은 `src/assets/kkami-pet/`, 실행용 `.riv`는 `public/rive/`에서 관리합니다. `design/`의 원본 사진·녹음 제외 규칙은 유지합니다.
+
+### 기능 구성
+
 - 기능별로 `src/features/<기능>/` 아래에 로직, store, 화면을 모읍니다.
   - `timer.ts`처럼 **규칙은 순수 함수**로 두고 현재 시각을 인자로 받습니다. → 테스트에서 시간을 마음대로 넣어 검증
   - `store.ts`는 순수 함수를 불러 상태를 바꾸고 localStorage에 저장합니다.
@@ -141,6 +149,8 @@ pomodoro-routine/
 ```
 
 ## 변경 이력
+
+- 2026-11-10: 돌봄 기능·Rive 에셋 및 WASM 준비 절차 추가 (I-020).
 
 - 2026-11-07: 작성 (create-next-app 16.4.5 기준)
 - 2026-11-07: 패키지 매니저를 pnpm에서 npm으로 변경

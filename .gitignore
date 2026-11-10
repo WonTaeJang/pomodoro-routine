@@ -45,3 +45,5 @@ next-env.d.ts
 
 # Claude 앱이 보내준 파일을 저장하는 폴더
 /Claude outputs/
+# Generated from the installed Rive runtime by predev/prebuild.
+/public/rive/rive.wasm

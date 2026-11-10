@@ -31,6 +31,8 @@ Screenshots: put the images in docs/images/ and uncomment the lines below.
 
 Your tasks, history and settings are saved **only in this browser (localStorage)**. Nothing is sent to a server, and there's no sync between devices yet. Clearing your browser data also deletes your history.
 
+The pet care prototype is available at `/pet` on the development server. Pet pixel Kkami to see a happy reaction before returning to idle. Pat counts aren't saved, and timer rewards aren't connected yet. [Implementation and asset guide (Korean)](./docs/07-pet-prototype.md)
+
 ## Getting started
 
 You need [Node.js](https://nodejs.org) **22.12 or later**.

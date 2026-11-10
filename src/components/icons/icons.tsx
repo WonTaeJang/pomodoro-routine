@@ -1,5 +1,18 @@
 import { Icon, type IconProps } from "./Icon";
 
+/** 도트 강아지 돌봄에서 쓰는 24×24 격자의 채운 하트. */
+export function PixelHeartIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path
+        d="M3 3h6v3h6V3h6v3h3v9h-3v3h-3v3h-3v3H9v-3H6v-3H3v-3H0V6h3z"
+        fill="currentColor"
+        stroke="none"
+      />
+    </Icon>
+  );
+}
+
 /** 시작 */
 export function PlayIcon(props: IconProps) {
   return (

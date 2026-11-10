@@ -10,6 +10,7 @@
 | [04-reference-pomodotree.md](./04-reference-pomodotree.md) | 참고 사이트 PomodoTree 분석 |
 | [05-setup.md](./05-setup.md) | 개발 환경 설정, 설치와 실행 방법, 폴더 구조 |
 | [06-design-system.md](./06-design-system.md) | 디자인 토큰과 공통 컴포넌트 |
+| [07-pet-prototype.md](./07-pet-prototype.md) | Rive 돌봄 프로토타입 실행, 에셋 제작, 데이터 연결 |
 
 ## 개발 규칙
 

@@ -1,0 +1,370 @@
+@use "../../../styles/breakpoints" as bp;
+
+// 이 방에서만 쓰는 도트 일러스트의 좌표·팔레트. 일반 UI는 공통 토큰을 사용합니다.
+$interaction-layer: 3;
+$loading-layer: 4;
+$small-room-height: 316px;
+$small-dog-width: 360px;
+$small-dog-height: 280px;
+$small-target-width: 136px;
+$small-target-height: 170px;
+$small-target-bottom: 42px;
+$small-window-width: 62px;
+$small-window-height: 82px;
+$small-window-border: 5px;
+$small-rug-width: 180px;
+$room-height: 356px;
+$room-background: linear-gradient(
+  to bottom,
+  #f4efdf 0 74%,
+  #dfd1ba 74% calc(74% + 4px),
+  #e9ddc6 calc(74% + 4px) 100%
+);
+$room-color: #60554b;
+$room-before-background-image: linear-gradient(
+  90deg,
+  #cbbfa8 1px,
+  transparent 1px
+);
+$room-before-background-size: 52px 100%;
+$window-top: 38px;
+$window-width: 90px;
+$window-height: 110px;
+$window-border: 7px solid #fdf9ed;
+$window-background: #cbded8;
+$window-box-shadow: 4px 5px 0 #dfd5bf;
+$window-before-window-after-background: #fdf9ed;
+$window-before-width: 6px;
+$window-before-left: calc(50% - 3px);
+$window-after-height: 6px;
+$window-span-width: 20px;
+$window-span-height: 20px;
+$window-span-background: #faf1c4;
+$window-span-right: 10px;
+$window-span-top: 12px;
+$window-span-box-shadow: 4px 4px 0 #e2e7c6;
+$window-i-bottom: 14px;
+$window-i-height: 15px;
+$window-i-background: #b6cfb6;
+$window-i-box-shadow: 12px -7px 0 -2px #b6cfb6;
+$plant-width: 40px;
+$plant-height: 74px;
+$plant-span-left: 8px;
+$plant-span-width: 28px;
+$plant-span-height: 28px;
+$plant-span-background: #bb856e;
+$plant-span-box-shadow:
+  4px -4px 0 #cd9a80,
+  inset -6px 0 #ab755f;
+$plant-i-left: 20px;
+$plant-i-top: 10px;
+$plant-i-width: 5px;
+$plant-i-height: 40px;
+$plant-i-background: #849171;
+$plant-i-before-plant-i-after-width: 16px;
+$plant-i-before-plant-i-after-height: 20px;
+$plant-i-before-plant-i-after-background: #95a380;
+$plant-i-before-left: -14px;
+$plant-i-before-top: 10px;
+$plant-i-before-box-shadow: -4px -4px 0 #a7b492;
+$plant-i-after-left: 5px;
+$plant-i-after-top: -5px;
+$plant-i-after-box-shadow: 4px -4px 0 #a7b492;
+$rug-width: 240px;
+$rug-height: 48px;
+$rug-background: #d5b496;
+$rug-border: 6px solid #e0c3a8;
+$rug-outline: 3px solid #d5b496;
+$rug-left: calc(50% - 120px);
+$rug-bottom: 28px;
+$dog-width: 432px;
+$dog-height: 336px;
+$dog-left: calc(50% - 216px);
+$dog-bottom: 10px;
+$petTarget-width: 164px;
+$petTarget-height: 200px;
+$petTarget-bottom: 46px;
+$petTarget-left: calc(50% - 82px);
+$petTarget-focus-visible-outline: 3px dashed #986e50;
+$petTarget-focus-visible-outline-offset: 8px;
+$bubble-top: 24px;
+$bubble-background: #fffcf5;
+$bubble-border: 1px solid #e3d9c4;
+$bubble-box-shadow: 0 3px 0 #e5dcc7;
+$bubble-after-left: calc(50% - 4px);
+$bubble-after-bottom: -7px;
+$bubble-after-width: 10px;
+$bubble-after-height: 10px;
+$bubble-after-background: #fffcf5;
+$bubble-after-border-right: 1px solid #e3d9c4;
+$bubble-after-border-bottom: 1px solid #e3d9c4;
+$bubble-svg-width: 12px;
+$bubble-svg-height: 12px;
+$bubble-svg-color: #cc8e80;
+$roomLabel-bottom: 12px;
+$roomLabel-right: 16px;
+$roomLabel-color: #86755d;
+$loading-background: #f4efdfed;
+.room {
+  position: relative;
+  height: $room-height;
+  margin: 0 var(--space-3);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: $room-background;
+  color: $room-color;
+}
+
+.room::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 26%;
+  opacity: 0.18;
+  background-image: $room-before-background-image;
+  background-size: $room-before-background-size;
+}
+
+.window {
+  position: absolute;
+  top: $window-top;
+  left: 9%;
+  width: $window-width;
+  height: $window-height;
+  border: $window-border;
+  background: $window-background;
+  box-shadow: $window-box-shadow;
+}
+
+.window::before,
+.window::after {
+  content: "";
+  position: absolute;
+  background: $window-before-window-after-background;
+  z-index: var(--z-raised);
+}
+
+.window::before {
+  width: $window-before-width;
+  height: 100%;
+  left: $window-before-left;
+}
+
+.window::after {
+  height: $window-after-height;
+  width: 100%;
+  top: 50%;
+}
+
+.window span {
+  position: absolute;
+  width: $window-span-width;
+  height: $window-span-height;
+  background: $window-span-background;
+  right: $window-span-right;
+  top: $window-span-top;
+  box-shadow: $window-span-box-shadow;
+}
+
+.window i {
+  position: absolute;
+  bottom: $window-i-bottom;
+  left: 0;
+  width: 100%;
+  height: $window-i-height;
+  background: $window-i-background;
+  box-shadow: $window-i-box-shadow;
+}
+
+.plant {
+  position: absolute;
+  right: 10%;
+  bottom: 26%;
+  width: $plant-width;
+  height: $plant-height;
+}
+
+.plant span {
+  position: absolute;
+  bottom: 0;
+  left: $plant-span-left;
+  width: $plant-span-width;
+  height: $plant-span-height;
+  background: $plant-span-background;
+  box-shadow: $plant-span-box-shadow;
+}
+
+.plant i {
+  position: absolute;
+  left: $plant-i-left;
+  top: $plant-i-top;
+  width: $plant-i-width;
+  height: $plant-i-height;
+  background: $plant-i-background;
+}
+
+.plant i::before,
+.plant i::after {
+  content: "";
+  position: absolute;
+  width: $plant-i-before-plant-i-after-width;
+  height: $plant-i-before-plant-i-after-height;
+  background: $plant-i-before-plant-i-after-background;
+}
+
+.plant i::before {
+  left: $plant-i-before-left;
+  top: $plant-i-before-top;
+  box-shadow: $plant-i-before-box-shadow;
+}
+
+.plant i::after {
+  left: $plant-i-after-left;
+  top: $plant-i-after-top;
+  box-shadow: $plant-i-after-box-shadow;
+}
+
+.rug {
+  position: absolute;
+  width: $rug-width;
+  height: $rug-height;
+  background: $rug-background;
+  border: $rug-border;
+  outline: $rug-outline;
+  left: $rug-left;
+  bottom: $rug-bottom;
+  border-radius: 50%;
+}
+
+.dog {
+  position: absolute;
+  // Keep the Rive startup screen above the speech bubble. Once it ends,
+  // the transparent canvas reveals the bubble without changing the layout.
+  z-index: var(--z-overlay);
+  width: $dog-width;
+  height: $dog-height;
+  left: $dog-left;
+  bottom: $dog-bottom;
+  pointer-events: none;
+}
+
+.dog canvas {
+  display: block;
+}
+
+.petTarget {
+  position: absolute;
+  z-index: $interaction-layer;
+  width: $petTarget-width;
+  height: $petTarget-height;
+  bottom: $petTarget-bottom;
+  left: $petTarget-left;
+  border: 0;
+  background: transparent;
+  border-radius: 35%;
+  cursor: grab;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.petTarget:active {
+  cursor: grabbing;
+}
+
+.petTarget:focus-visible {
+  outline: $petTarget-focus-visible-outline;
+  outline-offset: $petTarget-focus-visible-outline-offset;
+}
+
+.bubble {
+  position: absolute;
+  z-index: var(--z-raised);
+  top: $bubble-top;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--space-2-5) var(--space-3-5);
+  background: $bubble-background;
+  border: $bubble-border;
+  box-shadow: $bubble-box-shadow;
+  white-space: nowrap;
+  font-size: var(--font-size-2xs);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+}
+
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: $bubble-after-left;
+  bottom: $bubble-after-bottom;
+  width: $bubble-after-width;
+  height: $bubble-after-height;
+  background: $bubble-after-background;
+  border-right: $bubble-after-border-right;
+  border-bottom: $bubble-after-border-bottom;
+  transform: rotate(45deg);
+}
+
+.bubble svg {
+  width: $bubble-svg-width;
+  height: $bubble-svg-height;
+  color: $bubble-svg-color;
+}
+
+.roomLabel {
+  position: absolute;
+  bottom: $roomLabel-bottom;
+  right: $roomLabel-right;
+  font-size: var(--font-size-2xs);
+  color: $roomLabel-color;
+  letter-spacing: 0.1em;
+}
+
+.loading {
+  position: absolute;
+  z-index: $loading-layer;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background: $loading-background;
+  font-size: var(--font-size-sm);
+}
+
+@include bp.down(sm) {
+  .room {
+    height: $small-room-height;
+    margin: 0 var(--space-2);
+  }
+  .dog {
+    width: $small-dog-width;
+    height: $small-dog-height;
+    left: calc(50% - #{$small-dog-width * 0.5});
+    bottom: var(--space-3);
+  }
+  .petTarget {
+    width: $small-target-width;
+    height: $small-target-height;
+    left: calc(50% - #{$small-target-width * 0.5});
+    bottom: $small-target-bottom;
+  }
+  .window {
+    left: 7%;
+    top: var(--space-12);
+    width: $small-window-width;
+    height: $small-window-height;
+    border-width: $small-window-border;
+  }
+  .plant {
+    right: 7%;
+    transform: scale(0.85);
+    transform-origin: bottom;
+  }
+  .rug {
+    width: $small-rug-width;
+    left: calc(50% - #{$small-rug-width * 0.5});
+    bottom: var(--space-7);
+  }
+}
