@@ -144,6 +144,14 @@ import { PawIcon } from "@/components/icons";
 
 ## 변경 이력
 
+- 2026-11-11: 돌봄 `petPose` 결과로 화면 문구와 Rive 자세를 연결. `POSE_COPY` 매핑과 공통 키보드 핸들러로 중복 분기 정리 (I-039).
+
+- 2026-11-11: 간식 아이콘을 뼈 모양 비스킷으로 변경하고, Rive `Snacking` 전용 모션 연결 (I-038).
+
+- 2026-11-11: `PixelSnackIcon`과 돌봄 간식 버튼 추가. 기존 `Button`·반응형 줄바꿈·Rive 기쁨 모션 재사용 (I-037).
+
+- 2026-11-11: `PetAffinity`에 친밀도 단계·네이티브 진행 막대·펼침 상세를 분리. 날짜는 `useToday`, 적립·단계 계산은 순수 함수 `affinity.ts`, 저장은 기존 `PetRepository` 사용 (I-030).
+
 - 2026-11-10: I-024 Rive 전용 훅 분리와 현재 돌봄 UI 구성 반영.
 
 - 2026-11-10: 돌봄 기록의 재시도·누적 합산을 위한 저장 계층 예외 명시.
@@ -175,3 +183,5 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-08: 집중 소리 랜덤(`random.ts`, `useFocusSoundChoice`), `Shuffle` 아이콘
 - 2026-11-08: 집중 소리 창 위·아래 고정, `useScrollEdges`
 - 2026-11-10: 로그인(`src/features/auth/`: `useAuth`, `Avatar`, 로그인·프로필·돌아오는 화면), `User`·`LogIn`·`LogOut` 아이콘, ☰ 메뉴 계정 항목
+
+- 2026-11-11: I-040 돌봄 반응 중 공통 Button의 disabled 스타일 사용. 강아지 직접 조작·다시 깨워보기도 잠그고 비활성 강아지 영역의 잡기 커서를 해제. 추가 안내 문구 없음.
