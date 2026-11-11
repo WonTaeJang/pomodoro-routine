@@ -71,6 +71,7 @@ function PetRoom({ retry }: { retry: () => void }) {
   const { RiveComponent, loaded, ready, failed } = animation;
   const {
     pose,
+    snackSequence,
     pats,
     pet,
     feed,
@@ -86,7 +87,10 @@ function PetRoom({ retry }: { retry: () => void }) {
   const happy = pose === "happy" || snacking;
   const copy = POSE_COPY[pose];
 
-  usePetRivePose(animation, { sleeping, startled, happy });
+  usePetRivePose(animation, {
+    pose,
+    snackSequence,
+  });
 
   return (
     <main className={styles.page}>

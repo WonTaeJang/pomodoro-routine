@@ -1,6 +1,6 @@
 export const PET_COOLDOWN_MS = 350;
 export const PET_HAPPY_MS = 2800;
-export const PET_SNACK_MS = 2800;
+export const PET_SNACK_MS = 1800;
 export const PET_STROKE_DISTANCE = 16;
 export const PET_SLEEP_MS = 5000;
 export const PET_STARTLE_MS = 1000;

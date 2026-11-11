@@ -139,3 +139,20 @@ describe("간식 입력", () => {
     });
   });
 });
+
+describe("먹기 반응", () => {
+  it("먹는 중 쓰담은 먹기를 마친 뒤 반응", () => {
+    const eating = petReducer(awakeState(), { type: "feed", now: 100 });
+    const patted = petReducer(eating, { type: "pet", now: 200 });
+    expect(patted).toMatchObject({
+      snacks: 1,
+      pats: 1,
+      snackUntil: 1900,
+      happyUntil: 4700,
+    });
+    expect(petReducer(patted, { type: "settle", now: 1900 })).toMatchObject({
+      snackUntil: null,
+      happyUntil: 4700,
+    });
+  });
+});

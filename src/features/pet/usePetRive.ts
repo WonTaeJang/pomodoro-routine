@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Alignment,
   Fit,
@@ -11,6 +11,7 @@ import {
   useViewModelInstanceTrigger,
 } from "@rive-app/react-webgl2";
 import { useMediaQuery } from "@/lib/useMediaQuery";
+import type { PetPose } from "./pet";
 
 const LOAD_TIMEOUT_MS = 15000;
 const POSE_SETTLE_MS = 80;
@@ -45,6 +46,14 @@ export function usePetRive(enabled: boolean) {
     "isStartled",
     rive?.viewModelInstance,
   );
+  const { setValue: setSnacking } = useViewModelInstanceBoolean(
+    "isSnacking",
+    rive?.viewModelInstance,
+  );
+  const { trigger: snackAgain } = useViewModelInstanceTrigger(
+    "snackAgain",
+    rive?.viewModelInstance,
+  );
   useViewModelInstanceTrigger("sceneReady", rive?.viewModelInstance, {
     onTrigger: () => setSceneReady(true),
   });
@@ -67,6 +76,8 @@ export function usePetRive(enabled: boolean) {
     setHappy,
     setSleeping,
     setStartled,
+    setSnacking,
+    snackAgain,
   };
 }
 
@@ -74,18 +85,38 @@ export function usePetRive(enabled: boolean) {
 export function usePetRivePose(
   animation: ReturnType<typeof usePetRive>,
   {
-    sleeping,
-    startled,
-    happy,
-  }: { sleeping: boolean; startled: boolean; happy: boolean },
+    pose,
+    snackSequence,
+  }: {
+    pose: PetPose;
+    snackSequence: number;
+  },
 ) {
-  const { rive, sceneReady, setHappy, setSleeping, setStartled } = animation;
+  const {
+    rive,
+    sceneReady,
+    setHappy,
+    setSleeping,
+    setStartled,
+    setSnacking,
+    snackAgain,
+  } = animation;
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
+  const previousSnack = useRef(snackSequence);
+  const sleeping = pose === "sleeping";
+  const startled = pose === "startled";
+  const snacking = pose === "snacking";
+  const happy = pose === "happy" || snacking;
 
   useEffect(() => {
     setHappy(happy);
     setStartled(startled);
     setSleeping(sleeping);
+    setSnacking(snacking);
+    if (previousSnack.current !== snackSequence) {
+      previousSnack.current = snackSequence;
+      if (snacking) snackAgain();
+    }
     if (!rive) return;
     rive.play();
     // Apply the new pose before freezing; the startup splash still plays.
@@ -95,6 +126,10 @@ export function usePetRivePose(
     }
   }, [
     happy,
+    snacking,
+    snackSequence,
+    setSnacking,
+    snackAgain,
     sleeping,
     startled,
     sceneReady,
