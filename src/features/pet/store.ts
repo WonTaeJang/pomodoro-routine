@@ -1,71 +1,20 @@
 import { createStore } from "zustand/vanilla";
 import { useStore } from "zustand";
+import { createPetProfile, type PetProfile } from "./profile";
 import {
-  addPats,
-  addSnacks,
-  createPetProfile,
-  type PetProfile,
-} from "./profile";
+  appendCare,
+  applyPending,
+  careEntry,
+  pendingCounts,
+  type CareKind,
+  type PendingCare,
+} from "./pendingCare";
 import {
   createLocalPetRepository,
   PetStorageError,
   type PetRepository,
   type PetStorageIssue,
 } from "./repository";
-
-import { affinityDay } from "./affinity";
-
-type CareKind = "pats" | "snacks";
-type PendingCare = {
-  kind: CareKind;
-  day: string;
-  count: number;
-  at: number;
-};
-
-function careEntry(kind: CareKind, at: number): PendingCare {
-  return { kind, at, day: affinityDay(at), count: 1 };
-}
-
-/** Keep the input date and time even when saving waits or fails. */
-function appendCare(
-  pending: readonly PendingCare[],
-  entry: PendingCare,
-): PendingCare[] {
-  const index = pending.findIndex(
-    (p) => p.kind === entry.kind && p.day === entry.day,
-  );
-  if (index < 0) return [...pending, entry];
-  return pending.map((p, i) =>
-    i === index
-      ? { ...p, count: p.count + entry.count, at: Math.max(p.at, entry.at) }
-      : p,
-  );
-}
-
-function applyPending(
-  base: PetProfile,
-  pending: readonly PendingCare[],
-): PetProfile {
-  return pending.reduce(
-    (pet, entry) =>
-      entry.kind === "pats"
-        ? addPats(pet, entry.count, entry.at, entry.day)
-        : addSnacks(pet, entry.count, entry.at),
-    base,
-  );
-}
-
-function pendingCounts(pending: readonly PendingCare[]) {
-  return pending.reduce(
-    (counts, entry) => {
-      if (entry.kind === "pats") counts.pendingPats += entry.count;
-      else counts.pendingSnacks += entry.count;
-      return counts;
-    },
-    { pendingPats: 0, pendingSnacks: 0 },
-  );
-}
 
 type PetStore = {
   pet: PetProfile | null;
@@ -107,6 +56,17 @@ export function createPetStore(
         ...pendingCounts(pending),
       });
     }
+    function acceptSaved(saved: PetProfile | null) {
+      basePet = saved;
+      persistedId = saved?.id ?? null;
+      pending = [];
+      set({
+        pet: saved,
+        ...pendingCounts(pending),
+        retryOperation: null,
+        issue: null,
+      });
+    }
     const fail = (error: unknown) =>
       set({ issue: error instanceof PetStorageError ? error.issue : "save" });
     async function flush(fresh?: PendingCare) {
@@ -128,15 +88,7 @@ export function createPetStore(
           const base = current ?? basePet;
           return base ? applyPending(base, pending) : null;
         });
-        basePet = saved;
-        persistedId = saved?.id ?? null;
-        pending = [];
-        set({
-          pet: saved,
-          ...pendingCounts(pending),
-          retryOperation: null,
-          issue: null,
-        });
+        acceptSaved(saved);
       } catch (error) {
         fail(error);
       }
@@ -145,15 +97,7 @@ export function createPetStore(
       set({ retryOperation: "clear" });
       try {
         await repository.clear();
-        basePet = null;
-        persistedId = null;
-        pending = [];
-        set({
-          pet: null,
-          ...pendingCounts(pending),
-          retryOperation: null,
-          issue: null,
-        });
+        acceptSaved(null);
       } catch (error) {
         fail(error);
       }
@@ -170,15 +114,7 @@ export function createPetStore(
           deletionCompleted ||
           retryOperation === null
         ) {
-          basePet = saved;
-          persistedId = saved?.id ?? null;
-          pending = [];
-          set({
-            pet: saved,
-            ...pendingCounts(pending),
-            retryOperation: null,
-            issue: null,
-          });
+          acceptSaved(saved);
         } else {
           basePet = saved ?? basePet;
           showPending();
