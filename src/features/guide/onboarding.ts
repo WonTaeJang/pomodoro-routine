@@ -7,7 +7,6 @@ import type { OnboardingSlide } from "./content";
  * - 처음 들어와 타이머 화면을 열면 한 번 뜸. 어떻게 닫든 본 것으로 저장
  * - 이미 쓰던 사람(할 일이나 기록이 있음)에게는 띄우지 않음
  * - ☰ 메뉴와 사용법 페이지의 "안내 다시 보기"로 언제든 다시 열 수 있음
- * - "모든 데이터 지우기"를 하면 다시 처음 방문처럼
  */
 
 const KEY = STORAGE_KEYS.onboarding;
@@ -24,15 +23,6 @@ export function isOnboardingSeen(): boolean {
 export function markOnboardingSeen() {
   try {
     localStorage.setItem(KEY, "seen");
-  } catch {
-    // 무시
-  }
-}
-
-/** 데이터를 모두 지울 때: 다음 방문에 안내가 다시 뜨게 */
-export function resetOnboarding() {
-  try {
-    localStorage.removeItem(KEY);
   } catch {
     // 무시
   }

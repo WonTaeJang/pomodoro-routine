@@ -471,17 +471,6 @@ const en: Messages = {
             "Timer, alert and display settings (including theme and language) go back to their defaults. Your tasks and history stay.",
         },
       },
-      clearAll: {
-        label: "Delete all data",
-        description: "Deletes tasks, history, pet records and settings",
-        button: "Delete",
-        confirm: {
-          title: "Delete all data?",
-          action: "Delete all",
-          message:
-            "All tasks, focus history, pet records and settings saved in this browser will be deleted. This can’t be undone.",
-        },
-      },
     },
   },
   shortcuts: {

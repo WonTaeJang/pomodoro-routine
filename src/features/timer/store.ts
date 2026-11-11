@@ -47,7 +47,7 @@ type TimerStore = {
   updateSettings: (patch: Partial<TimerSettings>) => void;
   /** 설정만 기본값으로 되돌립니다. */
   resetSettings: () => void;
-  /** 설정과 타이머를 처음 상태로 되돌립니다. (데이터 초기화) */
+  /** 설정과 타이머를 처음 상태로 되돌립니다. (지금은 테스트에서만 씀) */
   resetAll: () => void;
 };
 

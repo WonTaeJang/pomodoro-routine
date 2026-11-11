@@ -3,14 +3,11 @@
 import { useState } from "react";
 import { useTranslations } from "use-intl";
 import { Button, ConfirmDialog, FieldRow, Section } from "@/components/ui";
-import { resetAllData, resetSettings } from "../resetData";
+import { resetSettings } from "../resetData";
 
-type Pending = "settings" | "all" | null;
-
-/** 설정 되돌리기, 모든 데이터 지우기 */
+/** 설정 되돌리기 */
 export function DataSection() {
-  const [pending, setPending] = useState<Pending>(null);
-  const close = () => setPending(null);
+  const [confirming, setConfirming] = useState(false);
   const t = useTranslations("settings.data");
 
   return (
@@ -22,38 +19,20 @@ export function DataSection() {
         <Button
           variant="secondary"
           size="sm"
-          onClick={() => setPending("settings")}
+          onClick={() => setConfirming(true)}
         >
           {t("resetSettings.button")}
         </Button>
       </FieldRow>
-      <FieldRow
-        label={t("clearAll.label")}
-        description={t("clearAll.description")}
-      >
-        <Button variant="danger" size="sm" onClick={() => setPending("all")}>
-          {t("clearAll.button")}
-        </Button>
-      </FieldRow>
 
       <ConfirmDialog
-        open={pending === "settings"}
+        open={confirming}
         title={t("resetSettings.confirm.title")}
         confirmLabel={t("resetSettings.confirm.action")}
         onConfirm={resetSettings}
-        onClose={close}
+        onClose={() => setConfirming(false)}
       >
         {t("resetSettings.confirm.message")}
-      </ConfirmDialog>
-      <ConfirmDialog
-        open={pending === "all"}
-        title={t("clearAll.confirm.title")}
-        confirmLabel={t("clearAll.confirm.action")}
-        tone="danger"
-        onConfirm={resetAllData}
-        onClose={close}
-      >
-        {t("clearAll.confirm.message")}
       </ConfirmDialog>
     </Section>
   );

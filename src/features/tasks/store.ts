@@ -27,7 +27,7 @@ type TasksStore = TasksState & {
   recordPomodoros: (taskIds: string[]) => void;
   /** 완료한 할 일을 목록에서 숨깁니다. (캘린더에는 남음) */
   archiveDone: () => void;
-  /** 할 일을 모두 지웁니다. (데이터 초기화) */
+  /** 할 일을 모두 지웁니다. (로그아웃할 때 쓸 예정, 백로그 I-027) */
   clearAll: () => void;
 };
 

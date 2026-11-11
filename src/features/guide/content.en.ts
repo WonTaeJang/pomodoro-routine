@@ -118,7 +118,7 @@ const content: GuideContent = {
       points: [
         "Your tasks and history are saved only in this browser. They don't sync to other devices yet.",
         "Clearing your browser data also deletes your history.",
-        "Under 'Data' in Settings, you can reset settings or delete everything.",
+        "Under 'Data' in Settings, you can reset settings to their defaults.",
       ],
     },
   ],

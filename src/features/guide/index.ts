@@ -2,4 +2,4 @@
 export { GuideScreen } from "./components/GuideScreen";
 export { Onboarding } from "./components/Onboarding";
 export { useGuideContent } from "./content";
-export { resetOnboarding, useOnboardingStore } from "./onboarding";
+export { useOnboardingStore } from "./onboarding";
