@@ -118,7 +118,8 @@ import { PawIcon } from "@/components/icons";
   - `recordings.json`: 녹음마다 원본 파일, 자를 구간, 이음매 길이 (다듬기 스크립트와 앱이 함께 읽음). 새 녹음은 여기에 넣고 `node scripts/focus-sounds.mjs design/sound <id>`로 그 소리만 만듦
   - `random.ts`: 랜덤일 때 n번째 집중의 소리 (`randomFocusSound`, 순수 함수, 테스트). `useFocusSoundChoice()`: 고른 설정과 실제로 틀 소리 (재생, 헤더 버튼, 창이 함께 씀)
   - `noise.ts`: 노이즈 만들기, 크기 맞추기, 끊김 없이 반복되게 잇기 (순수 함수, 테스트)
-  - `player.ts`: "지금 들려야 할 소리"를 받아 서서히 켜고 끄고 바꿈, 녹음 받기, 미리 듣기
+  - `player.ts`: "지금 들려야 할 소리"를 받아 서서히 켜고 끄고 바꿈, 녹음 받기, 미리 듣기. 실제로 소리가 나오는지는 `useFocusSoundPlaying()`으로 읽음 (헤더 버튼의 재생 표시)
+  - `components/PlayingBars`: 오르내리는 막대 3개 (헤더 버튼, 소리 칸이 함께 씀. 놓을 자리는 `className`으로)
   - `components/FocusSoundPanel`: 위(제목) · 가운데(소리 목록, 넘치면 여기만 스크롤) · 아래(소리 크기). 맨 위 끄기·랜덤 두 칸, 묶음마다 세 칸씩(아이콘 위, 이름 아래, 설명은 툴팁), 집중 중이면 실제로 나오는 소리 칸에 재생 중 막대, 소리 크기(양쪽 스피커 아이콘)
 - 단축키(`src/features/shortcuts/`): `ShortcutList`(하는 일 | 키 목록. 설정 창과 사용법 페이지가 함께 씀), `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
 - 저절로 뜨는 팝업 기다리기: `src/lib/popupHold.ts`. 사용자가 직접 연 창(설정, 수료증)은 `useHoldAutoPopups()`를 부르고, 완료 팝업은 `useAutoPopupsHeld()`가 false일 때 뜸. 새로 만드는 "사용자가 여는 창"도 같은 훅을 부르면 됨
@@ -158,6 +159,7 @@ import { PawIcon } from "@/components/icons";
 
 - 2026-11-10: 돌봄 화면의 공통 컴포넌트·문구·로직 분리, 도트 아트 전용 값과 `PixelHeartIcon` 추가 (I-020).
 - 2026-11-11: 수료증 위쪽 까미를 학사모 그림에서 동그란 까미 사진으로 바꿈 (I-026).
+- 2026-11-11: 집중 소리 재생 표시 `PlayingBars`, `useFocusSoundPlaying` 추가 (I-025).
 
 - 2026-11-07: 작성. 디자인 토큰 도입, Card·Badge 추가, `05-setup.md`의 스타일·컴포넌트 내용을 옮김
 - 2026-11-07: Slider, ConfirmDialog, FieldRow, 설정 컴포넌트 추가
