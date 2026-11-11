@@ -4,9 +4,7 @@ import { useTranslations } from "use-intl";
 import { ConfirmDialog, SegmentedControl } from "@/components/ui";
 import { useSessionState } from "../hooks";
 import { useTimerStore } from "../store";
-import type { TimerMode, TimerStatus } from "../types";
-
-const MODES: TimerMode[] = ["focus", "short-break", "long-break"];
+import { TIMER_MODES, type TimerMode, type TimerStatus } from "../types";
 
 type ModeSwitcherProps = {
   mode: TimerMode;
@@ -21,7 +19,7 @@ export function ModeSwitcher({ mode, status }: ModeSwitcherProps) {
   const [pendingMode, setPendingMode] = useSessionState<TimerMode | null>(null);
   const switchMode = useTimerStore.getState().switchMode;
   const t = useTranslations("timer");
-  const modeOptions = MODES.map((value) => ({
+  const modeOptions = TIMER_MODES.map((value) => ({
     value,
     label: t(`modes.${value}`),
   }));

@@ -1,7 +1,10 @@
 import type { FocusSoundSetting } from "@/features/focus-sound/sounds";
 
 /** 타이머 모드 */
-export type TimerMode = "focus" | "short-break" | "long-break";
+/** 세션 종류 (화면에 보이는 순서) */
+export const TIMER_MODES = ["focus", "short-break", "long-break"] as const;
+
+export type TimerMode = (typeof TIMER_MODES)[number];
 
 /** idle: 시작 전 / running: 진행 중 / paused: 일시정지 */
 export type TimerStatus = "idle" | "running" | "paused";
