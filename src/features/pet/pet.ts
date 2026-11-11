@@ -1,4 +1,3 @@
-export const PET_COOLDOWN_MS = 350;
 export const PET_HAPPY_MS = 2800;
 export const PET_SNACK_MS = 1800;
 export const PET_STROKE_DISTANCE = 16;
@@ -87,31 +86,21 @@ export function petReducer(state: PetState, action: PetAction): PetState {
         };
       }
       if (state.phase === "startled") return state;
-      if (
-        state.lastPatAt !== null &&
-        action.now - state.lastPatAt < PET_COOLDOWN_MS
-      )
-        return state;
+      if (nextReactionAt(state) !== null) return state;
       return {
         ...state,
         pats: state.pats + 1,
         lastPatAt: action.now,
-        happyUntil: Math.max(action.now, state.snackUntil ?? 0) + PET_HAPPY_MS,
+        happyUntil: action.now + PET_HAPPY_MS,
       };
     case "feed":
-      if (state.phase !== "awake") return state;
+      if (state.phase !== "awake" || nextReactionAt(state) !== null)
+        return state;
       return {
         ...state,
         snacks: state.snacks + 1,
         snackUntil: action.now + PET_SNACK_MS,
-        happyUntil:
-          action.now +
-          PET_SNACK_MS +
-          (state.snackUntil !== null &&
-          state.happyUntil !== null &&
-          state.happyUntil > state.snackUntil
-            ? PET_HAPPY_MS
-            : 0),
+        happyUntil: action.now + PET_SNACK_MS,
       };
     case "settle":
       return state;

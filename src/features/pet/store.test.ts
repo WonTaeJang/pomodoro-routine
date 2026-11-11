@@ -545,7 +545,7 @@ describe("친밀도 저장과 재시도", () => {
     });
   });
 
-  it("간식 입력은 횟수 제한 없이 적립하고 재생은 적립하지 않음", async () => {
+  it("돌봄 반응 중 입력은 적립하지 않고 종료 후 다음 행동만 저장", async () => {
     const f = fixture(),
       saved = f.store();
     await saved.getState().hydrate();
@@ -565,13 +565,18 @@ describe("친밀도 저장과 재시도", () => {
     send({ type: "advanceIntro", now: 5000 });
     send({ type: "feed", now: 5001 });
     send({ type: "feed", now: 5002 });
+    send({ type: "pet", now: 5003 });
+    send({ type: "feed", now: 6801 });
+    send({ type: "pet", now: 8601 });
+    send({ type: "feed", now: 8602 });
+    send({ type: "pet", now: 8603 });
     send({ type: "reset" });
     await Promise.all(writes);
-    expect(writes).toHaveLength(2);
+    expect(writes).toHaveLength(3);
     expect(saved.getState().pet).toMatchObject({
-      totalPats: 0,
+      totalPats: 1,
       totalSnacks: 2,
-      affinity: { points: 6 },
+      affinity: { points: 8 },
     });
   });
 

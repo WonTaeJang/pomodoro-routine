@@ -270,8 +270,12 @@ $loading-background: #f4efdfed;
   -webkit-tap-highlight-color: transparent;
 }
 
-.petTarget:active {
+.petTarget:active:not(:disabled) {
   cursor: grabbing;
+}
+
+.petTarget:disabled {
+  cursor: default;
 }
 
 .petTarget[data-sleeping="true"] {

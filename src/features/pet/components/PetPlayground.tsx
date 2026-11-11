@@ -140,7 +140,7 @@ function PetRoom({ retry }: { retry: () => void }) {
             aria-describedby="pet-keyboard-help"
             data-sleeping={sleeping || startled}
             aria-label={t(copy.label)}
-            disabled={!ready || startled}
+            disabled={!ready || startled || happy}
             onPointerDown={startStroke}
             onPointerMove={moveStroke}
             onPointerUp={endStroke}
@@ -170,7 +170,7 @@ function PetRoom({ retry }: { retry: () => void }) {
               className={styles.petButton}
               aria-describedby="pet-keyboard-help"
               onClick={pet}
-              disabled={!ready || startled}
+              disabled={!ready || startled || happy}
               onKeyDown={stopCareKey}
             >
               {t(copy.action)}
@@ -180,7 +180,7 @@ function PetRoom({ retry }: { retry: () => void }) {
               icon={<PixelSnackIcon />}
               className={styles.petButton}
               onClick={feed}
-              disabled={!ready || sleeping || startled}
+              disabled={!ready || sleeping || startled || happy}
               aria-describedby="pet-keyboard-help"
               onKeyDown={stopCareKey}
             >
@@ -209,7 +209,12 @@ function PetRoom({ retry }: { retry: () => void }) {
               {storesReady && hydrated ? t("patCount", { count: pats }) : "—"}
             </strong>
           </div>
-          <Button variant="ghost" size="sm" onClick={reset} disabled={!ready}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={reset}
+            disabled={!ready || happy}
+          >
             {t("reset")}
           </Button>
         </div>
