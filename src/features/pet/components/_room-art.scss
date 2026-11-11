@@ -1,8 +1,11 @@
 @use "../../../styles/breakpoints" as bp;
+@use "../../../styles/mixins";
 
 // 이 방에서만 쓰는 도트 일러스트의 좌표·팔레트. 일반 UI는 공통 토큰을 사용합니다.
 $interaction-layer: 3;
 $loading-layer: 4;
+// 로딩 덮개보다 위: Rive 시작 화면은 덮개 위에 보여야 함 (누르기는 통과시킴)
+$dog-layer: 5;
 $small-room-height: 316px;
 $small-dog-width: 360px;
 $small-dog-height: 280px;
@@ -108,7 +111,8 @@ $bubble-svg-color: #cc8e80;
 $roomLabel-bottom: 12px;
 $roomLabel-right: 16px;
 $roomLabel-color: #86755d;
-$loading-background: #f4efdfed;
+// 불투명: 강아지가 준비되기 전에는 방(창문, 화분, 말풍선)이 비치지 않게 (B-003)
+$loading-background: #f4efdf;
 .room {
   position: relative;
   height: $room-height;
@@ -241,9 +245,9 @@ $loading-background: #f4efdfed;
 
 .dog {
   position: absolute;
-  // Keep the Rive startup screen above the speech bubble. Once it ends,
-  // the transparent canvas reveals the bubble without changing the layout.
-  z-index: var(--z-overlay);
+  // Keep the Rive startup screen above the loading cover and the speech bubble.
+  // Once it ends, the transparent canvas reveals the room without changing the layout.
+  z-index: $dog-layer;
   width: $dog-width;
   height: $dog-height;
   left: $dog-left;
@@ -345,6 +349,20 @@ $loading-background: #f4efdfed;
   gap: var(--space-3);
   background: $loading-background;
   font-size: var(--font-size-sm);
+  transition: opacity var(--duration-base);
+
+  // 걷힌 뒤에는 눌리지도 읽히지도 않게 (서서히 사라진 다음에 숨김)
+  &[data-hidden="true"] {
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      opacity var(--duration-base),
+      visibility 0s linear var(--duration-base);
+  }
+
+  @include mixins.reduced-motion {
+    transition: none;
+  }
 }
 
 @include bp.down(sm) {

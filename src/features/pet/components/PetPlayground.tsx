@@ -149,16 +149,26 @@ function PetRoom({ retry }: { retry: () => void }) {
             onClick={clickPet}
             onKeyDown={stopCareKey}
           />
-          {!loaded && (
-            <div className={styles.loading} role={failed ? "alert" : "status"}>
-              <p>{failed ? t("error") : t("loading")}</p>
-              {failed && (
-                <Button variant="secondary" size="sm" onClick={retry}>
-                  {t("retry")}
-                </Button>
-              )}
-            </div>
-          )}
+          {/*
+            강아지가 준비될 때까지 방을 가려 두고, 준비되면 서서히 걷음 (B-003).
+            Rive 시작 화면은 이 덮개 위에 보이므로, 파일을 다 받은 뒤에는 안내 글을 지움
+          */}
+          <div
+            className={styles.loading}
+            data-hidden={ready}
+            role={failed ? "alert" : "status"}
+          >
+            {!loaded && (
+              <>
+                <p>{failed ? t("error") : t("loading")}</p>
+                {failed && (
+                  <Button variant="secondary" size="sm" onClick={retry}>
+                    {t("retry")}
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
           <span className={styles.roomLabel} aria-hidden="true">
             {t("roomLabel")}
           </span>
