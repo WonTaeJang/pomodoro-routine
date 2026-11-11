@@ -156,3 +156,21 @@ describe("먹기 반응", () => {
     });
   });
 });
+
+describe("지연된 반응 종료", () => {
+  it.each(["feed", "pet"] as const)(
+    "종료 콜백이 늦어도 %s 결과가 같음",
+    (type) => {
+      const eating = petReducer(awakeState(), { type: "feed", now: 100 });
+      const patted = petReducer(eating, { type: "pet", now: 200 });
+      for (const now of [1900, 4700, 20000]) {
+        expect(petReducer(patted, { type, now })).toEqual(
+          petReducer(petReducer(patted, { type: "settle", now }), {
+            type,
+            now,
+          }),
+        );
+      }
+    },
+  );
+});

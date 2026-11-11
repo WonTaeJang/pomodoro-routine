@@ -61,6 +61,13 @@ function settleReactions(state: PetState, now: number): PetState {
 
 /** 현재 시각을 주입해, UI·브라우저 타이머와 분리한 돌봄 규칙. */
 export function petReducer(state: PetState, action: PetAction): PetState {
+  if (
+    action.type === "pet" ||
+    action.type === "feed" ||
+    action.type === "settle"
+  ) {
+    state = settleReactions(state, action.now);
+  }
   switch (action.type) {
     case "start":
       if (state.phase !== "sleeping" || state.introUntil !== null) return state;
@@ -107,7 +114,7 @@ export function petReducer(state: PetState, action: PetAction): PetState {
             : 0),
       };
     case "settle":
-      return settleReactions(state, action.now);
+      return state;
     case "reset":
       return createPetState();
   }
