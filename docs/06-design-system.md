@@ -99,7 +99,7 @@ import { PawIcon } from "@/components/icons";
 - 통계(`src/features/stats/`): `stats.ts`(연속 일수 `getStreak`, 최근 n일과 그 전 n일 `getRecentComparison`, 최근 n일 막대 `getRecentDays`. 순수 함수, 테스트), `StatsPanel`(캘린더 맨 위 카드: 요약 4칸, CSS 막대 차트, 기록 없을 때 안내)
   - 날짜 도우미는 `src/lib/date.ts`: `startOfMonth`, 요일 이름 `weekdayNames(locale)`(달력과 막대 차트가 같이 씀). 표기 함수는 모두 언어를 받음 (`formatLongDate`, `formatMonth`, `formatDate`, `formatDuration`)
 - 설정: `SettingsDialog`(☰ 메뉴나 S 키로 열림), 묶음별 `TimerSection`, `AlertSection`, `DisplaySection`, `ShortcutSection`, `DataSection`, 안내 문구 `SettingsNote`. 묶음 모양은 공통 `Section`, 한 줄 모양은 공통 `FieldRow`
-  - 설정 되돌리기, 모든 데이터 지우기는 여러 store를 함께 바꾸므로 `src/features/settings/resetData.ts`에 둠
+  - 설정 되돌리기는 여러 store(타이머 설정, 테마, 언어)를 함께 바꾸므로 `src/features/settings/resetData.ts`에 둠
 - 알림(`src/features/alerts/`, 화면 없음). 밖에서는 `index.ts`에서 내보낸 것만 씀 (`useAlerts`, `prepareAlerts`, 설정 화면용 `previewAlertSound`, 알림 권한 함수 등)
   - `alerts.ts`: 다음 알림 계산, 알림 종류 (순수 함수. 문구는 사전의 `alerts.<종류>`)
   - `scheduler.ts`: 예약·취소·중복 방지 규칙. 시간, 소리, 알림을 바깥에서 끼워 넣어(`AlertEnv`) 테스트 가능
@@ -123,7 +123,8 @@ import { PawIcon } from "@/components/icons";
   - `components/FocusSoundPanel`: 위(제목) · 가운데(소리 목록, 넘치면 여기만 스크롤) · 아래(소리 크기). 맨 위 끄기·랜덤 두 칸, 묶음마다 세 칸씩(아이콘 위, 이름 아래, 설명은 툴팁), 집중 중이면 실제로 나오는 소리 칸에 재생 중 막대, 소리 크기(양쪽 스피커 아이콘)
 - 단축키(`src/features/shortcuts/`): `ShortcutList`(하는 일 | 키 목록. 설정 창과 사용법 페이지가 함께 씀), `shortcuts.ts`에 키 정의(`SHORTCUTS`)와 판별 규칙(`matchShortcut`, 순수 함수). 컴포넌트는 `useShortcuts({ toggle, reset, ... })`로 자기 동작만 연결 (타이머 버튼은 Space·R·N, 설정 버튼은 S). `focusSource.ts`는 포커스가 키보드로 옮겨 왔는지 기록 (Space를 버튼에 맡길지 판단)
 - 저절로 뜨는 팝업 기다리기: `src/lib/popupHold.ts`. 사용자가 직접 연 창(설정, 수료증)은 `useHoldAutoPopups()`를 부르고, 완료 팝업은 `useAutoPopupsHeld()`가 false일 때 뜸. 새로 만드는 "사용자가 여는 창"도 같은 훅을 부르면 됨
-- 로그인(`src/features/auth/`, 밖에서는 `index.ts`로): `supabase.ts`(브라우저용 Supabase 연결 `getSupabase()`, 설정 여부 `isAuthConfigured`), `session.ts`(로그인 상태 `useAuth()`: disabled · loading · signedOut · signedIn, `signInWithGoogle`, `finishSignIn`, `signOut`, `updateNickname`), `profile.ts`(순수 함수: `profileOf`, `checkNickname`, `safeNextPath`, 테스트), `components/`(`LoginScreen`, `ProfileScreen`, `AuthCallback`, 세 화면이 같이 쓰는 가운데 카드 `AuthCard`, 동그란 프로필 사진 `Avatar`). 지금 기능(할 일·기록 등)과는 아직 연결하지 않음
+- 로그인(`src/features/auth/`, 밖에서는 `index.ts`로): `supabase.ts`(브라우저용 Supabase 연결 `getSupabase()`, 설정 여부 `isAuthConfigured`), `session.ts`(로그인 상태 `useAuth()`: disabled · loading · signedOut · signedIn, `signInWithGoogle`, `finishSignIn`, `signOut`, `updateNickname`), `profile.ts`(순수 함수: `profileOf`, `checkNickname`, `safeNextPath`, 테스트), `components/`(`LoginScreen`, `ProfileScreen`, `AuthCallback`, 세 화면이 같이 쓰는 가운데 카드 `AuthCard`, 동그란 프로필 사진 `Avatar`)
+- 계정에 기록 저장(`src/features/sync/`, 백로그 I-027): 앱 틀에서 `useAccountSync(ready)` 한 번. 로그인한 동안 브라우저 기록을 Supabase 표와 맞춤 (지금은 집중 기록만). `sessionRows.ts`(앱 기록 ↔ 표의 줄, 순수 함수, 테스트), `sessionsApi.ts`(받기·올리기 조회문), `sessionSync.ts`(무엇을 받고 올릴지 정하는 순서, 서버를 인자로 받아 테스트). 표 정의는 `supabase/sync-tables.sql`
 - 다국어(`src/i18n/`): 화면에서는 use-intl의 `useTranslations("묶음")`, `useLocale()`. 화면 밖(브라우저 알림, 수료증 그림, 시간 계산 함수)은 `getTranslator()`나 `Translator`를 받는 함수로. 문구는 `messages/ko.ts`(기준)·`en.ts`에 기능별로 두고, 여러 기능이 같이 쓰는 말(취소, 닫기, 오늘, 기록 없음, 소리 크기 등)은 `common`에 하나만 둠. 언어 상태는 `locale.ts`(`setLocale`, 다른 탭 맞추기 `applySavedLocale`), 첫 화면 언어는 `locales.ts`의 시작 스크립트. 기능 쪽 목록에는 이름 대신 문구 키를 둠 (예: 집중 소리 `focusSound.sounds.<id>`, 단축키 `shortcuts.<id>`, 알림 `alerts.<종류>`)
 - 탭을 보고 있는지: `src/lib/usePageVisible.ts` (자동 시작 카운트다운은 탭을 보고 있을 때만 시작)
 - 화면 꺼짐 방지: `src/lib/useWakeLock.ts`의 `useWakeLock(active)`. 어느 페이지든 "진행 중 + 설정 켜짐"일 때 켬 (`TimerRuntime`)
@@ -160,6 +161,7 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-10: 돌봄 화면의 공통 컴포넌트·문구·로직 분리, 도트 아트 전용 값과 `PixelHeartIcon` 추가 (I-020).
 - 2026-11-11: 수료증 위쪽 까미를 학사모 그림에서 동그란 까미 사진으로 바꿈 (I-026).
 - 2026-11-11: 집중 소리 재생 표시 `PlayingBars`, `useFocusSoundPlaying` 추가 (I-025).
+- 2026-11-11: 계정에 기록 저장 `src/features/sync/` 추가 (집중 기록부터, I-027). 설정의 "모든 데이터 지우기" 제거.
 
 - 2026-11-07: 작성. 디자인 토큰 도입, Card·Badge 추가, `05-setup.md`의 스타일·컴포넌트 내용을 옮김
 - 2026-11-07: Slider, ConfirmDialog, FieldRow, 설정 컴포넌트 추가

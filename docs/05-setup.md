@@ -118,7 +118,7 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
 - 기능별로 `src/features/<기능>/` 아래에 로직, store, 화면을 모읍니다.
   - `timer.ts`처럼 **규칙은 순수 함수**로 두고 현재 시각을 인자로 받습니다. → 테스트에서 시간을 마음대로 넣어 검증
   - `store.ts`는 순수 함수를 불러 상태를 바꾸고 localStorage에 저장합니다.
-  - 돌봄 기록은 `PetRepository`를 통해 명시적으로 저장합니다. 실패 재시도·버전 검증·여러 탭의 누적 합산을 처리하며, 기존 앱의 초기 복원·탭 동기화·전체 초기화에 연결합니다. 자세한 계약은 [07-pet-prototype.md](./07-pet-prototype.md)를 따릅니다.
+  - 돌봄 기록은 `PetRepository`를 통해 명시적으로 저장합니다. 실패 재시도·버전 검증·여러 탭의 누적 합산을 처리하며, 기존 앱의 초기 복원·탭 동기화에 연결합니다. (전체 초기화 기능은 2026-11-11에 없앰) 자세한 계약은 [07-pet-prototype.md](./07-pet-prototype.md)를 따릅니다.
   - `components/`는 store를 읽어 화면을 그립니다.
 - 저장된 값은 화면이 뜬 뒤 앱 틀(`AppShell`)이 `useHydrateStores()`로 한 번 불러옵니다. 서버에서 그린 화면과 첫 화면이 달라 생기는 오류(hydration 불일치)를 막기 위함입니다. 각 화면은 `useStoresReady()`로 다 불러왔는지 확인합니다.
 - 다른 탭이 저장하면 `useTabSync()`(`src/lib/useTabSync.ts`)가 다시 불러옵니다. 소리와 알림을 낼 탭은 `src/lib/soundTab.ts`에서 정합니다.
@@ -145,7 +145,7 @@ pomodoro-routine/
 ├── src/features/alerts/   알림 소리, 브라우저 알림
 ├── src/features/focus-sound/ 집중 소리 (노이즈 만들기, 재생, 헤더 버튼과 펼침 창)
 ├── src/features/guide/    사용법 페이지, 첫 방문 안내 (글은 content.ko.ts, content.en.ts)
-├── src/features/settings/ 설정 창, 데이터 초기화
+├── src/features/settings/ 설정 창, 설정 되돌리기
 ├── src/features/shortcuts/ 키보드 단축키
 ├── src/features/auth/     로그인 (Supabase 연결, 로그인 상태, 프로필 계산, 로그인·프로필 화면)
 ├── src/features/certificate/ 수료증 (내용 계산, 캔버스 그리기, 공유·저장, 팝업)
