@@ -11,6 +11,7 @@ import { TestModeBadge } from "@/features/timer/components/TestModeBadge";
 import { TimerRuntime } from "@/features/timer/components/TimerRuntime";
 import { useTimerStore } from "@/features/timer/store";
 import { StoresReadyContext, useHydrateStores } from "@/lib/useHydrateStores";
+import { useAccountSync } from "@/features/sync";
 import { useTabSync } from "@/lib/useTabSync";
 import styles from "./AppShell.module.scss";
 import { HeaderMenu } from "./HeaderMenu";
@@ -29,6 +30,7 @@ type AppShellProps = {
 export function AppShell({ children, footer }: AppShellProps) {
   const ready = useHydrateStores();
   useTabSync(ready);
+  useAccountSync(ready);
   const mode = useTimerStore((s) => s.timer.mode);
 
   return (

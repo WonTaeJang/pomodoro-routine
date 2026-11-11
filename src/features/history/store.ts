@@ -2,12 +2,15 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { STORAGE_KEYS, tabSafeStorage } from "@/lib/storage";
 import type { CompletedSession } from "@/features/timer/types";
+import { newSessions } from "./sessions";
 
 type HistoryStore = {
   /** 끝까지 마친 세션 기록. 오늘 기록과 v1.5 통계에 사용 */
   sessions: CompletedSession[];
   addSessions: (sessions: CompletedSession[]) => void;
-  /** 기록을 모두 지웁니다. (데이터 초기화) */
+  /** 계정에서 받아온 기록을 합칩니다. 이미 있는 기록은 빼고, 끝난 순서대로 둡니다. */
+  mergeSessions: (sessions: CompletedSession[]) => void;
+  /** 기록을 모두 지웁니다. (로그아웃할 때 쓸 예정, 백로그 I-027) */
   clear: () => void;
 };
 
@@ -19,6 +22,16 @@ export const useHistoryStore = create<HistoryStore>()(
         if (sessions.length === 0) return;
         set((s) => ({ sessions: [...s.sessions, ...sessions] }));
       },
+      mergeSessions: (sessions) =>
+        set((s) => {
+          const added = newSessions(s.sessions, sessions);
+          if (added.length === 0) return s;
+          return {
+            sessions: [...s.sessions, ...added].sort(
+              (a, b) => a.endedAt - b.endedAt,
+            ),
+          };
+        }),
       clear: () => set({ sessions: [] }),
     }),
     {

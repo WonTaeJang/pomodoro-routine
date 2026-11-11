@@ -12,15 +12,15 @@ export function focusSessions(
 }
 
 /** 같은 세션인지 가리는 값. 여러 탭이 같은 세션을 함께 끝내도 하나로 봅니다. */
-const sessionId = (s: CompletedSession) => `${s.mode}:${s.endedAt}`;
+export const sessionKey = (s: CompletedSession) => `${s.mode}:${s.endedAt}`;
 
 /** incoming 중 existing에 아직 없는 세션 (순서 유지) */
 export function newSessions(
   existing: CompletedSession[],
   incoming: CompletedSession[],
 ): CompletedSession[] {
-  const seen = new Set(existing.map(sessionId));
-  return incoming.filter((s) => !seen.has(sessionId(s)));
+  const seen = new Set(existing.map(sessionKey));
+  return incoming.filter((s) => !seen.has(sessionKey(s)));
 }
 
 /**
