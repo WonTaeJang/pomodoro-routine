@@ -9,6 +9,7 @@ import {
   affinityDay,
   affinityProgress,
   AFFINITY_PER_PAT,
+  AFFINITY_PER_SNACK,
   DAILY_AFFINITY_PATS,
 } from "../affinity";
 import { petStore, usePetStore } from "../store";
@@ -94,6 +95,7 @@ export function PetAffinity() {
                 points: AFFINITY_PER_PAT,
               })}
             </span>
+            <span>{t("snackHint", { points: AFFINITY_PER_SNACK })}</span>
           </div>
         )}
       </details>

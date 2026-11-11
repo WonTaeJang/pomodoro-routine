@@ -77,6 +77,7 @@ type PetStore = {
   hydrate(): Promise<void>;
   meet(): Promise<void>;
   recordPat(): Promise<void>;
+  recordSnack(): Promise<void>;
   retry(): Promise<void>;
   clear(): Promise<void>;
 };
@@ -211,6 +212,7 @@ export function createPetStore(
           await flush();
         }),
       recordPat: () => recordCare("pats"),
+      recordSnack: () => recordCare("snacks"),
       retry: () =>
         enqueue(() => {
           if (get().retryOperation === "clear") return clearRecord();

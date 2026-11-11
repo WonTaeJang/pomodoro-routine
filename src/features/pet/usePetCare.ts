@@ -8,22 +8,28 @@ import {
   type MouseEvent,
 } from "react";
 import { useStore } from "zustand";
-import { PET_STROKE_DISTANCE } from "./pet";
+import { PET_STROKE_DISTANCE, nextReactionAt, petPose } from "./pet";
 import { createPetCareStore } from "./careStore";
 import { petStore, usePetStore } from "./store";
 
-/** 포인터·타이머는 페이지별 상태, 인정된 쓰담은 영구 기록으로 전달. */
+/** 포인터·타이머는 페이지별 상태, 인정된 쓰담·간식은 영구 기록으로 전달. */
 export function usePetCare(ready: boolean) {
   const [careStore] = useState(() =>
-    createPetCareStore(() => {
-      void petStore.getState().recordPat();
-    }),
+    createPetCareStore(
+      () => {
+        void petStore.getState().recordPat();
+      },
+      () => {
+        void petStore.getState().recordSnack();
+      },
+    ),
   );
   const state = useStore(careStore, (s) => s.state);
   const dispatch = careStore.getState().dispatch;
   const pats = usePetStore((s) => s.pet?.totalPats ?? 0);
   const stroke = useRef<{ id: number; x: number; y: number } | null>(null);
   const dragged = useRef(false);
+  const reactionAt = nextReactionAt(state);
 
   useEffect(() => {
     if (ready) dispatch({ type: "start", now: performance.now() });
@@ -39,17 +45,21 @@ export function usePetCare(ready: boolean) {
   }, [ready, state.introUntil, dispatch]);
 
   useEffect(() => {
-    if (state.happyUntil === null) return;
+    if (reactionAt === null) return;
     const timer = setTimeout(
       () => dispatch({ type: "settle", now: performance.now() }),
       // Round up so the timeout cannot run just before its deadline.
-      Math.ceil(Math.max(0, state.happyUntil - performance.now())),
+      Math.ceil(Math.max(0, reactionAt - performance.now())),
     );
     return () => clearTimeout(timer);
-  }, [state.happyUntil, dispatch]);
+  }, [reactionAt, dispatch]);
 
   function pet() {
     if (ready) dispatch({ type: "pet", now: performance.now() });
+  }
+
+  function feed() {
+    if (ready) dispatch({ type: "feed", now: performance.now() });
   }
 
   function startStroke(event: PointerEvent<HTMLButtonElement>) {
@@ -97,10 +107,11 @@ export function usePetCare(ready: boolean) {
   }
 
   return {
-    phase: state.phase,
-    happy: state.happyUntil !== null,
+    pose: petPose(state),
+    snackSequence: state.snacks,
     pats,
     pet,
+    feed,
     reset,
     startStroke,
     moveStroke,

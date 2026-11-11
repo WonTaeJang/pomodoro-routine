@@ -126,3 +126,16 @@ describe("깨우기 반응 중 예약 처리", () => {
     });
   });
 });
+
+describe("간식 입력", () => {
+  it("수면에서는 먹지 않고 깨어 있을 때 간식만 셈", () => {
+    expect(petReducer(createPetState(), { type: "feed", now: 0 }).snacks).toBe(
+      0,
+    );
+    const first = petReducer(awakeState(), { type: "feed", now: 100 });
+    expect(petReducer(first, { type: "feed", now: 101 })).toMatchObject({
+      snacks: 2,
+      pats: 0,
+    });
+  });
+});

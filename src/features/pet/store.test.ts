@@ -225,13 +225,20 @@ describe("돌봄 로컬 저장", () => {
     await saved.getState().hydrate();
     await saved.getState().meet();
     const pending: Promise<void>[] = [];
-    const care = createPetCareStore(() => {
-      pending.push(saved.getState().recordPat());
-    });
+    const care = createPetCareStore(
+      () => {
+        pending.push(saved.getState().recordPat());
+      },
+      () => {
+        pending.push(saved.getState().recordSnack());
+      },
+    );
     const send = care.getState().dispatch;
     send({ type: "start", now: 0 });
+    send({ type: "feed", now: 5 }); // sleeping: no reward
     send({ type: "pet", now: 10 }); // wake only
     send({ type: "pet", now: 500 }); // startled
+    send({ type: "feed", now: 500 }); // startled: no reward
     send({ type: "advanceIntro", now: 1010 });
     send({ type: "pet", now: 1020 });
     send({ type: "pet", now: 1030 }); // cooldown
@@ -240,6 +247,7 @@ describe("돌봄 로컬 저장", () => {
     await Promise.all(pending);
     expect(pending).toHaveLength(1);
     expect(saved.getState().pet!.totalPats).toBe(1);
+    expect(saved.getState().pet!.affinity.points).toBe(2);
     expect(care.getState().state.phase).toBe("sleeping");
     expect((await f.repository.load())!.totalPats).toBe(1);
   });
@@ -378,6 +386,102 @@ describe("돌봄 로컬 저장", () => {
 });
 
 describe("친밀도 저장과 재시도", () => {
+  it("간식은 쓰담 한도 이후에도 두 탭에서 제한 없이 +3, 재방문에도 유지", async () => {
+    const f = fixture(),
+      a = f.store(),
+      b = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    await b.getState().hydrate();
+    await Promise.all(
+      Array.from({ length: 7 }, () => a.getState().recordPat()),
+    );
+    const lastPat = a.getState().pet!.lastPettedAt;
+    await Promise.all(
+      Array.from({ length: 20 }, (_, i) =>
+        (i % 2 ? a : b).getState().recordSnack(),
+      ),
+    );
+    const reopened = f.store();
+    await reopened.getState().hydrate();
+    expect(reopened.getState().pet).toMatchObject({
+      totalPats: 7,
+      totalSnacks: 20,
+      lastPettedAt: lastPat,
+      affinity: { points: 70 },
+    });
+  });
+
+  it("실패한 간식·쓰담을 복원하고 재시도해도 한 번만 적립", async () => {
+    const f = fixture(),
+      a = f.store(),
+      b = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    f.blockWrite(true);
+    await a.getState().recordSnack();
+    await a.getState().recordPat();
+    await a.getState().recordSnack();
+    expect(a.getState()).toMatchObject({
+      pendingPats: 1,
+      pendingSnacks: 2,
+      pet: { affinity: { points: 8 } },
+    });
+    f.blockWrite(false);
+    await b.getState().hydrate();
+    await b.getState().recordSnack();
+    await a.getState().hydrate();
+    await a.getState().hydrate();
+    await a.getState().retry();
+    await a.getState().retry();
+    expect(await f.repository.load()).toMatchObject({
+      totalPats: 1,
+      totalSnacks: 3,
+      affinity: { points: 11 },
+    });
+    expect(a.getState()).toMatchObject({
+      pendingPats: 0,
+      pendingSnacks: 0,
+      issue: null,
+    });
+    await a.getState().clear();
+    await a.getState().meet();
+    expect(a.getState().pet).toMatchObject({
+      totalSnacks: 0,
+      affinity: { points: 0 },
+    });
+  });
+
+  it("간식 입력은 횟수 제한 없이 적립하고 재생은 적립하지 않음", async () => {
+    const f = fixture(),
+      saved = f.store();
+    await saved.getState().hydrate();
+    await saved.getState().meet();
+    const writes: Promise<void>[] = [];
+    const care = createPetCareStore(
+      () => {
+        writes.push(saved.getState().recordPat());
+      },
+      () => {
+        writes.push(saved.getState().recordSnack());
+      },
+    );
+    const send = care.getState().dispatch;
+    send({ type: "start", now: 0 });
+    send({ type: "feed", now: 1 });
+    send({ type: "advanceIntro", now: 5000 });
+    send({ type: "feed", now: 5001 });
+    send({ type: "feed", now: 5002 });
+    send({ type: "reset" });
+    await Promise.all(writes);
+    expect(writes).toHaveLength(2);
+    expect(saved.getState().pet).toMatchObject({
+      totalPats: 0,
+      totalSnacks: 2,
+      affinity: { points: 6 },
+    });
+  });
+
   it("저장 대기 중 자정이 지나도 입력한 날짜에 적립", async () => {
     const f = fixture(),
       store = f.store();

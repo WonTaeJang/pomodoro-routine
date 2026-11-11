@@ -3,7 +3,7 @@
 @use "room-art";
 
 $page-max: 780px;
-$action-width: 208px;
+$action-width: 140px;
 
 .page {
   max-width: $page-max;
@@ -57,10 +57,17 @@ $action-width: 208px;
   text-align: center;
   padding: var(--space-5);
 }
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
 .petButton {
   --color-accent: var(--color-short-break);
   --color-accent-hover: color-mix(in srgb, var(--color-short-break) 86%, black);
   min-width: $action-width;
+  flex: 1;
 }
 .metrics {
   display: flex;

@@ -1,17 +1,56 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import { useTranslations } from "use-intl";
 import { usePetRive, usePetRivePose } from "../usePetRive";
 import { Button, Card, VisuallyHidden } from "@/components/ui";
-import { PixelHeartIcon, ChevronLeftIcon } from "@/components/icons";
+import {
+  PixelHeartIcon,
+  PixelSnackIcon,
+  ChevronLeftIcon,
+} from "@/components/icons";
 import { usePetCare } from "../usePetCare";
 import { petStore, usePetStore } from "../store";
 import { useStoresReady } from "@/lib/useHydrateStores";
 import styles from "./PetPlayground.module.scss";
-
 import { PetAffinity } from "./PetAffinity";
+import type { PetPose } from "../pet";
+
+const POSE_COPY = {
+  sleeping: {
+    status: "sleeping",
+    bubble: "sleepBubble",
+    action: "wake",
+    label: "wakeLabel",
+  },
+  startled: {
+    status: "startled",
+    bubble: "startleBubble",
+    action: "startled",
+    label: "startled",
+  },
+  idle: { status: "idle", bubble: "bubble", action: "pet", label: "petLabel" },
+  happy: {
+    status: "happy",
+    bubble: "happyBubble",
+    action: "pet",
+    label: "petLabel",
+  },
+  snacking: {
+    status: "snackHappy",
+    bubble: "snackBubble",
+    action: "pet",
+    label: "petLabel",
+  },
+} as const satisfies Record<
+  PetPose,
+  { status: string; bubble: string; action: string; label: string }
+>;
+
+function stopCareKey(event: KeyboardEvent<HTMLButtonElement>) {
+  if (event.key === " " || event.key === "Enter") event.stopPropagation();
+}
 
 export function PetPlayground() {
   const [attempt, setAttempt] = useState(0);
@@ -31,18 +70,21 @@ function PetRoom({ retry }: { retry: () => void }) {
   const animation = usePetRive(storesReady && hydrated);
   const { RiveComponent, loaded, ready, failed } = animation;
   const {
-    phase,
-    happy,
+    pose,
     pats,
     pet,
+    feed,
     reset,
     startStroke,
     moveStroke,
     endStroke,
     clickPet,
   } = usePetCare(ready);
-  const sleeping = phase === "sleeping";
-  const startled = phase === "startled";
+  const sleeping = pose === "sleeping";
+  const startled = pose === "startled";
+  const snacking = pose === "snacking";
+  const happy = pose === "happy" || snacking;
+  const copy = POSE_COPY[pose];
 
   usePetRivePose(animation, { sleeping, startled, happy });
 
@@ -68,13 +110,7 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
           <span className={styles.status} role="status">
             <i />
-            {startled
-              ? t("startled")
-              : sleeping
-                ? t("sleeping")
-                : happy
-                  ? t("happy")
-                  : t("idle")}
+            {t(copy.status)}
           </span>
         </div>
         <PetAffinity />
@@ -89,14 +125,8 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
           <div className={styles.rug} aria-hidden="true" />
           <div className={styles.bubble} aria-hidden="true">
-            {startled
-              ? t("startleBubble")
-              : sleeping
-                ? t("sleepBubble")
-                : happy
-                  ? t("happyBubble")
-                  : t("bubble")}
-            <PixelHeartIcon />
+            {t(copy.bubble)}
+            {snacking ? <PixelSnackIcon /> : <PixelHeartIcon />}
           </div>
           <div className={styles.dog} aria-hidden="true">
             <RiveComponent />
@@ -105,13 +135,7 @@ function PetRoom({ retry }: { retry: () => void }) {
             className={styles.petTarget}
             aria-describedby="pet-keyboard-help"
             data-sleeping={sleeping || startled}
-            aria-label={
-              startled
-                ? t("startled")
-                : sleeping
-                  ? t("wakeLabel")
-                  : t("petLabel")
-            }
+            aria-label={t(copy.label)}
             disabled={!ready || startled}
             onPointerDown={startStroke}
             onPointerMove={moveStroke}
@@ -119,10 +143,7 @@ function PetRoom({ retry }: { retry: () => void }) {
             onPointerCancel={endStroke}
             onLostPointerCapture={endStroke}
             onClick={clickPet}
-            onKeyDown={(event) => {
-              if (event.key === " " || event.key === "Enter")
-                event.stopPropagation();
-            }}
+            onKeyDown={stopCareKey}
           />
           {!loaded && (
             <div className={styles.loading} role={failed ? "alert" : "status"}>
@@ -139,19 +160,29 @@ function PetRoom({ retry }: { retry: () => void }) {
           </span>
         </div>
         <div className={styles.controls}>
-          <Button
-            icon={<PixelHeartIcon />}
-            className={styles.petButton}
-            aria-describedby="pet-keyboard-help"
-            onClick={pet}
-            disabled={!ready || startled}
-            onKeyDown={(event) => {
-              if (event.key === " " || event.key === "Enter")
-                event.stopPropagation();
-            }}
-          >
-            {startled ? t("startled") : sleeping ? t("wake") : t("pet")}
-          </Button>
+          <div className={styles.actions}>
+            <Button
+              icon={<PixelHeartIcon />}
+              className={styles.petButton}
+              aria-describedby="pet-keyboard-help"
+              onClick={pet}
+              disabled={!ready || startled}
+              onKeyDown={stopCareKey}
+            >
+              {t(copy.action)}
+            </Button>
+            <Button
+              variant="secondary"
+              icon={<PixelSnackIcon />}
+              className={styles.petButton}
+              onClick={feed}
+              disabled={!ready || sleeping || startled}
+              aria-describedby="pet-keyboard-help"
+              onKeyDown={stopCareKey}
+            >
+              {t("feed")}
+            </Button>
+          </div>
           {storageIssue && (
             <div className={styles.storageIssue} role="alert">
               <span>{t(`storageIssue.${storageIssue}`)}</span>
