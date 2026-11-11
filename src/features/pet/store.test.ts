@@ -63,6 +63,60 @@ function fixture() {
 }
 
 describe("돌봄 로컬 저장", () => {
+  it.each([false, true])(
+    "복원 알림 전 재시도도 삭제/교체된 옛 미저장 돌봄을 폐기: %s",
+    async (replace) => {
+      const f = fixture(),
+        a = f.store(),
+        b = f.store();
+      await a.getState().hydrate();
+      await a.getState().meet();
+      f.blockWrite(true);
+      await a.getState().recordPat();
+      await a.getState().recordSnack();
+      f.blockWrite(false);
+      await b.getState().hydrate();
+      await b.getState().clear();
+      if (replace) await b.getState().meet();
+      const expected = await f.repository.load();
+      await a.getState().retry();
+      await a.getState().retry();
+      expect(await f.repository.load()).toEqual(expected);
+      expect(a.getState()).toMatchObject({
+        pet: expected,
+        pendingPats: 0,
+        pendingSnacks: 0,
+        retryOperation: null,
+        issue: null,
+      });
+    },
+  );
+
+  it.each([false, true])(
+    "초기화 이후 새 입력은 옛 미저장 기록을 제외하고 한 번만 합산: %s",
+    async (replace) => {
+      const f = fixture(),
+        a = f.store(),
+        b = f.store();
+      await a.getState().hydrate();
+      await a.getState().meet();
+      f.blockWrite(true);
+      await a.getState().recordPat();
+      await a.getState().recordSnack();
+      f.blockWrite(false);
+      await b.getState().hydrate();
+      await b.getState().clear();
+      if (replace) await b.getState().meet();
+      await a.getState().recordSnack();
+      await a.getState().retry();
+      expect(await f.repository.load()).toMatchObject({
+        totalPats: 0,
+        totalSnacks: 1,
+        affinity: { points: 3 },
+      });
+    },
+  );
+
   it("최초 읽기 실패 후 다른 ID를 복원해도 미저장 쓰담을 한 번 합산", async () => {
     const f = fixture(),
       a = f.store(),
@@ -386,6 +440,45 @@ describe("돌봄 로컬 저장", () => {
 });
 
 describe("친밀도 저장과 재시도", () => {
+  it.each([false, true])(
+    "초기화 확인 뒤 새 입력 저장도 실패하면 새 입력만 재시도: %s",
+    async (replace) => {
+      const f = fixture(),
+        a = f.store(),
+        b = f.store();
+      await a.getState().hydrate();
+      await a.getState().meet();
+      f.blockWrite(true);
+      await a.getState().recordPat();
+      await a.getState().recordSnack();
+      f.blockWrite(false);
+      await b.getState().hydrate();
+      await b.getState().clear();
+      if (replace) await b.getState().meet();
+      f.blockWrite(true);
+      await a.getState().recordSnack();
+      expect(a.getState()).toMatchObject({
+        pendingPats: 0,
+        pendingSnacks: 1,
+        pet: { totalPats: 0, totalSnacks: 1, affinity: { points: 3 } },
+      });
+      await a.getState().hydrate();
+      f.blockWrite(false);
+      await a.getState().retry();
+      await a.getState().retry();
+      expect(await f.repository.load()).toMatchObject({
+        totalPats: 0,
+        totalSnacks: 1,
+        affinity: { points: 3 },
+      });
+      expect(a.getState()).toMatchObject({
+        pendingPats: 0,
+        pendingSnacks: 0,
+        issue: null,
+      });
+    },
+  );
+
   it("간식은 쓰담 한도 이후에도 두 탭에서 제한 없이 +3, 재방문에도 유지", async () => {
     const f = fixture(),
       a = f.store(),

@@ -109,16 +109,23 @@ export function createPetStore(
     }
     const fail = (error: unknown) =>
       set({ issue: error instanceof PetStorageError ? error.issue : "save" });
-    async function flush() {
+    async function flush(fresh?: PendingCare) {
       const { pet } = get();
       if (!pet) return;
       // A new save supersedes a previously failed deletion.
       set({ retryOperation: "save" });
       try {
         const saved = await repository.update((current) => {
-          const base =
-            current ??
-            (persistedId === pet.id ? createPetProfile(id(), now()) : basePet);
+          // Check under the write lock: the storage event may not have arrived.
+          // Retry discards old work; an explicit new action can start a new record.
+          if (remotelyReset(current)) {
+            pending = fresh ? [fresh] : [];
+            basePet =
+              current ?? (fresh ? createPetProfile(id(), fresh.at) : null);
+            persistedId = current?.id ?? null;
+            showPending();
+          }
+          const base = current ?? basePet;
           return base ? applyPending(base, pending) : null;
         });
         basePet = saved;
@@ -193,7 +200,7 @@ export function createPetStore(
         basePet ??= createPetProfile(id(), entry.at);
         pending = appendCare(pending, entry);
         showPending();
-        await flush();
+        await flush(entry);
       });
     }
     return {
