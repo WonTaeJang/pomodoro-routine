@@ -44,6 +44,9 @@ function fixture() {
   return {
     storage,
     repository,
+    setTime: (value: number) => {
+      clock = value;
+    },
     store: () =>
       createPetStore(
         repository,
@@ -202,7 +205,15 @@ describe("돌봄 로컬 저장", () => {
       Object.keys(
         JSON.parse(f.storage.getItem(STORAGE_KEYS.pet)!).state.pet,
       ).sort(),
-    ).toEqual(["createdAt", "id", "lastPettedAt", "totalPats", "updatedAt"]);
+    ).toEqual([
+      "affinity",
+      "createdAt",
+      "id",
+      "lastPettedAt",
+      "totalPats",
+      "totalSnacks",
+      "updatedAt",
+    ]);
     expect(second.getState().pet!.lastPettedAt).toBe(
       second.getState().pet!.updatedAt,
     );
@@ -363,5 +374,107 @@ describe("돌봄 로컬 저장", () => {
       pendingPats: 0,
       issue: null,
     });
+  });
+});
+
+describe("친밀도 저장과 재시도", () => {
+  it("저장 대기 중 자정이 지나도 입력한 날짜에 적립", async () => {
+    const f = fixture(),
+      store = f.store();
+    f.setTime(new Date(2026, 10, 11, 23, 59, 59).getTime());
+    await store.getState().hydrate();
+    await store.getState().meet();
+    const yesterday = store.getState().recordPat();
+    f.setTime(new Date(2026, 10, 12, 0, 0, 1).getTime());
+    const today = store.getState().recordPat();
+    await Promise.all([yesterday, today]);
+    expect(store.getState().pet!.affinity).toEqual({
+      points: 4,
+      rewardedPats: { "2026-11-11": 1, "2026-11-12": 1 },
+    });
+  });
+
+  it("동시 두 탭의 쓰담은 합산하되 친밀도는 하루 10점까지만 저장", async () => {
+    const f = fixture(),
+      a = f.store(),
+      b = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    await b.getState().hydrate();
+    await Promise.all(
+      Array.from({ length: 12 }, (_, i) =>
+        (i % 2 ? a : b).getState().recordPat(),
+      ),
+    );
+    await a.getState().hydrate();
+    await b.getState().hydrate();
+    expect(a.getState().pet).toEqual(b.getState().pet);
+    expect(a.getState().pet).toMatchObject({
+      totalPats: 12,
+      affinity: { points: 10 },
+    });
+    const reopened = f.store();
+    await reopened.getState().hydrate();
+    await reopened.getState().recordPat();
+    expect(reopened.getState().pet).toMatchObject({
+      totalPats: 13,
+      affinity: { points: 10 },
+    });
+  });
+
+  it("날짜별 미저장 쓰담을 최신 원본에 적용해 복원·재시도에서도 중복 적립하지 않음", async () => {
+    const f = fixture(),
+      a = f.store(),
+      b = f.store();
+    f.setTime(new Date(2026, 10, 11, 12).getTime());
+    await a.getState().hydrate();
+    await a.getState().meet();
+    await Promise.all(
+      Array.from({ length: 3 }, () => a.getState().recordPat()),
+    );
+    f.blockWrite(true);
+    await a.getState().recordPat();
+    await a.getState().recordPat();
+    f.setTime(new Date(2026, 10, 12, 12).getTime());
+    await a.getState().recordPat();
+    f.blockWrite(false);
+    await b.getState().hydrate();
+    await b.getState().recordPat();
+    await a.getState().hydrate();
+    await a.getState().hydrate();
+    expect(a.getState().pet!.affinity.points).toBe(14);
+    await a.getState().retry();
+    await a.getState().retry();
+    expect((await f.repository.load())!.affinity).toEqual({
+      points: 14,
+      rewardedPats: { "2026-11-11": 5, "2026-11-12": 2 },
+    });
+    expect((await f.repository.load())!.totalPats).toBe(7);
+    expect(JSON.parse(f.storage.getItem(STORAGE_KEYS.pet)!).version).toBe(3);
+  });
+
+  it("최초 저장 실패 시 임시 친밀도를 중복 저장하지 않음", async () => {
+    const f = fixture(),
+      a = f.store();
+    await a.getState().hydrate();
+    f.blockWrite(true);
+    await a.getState().meet();
+    await a.getState().recordPat();
+    await a.getState().hydrate();
+    await a.getState().hydrate();
+    f.blockWrite(false);
+    await a.getState().retry();
+    expect((await f.repository.load())!.affinity.points).toBe(2);
+  });
+
+  it("전체 초기화 후 친밀도와 하루 한도를 새 기록으로 시작", async () => {
+    const f = fixture(),
+      a = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    await a.getState().recordPat();
+    await a.getState().clear();
+    await a.getState().meet();
+    expect(a.getState().pet!.affinity).toEqual({ points: 0, rewardedPats: {} });
   });
 });

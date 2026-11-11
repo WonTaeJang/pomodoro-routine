@@ -1,6 +1,11 @@
 import { createStore } from "zustand/vanilla";
 import { useStore } from "zustand";
-import { addPats, createPetProfile, type PetProfile } from "./profile";
+import {
+  addPats,
+  addSnacks,
+  createPetProfile,
+  type PetProfile,
+} from "./profile";
 import {
   createLocalPetRepository,
   PetStorageError,
@@ -8,11 +13,66 @@ import {
   type PetStorageIssue,
 } from "./repository";
 
+import { affinityDay } from "./affinity";
+
+type CareKind = "pats" | "snacks";
+type PendingCare = {
+  kind: CareKind;
+  day: string;
+  count: number;
+  at: number;
+};
+
+function careEntry(kind: CareKind, at: number): PendingCare {
+  return { kind, at, day: affinityDay(at), count: 1 };
+}
+
+/** Keep the input date and time even when saving waits or fails. */
+function appendCare(
+  pending: readonly PendingCare[],
+  entry: PendingCare,
+): PendingCare[] {
+  const index = pending.findIndex(
+    (p) => p.kind === entry.kind && p.day === entry.day,
+  );
+  if (index < 0) return [...pending, entry];
+  return pending.map((p, i) =>
+    i === index
+      ? { ...p, count: p.count + entry.count, at: Math.max(p.at, entry.at) }
+      : p,
+  );
+}
+
+function applyPending(
+  base: PetProfile,
+  pending: readonly PendingCare[],
+): PetProfile {
+  return pending.reduce(
+    (pet, entry) =>
+      entry.kind === "pats"
+        ? addPats(pet, entry.count, entry.at, entry.day)
+        : addSnacks(pet, entry.count, entry.at),
+    base,
+  );
+}
+
+function pendingCounts(pending: readonly PendingCare[]) {
+  return pending.reduce(
+    (counts, entry) => {
+      if (entry.kind === "pats") counts.pendingPats += entry.count;
+      else counts.pendingSnacks += entry.count;
+      return counts;
+    },
+    { pendingPats: 0, pendingSnacks: 0 },
+  );
+}
+
 type PetStore = {
   pet: PetProfile | null;
   hydrated: boolean;
   issue: PetStorageIssue | null;
   pendingPats: number;
+  pendingSnacks: number;
   retryOperation: "save" | "clear" | null;
   hydrate(): Promise<void>;
   meet(): Promise<void>;
@@ -34,10 +94,22 @@ export function createPetStore(
   };
   return createStore<PetStore>()((set, get) => {
     let persistedId: string | null = null;
+    // Keep the last base separate from optimistic rewards. Replaying pending
+    // day batches against fresh disk data must not count rewards twice.
+    let basePet: PetProfile | null = null;
+    let pending: PendingCare[] = [];
+    const remotelyReset = (current: PetProfile | null) =>
+      persistedId !== null && current?.id !== persistedId;
+    function showPending() {
+      set({
+        pet: basePet && applyPending(basePet, pending),
+        ...pendingCounts(pending),
+      });
+    }
     const fail = (error: unknown) =>
       set({ issue: error instanceof PetStorageError ? error.issue : "save" });
     async function flush() {
-      const { pet, pendingPats } = get();
+      const { pet } = get();
       if (!pet) return;
       // A new save supersedes a previously failed deletion.
       set({ retryOperation: "save" });
@@ -45,13 +117,18 @@ export function createPetStore(
         const saved = await repository.update((current) => {
           const base =
             current ??
-            (persistedId === pet.id
-              ? createPetProfile(id(), now())
-              : { ...pet, totalPats: pet.totalPats - pendingPats });
-          return pendingPats ? addPats(base, pendingPats, pet.updatedAt) : base;
+            (persistedId === pet.id ? createPetProfile(id(), now()) : basePet);
+          return base ? applyPending(base, pending) : null;
         });
-        set({ pet: saved, pendingPats: 0, retryOperation: null, issue: null });
+        basePet = saved;
         persistedId = saved?.id ?? null;
+        pending = [];
+        set({
+          pet: saved,
+          ...pendingCounts(pending),
+          retryOperation: null,
+          issue: null,
+        });
       } catch (error) {
         fail(error);
       }
@@ -60,8 +137,15 @@ export function createPetStore(
       set({ retryOperation: "clear" });
       try {
         await repository.clear();
+        basePet = null;
         persistedId = null;
-        set({ pet: null, pendingPats: 0, retryOperation: null, issue: null });
+        pending = [];
+        set({
+          pet: null,
+          ...pendingCounts(pending),
+          retryOperation: null,
+          issue: null,
+        });
       } catch (error) {
         fail(error);
       }
@@ -69,27 +153,28 @@ export function createPetStore(
     async function restore() {
       try {
         const saved = await repository.load();
-        const { pet, pendingPats, retryOperation, issue } = get();
+        const { retryOperation, issue } = get();
         // Only a previously observed identity can prove a remote reset.
         // A temporary ID created during a read failure is not such evidence.
-        const remotelyReset = persistedId !== null && saved?.id !== persistedId;
         const deletionCompleted = retryOperation === "clear" && saved === null;
-        if (remotelyReset || deletionCompleted || retryOperation === null) {
+        if (
+          remotelyReset(saved) ||
+          deletionCompleted ||
+          retryOperation === null
+        ) {
+          basePet = saved;
+          persistedId = saved?.id ?? null;
+          pending = [];
           set({
             pet: saved,
-            pendingPats: 0,
+            ...pendingCounts(pending),
             retryOperation: null,
             issue: null,
           });
         } else {
-          const base =
-            saved ??
-            (pet && { ...pet, totalPats: pet.totalPats - pendingPats });
+          basePet = saved ?? basePet;
+          showPending();
           set({
-            pet:
-              base && pet && pendingPats
-                ? addPats(base, pendingPats, pet.updatedAt)
-                : base,
             // Reading successfully does not mean pending writes/deletion succeeded.
             issue: issue ?? "save",
           });
@@ -100,29 +185,32 @@ export function createPetStore(
       }
       set({ hydrated: true });
     }
+    function recordCare(kind: CareKind) {
+      const entry = careEntry(kind, now());
+      return enqueue(async () => {
+        if (!get().hydrated) return;
+        basePet ??= createPetProfile(id(), entry.at);
+        pending = appendCare(pending, entry);
+        showPending();
+        await flush();
+      });
+    }
     return {
       pet: null,
       hydrated: false,
       issue: null,
       pendingPats: 0,
+      pendingSnacks: 0,
       retryOperation: null,
       hydrate: () => enqueue(restore),
       meet: () =>
         enqueue(async () => {
           if (!get().hydrated || get().pet) return;
-          set({ pet: createPetProfile(id(), now()) });
+          basePet = createPetProfile(id(), now());
+          set({ pet: basePet });
           await flush();
         }),
-      recordPat: () =>
-        enqueue(async () => {
-          if (!get().hydrated) return;
-          const pet = get().pet ?? createPetProfile(id(), now());
-          set({
-            pet: addPats(pet, 1, now()),
-            pendingPats: get().pendingPats + 1,
-          });
-          await flush();
-        }),
+      recordPat: () => recordCare("pats"),
       retry: () =>
         enqueue(() => {
           if (get().retryOperation === "clear") return clearRecord();

@@ -1,5 +1,6 @@
 import { STORAGE_KEYS } from "@/lib/storage";
-import { isPetProfile, type PetProfile } from "./profile";
+import { isLegacyPetProfile, isPetProfile, type PetProfile } from "./profile";
+import { createAffinity, isAffinity } from "./affinity";
 
 export type PetStorageIssue = "load" | "save" | "invalid" | "newer";
 export class PetStorageError extends Error {
@@ -17,7 +18,7 @@ export interface PetRepository {
   clear(): Promise<void>;
 }
 
-const VERSION = 1;
+const VERSION = 3;
 export function decodePet(raw: string | null): PetProfile | null {
   if (raw === null) return null;
   let saved;
@@ -27,19 +28,40 @@ export function decodePet(raw: string | null): PetProfile | null {
     throw new PetStorageError("invalid");
   }
   if (saved?.version > VERSION) throw new PetStorageError("newer");
-  // v1 is the first persisted format. Future migrations belong here.
+  // v1 has no daily history, so past pats cannot earn affinity retroactively.
   if (
-    saved?.version !== VERSION ||
+    (saved?.version !== 1 &&
+      saved?.version !== 2 &&
+      saved?.version !== VERSION) ||
     !saved.state ||
     typeof saved.state !== "object" ||
     !("pet" in saved.state)
   )
     throw new PetStorageError("invalid");
   const pet: unknown = saved.state.pet;
-  if (pet !== null && !isPetProfile(pet)) throw new PetStorageError("invalid");
   if (pet === null) return null;
+  if (
+    !isLegacyPetProfile(pet) ||
+    (saved.version === 2 && !isAffinity((pet as PetProfile).affinity)) ||
+    (saved.version === VERSION && !isPetProfile(pet))
+  )
+    throw new PetStorageError("invalid");
   const { id, createdAt, totalPats, lastPettedAt, updatedAt } = pet;
-  return { id, createdAt, totalPats, lastPettedAt, updatedAt };
+  const affinity =
+    saved.version === 1 ? createAffinity() : (pet as PetProfile).affinity;
+  return {
+    id,
+    createdAt,
+    totalPats,
+    totalSnacks:
+      saved.version === VERSION ? (pet as PetProfile).totalSnacks : 0,
+    lastPettedAt,
+    updatedAt,
+    affinity: {
+      points: affinity.points,
+      rewardedPats: { ...affinity.rewardedPats },
+    },
+  };
 }
 
 type Lock = <T>(run: () => Promise<T>) => Promise<T>;

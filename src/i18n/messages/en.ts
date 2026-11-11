@@ -6,6 +6,25 @@ import type { Messages } from "./ko";
  */
 const en: Messages = {
   pet: {
+    affinity: {
+      label: "Bond",
+      level: "Bond Lv.{level}",
+      loading: "Loading",
+      progress: "Bond level {level}, {points} points",
+      points: "{points} / {next} points",
+      max: "Max level · {points} points",
+      today: "Pats today +{earned} / {max}",
+      snackHint: "+{points} for every treat",
+      hint: "+{points} for each of your first {count} pats daily. Your bond never decreases.",
+      levelUp: "Closer to Kkami · Lv.{level}",
+      stages: {
+        "1": "Getting acquainted",
+        "2": "Familiar faces",
+        "3": "Good friends",
+        "4": "Close friends",
+        "5": "Best friends",
+      },
+    },
     storageIssue: {
       load: "Couldn’t load your record.",
       save: "Couldn’t save your record.",
@@ -28,6 +47,9 @@ const en: Messages = {
     bubble: "Take a little break with me?",
     happyBubble: "Hehe, one more!",
     pet: "Give a little pat",
+    feed: "Give a treat",
+    snackHappy: "Yummy",
+    snackBubble: "Yum, thank you!",
     petLabel: "Pet Kkami",
     keyboard: "With a keyboard, focus the button and press Enter or Space.",
     count: "Total pats",

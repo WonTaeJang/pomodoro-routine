@@ -34,6 +34,10 @@ const SAMPLE_VALUES = {
   diff: "+10분",
   name: "까미",
   max: 20,
+  level: 2,
+  points: 24,
+  next: 60,
+  earned: 4,
   paw: () => "🐾",
   nowrap: (chunks: string) => chunks,
 };

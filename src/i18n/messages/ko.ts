@@ -6,6 +6,25 @@
  */
 const ko = {
   pet: {
+    affinity: {
+      label: "친밀도",
+      level: "친밀도 Lv.{level}",
+      loading: "불러오는 중",
+      progress: "친밀도 {level}단계, {points}점",
+      points: "{points} / {next}점",
+      max: "최고 단계 · {points}점",
+      today: "오늘 쓰담 +{earned} / {max}",
+      snackHint: "간식은 줄 때마다 +{points}",
+      hint: "하루 첫 {count}번 쓰담에 +{points}씩. 친밀도는 줄지 않아요.",
+      levelUp: "까미와 더 가까워졌어요 · Lv.{level}",
+      stages: {
+        "1": "알아가는 사이",
+        "2": "익숙한 사이",
+        "3": "친한 친구",
+        "4": "소중한 친구",
+        "5": "단짝",
+      },
+    },
     storageIssue: {
       load: "기록을 불러오지 못했어요.",
       save: "기록을 저장하지 못했어요.",
@@ -28,6 +47,9 @@ const ko = {
     bubble: "나랑 잠깐 쉬어갈래?",
     happyBubble: "헤헤, 한 번 더!",
     pet: "쓰다듬기",
+    feed: "간식 주기",
+    snackHappy: "맛있어요",
+    snackBubble: "냠냠, 고마워!",
     petLabel: "까미 쓰다듬기",
     keyboard: "키보드로는 버튼에 초점을 맞추고 Enter 또는 Space를 눌러요.",
     count: "누적 쓰담",

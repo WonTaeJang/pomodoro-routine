@@ -1,0 +1,64 @@
+@use "../../../styles/mixins";
+
+.affinity {
+  margin: 0 var(--space-5) var(--space-4);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+.summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  list-style: none;
+  padding: var(--space-2) 0;
+  @include mixins.focus-ring;
+  &::-webkit-details-marker {
+    display: none;
+  }
+  > span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1-5);
+    white-space: nowrap;
+  }
+  svg {
+    color: var(--color-short-break);
+  }
+}
+.bar {
+  appearance: none;
+  flex: 1;
+  min-width: 0;
+  height: var(--space-1-5);
+  border: 0;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: var(--color-border);
+  color: var(--color-short-break);
+  &::-webkit-progress-bar {
+    background: var(--color-border);
+    border-radius: var(--radius-full);
+  }
+  &::-webkit-progress-value {
+    background: var(--color-short-break);
+    border-radius: var(--radius-full);
+  }
+  &::-moz-progress-bar {
+    background: var(--color-short-break);
+    border-radius: var(--radius-full);
+  }
+}
+.detail {
+  @include mixins.stack(var(--space-1));
+  padding-top: var(--space-2);
+  strong {
+    color: var(--color-text);
+  }
+}
+.notice {
+  color: var(--color-short-break);
+  &:not(:empty) {
+    margin-top: var(--space-2);
+  }
+}

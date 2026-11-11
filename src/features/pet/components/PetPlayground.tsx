@@ -11,6 +11,8 @@ import { petStore, usePetStore } from "../store";
 import { useStoresReady } from "@/lib/useHydrateStores";
 import styles from "./PetPlayground.module.scss";
 
+import { PetAffinity } from "./PetAffinity";
+
 export function PetPlayground() {
   const [attempt, setAttempt] = useState(0);
   return (
@@ -75,6 +77,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                   : t("idle")}
           </span>
         </div>
+        <PetAffinity />
         <div className={styles.room}>
           <div className={styles.window} aria-hidden="true">
             <span />
