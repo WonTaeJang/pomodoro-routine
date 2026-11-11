@@ -1,8 +1,21 @@
 @use "../../../styles/mixins";
 
-// 소리를 켜 두면 버튼 오른쪽 위에 강조색 점
+// 소리를 골라 두면 버튼 오른쪽 위에 강조색 점, 소리가 나오는 동안에는 그 자리에 오르내리는 막대
 .button {
   position: relative;
+}
+
+.button.playing {
+  color: var(--color-accent);
+}
+
+// 버튼 안 오른쪽 위에만 그려서 버튼 크기와 옆 버튼 자리는 그대로
+.bars {
+  position: absolute;
+  top: 2px;
+  right: 1px;
+  height: 8px;
+  pointer-events: none;
 }
 
 .on::after {

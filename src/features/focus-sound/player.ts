@@ -39,6 +39,29 @@ let playing: Playing | null = null;
 const buffers = new Map<FocusSoundId, AudioBuffer>();
 const loading = new Set<FocusSoundId>();
 
+/** "소리가 나오는 중"이 바뀌면 알릴 곳 (헤더 버튼의 재생 표시) */
+const listeners = new Set<() => void>();
+let audible = false;
+let watchedAudio: AudioContext | null = null;
+
+/** 재생 상태나 오디오 상태가 바뀔 때마다 불러서, 실제로 들리는지가 달라졌으면 알립니다. */
+function updateAudible() {
+  const next = playing !== null && getAudio()?.state === "running";
+  if (next === audible) return;
+  audible = next;
+  listeners.forEach((listener) => listener());
+}
+
+/** 지금 집중 소리가 실제로 나오는 중인지 (서서히 꺼지기 시작하면 바로 false) */
+export function isFocusSoundPlaying(): boolean {
+  return audible;
+}
+
+export function subscribeFocusSoundPlaying(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
 /** 노이즈를 만듭니다. (양쪽 귀에 조금 다른 소리를 넣어 넓게 들리게) */
 function makeSynth(ctx: AudioContext, sound: SynthSound): AudioBuffer {
   const rate = ctx.sampleRate;
@@ -122,9 +145,20 @@ function fadeOut(ctx: AudioContext, node: Playing) {
   node.source.stop(ctx.currentTime + STOP_AFTER);
 }
 
+/** 소리를 지금 들려야 할 상태로 맞추고, 들리는지 여부를 알립니다. */
 function apply() {
   const ctx = getAudio();
   if (!ctx) return;
+  // 브라우저가 오디오를 막거나(새로고침 직후) 멈추면(다른 앱에 다녀옴) 재생 표시도 따라가게
+  if (watchedAudio !== ctx) {
+    watchedAudio = ctx;
+    ctx.addEventListener("statechange", updateAudible);
+  }
+  syncPlayback(ctx);
+  updateAudible();
+}
+
+function syncPlayback(ctx: AudioContext) {
   const target = wanted ?? preview;
   const level = target ? target.volume * FOCUS_SOUNDS[target.id].level : 0;
 

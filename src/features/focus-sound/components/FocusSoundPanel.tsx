@@ -24,6 +24,7 @@ import {
 } from "../sounds";
 import { useFocusSoundChoice } from "../useFocusSoundChoice";
 import styles from "./FocusSoundPanel.module.scss";
+import { PlayingBars } from "./PlayingBars";
 
 /** 맨 위 넓은 두 칸 (이름과 설명은 focusSound.<값>.label / description) */
 const WIDE_OPTIONS = [
@@ -206,11 +207,7 @@ function SoundOption({
       {playing ? (
         <>
           <VisuallyHidden>{t("playing")}</VisuallyHidden>
-          <span className={styles.playing} aria-hidden="true">
-            <span className={styles.bar} />
-            <span className={styles.bar} />
-            <span className={styles.bar} />
-          </span>
+          <PlayingBars className={styles.playing} />
         </>
       ) : null}
     </label>

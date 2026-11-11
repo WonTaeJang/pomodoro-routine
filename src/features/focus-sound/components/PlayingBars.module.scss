@@ -1,0 +1,41 @@
+@use "../../../styles/mixins";
+
+.bars {
+  display: flex;
+  height: 10px;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.bar {
+  width: 3px;
+  height: 100%;
+  border-radius: 1px;
+  background: var(--color-accent);
+  transform-origin: bottom;
+  animation: bounce 0.9s ease-in-out infinite;
+
+  &:nth-child(2) {
+    animation-delay: -0.3s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: -0.6s;
+  }
+
+  @include mixins.reduced-motion {
+    animation: none;
+    transform: scaleY(0.6);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+
+  50% {
+    transform: scaleY(1);
+  }
+}
