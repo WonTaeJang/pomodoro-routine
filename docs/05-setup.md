@@ -36,6 +36,22 @@ npm run dev
 3. Supabase **Authentication → Sign In / Providers → Google**: 구글 클라우드에서 만든 OAuth 클라이언트 ID와 보안 비밀번호를 넣습니다. 구글 쪽 승인된 리디렉션 URI는 Supabase가 보여주는 Callback URL(`https://<프로젝트>.supabase.co/auth/v1/callback`)입니다.
 4. `.env.local`을 바꾸면 `npm run dev`를 다시 시작합니다 (값이 빌드할 때 들어감).
 
+### 테스트 계정 로그인 (개발 서버 전용)
+
+구글은 앱에 내장된 브라우저(Claude 브라우저 등)에서의 로그인을 막습니다 (계정을 골라도 계정 선택 화면에 머무름). 그런 브라우저에서 로그인 뒤 화면과 계정 저장을 확인하려고 개발 서버에서만 보이는 "테스트 계정으로 로그인 (개발용)" 버튼을 둡니다.
+
+1. Supabase **Authentication → Users → Add user**로 이메일·비밀번호 계정을 만듭니다 ("Auto Confirm User" 체크). 본인 계정과 섞이지 않게 테스트 전용으로 만듭니다.
+2. 저장소 맨 위에 `.env.development.local`을 만들고 아래 두 줄을 넣습니다. (git에 올라가지 않고, `npm run dev`에서만 읽힘)
+
+```bash
+NEXT_PUBLIC_DEV_LOGIN_EMAIL=테스트 계정 이메일
+NEXT_PUBLIC_DEV_LOGIN_PASSWORD=테스트 계정 비밀번호
+```
+
+- 값에 `$`가 있으면 Next.js가 그 뒤를 다른 변수 이름으로 읽어 값이 바뀝니다. `\$`로 적습니다. (예: `abc$12` → `abc\$12`)
+
+3. `npm run dev`를 다시 시작하면 `/login`에 버튼이 보입니다. 값이 없거나 배포용 빌드(`npm run build`)에서는 버튼이 없고 값도 들어가지 않습니다.
+
 ## 5초 테스트 모드
 
 `npm run dev` 실행 후 http://localhost:3000/?test=5 로 열면 집중과 휴식이 모두 5초가 됩니다.

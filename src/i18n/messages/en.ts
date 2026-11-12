@@ -487,7 +487,8 @@ const en: Messages = {
       redirecting: "Taking you to Google…",
       failed: "Couldn’t start logging in. Please try again in a moment.",
       notConfigured: "Logging in isn’t available on this site yet.",
-      note: "For now, your tasks and history stay in this browser even when you’re logged in.",
+      devAccount: "Log in with the test account (dev only)",
+      note: "When you’re logged in, your focus history is saved to your account. Tasks and settings still stay in this browser.",
     },
     callback: {
       working: "Logging you in…",

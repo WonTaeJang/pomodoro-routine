@@ -60,6 +60,30 @@ export async function signInWithGoogle(next?: string): Promise<boolean> {
   return !error;
 }
 
+// 개발 서버에서만 쓰는 테스트 계정 (.env.development.local). 배포용 빌드에는 값이 들어가지 않음
+const DEV_LOGIN_EMAIL = process.env.NEXT_PUBLIC_DEV_LOGIN_EMAIL;
+const DEV_LOGIN_PASSWORD = process.env.NEXT_PUBLIC_DEV_LOGIN_PASSWORD;
+
+/**
+ * 테스트 계정 로그인을 쓸 수 있는지. 개발 서버이고 테스트 계정 정보가 있을 때만.
+ * 구글은 앱에 내장된 브라우저(예: Claude 브라우저)에서의 로그인을 막아서, 그런 곳에서 로그인 뒤 화면을 확인하려고 둠
+ */
+export const isDevLoginAvailable =
+  process.env.NODE_ENV === "development" &&
+  isAuthConfigured &&
+  Boolean(DEV_LOGIN_EMAIL && DEV_LOGIN_PASSWORD);
+
+/** 테스트 계정(이메일·비밀번호)으로 로그인. 개발 서버 전용. 성공하면 true */
+export async function signInWithDevAccount(): Promise<boolean> {
+  const supabase = getSupabase();
+  if (!isDevLoginAvailable || !supabase) return false;
+  const { error } = await supabase.auth.signInWithPassword({
+    email: DEV_LOGIN_EMAIL!,
+    password: DEV_LOGIN_PASSWORD!,
+  });
+  return !error;
+}
+
 /** 같은 code로 두 번 바꾸지 않게 (개발 모드에서 화면이 두 번 그려져도) */
 const exchanges = new Map<string, Promise<boolean>>();
 
