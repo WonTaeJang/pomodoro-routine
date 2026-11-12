@@ -24,13 +24,15 @@ Screenshots: put the images in docs/images/ and uncomment the lines below.
 - **Calendar and stats**: daily focus count, time and finished tasks, plus your streak, the last 7 days, this month and all-time totals.
 - **Kkami certificate**: finish a cycle and save or share that day's certificate as an image (1080×1920, Instagram story size).
 - **Alerts**: a chime when a session ends, and a browser notification if you're in another tab.
-- **Sign-in (optional)**: sign in with Google and change your nickname on your profile. Everything works without signing in. Kakao sign-in is coming later.
+- **Sign-in (optional)**: sign in with Google to save your tasks, history and settings to your account and pick up on other devices. You can change your nickname or delete your account on your profile. Everything works without signing in. Kakao sign-in is coming later.
 - **Keyboard shortcuts**: `Space` start / pause, `R` reset, `N` next session, `S` settings.
 - **Also**: dark mode, Korean / English, a first-visit intro and a guide page (`/guide`), keep screen on while the timer runs, and one shared timer across tabs.
 
 ### Where is my data saved?
 
-Your tasks, history, pet records and settings are saved **only in this browser (localStorage)**. Your history isn't sent to a server even when you sign in (only your account lives in Supabase), and there's no sync between devices yet. Clearing your browser data also deletes your history.
+- **Without signing in:** your tasks, history, pet records and settings are saved **only in this browser (localStorage)**. Nothing is sent to a server, and clearing your browser data also deletes your history.
+- **When you sign in:** your tasks, focus history and settings (durations, auto-start, focus sound, etc.) are also saved to your account (Supabase), so you can continue on other devices with the same account. Sound volume, notifications, display settings, theme, language and pet records stay in this browser.
+- **Logging out** clears tasks, history and the timer in this browser (they stay in your account). **Deleting your account** removes it and all data saved to it.
 
 The pet care prototype is available at `/pet` on the development server. Pet pixel Kkami to see a happy reaction before returning to idle. Total pats are saved in this browser; timer rewards aren't connected yet. [Implementation and asset guide (Korean)](./docs/07-pet-prototype.md)
 
@@ -57,7 +59,7 @@ Then open http://localhost:3000 in your browser.
 
 During development, add `?test=5` to the address to make every session 5 seconds long (`?test=off` turns it off). See the [setup guide](./docs/05-setup.md) (in Korean) for more.
 
-To try sign-in, create a Supabase project and put its URL and publishable key in `.env.local`. Without them, only the sign-in menu is hidden and everything else works. ([Sign-in setup, in Korean](./docs/05-setup.md#로그인-supabase-설정))
+To try sign-in, create a Supabase project and put its URL and publishable key in `.env.local`. Without them, only the sign-in menu is hidden and everything else works. To save to accounts, also run the two SQL files in `supabase/`. ([Sign-in setup, in Korean](./docs/05-setup.md#로그인-supabase-설정))
 
 ## Tech stack
 

@@ -488,7 +488,7 @@ const en: Messages = {
       failed: "Couldn’t start logging in. Please try again in a moment.",
       notConfigured: "Logging in isn’t available on this site yet.",
       devAccount: "Log in with the test account (dev only)",
-      note: "When you’re logged in, your focus history is saved to your account. Tasks and settings still stay in this browser.",
+      note: "When you’re logged in, your tasks, history and settings are saved to your account so you can continue on other devices.",
     },
     callback: {
       working: "Logging you in…",
