@@ -35,6 +35,7 @@ npm run dev
 2. Supabase **Authentication → URL Configuration**: Site URL `http://localhost:3000`, Redirect URLs에 `http://localhost:3000/**`. 배포하면 실제 주소를 정확한 경로로 추가합니다.
 3. Supabase **Authentication → Sign In / Providers → Google**: 구글 클라우드에서 만든 OAuth 클라이언트 ID와 보안 비밀번호를 넣습니다. 구글 쪽 승인된 리디렉션 URI는 Supabase가 보여주는 Callback URL(`https://<프로젝트>.supabase.co/auth/v1/callback`)입니다.
 4. `.env.local`을 바꾸면 `npm run dev`를 다시 시작합니다 (값이 빌드할 때 들어감).
+5. 계정에 기록을 저장하려면 Supabase **SQL Editor**에서 `supabase/sync-tables.sql`(표 3개)과 `supabase/delete-account.sql`(회원 탈퇴 함수)을 차례로 한 번씩 실행합니다.
 
 ### 테스트 계정 로그인 (개발 서버 전용)
 

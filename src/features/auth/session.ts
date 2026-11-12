@@ -106,6 +106,21 @@ export async function signOut(): Promise<void> {
   await getSupabase()?.auth.signOut({ scope: "local" });
 }
 
+/**
+ * 회원 탈퇴: 계정과 계정에 저장된 할 일·기록·설정을 지웁니다 (서버의 delete_my_account 함수,
+ * supabase/delete-account.sql). 성공하면 이 브라우저에서도 로그아웃하므로 이 브라우저의 할 일·기록·타이머도 지워짐.
+ * 지우지 못하면 false
+ */
+export async function deleteAccount(): Promise<boolean> {
+  const supabase = getSupabase();
+  if (!supabase) return false;
+  const { error } = await supabase.rpc("delete_my_account");
+  if (error) return false;
+  // 계정이 없어져 서버 쪽 로그아웃은 실패하지만, 이 브라우저의 로그인 정보는 지워짐
+  await signOut();
+  return true;
+}
+
 export type NicknameResult = NicknameCheck | { ok: false; reason: "failed" };
 
 /**

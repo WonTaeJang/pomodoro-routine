@@ -520,6 +520,15 @@ const en: Messages = {
       logout: "Log out",
       logoutNote:
         "Logging out clears your tasks, history and timer in this browser. They stay in your account and come back when you log in again.",
+      deleteAccount: {
+        button: "Delete account",
+        title: "Delete your account?",
+        message:
+          "Your account and the tasks, history and settings saved to it will be deleted. This can’t be undone. Tasks, history and the timer in this browser will be cleared too.",
+        action: "Delete account",
+        working: "Deleting…",
+        failed: "Couldn’t delete your account. Please try again in a moment.",
+      },
     },
   },
 };

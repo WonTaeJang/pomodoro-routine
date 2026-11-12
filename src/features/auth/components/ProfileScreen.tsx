@@ -5,16 +5,16 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "use-intl";
 import { LogInIcon, LogOutIcon } from "@/components/icons";
-import { Button, TextField } from "@/components/ui";
+import { Button, ConfirmDialog, TextField } from "@/components/ui";
 import { formatDate } from "@/lib/date";
 import { NICKNAME_MAX, profileOf } from "../profile";
-import { signOut, updateNickname, useAuth } from "../session";
+import { deleteAccount, signOut, updateNickname, useAuth } from "../session";
 import { Avatar } from "./Avatar";
 import styles from "./ProfileScreen.module.scss";
 import { AuthCard } from "./AuthCard";
 import page from "./AuthPage.module.scss";
 
-/** 내 프로필 (/profile): 사진, 닉네임 바꾸기, 이메일, 로그인 방법, 가입한 날, 로그아웃 */
+/** 내 프로필 (/profile): 사진, 닉네임 바꾸기, 이메일, 로그인 방법, 가입한 날, 로그아웃, 회원 탈퇴 */
 export function ProfileScreen() {
   const t = useTranslations("auth");
   const router = useRouter();
@@ -95,6 +95,50 @@ function ProfileDetails({ user }: { user: User }) {
         {t("logout")}
       </Button>
       <p className={page.muted}>{t("logoutNote")}</p>
+      <DeleteAccount />
+    </>
+  );
+}
+
+/** 회원 탈퇴: 확인 팝업에서 한 번 더 눌러야 지움. 탈퇴하면 타이머 화면으로 */
+function DeleteAccount() {
+  const t = useTranslations("auth.profile.deleteAccount");
+  const router = useRouter();
+  const [confirming, setConfirming] = useState(false);
+  const [state, setState] = useState<"idle" | "deleting" | "failed">("idle");
+
+  async function remove() {
+    setState("deleting");
+    if (await deleteAccount()) router.replace("/");
+    else setState("failed");
+  }
+
+  return (
+    <>
+      <Button
+        variant="ghost"
+        size="sm"
+        className={styles.deleteAccount}
+        disabled={state === "deleting"}
+        onClick={() => setConfirming(true)}
+      >
+        {state === "deleting" ? t("working") : t("button")}
+      </Button>
+      {state === "failed" ? (
+        <p className={page.error} role="alert">
+          {t("failed")}
+        </p>
+      ) : null}
+      <ConfirmDialog
+        open={confirming}
+        title={t("title")}
+        confirmLabel={t("action")}
+        tone="danger"
+        onConfirm={() => void remove()}
+        onClose={() => setConfirming(false)}
+      >
+        {t("message")}
+      </ConfirmDialog>
     </>
   );
 }

@@ -56,3 +56,9 @@
 .logout {
   align-self: flex-start;
 }
+
+// 회원 탈퇴는 자주 쓰지 않으므로 로그아웃 아래에 작게
+.deleteAccount {
+  align-self: flex-start;
+  color: var(--color-text-muted);
+}
