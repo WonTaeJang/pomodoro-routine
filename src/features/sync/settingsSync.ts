@@ -24,7 +24,6 @@ type SettingsSyncDeps = {
  * 한 계정의 설정 맞추기. sync()는 (처음이거나 refresh면) 서버 설정을 받아, 이 브라우저에서
  * 고치지 않았으면 반영하고, 이 브라우저에서 고쳤으면 올립니다 ("나중에 고친 쪽이 이김").
  * 이 브라우저에서 처음 맞출 때 서버에 설정이 있으면 서버 설정을 따릅니다.
- * 실패하면 false이고 다음에 부르면 다시 합니다.
  */
 export function createSettingsSync(deps: SettingsSyncDeps): Runner {
   let pulled = false;
@@ -58,10 +57,8 @@ export function createSettingsSync(deps: SettingsSyncDeps): Runner {
         memory = shape;
       }
       return true;
-    } catch {
-      // 인터넷이 끊겼거나 서버 오류: 설정은 그대로이므로 다음에 다시 맞춤
-      return false;
     } finally {
+      // 실패해도 확인한 데까지는 기억
       if (!isStopped()) deps.writeMemory(memory);
     }
   });

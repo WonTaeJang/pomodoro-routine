@@ -10,7 +10,7 @@ type HistoryStore = {
   addSessions: (sessions: CompletedSession[]) => void;
   /** 계정에서 받아온 기록을 합칩니다. 이미 있는 기록은 빼고, 끝난 순서대로 둡니다. */
   mergeSessions: (sessions: CompletedSession[]) => void;
-  /** 기록을 모두 지웁니다. (로그아웃할 때 쓸 예정, 백로그 I-027) */
+  /** 기록을 모두 지웁니다. (로그아웃할 때, src/features/sync/clearLocalData.ts) */
   clear: () => void;
 };
 

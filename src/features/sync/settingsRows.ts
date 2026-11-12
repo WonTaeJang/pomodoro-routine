@@ -1,7 +1,7 @@
 import { isFocusSoundSetting } from "@/features/focus-sound/sounds";
 import { SETTING_RANGES } from "@/features/timer/timer";
 import type { TimerSettings } from "@/features/timer/types";
-import { isUuid } from "./uuid";
+import { isUuid } from "./rowValues";
 
 /** 기기끼리 맞추는 설정 (나머지 설정·테마·언어는 브라우저에만) */
 export const SYNCED_SETTING_KEYS = [

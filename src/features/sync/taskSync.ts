@@ -1,7 +1,12 @@
 import type { Task } from "@/features/tasks/types";
 import type { TaskMemory } from "./memory";
 import { createRunner, type Runner } from "./runner";
-import { fromTaskRow, taskShape, type RemoteTaskRow } from "./taskRows";
+import {
+  fromTaskRow,
+  taskShape,
+  type RemoteTaskRow,
+  type TaskRow,
+} from "./taskRows";
 
 /**
  * 서버 시계는 "고친 시각"을 트랜잭션이 시작할 때 찍어서, 늦게 끝난 저장이 앞선 시각으로 남을 수 있음.
@@ -12,10 +17,10 @@ const CURSOR_OVERLAP_MS = 60_000;
 type TaskSyncDeps = {
   /** since 이후에 고친 내 할 일 (지운 표시 포함). since가 없으면 전부 */
   fetchSince: (since: string | null) => Promise<RemoteTaskRow[]>;
-  /** 서버 표에 올릴 수 있는 할 일인지 (못 올리는 할 일은 이 브라우저에만 둠) */
-  uploadable: (task: Task) => boolean;
-  /** 할 일 올리기 (서버에 있으면 덮어씀) */
-  upload: (tasks: Task[]) => Promise<void>;
+  /** 할 일을 서버 표의 줄로. 표에 넣을 수 없으면 null (그런 할 일은 이 브라우저에만 둠) */
+  toRow: (task: Task) => TaskRow | null;
+  /** 줄 올리기 (서버에 있으면 덮어씀) */
+  upload: (rows: TaskRow[]) => Promise<void>;
   /** 할 일에 지운 표시 */
   markDeleted: (ids: string[]) => Promise<void>;
   /** 이 브라우저의 할 일 */
@@ -38,7 +43,7 @@ function overlap(cursor: string | null): string | null {
 
 /**
  * 한 계정의 할 일 맞추기. sync()는 (처음이거나 refresh면) 서버에서 바뀐 할 일을 받아 반영하고,
- * 이 브라우저에서 바뀐 할 일을 올립니다. 실패하면 false이고 다음에 부르면 다시 합니다.
+ * 이 브라우저에서 바뀐 할 일을 올립니다.
  *
  * "서버와 같다고 확인한 모양"(baseline)과 비교해서
  * - 모양이 달라진 할 일 = 이 브라우저에서 고친 것 → 올림
@@ -83,14 +88,15 @@ export function createTaskSync(deps: TaskSyncDeps): Runner {
     const baseline = memory.baseline;
     const tasks = deps.getLocal();
     const present = new Set(tasks.map((task) => task.id));
-    const edited = tasks.filter(
-      (task) => taskShape(task) !== baseline[task.id] && deps.uploadable(task),
-    );
+    const edited = tasks
+      .filter((task) => taskShape(task) !== baseline[task.id])
+      .map((task) => ({ task, row: deps.toRow(task) }))
+      .filter((item) => item.row !== null);
     const deleted = Object.keys(baseline).filter((id) => !present.has(id));
     if (edited.length > 0) {
-      await deps.upload(edited);
+      await deps.upload(edited.map((item) => item.row!));
       if (isStopped()) return false;
-      for (const task of edited) baseline[task.id] = taskShape(task);
+      for (const { task } of edited) baseline[task.id] = taskShape(task);
     }
     if (deleted.length > 0) {
       await deps.markDeleted(deleted);
@@ -108,9 +114,6 @@ export function createTaskSync(deps: TaskSyncDeps): Runner {
         pulled = true;
       }
       return await push(memory, isStopped);
-    } catch {
-      // 인터넷이 끊겼거나 서버 오류: 할 일은 그대로이므로 다음에 다시 맞춤
-      return false;
     } finally {
       // 받거나 올린 데까지는 기억 (중간에 실패해도 다음에 그만큼 덜 함)
       if (!isStopped()) deps.writeMemory(memory);

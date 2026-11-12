@@ -33,7 +33,7 @@ type TasksStore = TasksState & {
    * 지금 집중할 할 일이 없어졌거나 완료됐으면 다른 할 일로 바꿈 (tasks.ts의 replaceTasks)
    */
   replaceTasks: (tasks: Task[]) => void;
-  /** 할 일을 모두 지웁니다. (로그아웃할 때 쓸 예정, 백로그 I-027) */
+  /** 할 일을 모두 지웁니다. (로그아웃할 때, src/features/sync/clearLocalData.ts) */
   clearAll: () => void;
 };
 

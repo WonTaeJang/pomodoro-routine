@@ -4,7 +4,7 @@ import {
   type CompletedSession,
   type TimerMode,
 } from "@/features/timer/types";
-import { isUuid } from "./uuid";
+import { fromIso, isUuid, toIso } from "./rowValues";
 
 /** 서버 `sessions` 표의 한 줄 (supabase/sync-tables.sql) */
 export type SessionRow = {
@@ -38,7 +38,7 @@ export function toSessionRow(
   return {
     user_id: userId,
     mode: session.mode,
-    ended_at: new Date(session.endedAt).toISOString(),
+    ended_at: toIso(session.endedAt),
     duration_ms: duration,
     // 표의 task_id는 uuid. 아니면 비워 두고 제목만 남김
     task_id: isUuid(session.taskId) ? session.taskId : null,
@@ -51,7 +51,7 @@ export function toSessionRow(
 export function fromSessionRow(
   row: Omit<SessionRow, "user_id">,
 ): CompletedSession | null {
-  const endedAt = Date.parse(row.ended_at);
+  const endedAt = fromIso(row.ended_at);
   if (!MODES.includes(row.mode) || Number.isNaN(endedAt)) return null;
   return {
     mode: row.mode,

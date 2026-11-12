@@ -4,7 +4,7 @@ import {
   TITLE_MAX_LENGTH,
 } from "@/features/tasks/tasks";
 import type { Task } from "@/features/tasks/types";
-import { isUuid } from "./uuid";
+import { fromIso, isUuid, toIso } from "./rowValues";
 
 /** 서버 `tasks` 표의 한 줄 (supabase/sync-tables.sql). updated_at은 서버가 찍음 */
 export type TaskRow = {
@@ -27,10 +27,6 @@ export type RemoteTaskRow = Omit<TaskRow, "user_id"> & { updated_at: string };
 export const TASK_COLUMNS =
   "id,title,estimate,completed_pomodoros,done,sort_order,created_at,completed_at,archived_at,deleted_at,updated_at";
 
-const iso = (ms: number | null) =>
-  ms === null ? null : new Date(ms).toISOString();
-const ms = (value: string | null) =>
-  value === null ? null : Date.parse(value);
 const isInt = (value: number, min: number, max = Number.MAX_SAFE_INTEGER) =>
   Number.isInteger(value) && value >= min && value <= max;
 
@@ -55,16 +51,16 @@ export function toTaskRow(task: Task, userId: string): TaskRow | null {
     completed_pomodoros: task.completedPomodoros,
     done: task.done,
     sort_order: task.order,
-    created_at: iso(task.createdAt)!,
-    completed_at: iso(task.completedAt),
-    archived_at: iso(task.archivedAt),
+    created_at: toIso(task.createdAt),
+    completed_at: toIso(task.completedAt),
+    archived_at: toIso(task.archivedAt),
     deleted_at: null,
   };
 }
 
 /** 서버에서 받은 줄을 앱의 할 일로 바꿉니다. 읽을 수 없는 줄은 null */
 export function fromTaskRow(row: RemoteTaskRow): Task | null {
-  const createdAt = Date.parse(row.created_at);
+  const createdAt = fromIso(row.created_at);
   if (!isUuid(row.id) || Number.isNaN(createdAt)) return null;
   return {
     id: row.id,
@@ -74,8 +70,8 @@ export function fromTaskRow(row: RemoteTaskRow): Task | null {
     done: row.done,
     order: row.sort_order,
     createdAt,
-    completedAt: ms(row.completed_at),
-    archivedAt: ms(row.archived_at),
+    completedAt: fromIso(row.completed_at),
+    archivedAt: fromIso(row.archived_at),
   };
 }
 

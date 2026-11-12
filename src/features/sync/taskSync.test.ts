@@ -1,7 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import type { Task } from "@/features/tasks/types";
 import type { TaskMemory } from "./memory";
-import { toTaskRow, type RemoteTaskRow, type TaskRow } from "./taskRows";
+import {
+  fromTaskRow,
+  toTaskRow,
+  type RemoteTaskRow,
+  type TaskRow,
+} from "./taskRows";
 import { createTaskSync } from "./taskSync";
 
 const USER = "11111111-1111-4111-8111-111111111111";
@@ -44,9 +49,9 @@ function setup(local: Task[] = []) {
       .filter((row) => !since || row.updated_at >= since)
       .sort((a, b) => a.updated_at.localeCompare(b.updated_at));
   });
-  const upload = vi.fn(async (list: Task[]) => {
+  const upload = vi.fn(async (rows: TaskRow[]) => {
     if (offline) throw new Error("offline");
-    list.forEach((t) => serverPut(t));
+    rows.forEach((row) => serverPut(fromTaskRow({ ...row, updated_at: "" })!));
   });
   const markDeleted = vi.fn(async (ids: string[]) => {
     if (offline) throw new Error("offline");
@@ -58,7 +63,7 @@ function setup(local: Task[] = []) {
   });
   const sync = createTaskSync({
     fetchSince,
-    uploadable: (t) => t.title !== "올리지 못함",
+    toRow: (t) => (t.title === "올리지 못함" ? null : toTaskRow(t, USER)),
     upload,
     markDeleted,
     getLocal: () => tasks,
@@ -101,7 +106,7 @@ describe("createTaskSync", () => {
     expect(await t.sync()).toBe(true);
     expect(t.localTitles()).toEqual(["할 일 1", "할 일 2"]);
     expect(t.serverTitles()).toEqual(["할 일 1", "할 일 2"]);
-    expect(t.upload).toHaveBeenCalledWith([task(1)]);
+    expect(t.upload).toHaveBeenCalledWith([toTaskRow(task(1), USER)]);
   });
 
   it("고친 할 일만 올리고, 바뀐 게 없으면 서버에 요청하지 않음", async () => {
@@ -110,7 +115,9 @@ describe("createTaskSync", () => {
     t.upload.mockClear();
     t.setLocal([task(1, { title: "고친 제목" }), task(2)]);
     await t.sync();
-    expect(t.upload).toHaveBeenCalledWith([task(1, { title: "고친 제목" })]);
+    expect(t.upload).toHaveBeenCalledWith([
+      toTaskRow(task(1, { title: "고친 제목" }), USER),
+    ]);
     await t.sync();
     expect(t.upload).toHaveBeenCalledTimes(1);
   });
@@ -194,7 +201,7 @@ describe("createTaskSync", () => {
   it("서버 표에 올릴 수 없는 할 일은 이 브라우저에만 두고 올린 것으로 치지 않음", async () => {
     const t = setup([task(1, { title: "올리지 못함" }), task(2)]);
     await t.sync();
-    expect(t.upload).toHaveBeenCalledWith([task(2)]);
+    expect(t.upload).toHaveBeenCalledWith([toTaskRow(task(2), USER)]);
     expect(t.memory().baseline[id(1)]).toBeUndefined();
     t.setLocal([task(2)]);
     await t.sync();

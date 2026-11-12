@@ -14,8 +14,7 @@ type SessionSyncDeps = {
 };
 
 /**
- * 한 계정의 집중 기록 맞추기. sync()는 (처음이거나 refresh면) 서버 기록을 받아 합치고,
- * 서버에 없는 기록을 올립니다. 실패하면 false이고 다음에 부르면 못 한 것부터 다시 합니다.
+ * 한 계정의 집중 기록 맞추기. (처음이거나 refresh면) 서버 기록을 받아 합치고, 서버에 없는 기록을 올립니다.
  * 기록은 추가만 되고 바뀌지 않으므로 "서버에 있는 것으로 확인한 기록"만 기억해 두고,
  * 거기 없는 것을 올리면 됩니다. 계정이 바뀌면 새로 만듭니다.
  */
@@ -24,26 +23,21 @@ export function createSessionSync(deps: SessionSyncDeps): Runner {
   let known: Set<string> | null = null;
 
   return createRunner(async (refresh, isStopped) => {
-    try {
-      if (!known || refresh) {
-        const remote = await deps.fetchAll();
-        if (isStopped()) return false;
-        known = new Set([...(known ?? []), ...remote.map(sessionKey)]);
-        deps.mergeLocal(remote);
-      }
-      const confirmed = known;
-      const pending = deps
-        .getLocal()
-        .filter((session) => !confirmed.has(sessionKey(session)));
-      if (pending.length > 0) {
-        await deps.upload(pending);
-        if (isStopped()) return false;
-        for (const session of pending) confirmed.add(sessionKey(session));
-      }
-      return true;
-    } catch {
-      // 인터넷이 끊겼거나 서버 오류: 브라우저 기록은 그대로이므로 다음에 다시 맞춤
-      return false;
+    if (!known || refresh) {
+      const remote = await deps.fetchAll();
+      if (isStopped()) return false;
+      known = new Set([...(known ?? []), ...remote.map(sessionKey)]);
+      deps.mergeLocal(remote);
     }
+    const confirmed = known;
+    const pending = deps
+      .getLocal()
+      .filter((session) => !confirmed.has(sessionKey(session)));
+    if (pending.length > 0) {
+      await deps.upload(pending);
+      if (isStopped()) return false;
+      for (const session of pending) confirmed.add(sessionKey(session));
+    }
+    return true;
   });
 }
