@@ -33,7 +33,10 @@ npm run dev
    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
    ```
 2. Supabase **Authentication → URL Configuration**: Site URL `http://localhost:3000`, Redirect URLs에 `http://localhost:3000/**`. 배포하면 실제 주소를 정확한 경로로 추가합니다.
-3. Supabase **Authentication → Sign In / Providers → Google**: 구글 클라우드에서 만든 OAuth 클라이언트 ID와 보안 비밀번호를 넣습니다. 구글 쪽 승인된 리디렉션 URI는 Supabase가 보여주는 Callback URL(`https://<프로젝트>.supabase.co/auth/v1/callback`)입니다.
+3. Supabase **Authentication → Sign In / Providers**에서 로그인 방법을 켭니다.
+   - **Google**: 구글 클라우드에서 만든 OAuth 클라이언트 ID와 보안 비밀번호를 넣습니다. 구글 쪽 승인된 리디렉션 URI는 Supabase가 보여주는 Callback URL(`https://<프로젝트>.supabase.co/auth/v1/callback`)입니다.
+   - **Kakao**: 카카오 디벨로퍼스 **앱 → 플랫폼 키 → REST API 키**에서 REST API 키(Client ID)와 카카오 로그인 Client Secret을 Supabase에 넣고, 같은 화면의 카카오 로그인 Redirect URI에 위 Callback URL을 넣습니다. **제품 설정 → 카카오 로그인**에서 상태 ON, 동의항목은 닉네임·프로필 사진과 카카오계정(이메일)을 **선택 동의**로 켭니다. Supabase가 이메일을 항상 같이 요청해서 이메일 동의항목이 없으면 KOE205 오류가 납니다. 이메일 동의항목은 비즈 앱만 켤 수 있어서, **앱 → 일반 → 비즈니스 정보 → 개인 개발자 비즈 앱 전환**(본인인증 필요, 앱 아이콘 등록 필요: `design/app-icon/kkamodoro-app-icon-128.png`)을 먼저 합니다. 이메일을 빼고 동의할 수 있으므로 Supabase Kakao 설정의 **Allow users without an email**을 켭니다.
+   - 보안 비밀번호(Client Secret)는 Supabase 대시보드에만 넣고 `.env.local`에는 넣지 않습니다.
 4. `.env.local`을 바꾸면 `npm run dev`를 다시 시작합니다 (값이 빌드할 때 들어감).
 5. 계정에 기록을 저장하려면 Supabase **SQL Editor**에서 `supabase/sync-tables.sql`(표 3개)과 `supabase/delete-account.sql`(회원 탈퇴 함수)을 차례로 한 번씩 실행합니다.
 
@@ -218,3 +221,4 @@ pomodoro-routine/
 - 2026-11-08: 다국어 `src/i18n/`, `kkamodoro-locale`, 화면 글자 쓰는 법 추가
 - 2026-11-08: README 화면 캡처 위치 `docs/images/` 추가
 - 2026-11-10: 로그인 (Supabase) 설정(`.env.local`), `kkamodoro-auth`, `src/features/auth/` 추가
+- 2026-11-13: 카카오 로그인 설정 추가

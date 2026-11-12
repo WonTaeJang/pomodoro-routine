@@ -28,3 +28,23 @@
   color: var(--color-danger);
   font-size: var(--font-size-sm);
 }
+
+// 로그인 방법 버튼 묶음 (구글, 카카오)
+.providers {
+  @include mixins.stack(var(--space-2));
+}
+
+// 카카오 로그인 버튼: 카카오 로그인 디자인 가이드의 색(노란 바탕, 85% 검정 글자). 테마와 관계없이 같음.
+// Button(secondary) 색을 덮어야 하므로 .card .providers 안으로 한 단계 더 구체적으로
+$kakao-container: #fee500;
+$kakao-label: rgb(0 0 0 / 85%);
+
+.card .providers .kakao {
+  border-color: transparent;
+  background: $kakao-container;
+  color: $kakao-label;
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, $kakao-container, black 6%);
+  }
+}

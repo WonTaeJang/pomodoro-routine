@@ -31,7 +31,12 @@ export function profileOf(user: User): Profile {
   return {
     nickname,
     customNickname: custom !== null,
-    avatarUrl: text(meta.avatar_url) ?? text(meta.picture),
+    // 카카오는 사진 주소를 http://로 줄 때가 있어 https://로 (https 사이트에서 막히지 않게)
+    avatarUrl:
+      (text(meta.avatar_url) ?? text(meta.picture))?.replace(
+        /^http:\/\//,
+        "https://",
+      ) ?? null,
     email: user.email ?? null,
     provider: text(user.app_metadata?.provider),
     createdAt: Date.parse(user.created_at),

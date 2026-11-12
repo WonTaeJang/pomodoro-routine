@@ -44,17 +44,23 @@ export function useAuth(): AuthState {
   return { status, user };
 }
 
+/** 로그인 화면에서 고를 수 있는 로그인 방법 (Supabase 대시보드에서 켠 것) */
+export type OAuthProvider = "google" | "kakao";
+
 /**
- * 구글 로그인 화면으로 이동. 로그인하면 /auth/callback을 거쳐 next(이 사이트 안의 주소)로 돌아옴.
+ * 구글·카카오 로그인 화면으로 이동. 로그인하면 /auth/callback을 거쳐 next(이 사이트 안의 주소)로 돌아옴.
  * 이동을 시작하지 못하면 false.
  */
-export async function signInWithGoogle(next?: string): Promise<boolean> {
+export async function signInWithOAuth(
+  provider: OAuthProvider,
+  next?: string,
+): Promise<boolean> {
   const supabase = getSupabase();
   if (!supabase) return false;
   const callback = new URL("/auth/callback", window.location.origin);
   callback.searchParams.set("next", safeNextPath(next));
   const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
+    provider,
     options: { redirectTo: callback.toString() },
   });
   return !error;

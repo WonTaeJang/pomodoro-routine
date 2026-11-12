@@ -24,7 +24,7 @@ Screenshots: put the images in docs/images/ and uncomment the lines below.
 - **Calendar and stats**: daily focus count, time and finished tasks, plus your streak, the last 7 days, this month and all-time totals.
 - **Kkami certificate**: finish a cycle and save or share that day's certificate as an image (1080×1920, Instagram story size).
 - **Alerts**: a chime when a session ends, and a browser notification if you're in another tab.
-- **Sign-in (optional)**: sign in with Google to save your tasks, history and settings to your account and pick up on other devices. You can change your nickname or delete your account on your profile. Everything works without signing in. Kakao sign-in is coming later.
+- **Sign-in (optional)**: sign in with Google or Kakao to save your tasks, history and settings to your account and pick up on other devices. You can change your nickname or delete your account on your profile. Everything works without signing in.
 - **Keyboard shortcuts**: `Space` start / pause, `R` reset, `N` next session, `S` settings.
 - **Also**: dark mode, Korean / English, a first-visit intro and a guide page (`/guide`), keep screen on while the timer runs, and one shared timer across tabs.
 

@@ -36,6 +36,24 @@ describe("프로필", () => {
   });
 });
 
+describe("카카오 로그인 프로필", () => {
+  it("이메일이 없어도 이름·사진으로 만들고, http 사진 주소는 https로", () => {
+    const kakao = {
+      ...user(
+        { name: "까미", avatar_url: "http://k.kakaocdn.net/a.jpg" },
+        undefined,
+      ),
+      email: undefined,
+      app_metadata: { provider: "kakao" },
+    } as unknown as User;
+    const p = profileOf(kakao);
+    expect(p.nickname).toBe("까미");
+    expect(p.avatarUrl).toBe("https://k.kakaocdn.net/a.jpg");
+    expect(p.email).toBeNull();
+    expect(p.provider).toBe("kakao");
+  });
+});
+
 describe("닉네임 확인", () => {
   it("앞뒤 공백을 떼고 가운데 공백은 하나로", () => {
     expect(checkNickname("  까미  짱 ")).toEqual({
