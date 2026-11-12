@@ -120,6 +120,18 @@ export function toggleDone(
   return { tasks, activeTaskId };
 }
 
+/**
+ * 할 일 목록을 통째로 바꿉니다. (계정에서 받은 변경을 반영할 때)
+ * 지금 집중할 할 일이 없어졌거나 완료됐으면 남은 할 일 중 첫 번째로 (고르지 않은 상태면 그대로)
+ */
+export function replaceTasks(state: TasksState, tasks: Task[]): TasksState {
+  if (state.activeTaskId === null) return { tasks, activeTaskId: null };
+  const active = tasks.find((t) => t.id === state.activeTaskId);
+  const activeTaskId =
+    active && !active.done ? active.id : firstOpenTaskId(tasks);
+  return { tasks, activeTaskId };
+}
+
 /** 집중할 할 일을 고릅니다. 없거나 완료한 할 일은 고를 수 없습니다. */
 export function setActiveTask(
   state: TasksState,

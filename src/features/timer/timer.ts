@@ -14,6 +14,14 @@ import type {
 
 const MINUTE = 60_000;
 
+/** 설정에서 고를 수 있는 세션 길이(분)와 긴 휴식 주기 범위. 설정 창과 계정에서 받은 설정 검사에 같이 씀 */
+export const SETTING_RANGES = {
+  focusMinutes: { min: 5, max: 90, step: 5 },
+  shortBreakMinutes: { min: 1, max: 30, step: 1 },
+  longBreakMinutes: { min: 5, max: 60, step: 5 },
+  longBreakInterval: { min: 2, max: 8, step: 1 },
+} as const;
+
 export const DEFAULT_SETTINGS: TimerSettings = {
   focusMinutes: 25,
   shortBreakMinutes: 5,

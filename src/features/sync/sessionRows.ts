@@ -4,6 +4,7 @@ import {
   type CompletedSession,
   type TimerMode,
 } from "@/features/timer/types";
+import { isUuid } from "./uuid";
 
 /** 서버 `sessions` 표의 한 줄 (supabase/sync-tables.sql) */
 export type SessionRow = {
@@ -22,7 +23,6 @@ export const SESSION_COLUMNS =
   "mode,ended_at,duration_ms,task_id,task_title,cycle_completed";
 
 const MODES: readonly string[] = TIMER_MODES;
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * 기록을 서버에 올릴 모양으로 바꿉니다. 표의 제한에 맞지 않는 기록은 null
@@ -41,8 +41,7 @@ export function toSessionRow(
     ended_at: new Date(session.endedAt).toISOString(),
     duration_ms: duration,
     // 표의 task_id는 uuid. 아니면 비워 두고 제목만 남김
-    task_id:
-      session.taskId && UUID.test(session.taskId) ? session.taskId : null,
+    task_id: isUuid(session.taskId) ? session.taskId : null,
     task_title: session.taskTitle?.slice(0, TITLE_MAX_LENGTH) || null,
     cycle_completed: session.cycleCompleted === true,
   };

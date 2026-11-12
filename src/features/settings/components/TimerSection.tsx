@@ -3,6 +3,7 @@
 import { useTranslations } from "use-intl";
 import { FieldRow, Section, Stepper, Switch } from "@/components/ui";
 import { useTimerStore } from "@/features/timer/store";
+import { SETTING_RANGES } from "@/features/timer/timer";
 import type { TimerMode, TimerSettings } from "@/features/timer/types";
 import { SettingsNote } from "./SettingsNote";
 import styles from "./Settings.module.scss";
@@ -10,17 +11,11 @@ import styles from "./Settings.module.scss";
 /** 시간 설정 이름 (focusMinutes 등) */
 type MinutesKey = Extract<keyof TimerSettings, `${string}Minutes`>;
 
-/** 모드별 시간 조절 범위 (분) */
-const LENGTHS: {
-  mode: TimerMode;
-  key: MinutesKey;
-  min: number;
-  max: number;
-  step: number;
-}[] = [
-  { mode: "focus", key: "focusMinutes", min: 5, max: 90, step: 5 },
-  { mode: "short-break", key: "shortBreakMinutes", min: 1, max: 30, step: 1 },
-  { mode: "long-break", key: "longBreakMinutes", min: 5, max: 60, step: 5 },
+/** 모드별 시간 설정 (조절 범위는 SETTING_RANGES) */
+const LENGTHS: { mode: TimerMode; key: MinutesKey }[] = [
+  { mode: "focus", key: "focusMinutes" },
+  { mode: "short-break", key: "shortBreakMinutes" },
+  { mode: "long-break", key: "longBreakMinutes" },
 ];
 
 /** 세션 길이, 긴 휴식 주기, 자동 시작 */
@@ -34,15 +29,15 @@ export function TimerSection() {
 
   return (
     <Section title={t("title")} headingLevel={3}>
-      {LENGTHS.map(({ mode, key, min, max, step }) => (
+      {LENGTHS.map(({ mode, key }) => (
         <FieldRow key={mode} label={modes(mode)}>
           <Stepper
             className={styles.stepper}
             label={t(`length.${mode}`)}
             value={settings[key]}
-            min={min}
-            max={max}
-            step={step}
+            min={SETTING_RANGES[key].min}
+            max={SETTING_RANGES[key].max}
+            step={SETTING_RANGES[key].step}
             format={minutes}
             onChange={(value) => update({ [key]: value })}
           />
@@ -58,8 +53,8 @@ export function TimerSection() {
           className={styles.stepper}
           label={t("interval.label")}
           value={settings.longBreakInterval}
-          min={2}
-          max={8}
+          min={SETTING_RANGES.longBreakInterval.min}
+          max={SETTING_RANGES.longBreakInterval.max}
           format={(value) => t("interval.value", { value })}
           onChange={(longBreakInterval) => update({ longBreakInterval })}
         />

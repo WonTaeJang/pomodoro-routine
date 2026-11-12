@@ -7,13 +7,14 @@ import {
   initialTasksState,
   recordPomodoros,
   removeTask,
+  replaceTasks,
   migrateTasks,
   moveTask,
   setActiveTask,
   toggleDone,
   updateTask,
 } from "./tasks";
-import type { TasksState } from "./types";
+import type { Task, TasksState } from "./types";
 
 type TasksStore = TasksState & {
   add: (title: string, estimate: number) => void;
@@ -27,6 +28,11 @@ type TasksStore = TasksState & {
   recordPomodoros: (taskIds: string[]) => void;
   /** 완료한 할 일을 목록에서 숨깁니다. (캘린더에는 남음) */
   archiveDone: () => void;
+  /**
+   * 할 일 목록을 통째로 바꿉니다. (계정에서 받은 변경을 반영할 때)
+   * 지금 집중할 할 일이 없어졌거나 완료됐으면 다른 할 일로 바꿈 (tasks.ts의 replaceTasks)
+   */
+  replaceTasks: (tasks: Task[]) => void;
   /** 할 일을 모두 지웁니다. (로그아웃할 때 쓸 예정, 백로그 I-027) */
   clearAll: () => void;
 };
@@ -55,6 +61,7 @@ export const useTasksStore = create<TasksStore>()(
         setActive: (id) => apply((s) => setActiveTask(s, id)),
         recordPomodoros: (ids) => apply((s) => recordPomodoros(s, ids)),
         archiveDone: () => apply((s) => archiveDone(s, Date.now())),
+        replaceTasks: (tasks) => apply((s) => replaceTasks(s, tasks)),
         clearAll: () => apply(() => initialTasksState),
       };
     },

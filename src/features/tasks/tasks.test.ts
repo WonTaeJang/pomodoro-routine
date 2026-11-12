@@ -8,6 +8,7 @@ import {
   moveTask,
   recordPomodoros,
   removeTask,
+  replaceTasks,
   setActiveTask,
   sortForDisplay,
   toggleDone,
@@ -285,5 +286,28 @@ describe("예전 데이터 변환", () => {
       [0, null, null],
       [1, null, null],
     ]);
+  });
+});
+
+describe("목록 통째로 바꾸기 (계정에서 받은 변경)", () => {
+  it("집중할 할 일이 남아 있으면 그대로", () => {
+    const state = withTasks("a", "b");
+    const next = replaceTasks(state, state.tasks.slice().reverse());
+    expect(next.activeTaskId).toBe("t1");
+  });
+
+  it("집중할 할 일이 없어지거나 완료되면 남은 할 일 중 첫 번째로", () => {
+    const state = withTasks("a", "b", "c");
+    expect(replaceTasks(state, state.tasks.slice(1)).activeTaskId).toBe("t2");
+    const doneFirst = state.tasks.map((t) =>
+      t.id === "t1" ? { ...t, done: true } : t,
+    );
+    expect(replaceTasks(state, doneFirst).activeTaskId).toBe("t2");
+    expect(replaceTasks(state, []).activeTaskId).toBeNull();
+  });
+
+  it("고르지 않은 상태면 그대로 둠", () => {
+    const state = setActiveTask(withTasks("a"), null);
+    expect(replaceTasks(state, state.tasks).activeTaskId).toBeNull();
   });
 });
