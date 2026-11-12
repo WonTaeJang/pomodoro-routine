@@ -518,6 +518,8 @@ const en: Messages = {
       },
       joined: "Joined",
       logout: "Log out",
+      logoutNote:
+        "Logging out clears your tasks, history and timer in this browser. They stay in your account and come back when you log in again.",
     },
   },
 };

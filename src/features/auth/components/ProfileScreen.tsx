@@ -94,6 +94,7 @@ function ProfileDetails({ user }: { user: User }) {
       >
         {t("logout")}
       </Button>
+      <p className={page.muted}>{t("logoutNote")}</p>
     </>
   );
 }

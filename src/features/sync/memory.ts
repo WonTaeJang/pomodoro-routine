@@ -44,6 +44,15 @@ export function readSyncMemory(userId: string): SyncMemory {
   }
 }
 
+/** 기억을 지웁니다 (로그아웃) */
+export function clearSyncMemory() {
+  try {
+    localStorage.removeItem(STORAGE_KEYS.accountSync);
+  } catch {
+    // 지우지 못해도 다른 계정으로 로그인하면 계정이 달라서 새로 시작함
+  }
+}
+
 /**
  * 이 계정의 기억 중 한 부분만 바꿔 저장합니다. 할 일과 설정을 따로 맞추므로,
  * 저장 직전에 다시 읽어서 다른 부분을 덮어쓰지 않게 합니다.

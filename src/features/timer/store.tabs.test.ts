@@ -34,7 +34,8 @@ describe("다른 탭과 함께 쓰기", () => {
   beforeEach(() => {
     vi.useFakeTimers({ now: T0 });
     localStorage.clear();
-    useTimerStore.getState().resetAll();
+    useTimerStore.getState().resetSettings();
+    useTimerStore.getState().resetTimer();
     useTimerStore.getState().dismissCompleted();
     useHistoryStore.getState().clear();
     useTasksStore.getState().clearAll();

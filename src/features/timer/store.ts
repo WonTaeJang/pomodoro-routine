@@ -47,8 +47,8 @@ type TimerStore = {
   updateSettings: (patch: Partial<TimerSettings>) => void;
   /** 설정만 기본값으로 되돌립니다. */
   resetSettings: () => void;
-  /** 설정과 타이머를 처음 상태로 되돌립니다. (지금은 테스트에서만 씀) */
-  resetAll: () => void;
+  /** 타이머만 처음 상태로 되돌립니다 (진행 중이던 세션과 사이클). 설정은 그대로. 로그아웃할 때 */
+  resetTimer: () => void;
 };
 
 /** 기본 설정. 개발용 테스트 모드는 주소(?test=)로 켠 것이라 그대로 둡니다. */
@@ -127,14 +127,11 @@ export const useTimerStore = create<TimerStore>()(
           const settings = defaultSettings(get().settings);
           set({ settings, timer: applySettings(get().timer, settings) });
         },
-        resetAll: () => {
-          const settings = defaultSettings(get().settings);
+        resetTimer: () =>
           set({
-            settings,
-            timer: createInitialState(settings),
+            timer: createInitialState(get().settings),
             lastCompleted: null,
-          });
-        },
+          }),
       };
     },
     {

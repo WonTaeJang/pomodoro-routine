@@ -4,9 +4,10 @@ import { DEFAULT_SETTINGS, createInitialState } from "./timer";
 
 const MIN = 60_000;
 
-describe("설정 되돌리기, 데이터 초기화", () => {
+describe("설정 되돌리기, 타이머 초기화", () => {
   beforeEach(() => {
-    useTimerStore.getState().resetAll();
+    useTimerStore.getState().resetSettings();
+    useTimerStore.getState().resetTimer();
     useTimerStore.getState().updateSettings({ testDurationSeconds: null });
   });
 
@@ -34,16 +35,16 @@ describe("설정 되돌리기, 데이터 초기화", () => {
     expect(useTimerStore.getState().timer.durationMs).toBe(25 * MIN);
   });
 
-  it("데이터 초기화: 진행 중이던 타이머와 사이클도 처음으로", () => {
+  it("타이머 초기화(로그아웃): 진행 중이던 타이머와 사이클은 처음으로, 설정은 그대로", () => {
     const store = useTimerStore.getState();
     store.updateSettings({ focusMinutes: 50 });
     store.start();
     expect(useTimerStore.getState().timer.status).toBe("running");
 
-    useTimerStore.getState().resetAll();
+    useTimerStore.getState().resetTimer();
     const { settings, timer, lastCompleted } = useTimerStore.getState();
-    expect(settings.focusMinutes).toBe(25);
-    expect(timer).toEqual(createInitialState(DEFAULT_SETTINGS));
+    expect(settings.focusMinutes).toBe(50);
+    expect(timer).toEqual(createInitialState(settings));
     expect(lastCompleted).toBeNull();
   });
 });

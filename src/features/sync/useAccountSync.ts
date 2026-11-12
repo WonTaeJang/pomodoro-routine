@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { getSupabase, useAuth } from "@/features/auth";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { useTimerStore } from "@/features/timer/store";
+import { clearLocalAccountData } from "./clearLocalData";
 import { readSyncMemory, updateSyncMemory } from "./memory";
 import { createSessionSync } from "./sessionSync";
 import { fetchSessions, uploadSessions } from "./sessionsApi";
@@ -27,11 +28,24 @@ const SAVE_DELAY_MS = 800;
  * - 기록이 생기면 바로, 할 일·설정을 고치면 잠깐 모았다가 올림
  * - 인터넷이 다시 연결되거나 탭으로 돌아오면 못 올린 것을 다시 올림
  *   (탭으로 돌아오면 5분에 한 번까지 서버에서 다시 받음)
+ * - 로그아웃하면(다른 탭에서 해도) 이 브라우저의 할 일·기록·타이머를 지움 (clearLocalAccountData)
  * 로그인하지 않았으면 아무것도 하지 않습니다 (지금처럼 브라우저에만 저장).
  */
 export function useAccountSync(ready: boolean) {
-  const { user } = useAuth();
+  const { status, user } = useAuth();
   const userId = user?.id ?? null;
+  /** 이 화면에서 로그인해 있던 계정. 로그아웃으로 바뀌었는지 알려고 기억 */
+  const signedInAs = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!ready) return;
+    if (userId) {
+      signedInAs.current = userId;
+    } else if (status === "signedOut" && signedInAs.current) {
+      signedInAs.current = null;
+      clearLocalAccountData();
+    }
+  }, [ready, status, userId]);
 
   useEffect(() => {
     const supabase = getSupabase();
