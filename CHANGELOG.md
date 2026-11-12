@@ -1,6 +1,8 @@
 # 바뀐 점 (CHANGELOG)
 
-버전마다 바뀐 점을 적습니다. 새 버전이 맨 위입니다. 버전 규칙은 [docs/commit.md](docs/commit.md)의 "4. 버전"을 봅니다.
+개발 중 변경은 Unreleased에 모으고, 배포하거나 버전을 확정할 때 묶습니다. 새 버전이 맨 위입니다. 버전 규칙은 [docs/commit.md](docs/commit.md)의 "4. 버전"을 봅니다.
+
+## Unreleased
 
 ## 0.22.0 (2026-11-12)
 
