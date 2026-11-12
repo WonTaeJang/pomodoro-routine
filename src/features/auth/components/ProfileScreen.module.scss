@@ -1,41 +1,55 @@
+@use "../../../styles/mixins";
+
+// 사진 | 닉네임·이메일·로그인 방법. 닉네임을 고치는 동안 오른쪽이 길어져도 사진은 위에 그대로
 .identity {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-4);
 }
 
 .names {
   display: flex;
   min-width: 0;
+  flex: 1;
   flex-direction: column;
-  gap: var(--space-0-5);
+  align-items: flex-start;
+  gap: var(--space-1);
 
   p {
     overflow-wrap: anywhere;
   }
 }
 
+// 닉네임 | 연필 (연필은 글자 가운데 높이에)
+.nicknameRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-1);
+}
+
 .nickname {
+  min-width: 0;
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
 }
 
-// 닉네임 입력칸 | 저장 (버튼은 입력칸 높이에 맞춤)
-.form {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  column-gap: var(--space-2);
-  align-items: start;
-
-  // 저장 안내는 아래 줄 전체
-  > p {
-    grid-column: 1 / -1;
-  }
+// 카드와 같은 바탕이라 한 단계 진하게 (Badge 기본 모양보다 앞서게 .names 안에서)
+.names .provider {
+  margin-top: var(--space-0-5);
+  background: var(--color-surface-hover);
 }
 
-.save {
-  // 라벨 높이만큼 내려서 입력칸과 나란히
-  margin-top: calc(var(--font-size-sm) * 1.5 + var(--space-1-5));
+// 닉네임 고치기: 입력칸, 그 아래 오른쪽에 취소·저장
+.form {
+  @include mixins.stack(var(--space-2));
+  width: 100%;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
 }
 
 .facts {
@@ -53,12 +67,18 @@
   }
 }
 
-.logout {
-  align-self: flex-start;
+// 맨 아래 줄: 로그아웃 | 회원 탈퇴 (위와 구분선으로 떨어뜨리고, 탈퇴는 자주 쓰지 않으므로 오른쪽에 작게)
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--color-border);
 }
 
-// 회원 탈퇴는 자주 쓰지 않으므로 로그아웃 아래에 작게
-.deleteAccount {
-  align-self: flex-start;
+// 버튼 안쪽 여백만큼 밀어서 글자 끝을 카드 내용 오른쪽 끝에 맞춤 (Button 기본 색보다 앞서게 .actions 안에서)
+.actions .deleteAccount {
+  margin-right: calc(var(--space-3) * -1);
   color: var(--color-text-muted);
 }

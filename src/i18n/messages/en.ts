@@ -502,22 +502,24 @@ const en: Messages = {
       login: "Log in",
       avatarAlt: "Profile photo of {name}",
       nickname: "Nickname",
+      editNickname: "Change nickname",
       nicknameHint:
-        "Up to {max} characters. Leave it empty to use your Google name.",
+        "Up to {max} characters. Leave it empty to use your account name.",
       save: "Save",
       saved: "Nickname updated.",
       errors: {
         tooLong: "Nicknames can be up to {max} characters.",
         failed: "Couldn’t save. Please try again in a moment.",
       },
-      email: "Email",
-      provider: "Logged in with",
+      signedInWith: "Signed in with {provider}",
       providers: {
         google: "Google",
         kakao: "Kakao",
+        email: "Email",
       },
       joined: "Joined",
       logout: "Log out",
+      logoutTitle: "Log out?",
       logoutNote:
         "Logging out clears your tasks, history and timer in this browser. They stay in your account and come back when you log in again.",
       deleteAccount: {

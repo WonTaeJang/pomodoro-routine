@@ -33,6 +33,7 @@ const SAMPLE_VALUES = {
   length: "25분",
   diff: "+10분",
   name: "까미",
+  provider: "Google",
   max: 20,
   level: 2,
   points: 24,

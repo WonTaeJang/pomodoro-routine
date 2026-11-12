@@ -494,21 +494,23 @@ const ko = {
       login: "로그인하기",
       avatarAlt: "{name}의 프로필 사진",
       nickname: "닉네임",
-      nicknameHint: "{max}자까지. 비우면 Google 이름을 써요.",
+      editNickname: "닉네임 바꾸기",
+      nicknameHint: "{max}자까지. 비우면 로그인한 계정의 이름을 써요.",
       save: "저장",
       saved: "닉네임을 바꿨어요.",
       errors: {
         tooLong: "{max}자까지 쓸 수 있어요.",
         failed: "저장하지 못했어요. 잠시 뒤 다시 해 주세요.",
       },
-      email: "이메일",
-      provider: "로그인 방법",
+      signedInWith: "{provider}로 로그인",
       providers: {
         google: "Google",
         kakao: "카카오",
+        email: "이메일",
       },
       joined: "가입한 날",
       logout: "로그아웃",
+      logoutTitle: "로그아웃할까요?",
       logoutNote:
         "로그아웃하면 이 브라우저의 할 일, 기록, 타이머가 지워져요. 계정에는 그대로 남아 있어서 다시 로그인하면 돌아와요.",
       deleteAccount: {
