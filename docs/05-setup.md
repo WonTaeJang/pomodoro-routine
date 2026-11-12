@@ -99,18 +99,21 @@ npm run format:check  # 정리 안 된 파일이 있는지 확인만
 
 - 원본은 `design/kkami/`에 넣고, 정리(크기 줄이기, 위치 정보 등 메타데이터 제거, WebP 변환)한 뒤 `src/assets/kkami/`에 둡니다.
   - 저장소가 공개라서 휴대폰 사진의 **촬영 위치(GPS) 정보가 함께 올라가지 않도록** 반드시 메타데이터를 지웁니다.
-- 파일 이름은 상황별로 짓습니다.
+- 파일 이름은 `kkami-<쓰는 곳>-<원본 번호>.webp`로 짓습니다. 원본 번호는 `design/kkami/` 파일 이름 끝 번호입니다. 처음 넣은 상황별 사진 5장은 번호 없이 `kkami-<쓰는 곳>.webp`입니다.
 
-| 파일 | 쓰는 곳 |
-|---|---|
-| `kkami-default.webp` | 시작 전 |
-| `kkami-focus.webp` | 집중 중 |
-| `kkami-short-break.webp` | 짧은 휴식 |
-| `kkami-long-break.webp` | 긴 휴식 |
-| `kkami-done.webp` | 완료 팝업 |
-| `kkami-certificate.webp` | 수료증 이미지의 동그란 사진 (800x800) |
+| 쓰는 곳 | 파일 | 보이는 곳 |
+|---|---|---|
+| `default` | `kkami-default*.webp` | 시작 전 (정면으로 기다림), 휴식 완료 팝업 |
+| `focus` | `kkami-focus*.webp` | 집중 중 (곁에서 조용히 엎드림) |
+| `short-break` | `kkami-short-break*.webp` | 짧은 휴식 (잠깐 산책) |
+| `long-break` | `kkami-long-break*.webp` | 긴 휴식 (오래 산책, 신남) |
+| `done` | `kkami-done*.webp` | 집중 완료 팝업 (웃는 모습). 브라우저 알림 아이콘은 `kkami-done.webp` 고정 |
+| `guide` | `kkami-guide-016.webp` | 사용법 페이지 머리 (모자 쓴 까미) |
+| `empty` | `kkami-empty-019.webp` | 기록이 없을 때 (`EmptyState`: 캘린더 날짜, 통계) |
+| `certificate` | `kkami-certificate.webp` | 수료증 이미지의 동그란 사진 (800x800) |
 
-- 정리 기준: 얼굴 중심 정사각형으로 자르기 → 480x480 → WebP(품질 82), 메타데이터 없음
+- 타이머 화면과 완료 팝업은 묶음 중 한 장을 랜덤으로 보여 줍니다. 묶음은 `src/features/timer/photos/pools.ts`의 `KKAMI_PHOTOS`이고, 사진을 더하려면 파일을 넣고 여기 목록에 추가합니다.
+- 정리 기준: 원형 프레임에 맞게 까미 중심 정사각형으로 자르기(전화번호·광고·사람 손처럼 원에 걸리는 것은 잘라냄) → 480x480 → WebP(품질 82), 메타데이터 없음
 - 수료증 사진은 1080×1920에 크게 그리므로 800x800. 머리부터 리본까지 들어가게 정사각형으로 자름
 
 - 화면에서는 `import`해서 `next/image`로 씁니다. 크기 정보가 자동으로 들어가고, 파일이 바뀌면 캐시도 자동으로 새로 받습니다.
@@ -173,7 +176,7 @@ pomodoro-routine/
 ├── src/styles/            토큰(tokens/), mixin, 브레이크포인트, 전체 기본 스타일
 ├── src/lib/               공통 함수, 훅 (cx, date, random, audio, useNow·useToday, useHydrateStores·useStoresReady, useWakeLock)
 ├── src/assets/kkami/      까미 이미지 (정리된 것)
-├── src/assets/mascot/     까미 마스코트 SVG (basic, graduate, icon)
+├── src/assets/mascot/     까미 마스코트 SVG (icon: 로고·파비콘용)
 ├── design/                원본 사진, 원본 녹음(sound/) 등 (Git에 올리지 않음)
 ├── public/                파비콘 등 주소가 고정된 파일
 ├── public/sounds/         다듬은 집중 소리 녹음 (scripts/focus-sounds.mjs로 만듦)

@@ -65,7 +65,7 @@ import { PawIcon } from "@/components/icons";
 | `Switch` | 켜기/끄기 (`FieldRow` 모양) | `checked`, `onCheckedChange`, `label`, `description` |
 | `SwitchTrack` | 스위치 모양만 (줄 전체가 버튼인 메뉴 항목 안에서) | `checked` |
 | `Kbd` | 키보드 키 모양 (단축키 안내, 메뉴의 S) | `children`(키 이름), `className` |
-| `EmptyState` | 기록이 없을 때 가운데 까미와 흐린 안내 문구 (통계, 날짜 상세) | `children`(문구), `imageSize`(기본 64) |
+| `EmptyState` | 기록이 없을 때 가운데 동그란 까미 사진(뻗어서 쉬는 모습)과 흐린 안내 문구 (통계, 날짜 상세) | `children`(문구), `imageSize`(기본 64) |
 | `VisuallyHidden` | 화면에는 안 보이고 화면 낭독기만 읽는 내용 | `as`(span, div, table), `children` |
 | `SegmentedControl` | 여러 개 중 하나 선택 (모드 탭) | `label`, `options`, `value`, `onChange`. 방향키로 이동 |
 | `TextField` | 라벨 붙은 입력칸 | `label`, `hint`, `error`, `hideLabel` + input 속성 |
@@ -92,7 +92,7 @@ import { PawIcon } from "@/components/icons";
 ### 기능별 컴포넌트
 특정 기능에서만 쓰는 컴포넌트는 `src/features/<기능>/components/`에 둡니다.
 - 돌봄(`src/features/pet/`): `components/PetPlayground`는 화면 조합, `usePetRive`·`usePetRivePose`는 Rive 로드·구독·재생, `pet.ts`는 시각을 인자로 받는 순수 돌봄 규칙, `usePetCare`는 포인터·타이머 연결. 문구는 `pet` 사전, UI는 `Button`·`Card`·`VisuallyHidden`과 `PixelHeartIcon`을 사용합니다. `_room-art.scss`의 이름 붙인 Sass 값은 방 일러스트 전용 좌표·팔레트이며 일반 UI 토큰과 구분합니다.
-- 타이머: `TimerScreen`(페이지), `TimerRuntime`(앱 틀에서 한 번), `TimerPanel`(카드 조립), `ModeSwitcher`(모드 탭 + 전환 확인), `TimerRing`(진행 띠 + 효과), `KkamiPhoto`, `TimerControls`, `CycleProgress`, `CompletionDialog`(+ `useCompletionDialog.ts`: 언제 보일지, 자동 시작 카운트다운), `Celebration`, `TestModeBadge`
+- 타이머: `TimerScreen`(페이지), `TimerRuntime`(앱 틀에서 한 번), `TimerPanel`(카드 조립), `ModeSwitcher`(모드 탭 + 전환 확인), `TimerRing`(진행 띠 + 효과), `KkamiPhoto`(상황별 사진 묶음에서 랜덤, 새 사진을 전 사진 위로 서서히 겹침), `TimerControls`, `CycleProgress`, `CompletionDialog`(+ `useCompletionDialog.ts`: 언제 보일지, 자동 시작 카운트다운), `Celebration`, `TestModeBadge`
 - 할 일: `TaskPanel`, `SortableTaskList`(끌어서 순서 바꾸기, 묶음마다 하나), `TaskForm`, `TaskItem`, `TaskDoneCheck`, `PawCount`(🐾 완료/예상)
 - 기록: `TodaySummary`, 오늘 기록 훅 `useTodayFocus()` (헤더의 오늘 기록, 🏅 메달 버튼이 같이 씀). `sessions.ts`: 집중 세션만 고르기(`focusSessions`), 기록의 할 일 제목 찾기(`taskTitleOf`), 날짜별 요약(`getDayStats`: 집중 횟수·시간·사이클 번호), 기간 합계(`sumDays`). 헤더의 오늘 기록, 수료증, 캘린더, 통계가 같이 씀
 - 캘린더(`src/features/calendar/`): `calendar.ts`(보이는 달과 이동, 달력 칸, 그 달의 범위 `monthBounds`, 색 단계, 그날의 할 일. 순수 함수, 테스트), `CalendarScreen`(페이지), `MonthCalendar`(달력, 칸 하나는 `DayCell`), `DayDetail`(날짜 상세)
@@ -112,7 +112,8 @@ import { PawIcon } from "@/components/icons";
   - `render/drawCertificate.ts`: 1080×1920 캔버스에 그리기, `render/canvas.ts`: 글자 쓰기(`drawText`)·둥근 사각형·원 경로(`circlePath`)·글자 줄이기·원형 글자·발자국 등 그리기 도우미
   - `share.ts`: 공유 창, 내려받기 / `components/CertificateDialog`: 미리보기, 할 일 보이기, 공유·저장
   - `components/useCertificateImage.ts`: 이미지를 미리 만들어 둠. 내용이 실제로 바뀔 때만 다시 그리고, 다 만들기 전에는 공유·저장을 막고, 쓰지 않는 이미지 주소는 정리
-- 마스코트(`src/assets/mascot/`): `kkami-graduate.svg`(학사모)는 사용법 페이지 머리, `kkami-basic.svg`는 캘린더의 기록 없는 날, `kkami-icon.svg`는 로고·파비콘 등에 쓸 예정
+- 까미 사진 묶음(`src/features/timer/photos/`): `pools.ts`(상황별 사진 목록 `KKAMI_PHOTOS`), `memory.ts`(자리마다 지금 보여 주는 사진과 묶음별 마지막 사진을 브라우저에 기억, 고르기 규칙은 순수 함수·테스트), `useKkamiPhoto(slot, key, pool)`(세션 key가 바뀔 때만 새로 고름. 타이머는 묶음 이름, 완료 팝업은 끝난 시각이 key)
+- 마스코트(`src/assets/mascot/`): `kkami-icon.svg`는 로고·파비콘 등에 쓸 예정. 사용법 머리와 빈 화면은 까미 사진으로 바꿈(I-041)
 - 집중 소리(`src/features/focus-sound/`): 밖에서는 `FocusSoundButton`(헤더 🎧 + 펼침 창), `useFocusSound`(앱 틀에서 한 번), `prepareFocusSound`(시작 버튼)를 씀
   - `sounds.ts`: 소리 목록과 창의 묶음(`FOCUS_SOUND_GROUPS`: 노이즈, 자연의 소리, 공간의 소리). 설정값은 소리 id, `"off"`, `"random"`. 노이즈는 만드는 함수, 녹음은 파일 주소와 이음매 길이, 크기 맞춤 값
   - `recordings.json`: 녹음마다 원본 파일, 자를 구간, 이음매 길이 (다듬기 스크립트와 앱이 함께 읽음). 새 녹음은 여기에 넣고 `node scripts/focus-sounds.mjs design/sound <id>`로 그 소리만 만듦

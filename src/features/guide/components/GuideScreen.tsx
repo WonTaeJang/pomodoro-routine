@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import kkami from "@/assets/mascot/kkami-graduate.svg";
+import kkami from "@/assets/kkami/kkami-guide-016.webp";
 import { PageMain } from "@/components/layout/PageMain";
 import { Card } from "@/components/ui";
 import { useGuideContent } from "../content";
@@ -19,8 +19,14 @@ export function GuideScreen() {
     <PageMain>
       <div className={styles.layout}>
         <div className={styles.head}>
-          {/* 학사모 쓴 까미 (그림 비율 400×494 그대로) */}
-          <Image src={kkami} alt="" width={64} height={79} />
+          {/* 모자 쓴 까미 */}
+          <Image
+            src={kkami}
+            alt=""
+            width={72}
+            height={72}
+            className={styles.kkami}
+          />
           <div className={styles.headText}>
             <h1 className={styles.title}>{page.title}</h1>
             <p className={styles.intro}>{page.intro}</p>

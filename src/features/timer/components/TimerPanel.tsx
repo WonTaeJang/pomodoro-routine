@@ -61,7 +61,7 @@ export function TimerPanel({ ready }: TimerPanelProps) {
           }
           bigCelebration={lastCompleted?.cycleCompleted === true}
         >
-          <KkamiPhoto mode={timer.mode} status={timer.status} />
+          <KkamiPhoto mode={timer.mode} status={timer.status} ready={ready} />
         </TimerRing>
       </div>
 

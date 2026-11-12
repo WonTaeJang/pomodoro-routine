@@ -89,10 +89,10 @@ const ko = {
   },
   /** 까미 사진 설명 (화면 낭독기) */
   kkami: {
-    default: "정면을 바라보는 까미",
+    default: "정면을 바라보며 기다리는 까미",
     done: "웃고 있는 까미",
-    focus: "옆에서 엎드려 쉬고 있는 까미",
-    "short-break": "산책 중인 까미",
+    focus: "곁에서 조용히 엎드려 있는 까미",
+    "short-break": "산책 가는 까미",
     "long-break": "신이 난 까미",
   },
   timer: {
@@ -298,7 +298,7 @@ const ko = {
     },
     day: {
       future: "아직 오지 않은 날이에요.",
-      empty: "이날은 기록이 없어요.",
+      empty: "이날은 기록이 없어요. 까미도 푹 쉬었어요.",
       focus: "집중",
       focusCount: "{count}번",
       focusTime: "집중한 시간",

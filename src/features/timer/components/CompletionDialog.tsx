@@ -2,12 +2,11 @@
 
 import Image from "next/image";
 import { useTranslations } from "use-intl";
-import kkamiDefault from "@/assets/kkami/kkami-default.webp";
-import kkamiDone from "@/assets/kkami/kkami-done.webp";
 import { MedalIcon } from "@/components/icons";
 import { Button, Dialog } from "@/components/ui";
 import { CertificateLauncher } from "@/features/certificate";
 import { TaskDoneCheck } from "@/features/tasks/components/TaskDoneCheck";
+import { useKkamiPhoto } from "../photos/useKkamiPhoto";
 import { startSession } from "../startSession";
 import { useTimerStore } from "../store";
 import styles from "./CompletionDialog.module.scss";
@@ -37,6 +36,13 @@ export function CompletionDialog() {
   const t = useTranslations();
 
   const focusDone = completed?.mode === "focus";
+  // 집중을 마쳤으면 웃는 까미, 휴식을 마쳤으면 집중을 기다리는 까미. 팝업마다 한 장을 랜덤으로
+  const photoPool = focusDone ? "done" : "default";
+  const photo = useKkamiPhoto(
+    "completion",
+    completed ? `${photoPool}:${completed.endedAt}` : null,
+    photoPool,
+  );
   const cycleDone = focusDone && completed?.cycleCompleted === true;
   const nextLabel = t(`timer.modes.${next.mode}`);
   const walk = next.mode === "long-break" ? "long" : "short";
@@ -93,12 +99,14 @@ export function CompletionDialog() {
     >
       <div className={styles.content}>
         <div className={styles.photoWrap}>
-          <Image
-            src={focusDone ? kkamiDone : kkamiDefault}
-            alt={t(focusDone ? "kkami.done" : "kkami.default")}
-            sizes="140px"
-            className={styles.photo}
-          />
+          {photo ? (
+            <Image
+              src={photo}
+              alt={t(`kkami.${photoPool}`)}
+              sizes="140px"
+              className={styles.photo}
+            />
+          ) : null}
           {cycleDone ? (
             <span className={styles.medal} aria-hidden="true">
               <MedalIcon size={28} />

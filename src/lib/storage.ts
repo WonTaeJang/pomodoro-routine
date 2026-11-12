@@ -17,6 +17,8 @@ export const STORAGE_KEYS = {
   auth: "kkamodoro-auth",
   /** 계정과 맞출 때 기억해 둘 것: 서버와 같다고 확인한 할 일·설정 (src/features/sync/memory.ts) */
   accountSync: "kkamodoro-account-sync",
+  /** 지금 보여 주는 까미 사진 (src/features/timer/photos/memory.ts) */
+  kkamiPhotos: "kkamodoro-kkami-photos",
   /** 데이터가 아니라 탭끼리 정하는 값: 소리와 알림을 낼 탭 (src/lib/soundTab.ts) */
   soundTab: "kkamodoro-sound-tab",
 } as const;

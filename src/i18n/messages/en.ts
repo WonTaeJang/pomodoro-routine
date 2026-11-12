@@ -88,10 +88,10 @@ const en: Messages = {
     },
   },
   kkami: {
-    default: "Kkami looking straight ahead",
+    default: "Kkami looking up, waiting",
     done: "Kkami smiling",
-    focus: "Kkami lying down, resting",
-    "short-break": "Kkami out on a walk",
+    focus: "Kkami lying quietly nearby",
+    "short-break": "Kkami heading out for a walk",
     "long-break": "Kkami full of excitement",
   },
   timer: {
@@ -302,7 +302,7 @@ const en: Messages = {
     },
     day: {
       future: "This day hasn’t come yet.",
-      empty: "No records for this day.",
+      empty: "No records for this day. Kkami took a good rest, too.",
       focus: "Focus",
       focusCount: "{count}",
       focusTime: "Focus time",
