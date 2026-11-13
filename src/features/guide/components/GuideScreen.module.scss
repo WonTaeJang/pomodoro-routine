@@ -25,11 +25,18 @@
   grid-area: head;
 }
 
-// 좁은 화면에서 글 때문에 까미 사진이 줄어들지 않게
+// 휴대폰 104px, 넓은 화면 136px. 좁은 화면에서 글 때문에 까미 사진이 줄어들지 않게
 .kkami {
+  width: 104px;
+  height: 104px;
   flex-shrink: 0;
   border-radius: 50%;
   object-fit: cover;
+
+  @include bp.up(md) {
+    width: 136px;
+    height: 136px;
+  }
 }
 
 .headText {

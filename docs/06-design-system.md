@@ -68,7 +68,7 @@ import { PawIcon } from "@/components/icons";
 | `Switch` | 켜기/끄기 (`FieldRow` 모양) | `checked`, `onCheckedChange`, `label`, `description` |
 | `SwitchTrack` | 스위치 모양만 (줄 전체가 버튼인 메뉴 항목 안에서) | `checked` |
 | `Kbd` | 키보드 키 모양 (단축키 안내, 메뉴의 S) | `children`(키 이름), `className` |
-| `EmptyState` | 기록이 없을 때 가운데 동그란 까미 사진(뻗어서 쉬는 모습)과 흐린 안내 문구 (통계, 날짜 상세) | `children`(문구), `imageSize`(기본 64) |
+| `EmptyState` | 기록이 없을 때 가운데 동그란 까미 사진(뻗어서 쉬는 모습)과 흐린 안내 문구 (통계, 날짜 상세) | `children`(문구), `imageSize`(기본 120) |
 | `VisuallyHidden` | 화면에는 안 보이고 화면 낭독기만 읽는 내용 | `as`(span, div, table), `children` |
 | `SegmentedControl` | 여러 개 중 하나 선택 (모드 탭) | `label`, `options`, `value`, `onChange`. 방향키로 이동 |
 | `TextField` | 라벨 붙은 입력칸 | `label`, `hint`, `error`, `hideLabel` + input 속성 |
@@ -199,3 +199,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-13: `Dialog`의 `instant`(메뉴에서 연 설정 창은 바로 보임)
 - 2026-11-13: 터치 기본 동작(탭 강조·글자 선택·이미지 끌기) 정리
 - 2026-11-13: 테스트 모드 배지를 오른쪽 아래 플로팅으로
+- 2026-11-13: `EmptyState` 기본 사진 크기 64px → 120px, 사용법 머리 사진 확대

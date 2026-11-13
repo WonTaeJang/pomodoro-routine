@@ -20,12 +20,13 @@ export function GuideScreen() {
     <PageMain>
       <div className={styles.layout}>
         <div className={styles.head}>
-          {/* 모자 쓴 까미 */}
+          {/* 모자 쓴 까미. 보이는 크기는 CSS(.kkami)에서 화면 너비에 따라 */}
           <Image
             src={kkami}
             alt=""
-            width={72}
-            height={72}
+            width={136}
+            height={136}
+            sizes="(min-width: 768px) 136px, 104px"
             className={styles.kkami}
           />
           <div className={styles.headText}>

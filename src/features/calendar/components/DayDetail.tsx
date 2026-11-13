@@ -49,9 +49,7 @@ export function DayDetail({ day, today, stats }: DayDetailProps) {
       </div>
 
       {empty ? (
-        <EmptyState imageSize={72}>
-          {t(day > today ? "future" : "empty")}
-        </EmptyState>
+        <EmptyState>{t(day > today ? "future" : "empty")}</EmptyState>
       ) : (
         <>
           <dl className={styles.stats}>

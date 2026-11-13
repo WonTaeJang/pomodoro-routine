@@ -11,7 +11,7 @@ export type EmptyStateProps = {
 };
 
 /** 보여줄 기록이 없을 때: 가운데 길게 뻗고 쉬는 까미 사진과 흐린 안내 문구 */
-export function EmptyState({ children, imageSize = 64 }: EmptyStateProps) {
+export function EmptyState({ children, imageSize = 120 }: EmptyStateProps) {
   return (
     <div className={styles.empty}>
       <Image
