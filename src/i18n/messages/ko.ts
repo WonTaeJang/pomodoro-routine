@@ -93,6 +93,11 @@ const ko = {
       login: "로그인",
       profile: "내 프로필: {name}",
     },
+    /** 푸터·로그인 화면의 약관 링크 */
+    legal: {
+      privacy: "개인정보처리방침",
+      terms: "이용약관",
+    },
   },
   /** 까미 사진 설명 (화면 낭독기) */
   kkami: {
@@ -489,6 +494,8 @@ const ko = {
       notConfigured: "이 사이트에서는 아직 로그인을 쓸 수 없어요.",
       devAccount: "테스트 계정으로 로그인 (개발용)",
       note: "로그인하면 할 일, 기록, 설정이 계정에 저장돼서 다른 기기에서도 이어 쓸 수 있어요.",
+      agreement:
+        "로그인하면 <terms>이용약관</terms>에 동의하게 돼요. 개인정보는 <privacy>개인정보처리방침</privacy>에 따라 처리해요.",
     },
     callback: {
       working: "로그인하는 중…",

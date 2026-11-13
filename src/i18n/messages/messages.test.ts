@@ -41,6 +41,8 @@ const SAMPLE_VALUES = {
   earned: 4,
   paw: () => "🐾",
   nowrap: (chunks: string) => chunks,
+  terms: (chunks: string) => chunks,
+  privacy: (chunks: string) => chunks,
 };
 
 describe("화면 문구 사전", () => {

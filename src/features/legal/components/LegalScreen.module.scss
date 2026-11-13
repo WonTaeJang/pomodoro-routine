@@ -1,0 +1,56 @@
+@use "../../../styles/doc-page" as doc;
+@use "../../../styles/mixins";
+
+// 사용법 페이지와 같은 틀 (styles/_doc-page.scss)
+.layout {
+  @include doc.layout;
+}
+
+.head {
+  @include mixins.stack(var(--space-2));
+  padding-top: var(--space-2);
+  grid-area: head;
+}
+
+.title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.date {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.intro {
+  color: var(--color-text-muted);
+}
+
+.toc {
+  @include doc.toc;
+}
+
+.body {
+  @include mixins.stack(var(--space-6));
+  grid-area: body;
+  // 긴 이메일·주소가 좁은 화면에서 넘치지 않게
+  overflow-wrap: anywhere;
+}
+
+.section {
+  @include mixins.stack(var(--space-2));
+  // 목차로 이동했을 때 제목이 화면 맨 위에 붙지 않게
+  scroll-margin-top: var(--space-4);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.items {
+  @include mixins.stack(var(--space-1));
+  margin-top: var(--space-1);
+  padding-left: var(--space-5);
+  list-style: disc;
+}

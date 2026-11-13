@@ -5,6 +5,7 @@
   @include mixins.page-width;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-1-5);
   padding: 0 var(--space-4) var(--space-3);

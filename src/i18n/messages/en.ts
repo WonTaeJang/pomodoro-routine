@@ -93,6 +93,11 @@ const en: Messages = {
       login: "Log in",
       profile: "My profile: {name}",
     },
+    /** Legal links in the footer and on the login screen */
+    legal: {
+      privacy: "Privacy",
+      terms: "Terms",
+    },
   },
   kkami: {
     default: "Kkami looking up, waiting",
@@ -497,6 +502,8 @@ const en: Messages = {
       notConfigured: "Logging in isn’t available on this site yet.",
       devAccount: "Log in with the test account (dev only)",
       note: "When you’re logged in, your tasks, history and settings are saved to your account so you can continue on other devices.",
+      agreement:
+        "By logging in, you agree to the <terms>Terms of Service</terms>. Your information is handled under the <privacy>Privacy Policy</privacy>.",
     },
     callback: {
       working: "Logging you in…",

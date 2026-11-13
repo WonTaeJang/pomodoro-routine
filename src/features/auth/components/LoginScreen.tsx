@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "use-intl";
@@ -110,6 +111,21 @@ export function LoginScreen() {
         </>
       )}
       <p className={styles.muted}>{t("note")}</p>
+      {/* 로그인 버튼을 누르기 전에 볼 수 있게 (구글 브랜드 인증·약관 동의) */}
+      <p className={styles.muted}>
+        {t.rich("agreement", {
+          terms: (chunks) => (
+            <Link className={styles.inlineLink} href="/terms">
+              {chunks}
+            </Link>
+          ),
+          privacy: (chunks) => (
+            <Link className={styles.inlineLink} href="/privacy">
+              {chunks}
+            </Link>
+          ),
+        })}
+      </p>
     </AuthCard>
   );
 }

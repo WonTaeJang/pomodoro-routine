@@ -24,6 +24,15 @@
   font-size: var(--font-size-sm);
 }
 
+// 흐린 글 안의 링크 (로그인 화면의 이용약관·개인정보처리방침)
+.inlineLink {
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  text-decoration: underline;
+
+  @include mixins.focus-ring;
+}
+
 .error {
   color: var(--color-danger);
   font-size: var(--font-size-sm);
