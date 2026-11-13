@@ -12,6 +12,8 @@
   gap: var(--space-3);
   margin: 0 auto;
   padding: var(--space-3) var(--space-4);
+  // 로고·오늘 요약 배지처럼 버튼이 아닌 글자도 꾸욱 눌러 선택되지 않게
+  user-select: none;
 
   // 아주 좁은 휴대폰에서 메뉴와 버튼이 겹치지 않게 간격을 줄임
   @include bp.down(xs) {
