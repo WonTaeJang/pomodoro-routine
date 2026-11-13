@@ -37,7 +37,6 @@ export function AppShell({ children, footer }: AppShellProps) {
     <StoresReadyContext value={ready}>
       <div className={styles.screen} data-mode={mode}>
         <AppHeader nav={<AppNav />}>
-          <TestModeBadge ready={ready} />
           {ready ? <TodaySummary /> : null}
           {ready ? <TodayCertificateButton /> : null}
           <FocusSoundButton ready={ready} />
@@ -45,6 +44,8 @@ export function AppShell({ children, footer }: AppShellProps) {
         </AppHeader>
         <div className={styles.page}>{children}</div>
         {footer}
+        {/* 개발용 테스트 모드 표시: 화면 오른쪽 아래에 떠 있음 */}
+        <TestModeBadge ready={ready} />
         <TimerRuntime ready={ready} />
         <Onboarding ready={ready} />
       </div>
