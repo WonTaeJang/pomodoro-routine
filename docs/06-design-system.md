@@ -60,7 +60,7 @@ import { PawIcon } from "@/components/icons";
 | `Badge` | 짧은 정보 배지 | `variant`(solid, soft, medal, outline), `size`(sm, md, lg), `icon` |
 | `Button` | 글자 버튼 | `variant`(primary, secondary, ghost, danger), `size`(sm, md, lg), `icon`, `fullWidth` |
 | `IconButton` | 아이콘만 있는 동그란 버튼 | `label`(필수, 화면 낭독기용), `icon`, `variant`, `size`(sm~xl), `shortcut`(마우스를 올리면 "시작 (Space)") |
-| `Dialog` | 팝업 창 | `open`, `onClose`, `title`, `footer`. ESC, 바깥 클릭으로 닫힘. 팝업 위에 팝업을 열면 ESC는 맨 위 것만 닫고, 바깥 팝업의 글자 정렬을 물려받지 않음 |
+| `Dialog` | 팝업 창 | `open`, `onClose`, `title`, `footer`, `instant`(등장 효과 없이 바로 보이기: 메뉴에서 설정을 열 때처럼 다른 창이 닫히자마자 열 때). ESC, 바깥 클릭으로 닫힘. 팝업 위에 팝업을 열면 ESC는 맨 위 것만 닫고, 바깥 팝업의 글자 정렬을 물려받지 않음 |
 | `ConfirmDialog` | "정말 할까요?" 확인 팝업 | `open`, `title`, `confirmLabel`, `tone`(primary, danger), `onConfirm`, `onClose` |
 | `FieldRow` | 왼쪽 이름·설명, 오른쪽 조작 요소인 한 줄. 좁으면 조작 요소가 다음 줄로 | `label`, `description`, `htmlFor`, `children`(조작 요소) |
 | `Switch` | 켜기/끄기 (`FieldRow` 모양) | `checked`, `onCheckedChange`, `label`, `description` |
@@ -194,3 +194,4 @@ import { PawIcon } from "@/components/icons";
 
 - 2026-11-11: I-040 돌봄 반응 중 공통 Button의 disabled 스타일 사용. 강아지 직접 조작·다시 깨워보기도 잠그고 비활성 강아지 영역의 잡기 커서를 해제. 추가 안내 문구 없음.
 - 2026-11-13: mixin `keyboard-only`(휴대폰에서 단축키 안내 숨김)
+- 2026-11-13: `Dialog`의 `instant`(메뉴에서 연 설정 창은 바로 보임)

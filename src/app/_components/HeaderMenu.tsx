@@ -46,7 +46,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [settingsOpen, setSettingsOpen] = useSettingsOpen(buttonRef);
-  useShortcuts({ settings: () => setSettingsOpen(true) }, ready);
+  useShortcuts({ settings: () => setSettingsOpen("shortcut") }, ready);
 
   const theme = useTheme();
   const isDark = theme === "dark";
@@ -119,7 +119,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
           disabled={!ready}
           onClick={() => {
             close();
-            setSettingsOpen(true);
+            setSettingsOpen("menu");
           }}
         >
           <ItemLabel icon={<SettingsIcon />}>{t("settings")}</ItemLabel>
@@ -147,11 +147,18 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
       </div>
       {/* 열 때만 그려서, 열 때마다 알림 권한 같은 현재 상태를 새로 읽음 */}
       {settingsOpen ? (
-        <SettingsDialog onClose={() => setSettingsOpen(false)} />
+        <SettingsDialog
+          onClose={() => setSettingsOpen(null)}
+          // 메뉴에서 열면 메뉴가 닫히자마자 바로 보이게 (서서히 나타나면 뒤 화면이 비쳐 깜빡임)
+          instant={settingsOpen === "menu"}
+        />
       ) : null}
     </>
   );
 }
+
+/** 설정 창을 어디서 열었는지 (메뉴 / S 키). 닫혀 있으면 null */
+type SettingsOpenedFrom = "menu" | "shortcut" | null;
 
 /**
  * 설정 창 열림 상태. 닫히면 열기 전에 있던 곳으로 포커스를 돌려줌.
@@ -160,28 +167,28 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
  */
 function useSettingsOpen(
   fallback: RefObject<HTMLElement | null>,
-): [boolean, (open: boolean) => void] {
-  const [open, setOpen] = useState(false);
+): [SettingsOpenedFrom, (from: SettingsOpenedFrom) => void] {
+  const [openedFrom, setOpenedFrom] = useState<SettingsOpenedFrom>(null);
   const returnTo = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (open) return;
+    if (openedFrom) return;
     const target = returnTo.current;
     returnTo.current = null;
     if (!target) return;
     (target.checkVisibility() ? target : fallback.current)?.focus();
-  }, [open, fallback]);
+  }, [openedFrom, fallback]);
 
-  function setSettingsOpen(next: boolean) {
-    if (next && !open) {
+  function setSettingsOpen(next: SettingsOpenedFrom) {
+    if (next && !openedFrom) {
       returnTo.current =
         document.activeElement instanceof HTMLElement
           ? document.activeElement
           : null;
     }
-    setOpen(next);
+    setOpenedFrom(next);
   }
-  return [open, setSettingsOpen];
+  return [openedFrom, setSettingsOpen];
 }
 
 /**

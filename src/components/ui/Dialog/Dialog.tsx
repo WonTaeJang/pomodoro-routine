@@ -15,6 +15,11 @@ export type DialogProps = {
   /** 아래쪽 버튼 영역 */
   footer?: ReactNode;
   className?: string;
+  /**
+   * 등장 효과 없이 바로 보이기. 다른 창(메뉴 등)이 닫히자마자 열 때 켬:
+   * 서서히 나타나는 동안 뒤 화면이 비쳐 깜빡여 보이지 않게
+   */
+  instant?: boolean;
 };
 
 /**
@@ -29,6 +34,7 @@ export function Dialog({
   children,
   footer,
   className,
+  instant = false,
 }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
@@ -44,7 +50,7 @@ export function Dialog({
   return (
     <dialog
       ref={ref}
-      className={cx(styles.dialog, className)}
+      className={cx(styles.dialog, instant && styles.instant, className)}
       aria-labelledby={titleId}
       onCancel={(event) => {
         // ESC: 브라우저가 직접 닫지 않게 하고 open 상태로 제어

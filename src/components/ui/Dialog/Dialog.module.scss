@@ -29,6 +29,11 @@
   }
 }
 
+// 등장 효과 없이 바로 보임 (instant)
+.instant[open] {
+  animation: none;
+}
+
 .panel {
   display: flex;
   max-height: inherit;
