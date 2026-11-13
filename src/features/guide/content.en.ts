@@ -117,8 +117,11 @@ const content: GuideContent = {
       icon: "save",
       title: "Where is my data saved?",
       points: [
-        "Your tasks and history are saved only in this browser. They don't sync to other devices yet.",
-        "Clearing your browser data also deletes your history.",
+        "Everything works without signing in. In that case your tasks and history are saved only in this browser, and clearing your browser data deletes them too.",
+        "Sign in from the {menu} menu to save your tasks, focus history and timer and focus sound settings to your account. They carry over when you sign in on another device.",
+        "Tasks and history saved in this browser before you sign in are merged into your account when you sign in.",
+        "Display settings like theme, language and alerts, and Kkami's care records, stay in this browser, not in your account.",
+        "Logging out clears this browser's tasks, history and timer. They stay in your account and come back when you sign in again. Deleting your account deletes its records too.",
         "Under 'Data' in Settings, you can reset settings to their defaults.",
       ],
     },
@@ -155,7 +158,7 @@ const content: GuideContent = {
       points: [
         "{headphones} Focus sounds: focus to rain, a crackling fire and more.",
         "{calendar} Calendar: see your daily history and streak.",
-        "{menu} Menu: dark mode, language, settings and the guide.",
+        "{menu} Menu: sign in, dark mode, language, settings and the guide.",
       ],
     },
     {
