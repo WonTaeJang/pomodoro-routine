@@ -395,8 +395,8 @@ const en: Messages = {
       doneThatDay: "Done that day",
       tasks: "What I worked on",
       moreTasks: "+{count} more",
+      /** When there are no tasks or they are hidden */
       tasksHidden: "One more step forward today",
-      noTasks: "Pure focus, no task list needed",
       stamp: "By Kkami",
     },
   },

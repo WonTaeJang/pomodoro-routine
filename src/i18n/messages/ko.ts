@@ -388,8 +388,8 @@ const ko = {
       doneThatDay: "이날 완료",
       tasks: "이번 사이클에 한 일",
       moreTasks: "그 밖에 {count}개",
+      /** 할 일이 없거나 숨겼을 때 */
       tasksHidden: "오늘도 한 걸음 성장했어요",
-      noTasks: "할 일 없이 오롯이 집중했어요",
       stamp: "까미 인증",
     },
   },

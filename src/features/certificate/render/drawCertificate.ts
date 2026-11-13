@@ -54,7 +54,7 @@ export async function renderCertificate(
   if (options.showTasks && data.taskTitles.length > 0) {
     drawTasks(ctx, text, data.taskTitles);
   } else {
-    drawNoTasks(ctx, text, data.taskTitles.length > 0);
+    drawNoTasks(ctx, text);
   }
   drawStamp(ctx, text);
   drawBrand(ctx, text);
@@ -329,11 +329,9 @@ function drawTasks(ctx: Ctx, { family, t }: TextKit, titles: string[]) {
   }
 }
 
-/** 할 일이 없거나 숨겼을 때 */
-function drawNoTasks(ctx: Ctx, { family, t }: TextKit, hidden: boolean) {
-  const text = t(
-    hidden ? "certificate.image.tasksHidden" : "certificate.image.noTasks",
-  );
+/** 할 일이 없거나 숨겼을 때: 두 경우 모두 같은 응원 문구 */
+function drawNoTasks(ctx: Ctx, { family, t }: TextKit) {
+  const text = t("certificate.image.tasksHidden");
   drawText(ctx, family, text, LAYOUT.tasks.x, LAYOUT.noTasksY, {
     size: 36,
     weight: 600,
