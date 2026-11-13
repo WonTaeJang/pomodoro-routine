@@ -43,6 +43,8 @@ export type GuideSection = {
   icon: GuideIcon;
   title: string;
   points: string[];
+  /** 키보드가 있는 기기에서만 보여줌 (목차와 본문 모두) */
+  keyboardOnly?: boolean;
 };
 
 export type OnboardingSlide = {

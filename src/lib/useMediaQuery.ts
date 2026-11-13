@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
-/** 키보드가 없는 기기(휴대폰·태블릿 터치). 설정 창의 단축키 숨김(CSS)과 같은 기준 */
+/** 키보드가 없는 기기(휴대폰·태블릿 터치). 단축키 안내를 숨기는 CSS(mixin keyboard-only)와 같은 기준 */
 export const TOUCH_ONLY_QUERY = "(hover: none) and (pointer: coarse)";
 
 /**

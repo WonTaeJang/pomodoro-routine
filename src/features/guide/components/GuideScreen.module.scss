@@ -137,3 +137,8 @@
   background: var(--color-accent-subtle);
   color: var(--color-accent);
 }
+
+// 단축키처럼 키보드가 있어야 쓰는 섹션은 휴대폰에서 목차·본문 모두 숨김
+.keyboardOnly {
+  @include mixins.keyboard-only;
+}

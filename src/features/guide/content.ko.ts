@@ -102,6 +102,7 @@ const content: GuideContent = {
     {
       id: "shortcuts",
       icon: "keyboard",
+      keyboardOnly: true,
       title: "단축키",
       points: ["입력칸에 쓰는 중이거나 창이 열려 있을 때는 동작하지 않아요."],
     },

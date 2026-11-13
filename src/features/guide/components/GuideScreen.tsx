@@ -4,6 +4,7 @@ import Image from "next/image";
 import kkami from "@/assets/kkami/kkami-guide-016.webp";
 import { PageMain } from "@/components/layout/PageMain";
 import { Card } from "@/components/ui";
+import { cx } from "@/lib/cx";
 import { useGuideContent } from "../content";
 import { SectionBody, SectionIcon } from "./GuideParts";
 import { ReplayOnboardingButton } from "./ReplayOnboardingButton";
@@ -36,7 +37,10 @@ export function GuideScreen() {
         <nav aria-label={page.tocLabel} className={styles.toc}>
           <ul>
             {sections.map((s) => (
-              <li key={s.id}>
+              <li
+                key={s.id}
+                className={s.keyboardOnly ? styles.keyboardOnly : undefined}
+              >
                 <a href={`#${s.id}`}>
                   <SectionIcon icon={s.icon} size={16} />
                   {s.title}
@@ -51,7 +55,10 @@ export function GuideScreen() {
               as="section"
               key={s.id}
               id={s.id}
-              className={styles.section}
+              className={cx(
+                styles.section,
+                s.keyboardOnly && styles.keyboardOnly,
+              )}
               aria-labelledby={`${s.id}-title`}
             >
               <h2 id={`${s.id}-title`} className={styles.sectionTitle}>

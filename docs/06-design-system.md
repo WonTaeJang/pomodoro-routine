@@ -42,6 +42,7 @@
 | `focus-ring` / `focus-outline` | 키보드 포커스 테두리 |
 | `disabled` | 사용할 수 없는 상태 (흐리게, 커서) |
 | `reduced-motion` | 기기에서 "움직임 줄이기"를 켰을 때 |
+| `keyboard-only` | 키보드가 없는 기기(마우스 없이 터치만 되는 휴대폰·태블릿)에서 숨김. 단축키 안내(☰ 메뉴의 키 표시, 설정·사용법의 단축키)에 씀. JS에서는 `TOUCH_ONLY_QUERY`(같은 기준) |
 | `stack($gap)` | 세로로 쌓기 (`display: flex` + `flex-direction: column` + `gap`) |
 | `header-panel($width)` | 헤더 버튼 아래로 펼쳐지는 창 (집중 소리 창, ☰ 메뉴) |
 | `page-width` | 페이지 본문 너비: 휴대폰은 좁게, 넓은 화면은 넓게, 가운데 (`PageMain`, `AppFooter`) |
@@ -192,3 +193,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-10: 로그인(`src/features/auth/`: `useAuth`, `Avatar`, 로그인·프로필·돌아오는 화면), `User`·`LogIn`·`LogOut` 아이콘, ☰ 메뉴 계정 항목
 
 - 2026-11-11: I-040 돌봄 반응 중 공통 Button의 disabled 스타일 사용. 강아지 직접 조작·다시 깨워보기도 잠그고 비활성 강아지 영역의 잡기 커서를 해제. 추가 안내 문구 없음.
+- 2026-11-13: mixin `keyboard-only`(휴대폰에서 단축키 안내 숨김)

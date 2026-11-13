@@ -33,6 +33,14 @@
 }
 
 // 기기에서 "움직임 줄이기"를 켰을 때
+// 키보드가 없는 기기(마우스 없이 터치만 되는 휴대폰·태블릿)에서는 숨김. 단축키 안내에 씀
+// (src/lib/useMediaQuery.ts의 TOUCH_ONLY_QUERY와 같은 기준)
+@mixin keyboard-only {
+  @media (hover: none) and (pointer: coarse) {
+    display: none;
+  }
+}
+
 @mixin reduced-motion {
   @media (prefers-reduced-motion: reduce) {
     @content;

@@ -113,3 +113,8 @@
 .key {
   color: var(--color-text-muted);
 }
+
+// 단축키 표시는 키보드가 없는 기기(휴대폰)에서 숨김 (Kbd의 display보다 앞서게 .item 안에서)
+.item .key {
+  @include mixins.keyboard-only;
+}

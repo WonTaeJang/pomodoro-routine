@@ -35,7 +35,5 @@
 
 // 키보드가 없는 기기(터치만 되는 휴대폰 등)에서는 숨김
 .keyboardOnly {
-  @media (hover: none) and (pointer: coarse) {
-    display: none;
-  }
+  @include mixins.keyboard-only;
 }

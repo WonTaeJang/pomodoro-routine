@@ -108,6 +108,7 @@ const content: GuideContent = {
     {
       id: "shortcuts",
       icon: "keyboard",
+      keyboardOnly: true,
       title: "Keyboard shortcuts",
       points: ["Shortcuts don't work while you're typing or a dialog is open."],
     },
