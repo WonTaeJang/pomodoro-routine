@@ -113,7 +113,8 @@ import { PawIcon } from "@/components/icons";
   - `share.ts`: 공유 창, 내려받기 / `components/CertificateDialog`: 미리보기, 할 일 보이기, 공유·저장
   - `components/useCertificateImage.ts`: 이미지를 미리 만들어 둠. 내용이 실제로 바뀔 때만 다시 그리고, 다 만들기 전에는 공유·저장을 막고, 쓰지 않는 이미지 주소는 정리
 - 까미 사진 묶음(`src/features/timer/photos/`): `pools.ts`(상황별 사진 목록 `KKAMI_PHOTOS`), `memory.ts`(자리마다 지금 보여 주는 사진과 묶음별 마지막 사진을 브라우저에 기억, 고르기 규칙은 순수 함수·테스트), `useKkamiPhoto(slot, key, pool)`(세션 key가 바뀔 때만 새로 고름. 타이머는 묶음 이름, 완료 팝업은 끝난 시각이 key)
-- 마스코트(`src/assets/mascot/`): `kkami-icon.svg`는 로고·파비콘 등에 쓸 예정. 사용법 머리와 빈 화면은 까미 사진으로 바꿈(I-041)
+- 마스코트(`src/assets/mascot/`): `kkami-icon.svg`(얼굴 일러스트)는 아직 쓰지 않음. 사용법 머리와 빈 화면은 까미 사진으로 바꿈(I-041)
+- 앱 아이콘·파비콘(`src/app/favicon.ico`, `icon.svg`, `apple-icon.png`): 토마토색 바탕에 크림색 발바닥. 헤더 로고와 같은 모양
 - 집중 소리(`src/features/focus-sound/`): 밖에서는 `FocusSoundButton`(헤더 🎧 + 펼침 창), `useFocusSound`(앱 틀에서 한 번), `prepareFocusSound`(시작 버튼)를 씀
   - `sounds.ts`: 소리 목록과 창의 묶음(`FOCUS_SOUND_GROUPS`: 노이즈, 자연의 소리, 공간의 소리). 설정값은 소리 id, `"off"`, `"random"`. 노이즈는 만드는 함수, 녹음은 파일 주소와 이음매 길이, 크기 맞춤 값
   - `recordings.json`: 녹음마다 원본 파일, 자를 구간, 이음매 길이 (다듬기 스크립트와 앱이 함께 읽음). 새 녹음은 여기에 넣고 `node scripts/focus-sounds.mjs design/sound <id>`로 그 소리만 만듦

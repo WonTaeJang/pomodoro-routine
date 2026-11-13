@@ -97,7 +97,9 @@ npm run format:check  # 정리 안 된 파일이 있는지 확인만
 |---|---|---|
 | `design/kkami/` | **원본 사진**을 넣는 곳. 크기, 형식 상관없음 | 올리지 않음 (`.gitignore`) |
 | `src/assets/kkami/` | 화면에 쓰는 **정리된 이미지** | 올림 |
-| `public/` | 파비콘, 공유 미리보기 이미지처럼 주소가 고정되어야 하는 파일 | 올림 |
+| `src/app/` | 파비콘(`favicon.ico` 16·32·48px, `icon.svg`)과 홈 화면 아이콘(`apple-icon.png` 180px). Next.js가 파일 이름을 보고 알아서 연결 | 올림 |
+| `design/app-icon/` | 앱 아이콘 원본 (SVG, 128·512px PNG. 카카오 앱 아이콘은 128px) | 올리지 않음 (`.gitignore`) |
+| `public/` | 공유 미리보기 이미지처럼 주소가 고정되어야 하는 파일 | 올림 |
 | `docs/images/` | README에 넣는 화면 캡처 (`timer.ko.png`, `timer.en.png` 등) | 올림 |
 
 - 원본은 `design/kkami/`에 넣고, 정리(크기 줄이기, 위치 정보 등 메타데이터 제거, WebP 변환)한 뒤 `src/assets/kkami/`에 둡니다.
@@ -179,9 +181,9 @@ pomodoro-routine/
 ├── src/styles/            토큰(tokens/), mixin, 브레이크포인트, 전체 기본 스타일
 ├── src/lib/               공통 함수, 훅 (cx, date, random, audio, useNow·useToday, useHydrateStores·useStoresReady, useWakeLock)
 ├── src/assets/kkami/      까미 이미지 (정리된 것)
-├── src/assets/mascot/     까미 마스코트 SVG (icon: 로고·파비콘용)
+├── src/assets/mascot/     까미 마스코트 SVG (icon: 얼굴 일러스트, 아직 쓰지 않음)
 ├── design/                원본 사진, 원본 녹음(sound/) 등 (Git에 올리지 않음)
-├── public/                파비콘 등 주소가 고정된 파일
+├── public/                주소가 고정된 파일 (파비콘은 src/app/)
 ├── public/sounds/         다듬은 집중 소리 녹음 (scripts/focus-sounds.mjs로 만듦)
 ├── scripts/               개발용 스크립트 (focus-sounds.mjs: 녹음 다듬기, ffmpeg 필요)
 ├── AGENTS.md              AI 코딩 도우미용 Next.js 안내
