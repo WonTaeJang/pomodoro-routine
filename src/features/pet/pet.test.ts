@@ -1,10 +1,87 @@
 import { describe, expect, it } from "vitest";
 import { createPetState, petReducer, petPose, nextReactionAt } from "./pet";
+import { createPetCareStore } from "./careStore";
 
 function awakeState() {
   const sleeping = petReducer(createPetState(), { type: "start", now: -5000 });
   return petReducer(sleeping, { type: "advanceIntro", now: 0 });
 }
+
+describe("산책", () => {
+  it("수면·놀람 중에는 진입하지 않음", () => {
+    const sleeping = petReducer(createPetState(), { type: "start", now: 0 });
+    const startled = petReducer(sleeping, { type: "pet", now: 100 });
+    for (const state of [createPetState(), sleeping, startled]) {
+      expect(petReducer(state, { type: "walk", now: 200 })).toBe(state);
+    }
+  });
+
+  it.each([
+    { type: "pet", duration: 2800 },
+    { type: "feed", duration: 1800 },
+  ] as const)(
+    "$type 반응 종료부터 산책 가능하고, 늦은 종료 콜백에도 중복 실행하지 않음",
+    ({ type, duration }) => {
+      const active = petReducer(awakeState(), { type, now: 0 });
+      expect(petReducer(active, { type: "walk", now: duration - 1 })).toBe(
+        active,
+      );
+      const walking = petReducer(active, { type: "walk", now: duration });
+      expect(walking.location).toBe("walk");
+      expect(nextReactionAt(walking)).toBeNull();
+      for (const type of [
+        "pet",
+        "feed",
+        "walk",
+        "settle",
+        "start",
+        "advanceIntro",
+      ] as const) {
+        expect(petReducer(walking, { type, now: 60000 })).toBe(walking);
+      }
+      expect(petReducer(walking, { type: "reset" })).toBe(walking);
+      const home = petReducer(walking, { type: "returnHome" });
+      expect(home).toMatchObject({
+        location: "home",
+        phase: "awake",
+        introUntil: null,
+        pats: active.pats,
+        snacks: active.snacks,
+      });
+      expect(petPose(home)).toBe("idle");
+      expect(petReducer(home, { type: "returnHome" })).toBe(home);
+      expect(petReducer(home, { type: "feed", now: 60000 }).snacks).toBe(
+        active.snacks + 1,
+      );
+    },
+  );
+
+  it("반복 산책과 무시한 입력은 저장 콜백을 호출하지 않음", () => {
+    let pats = 0;
+    let snacks = 0;
+    const store = createPetCareStore(
+      () => pats++,
+      () => snacks++,
+    );
+    const { dispatch } = store.getState();
+    dispatch({ type: "start", now: -5000 });
+    dispatch({ type: "advanceIntro", now: 0 });
+    for (let round = 0; round < 10; round++) {
+      dispatch({ type: "walk", now: round });
+      dispatch({ type: "pet", now: round });
+      dispatch({ type: "feed", now: round });
+      dispatch({ type: "returnHome" });
+    }
+    expect({ pats, snacks }).toEqual({ pats: 0, snacks: 0 });
+    expect(store.getState().state.location).toBe("home");
+    expect(
+      createPetCareStore(
+        () => {},
+        () => {},
+      ).getState().state,
+    ).toEqual(createPetState());
+  });
+});
 
 describe("돌봄 반응", () => {
   const reactions = [

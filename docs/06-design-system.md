@@ -92,6 +92,7 @@ import { PawIcon } from "@/components/icons";
 ### 기능별 컴포넌트
 특정 기능에서만 쓰는 컴포넌트는 `src/features/<기능>/components/`에 둡니다.
 - 돌봄(`src/features/pet/`): `components/PetPlayground`는 화면 조합, `usePetRive`·`usePetRivePose`는 Rive 로드·구독·재생, `pet.ts`는 시각을 인자로 받는 순수 돌봄 규칙, `usePetCare`는 포인터·타이머 연결. 문구는 `pet` 사전, UI는 `Button`·`Card`·`VisuallyHidden`과 `PixelHeartIcon`을 사용합니다. `_room-art.scss`의 이름 붙인 Sass 값은 방 일러스트 전용 좌표·팔레트이며 일반 UI 토큰과 구분합니다.
+- 산책(`PetWalk`): 기존 `Button`·`PawIcon`으로 진입/복귀합니다. 집 화면을 숨겨 유지하고 별도 Rive 산책 장면을 진입 시 로드합니다. 안내 글은 상태·로딩/오류만 표시하며, 실패 중에도 복귀 버튼을 유지합니다. 산책 배경색은 Rive 아트 팔레트, 나머지 UI는 공통 토큰을 사용합니다.
 - 타이머: `TimerScreen`(페이지), `TimerRuntime`(앱 틀에서 한 번), `TimerPanel`(카드 조립), `ModeSwitcher`(모드 탭 + 전환 확인), `TimerRing`(진행 띠 + 효과), `KkamiPhoto`(상황별 사진 묶음에서 랜덤, 새 사진을 전 사진 위로 서서히 겹침), `TimerControls`, `CycleProgress`, `CompletionDialog`(+ `useCompletionDialog.ts`: 언제 보일지, 자동 시작 카운트다운), `Celebration`, `TestModeBadge`
 - 할 일: `TaskPanel`, `SortableTaskList`(끌어서 순서 바꾸기, 묶음마다 하나), `TaskForm`, `TaskItem`, `TaskDoneCheck`, `PawCount`(🐾 완료/예상)
 - 기록: `TodaySummary`, 오늘 기록 훅 `useTodayFocus()` (헤더의 오늘 기록, 🏅 메달 버튼이 같이 씀). `sessions.ts`: 집중 세션만 고르기(`focusSessions`), 기록의 할 일 제목 찾기(`taskTitleOf`), 날짜별 요약(`getDayStats`: 집중 횟수·시간·사이클 번호), 기간 합계(`sumDays`). 헤더의 오늘 기록, 수료증, 캘린더, 통계가 같이 씀

@@ -6,6 +6,13 @@
  */
 const ko = {
   pet: {
+    walk: {
+      start: "산책하기",
+      status: "산책 중",
+      return: "돌아가기",
+      scene: "산책길을 걷는 까미",
+      error: "산책길을 불러오지 못했어요.",
+    },
     affinity: {
       label: "친밀도",
       level: "친밀도 Lv.{level}",

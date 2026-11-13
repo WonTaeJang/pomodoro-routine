@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslations } from "use-intl";
 import { usePetRive, usePetRivePose } from "../usePetRive";
 import { Button, Card, VisuallyHidden } from "@/components/ui";
 import {
+  PawIcon,
   PixelHeartIcon,
   PixelSnackIcon,
   ChevronLeftIcon,
@@ -14,6 +15,7 @@ import { usePetCare } from "../usePetCare";
 import { petStore, usePetStore } from "../store";
 import { useStoresReady } from "@/lib/useHydrateStores";
 import styles from "./PetPlayground.module.scss";
+import { PetWalk } from "./PetWalk";
 import { PetAffinity } from "./PetAffinity";
 import type { PetPose } from "../pet";
 
@@ -71,6 +73,9 @@ function PetRoom({ retry }: { retry: () => void }) {
   const { RiveComponent, loaded, ready, failed } = animation;
   const {
     pose,
+    walking,
+    walk,
+    returnHome,
     snackSequence,
     pats,
     pet,
@@ -87,7 +92,15 @@ function PetRoom({ retry }: { retry: () => void }) {
   const happy = pose === "happy" || snacking;
   const copy = POSE_COPY[pose];
 
+  const walkButton = useRef<HTMLButtonElement>(null);
+  const wasWalking = useRef(false);
+  useEffect(() => {
+    if (wasWalking.current && !walking) walkButton.current?.focus();
+    wasWalking.current = walking;
+  }, [walking]);
+
   usePetRivePose(animation, {
+    active: !walking,
     pose,
     snackSequence,
   });
@@ -114,119 +127,133 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
           <span className={styles.status} role="status">
             <i />
-            {t(copy.status)}
+            {t(walking ? "walk.status" : copy.status)}
           </span>
         </div>
         <PetAffinity />
-        <div className={styles.room}>
-          <div className={styles.window} aria-hidden="true">
-            <span />
-            <i />
-          </div>
-          <div className={styles.plant} aria-hidden="true">
-            <i />
-            <span />
-          </div>
-          <div className={styles.rug} aria-hidden="true" />
-          <div className={styles.bubble} aria-hidden="true">
-            {t(copy.bubble)}
-            {snacking ? <PixelSnackIcon /> : <PixelHeartIcon />}
-          </div>
-          <div className={styles.dog} aria-hidden="true">
-            <RiveComponent />
-          </div>
-          <button
-            className={styles.petTarget}
-            aria-describedby="pet-keyboard-help"
-            data-sleeping={sleeping || startled}
-            aria-label={t(copy.label)}
-            disabled={!ready || startled || happy}
-            onPointerDown={startStroke}
-            onPointerMove={moveStroke}
-            onPointerUp={endStroke}
-            onPointerCancel={endStroke}
-            onLostPointerCapture={endStroke}
-            onClick={clickPet}
-            onKeyDown={stopCareKey}
-          />
-          {/*
+        {walking && <PetWalk onReturn={returnHome} />}
+        <div hidden={walking}>
+          <div className={styles.room}>
+            <div className={styles.window} aria-hidden="true">
+              <span />
+              <i />
+            </div>
+            <div className={styles.plant} aria-hidden="true">
+              <i />
+              <span />
+            </div>
+            <div className={styles.rug} aria-hidden="true" />
+            <div className={styles.bubble} aria-hidden="true">
+              {t(copy.bubble)}
+              {snacking ? <PixelSnackIcon /> : <PixelHeartIcon />}
+            </div>
+            <div className={styles.dog} aria-hidden="true">
+              <RiveComponent />
+            </div>
+            <button
+              className={styles.petTarget}
+              aria-describedby="pet-keyboard-help"
+              data-sleeping={sleeping || startled}
+              aria-label={t(copy.label)}
+              disabled={!ready || startled || happy}
+              onPointerDown={startStroke}
+              onPointerMove={moveStroke}
+              onPointerUp={endStroke}
+              onPointerCancel={endStroke}
+              onLostPointerCapture={endStroke}
+              onClick={clickPet}
+              onKeyDown={stopCareKey}
+            />
+            {/*
             강아지가 준비될 때까지 방을 가려 두고, 준비되면 서서히 걷음 (B-003).
             Rive 시작 화면은 이 덮개 위에 보이므로, 파일을 다 받은 뒤에는 안내 글을 지움
           */}
-          <div
-            className={styles.loading}
-            data-hidden={ready}
-            role={failed ? "alert" : "status"}
-          >
-            {!loaded && (
-              <>
-                <p>{failed ? t("error") : t("loading")}</p>
-                {failed && (
-                  <Button variant="secondary" size="sm" onClick={retry}>
-                    {t("retry")}
-                  </Button>
-                )}
-              </>
-            )}
-          </div>
-          <span className={styles.roomLabel} aria-hidden="true">
-            {t("roomLabel")}
-          </span>
-        </div>
-        <div className={styles.controls}>
-          <div className={styles.actions}>
-            <Button
-              icon={<PixelHeartIcon />}
-              className={styles.petButton}
-              aria-describedby="pet-keyboard-help"
-              onClick={pet}
-              disabled={!ready || startled || happy}
-              onKeyDown={stopCareKey}
+            <div
+              className={styles.loading}
+              data-hidden={ready}
+              role={failed ? "alert" : "status"}
             >
-              {t(copy.action)}
-            </Button>
-            <Button
-              variant="secondary"
-              icon={<PixelSnackIcon />}
-              className={styles.petButton}
-              onClick={feed}
-              disabled={!ready || sleeping || startled || happy}
-              aria-describedby="pet-keyboard-help"
-              onKeyDown={stopCareKey}
-            >
-              {t("feed")}
-            </Button>
+              {!loaded && (
+                <>
+                  <p>{failed ? t("error") : t("loading")}</p>
+                  {failed && (
+                    <Button variant="secondary" size="sm" onClick={retry}>
+                      {t("retry")}
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+            <span className={styles.roomLabel} aria-hidden="true">
+              {t("roomLabel")}
+            </span>
           </div>
-          {storageIssue && (
-            <div className={styles.storageIssue} role="alert">
-              <span>{t(`storageIssue.${storageIssue}`)}</span>
+          <div className={styles.controls}>
+            <div className={styles.actions}>
               <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  void petStore.getState().retry();
-                }}
+                icon={<PixelHeartIcon />}
+                className={styles.petButton}
+                aria-describedby="pet-keyboard-help"
+                onClick={pet}
+                disabled={!ready || startled || happy}
+                onKeyDown={stopCareKey}
               >
-                {t("retrySave")}
+                {t(copy.action)}
+              </Button>
+              <Button
+                variant="secondary"
+                icon={<PixelSnackIcon />}
+                className={styles.petButton}
+                onClick={feed}
+                disabled={!ready || sleeping || startled || happy}
+                aria-describedby="pet-keyboard-help"
+                onKeyDown={stopCareKey}
+              >
+                {t("feed")}
+              </Button>
+              <Button
+                ref={walkButton}
+                variant="secondary"
+                icon={<PawIcon />}
+                className={styles.petButton}
+                onClick={walk}
+                disabled={!ready || pose !== "idle"}
+                onKeyDown={stopCareKey}
+              >
+                {t("walk.start")}
               </Button>
             </div>
-          )}
-        </div>
-        <div className={styles.metrics}>
-          <div>
-            <span>{t("count")}</span>
-            <strong>
-              {storesReady && hydrated ? t("patCount", { count: pats }) : "—"}
-            </strong>
+            {storageIssue && (
+              <div className={styles.storageIssue} role="alert">
+                <span>{t(`storageIssue.${storageIssue}`)}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    void petStore.getState().retry();
+                  }}
+                >
+                  {t("retrySave")}
+                </Button>
+              </div>
+            )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={reset}
-            disabled={!ready || happy}
-          >
-            {t("reset")}
-          </Button>
+          <div className={styles.metrics}>
+            <div>
+              <span>{t("count")}</span>
+              <strong>
+                {storesReady && hydrated ? t("patCount", { count: pats }) : "—"}
+              </strong>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={reset}
+              disabled={!ready || happy}
+            >
+              {t("reset")}
+            </Button>
+          </div>
         </div>
       </Card>
     </main>

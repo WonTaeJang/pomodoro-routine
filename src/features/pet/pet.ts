@@ -5,6 +5,7 @@ export const PET_SLEEP_MS = 5000;
 export const PET_STARTLE_MS = 1000;
 
 export type PetState = {
+  location: "home" | "walk";
   phase: "sleeping" | "startled" | "awake";
   introUntil: number | null;
   pats: number;
@@ -15,12 +16,13 @@ export type PetState = {
 };
 
 export type PetAction =
-  | { type: "start" | "advanceIntro" | "pet" | "feed"; now: number }
+  | { type: "start" | "advanceIntro" | "pet" | "feed" | "walk"; now: number }
   | { type: "settle"; now: number }
-  | { type: "reset" };
+  | { type: "reset" | "returnHome" };
 
 export function createPetState(): PetState {
   return {
+    location: "home",
     phase: "sleeping",
     introUntil: null,
     pats: 0,
@@ -60,14 +62,26 @@ function settleReactions(state: PetState, now: number): PetState {
 
 /** 현재 시각을 주입해, UI·브라우저 타이머와 분리한 돌봄 규칙. */
 export function petReducer(state: PetState, action: PetAction): PetState {
+  if (state.location === "walk") {
+    return action.type === "returnHome"
+      ? { ...state, location: "home" }
+      : state;
+  }
   if (
     action.type === "pet" ||
     action.type === "feed" ||
+    action.type === "walk" ||
     action.type === "settle"
   ) {
     state = settleReactions(state, action.now);
   }
   switch (action.type) {
+    case "walk":
+      if (state.phase !== "awake" || nextReactionAt(state) !== null)
+        return state;
+      return { ...state, location: "walk" };
+    case "returnHome":
+      return state;
     case "start":
       if (state.phase !== "sleeping" || state.introUntil !== null) return state;
       return { ...state, introUntil: action.now + PET_SLEEP_MS };

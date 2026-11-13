@@ -87,9 +87,11 @@ export function usePetRivePose(
   {
     pose,
     snackSequence,
+    active = true,
   }: {
     pose: PetPose;
     snackSequence: number;
+    active?: boolean;
   },
 ) {
   const {
@@ -118,6 +120,10 @@ export function usePetRivePose(
       if (snacking) snackAgain();
     }
     if (!rive) return;
+    if (!active) {
+      rive.pause();
+      return;
+    }
     rive.play();
     // Apply the new pose before freezing; the startup splash still plays.
     if (reducedMotion && sceneReady) {
@@ -125,6 +131,7 @@ export function usePetRivePose(
       return () => clearTimeout(freeze);
     }
   }, [
+    active,
     happy,
     snacking,
     snackSequence,

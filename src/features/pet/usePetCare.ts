@@ -62,6 +62,16 @@ export function usePetCare(ready: boolean) {
     if (ready) dispatch({ type: "feed", now: performance.now() });
   }
 
+  function walk() {
+    stroke.current = null;
+    dragged.current = false;
+    if (ready) dispatch({ type: "walk", now: performance.now() });
+  }
+
+  function returnHome() {
+    dispatch({ type: "returnHome" });
+  }
+
   function startStroke(event: PointerEvent<HTMLButtonElement>) {
     if (!ready || !event.isPrimary || event.button !== 0) return;
     dragged.current = false;
@@ -107,6 +117,9 @@ export function usePetCare(ready: boolean) {
   }
 
   return {
+    walking: state.location === "walk",
+    walk,
+    returnHome,
     pose: petPose(state),
     snackSequence: state.snacks,
     pats,

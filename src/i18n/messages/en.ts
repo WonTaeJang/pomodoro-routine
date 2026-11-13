@@ -6,6 +6,13 @@ import type { Messages } from "./ko";
  */
 const en: Messages = {
   pet: {
+    walk: {
+      start: "Go for a walk",
+      status: "On a walk",
+      return: "Go home",
+      scene: "Kkami walking along a park path",
+      error: "Could not load the walk.",
+    },
     affinity: {
       label: "Bond",
       level: "Bond Lv.{level}",

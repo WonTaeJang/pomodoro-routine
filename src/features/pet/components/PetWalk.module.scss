@@ -1,0 +1,42 @@
+@use "../../../styles/breakpoints" as bp;
+
+// Scene palette follows the Rive artwork; controls use shared UI tokens.
+$walk-sky: #dce9e4;
+
+.scene {
+  position: relative;
+  height: 316px;
+  overflow: hidden;
+  background: $walk-sky;
+}
+.canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.cover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  &[data-failed="true"] {
+    z-index: 3;
+  }
+}
+.controls {
+  padding: var(--space-5);
+  text-align: center;
+}
+@include bp.up(sm) {
+  .scene {
+    height: 356px;
+  }
+}
