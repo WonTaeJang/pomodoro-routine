@@ -1,7 +1,21 @@
 @use "../../../styles/mixins";
 
 // 타이머 원 둘레의 집중 소리 분위기 (I-052). 원보다 넓게 깔고 바깥쪽으로 갈수록 흐려지게 가림.
-// 숫자·사진을 가리지 않게 원 뒤(z-index -1)에 두고, 창가 물방울만 원 위에 겹침
+
+// 테마와 관계없이 같은 색. 그 밖의 효과는 강조색(노이즈)·흐린 글자색(구름·종잇장·김)을 따름
+$water-blue: #5b9bf0; // 빗줄기·창가 물방울·파도·시냇물 파문
+$leaf: #6fa36a;
+$fire-glow: rgb(255 140 40 / 75%);
+$fire-glow-outer: rgb(255 90 30 / 35%);
+$fire-warmth: rgb(255 120 40 / 55%);
+$ember: #ffb04a;
+$ember-light: #ff8a2a;
+
+// 흐려지는 범위 (원 중심에서 이 안은 그대로, 바깥으로 갈수록 투명)
+$fade: radial-gradient(circle at 50% 50%, #000 52%, transparent 71%);
+// 원 양옆에 두는 효과용으로 조금 넓게
+$fade-wide: radial-gradient(circle at 50% 50%, #000 62%, transparent 76%);
+
 .ambience {
   position: absolute;
   z-index: -1;
@@ -11,7 +25,7 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 1.2s ease;
-  mask: radial-gradient(circle at 50% 50%, #000 52%, transparent 71%);
+  mask: $fade;
 
   i {
     position: absolute;
@@ -31,6 +45,18 @@
 
 .visible {
   opacity: 1;
+}
+
+// 숫자·사진을 가리지 않게 기본은 원 뒤(z-index -1). 사진 위를 지나가야 어울리는 것만 원 위에 겹침
+.window,
+.leaves {
+  z-index: 1;
+}
+
+// 원 양옆에서 움직여서 끝이 잘려 보이지 않게
+.pages,
+.steam {
+  mask: $fade-wide;
 }
 
 // --- 노이즈: 원에서 퍼져 나가는 옅은 고리 ---
@@ -77,8 +103,8 @@
   width: 1.5px;
   height: 18px;
   border-radius: 2px;
-  background: linear-gradient(transparent, var(--color-accent));
-  opacity: 0.45;
+  background: linear-gradient(transparent, $water-blue);
+  opacity: 0.55;
   animation: fall var(--d) linear infinite;
 }
 
@@ -88,18 +114,14 @@
   }
 }
 
-// --- 창가 빗소리: 원 위쪽 띠를 타고 흘러내리는 물방울 (원 위에 겹침) ---
-.window {
-  z-index: 1;
-
-  i {
-    width: 6px;
-    height: 9px;
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    background: var(--color-accent);
-    opacity: 0;
-    animation: slide var(--d) ease-in infinite;
-  }
+// --- 창가 빗소리: 원 위쪽 띠를 타고 흘러내리는 물방울 (사진 위로 지나감) ---
+.window i {
+  width: 6px;
+  height: 9px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: $water-blue;
+  opacity: 0;
+  animation: slide var(--d) ease-in infinite;
 }
 
 @keyframes slide {
@@ -123,12 +145,6 @@
 }
 
 // --- 모닥불: 아래쪽 큰 불빛 일렁임 + 원 둘레 온기 + 떠오르는 불티 (테마와 관계없이 주황) ---
-$fire-glow: rgb(255 140 40 / 75%);
-$fire-glow-outer: rgb(255 90 30 / 35%);
-$fire-warmth: rgb(255 120 40 / 55%);
-$ember: #ffb04a;
-$ember-light: #ff8a2a;
-
 .fire {
   &::before {
     position: absolute;
@@ -225,9 +241,7 @@ $ember-light: #ff8a2a;
   }
 }
 
-// --- 숲속: 천천히 흔들리며 떨어지는 나뭇잎 ---
-$leaf: #6fa36a;
-
+// --- 숲속: 천천히 흔들리며 떨어지는 나뭇잎 (사진 위로 지나감) ---
 .leaves i {
   top: -10px;
   width: 12px;
@@ -270,7 +284,7 @@ $leaf: #6fa36a;
   background: repeating-radial-gradient(
     circle at 25px -10px,
     transparent 0 22px,
-    var(--color-accent) 22px 23.5px,
+    $water-blue 22px 23.5px,
     transparent 23.5px 50px
   );
   background-size: 50px 40px;
@@ -318,5 +332,91 @@ $leaf: #6fa36a;
 @keyframes cloud {
   to {
     transform: translateX(440px);
+  }
+}
+
+// --- 시냇물: 원 아래쪽 물 위에 번지는 작은 파문 ---
+.ripples i {
+  width: 64px;
+  height: 18px;
+  border: 2px solid $water-blue;
+  border-radius: 50%;
+  opacity: 0;
+  translate: -50% 0;
+  animation: ripple-water var(--d) ease-out infinite;
+}
+
+@keyframes ripple-water {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.3);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+
+// --- 도서관: 원 양옆을 천천히 떠오르며 흔들리는 종잇장 ---
+.pages i {
+  bottom: -24px;
+  width: 18px;
+  height: 23px;
+  border: 2px solid var(--color-text-muted);
+  background: color-mix(in srgb, var(--color-text-muted) 25%, transparent);
+  border-radius: 2px;
+  opacity: 0;
+  animation: page var(--d) ease-in-out infinite;
+}
+
+@keyframes page {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotateY(0) rotate(-15deg);
+  }
+
+  15% {
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: translate(var(--x), -150px) rotateY(50deg) rotate(20deg);
+  }
+
+  85% {
+    opacity: 0.45;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(0, -300px) rotateY(0) rotate(-15deg);
+  }
+}
+
+// --- 카페: 원 양옆에서 피어오르는 커피 김 ---
+.steam i {
+  width: 16px;
+  height: 44px;
+  border-left: 3.5px solid var(--color-text);
+  border-radius: 50%;
+  opacity: 0;
+  filter: blur(1px);
+  animation: steam var(--d) ease-out infinite;
+}
+
+@keyframes steam {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scaleX(1);
+  }
+
+  25% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-34px) scaleX(-1.6);
   }
 }

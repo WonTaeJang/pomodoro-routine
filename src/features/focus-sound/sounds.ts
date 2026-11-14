@@ -1,10 +1,13 @@
 import {
   AirplaneIcon,
+  BookIcon,
   CloudRainIcon,
+  CoffeeIcon,
   FlameIcon,
   NoiseBrownIcon,
   NoisePinkIcon,
   NoiseWhiteIcon,
+  StreamIcon,
   TreeIcon,
   WavesIcon,
   WindowRainIcon,
@@ -29,7 +32,10 @@ export const FOCUS_SOUND_IDS = [
   "fireplace",
   "forest",
   "waves",
+  "stream",
   "airplane",
+  "library",
+  "cafe",
 ] as const;
 export type FocusSoundId = (typeof FOCUS_SOUND_IDS)[number];
 
@@ -131,9 +137,25 @@ export const FOCUS_SOUNDS: Record<FocusSoundId, FocusSound> = {
     icon: WavesIcon,
     level: 0.85,
   },
+  // 쉬지 않고 졸졸 흐르는 넓은 소리라 같은 크기(LUFS)여도 다른 녹음보다 크게 들려서 조금 낮춤
+  stream: {
+    ...recording("stream"),
+    icon: StreamIcon,
+    level: 0.6,
+  },
   airplane: {
     ...recording("airplane"),
     icon: AirplaneIcon,
+    level: 0.85,
+  },
+  library: {
+    ...recording("library"),
+    icon: BookIcon,
+    level: 0.85,
+  },
+  cafe: {
+    ...recording("cafe"),
+    icon: CoffeeIcon,
     level: 0.85,
   },
 };
@@ -146,8 +168,8 @@ export const FOCUS_SOUND_GROUPS: {
   { id: "noise", ids: ["white", "pink", "brown"] },
   {
     id: "nature",
-    ids: ["rain", "window-rain", "fireplace", "forest", "waves"],
+    ids: ["rain", "window-rain", "fireplace", "forest", "waves", "stream"],
   },
-  // 어떤 곳에 있는 듯한 소리 (나중에 카페, 기차 등도 여기에)
-  { id: "places", ids: ["airplane"] },
+  // 어떤 곳에 있는 듯한 소리
+  { id: "places", ids: ["airplane", "library", "cafe"] },
 ];

@@ -312,7 +312,7 @@
 - **언제**: 집중이 진행 중일 때만. 일시정지, 휴식, 집중이 끝나면 서서히 꺼지고 다시 시작하면 서서히 켜짐. 다른 페이지(캘린더)에 있어도 들림. 기본은 꺼짐, 크기 50% (알림 소리 크기와 따로).
 - **미리 듣기**: 집중 중이 아닐 때 소리를 고르면 4초 동안 들려줌 (녹음은 다 받은 뒤부터 4초). 집중 중에 고르면 바로 겹치며 바뀜.
 - **노이즈 3종(백색, 핑크, 브라운)**: 파일 없이 브라우저에서 만듦. 양쪽 귀에 조금 다른 소리를 넣어 넓게 들리게 하고, 끝과 처음을 겹쳐 끊김 없이 반복.
-- **자연의 소리 5종**: 처음엔 빗소리도 브라우저에서 만들었지만 인공적이라 실제 녹음으로 바꿈.
+- **자연의 소리 6종**: 처음엔 빗소리도 브라우저에서 만들었지만 인공적이라 실제 녹음으로 바꿈.
   - 원본은 `design/sound/`(Git에 올리지 않음), 다듬은 파일만 `public/sounds/`에 넣어 저장소에 올림 (2026-11-08 결정).
   - 다듬기는 `scripts/focus-sounds.mjs`(ffmpeg 필요). 소리마다 자를 구간과 값은 `src/features/focus-sound/recordings.json`에 있고 앱도 같은 파일에서 이음매 길이를 읽음: 고르게 이어지는 75~90초를 자르고, 아주 낮은 울림을 걸러내고, 모두 -20 LUFS로 크기를 맞추고, AAC(.m4a, 약 1MB)로 압축. 파일 끝에 이음매를 겹칠 2~4초가 더 들어 있고, 앱이 재생할 때 겹쳐서 끊김 없이 반복함.
   - 처음 고를 때 받음. 풀어 두면 1분에 약 20MB라 메모리에는 지금 쓰는 녹음 하나만 남김.
@@ -326,9 +326,13 @@
 | 숲속 | `forest.m4a` | Nature Forest Sound (ID 537925) | SoundReality |
 | 파도 | `waves.m4a` | [Ocean Sea Soft Waves (ID 121349)](https://pixabay.com/sound-effects/nature-ocean-sea-soft-waves-121349/) | SoundsForYou |
 | 비행기 기내 | `airplane.m4a` | Airplane Atmos (ID 22955) | freesound_community |
+| 시냇물 | `stream.m4a` | [Sound of a quiet spring stream (ID 144993)](https://pixabay.com/sound-effects/nature-sound-of-a-quiet-spring-stream-background-sounds-of-nature-144993/) | White_Records |
+| 도서관 | `library.m4a` | [A small library in Korea (ID 17716)](https://pixabay.com/sound-effects/film-special-effects-a-small-library-in-korea-17716/) | freesound_community |
+| 카페 | `cafe.m4a` | [QUIET CAFE, CHATTER, MILK FROTHING MACHINE (ID 24034)](https://pixabay.com/sound-effects/people-quiet-cafe-chatter-milk-frothing-machine-atmos-atmosphere-wildtrack-ambience-24034/) | freesound_community |
 
 - **창이 화면보다 길 때** (2026-11-08, 백로그 I-019): 제목과 소리 크기는 그대로 두고 가운데 소리 목록만 스크롤. 목록이 위·아래로 더 있으면 경계에 얇은 선. 아주 낮은 화면(목록이 7.5rem보다 작아질 때)은 창 전체가 스크롤.
 - **공간의 소리** (2026-11-08, 백로그 I-016): 어떤 곳에 있는 듯한 소리를 모으는 새 묶음. 첫 소리는 비행기 기내(엔진이 낮게 울리는 소리). 기내 소리는 대부분 낮은 울림이라 다른 녹음(40~80Hz)보다 낮은 30Hz 아래만 걸러냄. 나중에 카페·기차 등도 여기에.
+- **도서관·카페·시냇물** (2026-11-14, 백로그 I-029): 원본은 사용자가 Pixabay에서 고름. 소리 크기가 들쭉날쭉하지 않은 구간을 재서 자름: 도서관 160초부터 60초(원본 -41 LUFS로 아주 작음), 카페 55초부터 60초(우유 거품기 소리 구간 40~55초를 피함, 원본 -50 LUFS), 시냇물 88초부터 90초. 모두 -20 LUFS로 맞춤. 시냇물은 쉬지 않고 흐르는 넓은 소리라 같은 크기여도 크게 들려서 앱의 소리 크기 값(`level`)을 0.85 대신 0.6으로 낮춤. 도서관·카페는 원본이 작아 크게 키웠으므로 녹음 잡음(쉬익)이 들리면 구간이나 값을 다시 정함. 타이머 원 분위기(I-052): 시냇물은 원 아래 물결 파문, 도서관은 원 양옆으로 떠오르는 종잇장, 카페는 원 양옆에서 피어오르는 김(원 위는 모드 탭, 아래는 숫자와 가까워 양옆에 두고, 양옆까지 보이게 흐려지는 범위를 넓힘).
 - **랜덤** (2026-11-08, 백로그 I-018): 창 맨 위 "끄기" 옆. 고르면 집중마다 모든 소리(노이즈·자연·공간) 중 하나가 나옴.
   - 소리는 **지금까지 마친 집중 횟수**로 정함: 모든 소리를 섞은 묶음을 차례로 쓰고(골고루 나오게), 묶음이 바뀔 때도 바로 앞과 같은 소리는 피함. 따로 저장하지 않아도 일시정지·새로고침·다른 탭에서 같은 소리.
   - 집중을 건너뛰면 마친 횟수가 그대로라 다음 집중도 같은 소리 (마친 집중마다 바뀜).

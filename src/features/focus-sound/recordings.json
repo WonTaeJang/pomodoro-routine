@@ -46,5 +46,29 @@
     "loop": 84,
     "fade": 3,
     "lowCut": 30
+  },
+  {
+    "id": "stream",
+    "source": "white_records-sound-of-a-quiet-spring-stream-background-sounds-of-nature-144993.mp3",
+    "start": 88,
+    "loop": 90,
+    "fade": 3,
+    "lowCut": 60
+  },
+  {
+    "id": "library",
+    "source": "freesound_community-a-small-library-in-korea-17716.mp3",
+    "start": 160,
+    "loop": 60,
+    "fade": 3,
+    "lowCut": 60
+  },
+  {
+    "id": "cafe",
+    "source": "freesound_community-quiet-cafe-chatter-milk-frothing-machine-atmos-atmosphere-wildtrack-ambience-24034.mp3",
+    "start": 55,
+    "loop": 60,
+    "fade": 3,
+    "lowCut": 60
   }
 ]

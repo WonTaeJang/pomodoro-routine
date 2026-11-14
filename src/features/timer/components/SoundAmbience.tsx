@@ -19,7 +19,10 @@ const AMBIENCE = {
   fireplace: "fire",
   forest: "leaves",
   waves: "waves",
+  stream: "ripples",
   airplane: "clouds",
+  library: "pages",
+  cafe: "steam",
 } as const satisfies Record<FocusSoundId, string>;
 
 type Ambience = (typeof AMBIENCE)[FocusSoundId];
@@ -34,11 +37,24 @@ const COUNT: Record<Ambience, number> = {
   fire: 16,
   leaves: 6,
   waves: 3,
+  ripples: 6,
   clouds: 4,
+  pages: 5,
+  steam: 3,
 };
 
 /** 노이즈 고리가 한 번 퍼지는 시간 (초). 백색은 잘고 빠르게, 브라운은 느리고 깊게 */
 const RIPPLE_SECONDS = { white: 2.6, pink: 4.2, brown: 6.5 };
+
+/**
+ * 커피 김이 피어오르는 자리 [가로 %, 아래에서 %]. 원의 양옆 바깥.
+ * (원 위는 모드 탭, 아래는 남은 시간 숫자와 가까워 피함)
+ */
+const STEAM_AT = [
+  [9, 36],
+  [86, 36],
+  [14, 50],
+];
 
 type Vars = CSSProperties & Record<`--${string}`, string>;
 
@@ -93,6 +109,30 @@ function pieceStyles(ambience: Ambience, seed: number): Vars[] {
           bottom: `${18 + i * 14}px`,
           opacity: 0.32 - i * 0.08,
           "--d": s(3 + i * 1.3),
+        };
+      case "ripples":
+        // 원 아래쪽 물 위에 번지는 작은 파문
+        return {
+          left: `${between(25, 75)}%`,
+          bottom: `${between(10, 22).toFixed(0)}%`,
+          "--d": s(between(3.5, 5.5)),
+          animationDelay: s(-between(0, 5)),
+        };
+      case "pages":
+        // 원 양옆을 천천히 떠오르며 흔들리는 종잇장 (가운데는 원 뒤로 숨어서 양옆으로 번갈아)
+        return {
+          left: `${i % 2 === 0 ? between(6, 18) : between(78, 90)}%`,
+          "--x": `${between(-30, 30).toFixed(0)}px`,
+          "--d": s(between(9, 13)),
+          animationDelay: s(-between(0, 12)),
+        };
+      case "steam":
+        // 원 양옆에서 피어오르는 커피 김
+        return {
+          left: `${STEAM_AT[i][0]}%`,
+          bottom: `${STEAM_AT[i][1]}%`,
+          "--d": s(between(4.5, 6)),
+          animationDelay: s(-i * 1.7),
         };
       case "clouds":
         return {

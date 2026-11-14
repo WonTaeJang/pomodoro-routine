@@ -288,6 +288,27 @@ export function FlameIcon(props: IconProps) {
   );
 }
 
+/** 시냇물: 물방울과 그 아래 잔물결 */
+export function StreamIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 3c-2.2 3-4 5.2-4 7.5a4 4 0 0 0 8 0C16 8.2 14.2 6 12 3z" />
+      <path d="M3 19c2 0 2-1.5 4.5-1.5S9.5 19 12 19s2-1.5 4.5-1.5S19 19 21 19" />
+    </Icon>
+  );
+}
+
+/** 커피잔 (김이 나는) */
+export function CoffeeIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 10h12v4a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z" />
+      <path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16" />
+      <path d="M8 3.5v3M12 3.5v3" />
+    </Icon>
+  );
+}
+
 /** 나무 */
 export function TreeIcon(props: IconProps) {
   return (
