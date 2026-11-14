@@ -30,6 +30,12 @@
   font-weight: var(--font-weight-bold);
 }
 
+// 긴 이름(띄어쓰기 없는 영어 등)도 팝업 밖으로 넘지 않고 줄바꿈 (옆 발바닥 개수는 PawCount가 줄어들지 않게 함)
+.name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .note {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);

@@ -3,6 +3,8 @@
 // 세로 공간: 화면 높이(dvh)에 맞춰 사진, 시간 글자, 여백을 줄여서 한 화면에 들어가게
 .panel {
   display: flex;
+  // 페이지 격자 안에서 내용물(긴 할 일 제목 등)만큼 넓어지지 않게. 그래야 아래 할 일 칸이 … 으로 줄어듦
+  min-width: 0;
   flex-direction: column;
   align-items: center;
   padding: clamp(var(--space-4), 3dvh, var(--space-8)) var(--space-4)
@@ -64,6 +66,7 @@
 }
 
 .taskTitle {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

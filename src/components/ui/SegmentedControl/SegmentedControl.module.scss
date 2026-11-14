@@ -1,3 +1,4 @@
+@use "../../../styles/breakpoints" as bp;
 @use "../../../styles/mixins";
 
 .group {
@@ -17,9 +18,13 @@
   justify-content: center;
   gap: var(--space-1-5);
   height: var(--control-tab);
-  padding: 0 var(--space-4);
+  // 글자가 줄바꿈되지 않아서 좁은 휴대폰에서는 여백(과 글자)을 줄여 한 줄에 들어가게 함
+  // (영어 "Focus · Short break · Long break"가 가장 김)
+  // 360px 미만: 여백 8px, 글자 한 단계 작게
+  padding: 0 var(--space-2);
   border-radius: var(--radius-full);
   color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   white-space: nowrap;
   cursor: pointer;
@@ -38,6 +43,17 @@
 
   @include mixins.reduced-motion {
     transition: none;
+  }
+
+  // 360~480px: 여백 12px
+  @include bp.up(xs) {
+    padding: 0 var(--space-3);
+    font-size: inherit;
+  }
+
+  // 480px 이상: 여백 16px (원래 크기)
+  @include bp.up(sm) {
+    padding: 0 var(--space-4);
   }
 }
 
