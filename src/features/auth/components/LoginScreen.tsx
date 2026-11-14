@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "use-intl";
 import kkami from "@/assets/kkami/kkami-login-001.webp";
 import { Button } from "@/components/ui";
+import { cx } from "@/lib/cx";
 import { safeNextPath } from "../profile";
 import {
   isDevLoginAvailable,
@@ -65,7 +66,7 @@ export function LoginScreen() {
     redirecting !== null || state === "signingIn" || status !== "signedOut";
 
   return (
-    <AuthCard title={t("title")} intro={t("intro")} photo={kkami}>
+    <AuthCard title={t("title")} hideTitle photo={kkami}>
       {status === "disabled" ? (
         <p className={styles.error} role="alert">
           {t("notConfigured")}
@@ -112,7 +113,7 @@ export function LoginScreen() {
         </>
       )}
       {/* 계정 저장 안내와 약관 동의는 한 묶음으로 붙여 둠. 개인정보처리방침은 푸터 링크로 */}
-      <div className={styles.notes}>
+      <div className={cx(styles.muted, styles.notes)}>
         <p>{t("note")}</p>
         <p>
           {t.rich("agreement", {

@@ -485,7 +485,6 @@ const ko = {
   auth: {
     login: {
       title: "로그인",
-      intro: "로그인하지 않아도 지금처럼 모든 기능을 쓸 수 있어요.",
       google: "Google 계정으로 로그인",
       kakao: "카카오 로그인",
       redirecting: "{provider}로 이동하는 중…",

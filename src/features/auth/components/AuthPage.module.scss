@@ -15,29 +15,18 @@
   max-width: 420px;
 }
 
-// 사진 | 제목·소개 (로그인 화면). 사진은 글이 길어져도 줄어들지 않게
-.head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-// 휴대폰 80px, 넓은 화면 96px 둥근 사진
+// 카드 맨 위 가운데 둥근 사진 (로그인 화면). 휴대폰 104px, 넓은 화면 120px
 .photo {
-  width: 80px;
-  height: 80px;
-  flex-shrink: 0;
+  width: 104px;
+  height: 104px;
+  align-self: center;
   border-radius: 50%;
   object-fit: cover;
 
   @include bp.up(md) {
-    width: 96px;
-    height: 96px;
+    width: 120px;
+    height: 120px;
   }
-}
-
-.headText {
-  @include mixins.stack(var(--space-2));
 }
 
 .title {
@@ -45,16 +34,19 @@
   font-weight: var(--font-weight-bold);
 }
 
+// 사진이 제목 자리를 대신할 때: 화면에서는 숨기고 화면 낭독기·페이지 구조에는 남김
+.hiddenTitle {
+  @include mixins.visually-hidden;
+}
+
 .muted {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
 }
 
-// 로그인 화면 아래의 흐린 안내 묶음 (계정 저장 안내, 약관 동의)
+// 로그인 화면 아래의 흐린 안내 묶음 (계정 저장 안내, 약관 동의). 색·크기는 .muted와 함께
 .notes {
   @include mixins.stack(var(--space-2));
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
 }
 
 // 흐린 글 안의 링크 (로그인 화면의 이용약관)

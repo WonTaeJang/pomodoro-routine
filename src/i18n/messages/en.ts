@@ -493,7 +493,6 @@ const en: Messages = {
   auth: {
     login: {
       title: "Log in",
-      intro: "You can keep using every feature without logging in.",
       google: "Continue with Google",
       kakao: "Continue with Kakao",
       redirecting: "Taking you to {provider}…",
