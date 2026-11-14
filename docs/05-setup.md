@@ -97,8 +97,9 @@ npm run format:check  # 정리 안 된 파일이 있는지 확인만
 |---|---|---|
 | `design/kkami/` | **원본 사진**을 넣는 곳. 크기, 형식 상관없음 | 올리지 않음 (`.gitignore`) |
 | `src/assets/kkami/` | 화면에 쓰는 **정리된 이미지** | 올림 |
-| `src/app/` | 파비콘(`favicon.ico` 16·32·48px, `icon.svg`)과 홈 화면 아이콘(`apple-icon.png` 180px). Next.js가 파일 이름을 보고 알아서 연결 | 올림 |
+| `src/app/` | 파비콘(`favicon.ico` 16·32·48px, `icon.svg`), 홈 화면 아이콘(`apple-icon.png` 180px), 링크 미리보기 이미지(`opengraph-image.png` 1200×630, 설명은 `opengraph-image.alt.txt`). Next.js가 파일 이름을 보고 알아서 연결 | 올림 |
 | `design/app-icon/` | 앱 아이콘 원본 (SVG, 128·512px PNG. 카카오 앱 아이콘은 128px) | 올리지 않음 (`.gitignore`) |
+| `design/og/` | 링크 미리보기 이미지를 만드는 스크립트(`make-og.py`, Pillow). 저장소 루트에서 실행하면 `src/app/opengraph-image.png`를 다시 만듦 | 올리지 않음 (`.gitignore`) |
 | `public/` | 공유 미리보기 이미지처럼 주소가 고정되어야 하는 파일 | 올림 |
 | `docs/images/` | README에 넣는 화면 캡처 (`timer.ko.png`, `timer.en.png` 등) | 올림 |
 
