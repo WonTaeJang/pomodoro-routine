@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "use-intl";
-import { LogInIcon } from "@/components/icons";
 import { Button } from "@/components/ui";
 import { safeNextPath } from "../profile";
 import {
@@ -15,6 +14,7 @@ import {
   type OAuthProvider,
 } from "../session";
 import { AuthCard } from "./AuthCard";
+import { GoogleLogo, KakaoLogo } from "./BrandLogos";
 import styles from "./AuthPage.module.scss";
 
 /**
@@ -76,7 +76,8 @@ export function LoginScreen() {
             <Button
               variant="secondary"
               fullWidth
-              icon={<LogInIcon />}
+              icon={<GoogleLogo />}
+              className={styles.google}
               disabled={busy}
               onClick={() => void loginWith("google")}
             >
@@ -85,7 +86,7 @@ export function LoginScreen() {
             <Button
               variant="secondary"
               fullWidth
-              icon={<LogInIcon />}
+              icon={<KakaoLogo />}
               className={styles.kakao}
               disabled={busy}
               onClick={() => void loginWith("kakao")}
@@ -110,22 +111,19 @@ export function LoginScreen() {
           ) : null}
         </>
       )}
-      <p className={styles.muted}>{t("note")}</p>
-      {/* 로그인 버튼을 누르기 전에 볼 수 있게 (구글 브랜드 인증·약관 동의) */}
-      <p className={styles.muted}>
-        {t.rich("agreement", {
-          terms: (chunks) => (
-            <Link className={styles.inlineLink} href="/terms">
-              {chunks}
-            </Link>
-          ),
-          privacy: (chunks) => (
-            <Link className={styles.inlineLink} href="/privacy">
-              {chunks}
-            </Link>
-          ),
-        })}
-      </p>
+      {/* 계정 저장 안내와 약관 동의는 한 묶음으로 붙여 둠. 개인정보처리방침은 푸터 링크로 */}
+      <div className={styles.notes}>
+        <p>{t("note")}</p>
+        <p>
+          {t.rich("agreement", {
+            terms: (chunks) => (
+              <Link className={styles.inlineLink} href="/terms">
+                {chunks}
+              </Link>
+            ),
+          })}
+        </p>
+      </div>
     </AuthCard>
   );
 }

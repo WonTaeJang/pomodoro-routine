@@ -503,7 +503,7 @@ const en: Messages = {
       devAccount: "Log in with the test account (dev only)",
       note: "When you’re logged in, your tasks, history and settings are saved to your account so you can continue on other devices.",
       agreement:
-        "By logging in, you agree to the <terms>Terms of Service</terms>. Your information is handled under the <privacy>Privacy Policy</privacy>.",
+        "By logging in, you agree to the <terms>Terms of Service</terms>.",
     },
     callback: {
       working: "Logging you in…",

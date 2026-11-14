@@ -487,15 +487,14 @@ const ko = {
     login: {
       title: "로그인",
       intro: "로그인하지 않아도 지금처럼 모든 기능을 쓸 수 있어요.",
-      google: "Google로 로그인",
-      kakao: "카카오로 로그인",
+      google: "Google 계정으로 로그인",
+      kakao: "카카오 로그인",
       redirecting: "{provider}로 이동하는 중…",
       failed: "로그인을 시작하지 못했어요. 잠시 뒤 다시 해 주세요.",
       notConfigured: "이 사이트에서는 아직 로그인을 쓸 수 없어요.",
       devAccount: "테스트 계정으로 로그인 (개발용)",
       note: "로그인하면 할 일, 기록, 설정이 계정에 저장돼서 다른 기기에서도 이어 쓸 수 있어요.",
-      agreement:
-        "로그인하면 <terms>이용약관</terms>에 동의하게 돼요. 개인정보는 <privacy>개인정보처리방침</privacy>에 따라 처리해요.",
+      agreement: "로그인하면 <terms>이용약관</terms>에 동의하게 돼요.",
     },
     callback: {
       working: "로그인하는 중…",
