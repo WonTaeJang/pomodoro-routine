@@ -28,6 +28,8 @@ export type ProgressRingProps = {
   children?: ReactNode;
   /** 가운데 내용 위에 겹쳐 그릴 내용 (예: 축하 효과) */
   overlay?: ReactNode;
+  /** 띠와 가운데 내용 뒤에 깔 내용 (예: 집중 소리 분위기). 맨 뒤(z-index -1)에 놓으면 됨 */
+  underlay?: ReactNode;
   className?: string;
 };
 
@@ -45,6 +47,7 @@ export function ProgressRing({
   flashKey = null,
   children,
   overlay,
+  underlay,
   className,
 }: ProgressRingProps) {
   const remaining = Math.min(1, Math.max(0, value));
@@ -71,6 +74,7 @@ export function ProgressRing({
         } as CSSProperties
       }
     >
+      {underlay}
       <svg
         className={styles.svg}
         width={size}

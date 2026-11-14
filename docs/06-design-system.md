@@ -82,7 +82,7 @@ import { PawIcon } from "@/components/icons";
 | `Section` | 밑줄 있는 작은 제목 + 내용을 세로로 쌓은 묶음 (설정 창, 컴포넌트 미리보기) | `title`, `headingLevel`(2, 3), `children` |
 | `Slider` | 끌어서 값 고르기 (소리 크기) | `label`, `value`, `onChange`, `min`, `max`, `step`, `format`, `disabled`, `startIcon`·`endIcon`(막대 양 끝 장식). 방향키로도 조절 |
 | `Stepper` | − 값 + 숫자 조절 | `label`, `value`, `onChange`, `min`, `max`, `format`, `prefix` |
-| `ProgressRing` | 원형 진행 띠 | `value`(남은 비율 0~1), `size`(기준 지름), `thickness`, `markers`, `glow`, `flashKey`, `overlay`, `children`. 화면 크기는 CSS 변수 `--ring-display-size`로 바꿀 수 있고 도장 위치·안쪽 크기가 같은 비율로 따라감 |
+| `ProgressRing` | 원형 진행 띠 | `value`(남은 비율 0~1), `size`(기준 지름), `thickness`, `markers`, `glow`, `flashKey`, `overlay`, `underlay`(띠 뒤에 까는 내용, 예: 집중 소리 분위기), `children`. 화면 크기는 CSS 변수 `--ring-display-size`로 바꿀 수 있고 도장 위치·안쪽 크기가 같은 비율로 따라감 |
 
 아이콘(`src/components/icons/`): `Play`, `Pause`, `Reset`, `Skip`, `Settings`, `Plus`, `Minus`, `Check`, `Close`, `Trash`, `Edit`, `Grip`(끌기 손잡이), `ChevronLeft`·`ChevronRight`(이전·다음), `Headphones`(집중 소리), `VolumeOff`·`VolumeLow`·`VolumeHigh`(스피커), `NoiseWhite`·`NoisePink`·`NoiseBrown`(노이즈 파형), `CloudRain`·`WindowRain`·`Flame`·`Tree`·`Waves`(자연의 소리), `Timer`·`Calendar`(페이지 메뉴), `Sun`, `Moon`, `Paw`, `Medal` (새 아이콘은 같은 폴더의 `Icon`으로 만듦)
 - 모든 아이콘은 `size`(기본 20), `title`을 받고, 색은 글자색을 따릅니다. 목록에 아이콘을 담아 둘 때는 `IconComponent` 타입을 씁니다 (예: 집중 소리 `FOCUS_SOUNDS`의 `icon`).
@@ -210,3 +210,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-14: 긴 글 페이지 공통 틀 `_doc-page.scss`(사용법과 약관·방침 페이지가 같이 씀)
 - 2026-11-14: `ButtonLink`, `CenteredCard`, 둥근 사진 mixin `photo.round`(로그인·404 작업 중 겹치던 스타일 정리)
 - 2026-11-14: `ImageViewer`, 버튼 `overlay` 모양, `ExpandIcon`. `Dialog`와 `ImageViewer`가 여닫는 방식을 `useModalDialog`로 같이 씀
+- 2026-11-14: `ProgressRing`에 `underlay`(띠 뒤에 까는 내용) 추가. 타이머 원의 집중 소리 분위기(I-052)가 씀

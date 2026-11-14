@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { PawIcon } from "@/components/icons";
 import { ProgressRing } from "@/components/ui";
 import { Celebration } from "./Celebration";
+import { SoundAmbience } from "./SoundAmbience";
 import styles from "./TimerRing.module.scss";
 
 /**
@@ -36,6 +37,7 @@ type TimerRingProps = {
  * - 10%가 지날 때마다 발자국 도장 하나
  * - 마지막 구간에는 띠가 빛나고 지금 위치에 빛나는 점
  * - 집중을 마치면 띠가 퍼지며 발자국과 색종이가 터짐
+ * - 집중 소리가 들리는 동안 원 둘레에 그 소리 분위기의 은은한 움직임 (마지막 구간 빛이 나면 숨김)
  * 설정에서 효과를 끄면 띠만 줄어듭니다.
  */
 export function TimerRing({
@@ -76,6 +78,7 @@ export function TimerRing({
       markers={markers}
       glow={glow}
       flashKey={celebration}
+      underlay={<SoundAmbience hidden={!effects || glow} />}
       overlay={
         celebration !== null ? (
           <Celebration

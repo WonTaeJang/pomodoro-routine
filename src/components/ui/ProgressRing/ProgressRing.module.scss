@@ -14,6 +14,8 @@ $glow-tip: 12px;
 
 .ring {
   position: relative;
+  // 뒤에 까는 내용(underlay)이 z-index -1로 띠 뒤에 오되, 카드 밖으로는 내려가지 않게
+  isolation: isolate;
   display: inline-flex;
   width: var(--ring-display-size, var(--ring-size));
   height: var(--ring-display-size, var(--ring-size));

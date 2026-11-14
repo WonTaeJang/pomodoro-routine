@@ -98,3 +98,21 @@ describe("isFocusSoundPlaying", () => {
     expect(player.isFocusSoundPlaying()).toBe(true);
   });
 });
+
+describe("getAudibleFocusSound", () => {
+  it("들리는 소리를 알려 주고, 소리를 바꾸면 다시 알림 (타이머 원의 소리 분위기)", async () => {
+    const player = await loadPlayer();
+    const changed = vi.fn();
+    player.subscribeFocusSoundPlaying(changed);
+    expect(player.getAudibleFocusSound()).toBeNull();
+
+    player.setFocusSound({ id: "white", volume: 0.5 });
+    expect(player.getAudibleFocusSound()).toBe("white");
+    player.setFocusSound({ id: "brown", volume: 0.5 });
+    expect(player.getAudibleFocusSound()).toBe("brown");
+    expect(changed).toHaveBeenCalledTimes(2);
+
+    player.setFocusSound(null);
+    expect(player.getAudibleFocusSound()).toBeNull();
+  });
+});

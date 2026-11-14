@@ -39,14 +39,16 @@ let playing: Playing | null = null;
 const buffers = new Map<FocusSoundId, AudioBuffer>();
 const loading = new Set<FocusSoundId>();
 
-/** "소리가 나오는 중"이 바뀌면 알릴 곳 (헤더 버튼의 재생 표시) */
+/** 들리는 소리가 바뀌면 알릴 곳 (헤더 버튼의 재생 표시, 타이머 원의 소리 분위기) */
 const listeners = new Set<() => void>();
-let audible = false;
+/** 지금 실제로 들리는 소리. 들리지 않으면 null */
+let audible: FocusSoundId | null = null;
 let watchedAudio: AudioContext | null = null;
 
-/** 재생 상태나 오디오 상태가 바뀔 때마다 불러서, 실제로 들리는지가 달라졌으면 알립니다. */
+/** 재생 상태나 오디오 상태가 바뀔 때마다 불러서, 들리는 소리가 달라졌으면 알립니다. */
 function updateAudible() {
-  const next = playing !== null && getAudio()?.state === "running";
+  const next =
+    playing !== null && getAudio()?.state === "running" ? playing.id : null;
   if (next === audible) return;
   audible = next;
   listeners.forEach((listener) => listener());
@@ -54,6 +56,11 @@ function updateAudible() {
 
 /** 지금 집중 소리가 실제로 나오는 중인지 (서서히 꺼지기 시작하면 바로 false) */
 export function isFocusSoundPlaying(): boolean {
+  return audible !== null;
+}
+
+/** 지금 실제로 들리는 소리 (랜덤이면 이번에 고른 소리). 들리지 않으면 null */
+export function getAudibleFocusSound(): FocusSoundId | null {
   return audible;
 }
 
