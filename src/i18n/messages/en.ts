@@ -99,6 +99,11 @@ const en: Messages = {
       terms: "Terms",
     },
   },
+  notFound: {
+    title: "Kkami got lost",
+    message: "We couldn’t find this page. Please check the address.",
+    home: "Back to the timer",
+  },
   kkami: {
     default: "Kkami looking up, waiting",
     done: "Kkami smiling",

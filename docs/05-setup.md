@@ -117,6 +117,7 @@ npm run format:check  # 정리 안 된 파일이 있는지 확인만
 | `guide` | `kkami-guide-016.webp` | 사용법 페이지 머리 (모자 쓴 까미) |
 | `empty` | `kkami-empty-019.webp` | 기록이 없을 때 (`EmptyState`: 캘린더 날짜, 통계) |
 | `login` | `kkami-login-001.webp` | 로그인 화면 머리 (손바닥에 턱 올리고 빤히. 손이 함께 보이는 게 의도라 자르지 않음) |
+| `not-found` | `kkami-not-found-002.webp` | 없는 주소(404) 화면 (넥카라를 하고 어리둥절한 까미) |
 | `certificate` | `kkami-certificate.webp` | 수료증 이미지의 동그란 사진 (800x800) |
 
 - 타이머 화면과 완료 팝업은 묶음 중 한 장을 랜덤으로 보여 줍니다. 묶음은 `src/features/timer/photos/pools.ts`의 `KKAMI_PHOTOS`이고, 사진을 더하려면 파일을 넣고 여기 목록에 추가합니다.

@@ -1,0 +1,40 @@
+@use "../../styles/photo";
+
+// 가운데 정렬로 위에서부터 사진 · 404 · 제목 · 안내 · 버튼
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+// 휴대폰 112px, 넓은 화면 136px
+.photo {
+  @include photo.round(112px, 136px);
+  margin-bottom: var(--space-4);
+}
+
+.code {
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+}
+
+.title {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+// 좁은 화면에서 줄이 바뀔 때 한국어 단어가 쪼개지지 않고 두 줄 길이가 비슷하게
+.message {
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  text-wrap: balance;
+  word-break: keep-all;
+}
+
+.home {
+  margin-top: var(--space-5);
+}
