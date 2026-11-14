@@ -21,6 +21,7 @@ type TaskItemProps = {
 /**
  * 할 일 한 줄. 손잡이를 끌어서 옮깁니다. (SortableTaskList 안에서만 사용)
  * 수정 중에는 손잡이가 없어 옮길 수 없습니다.
+ * 두 줄: 제목이 한 줄을 다 쓰고, 발바닥·선택·수정·삭제는 그 아래 줄에 둡니다.
  */
 export function TaskItem({ task, active }: TaskItemProps) {
   const [editing, setEditing] = useState(false);
@@ -94,39 +95,45 @@ export function TaskItem({ task, active }: TaskItemProps) {
         onChange={() => toggleDone(task.id)}
         className={styles.check}
       />
-      <div className={styles.meta}>
-        {active ? (
-          <Badge variant="solid" size="sm" className={styles.badge}>
-            {t("active")}
-          </Badge>
-        ) : !task.done ? (
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setActive(task.id)}
-            aria-label={t("select.label", { title: task.title })}
-          >
-            {t("select.button")}
-          </Button>
-        ) : null}
-        <PawCount
-          done={task.completedPomodoros}
-          estimate={task.estimate}
-          className={styles.count}
-        />
-        <IconButton
-          label={t("edit", { title: task.title })}
-          icon={<EditIcon size={16} />}
+      {/* 보이는 순서와 읽는 순서를 맞춤: 발바닥 → 선택 → 수정 → 삭제 */}
+      <PawCount
+        done={task.completedPomodoros}
+        estimate={task.estimate}
+        className={styles.count}
+      />
+      {active ? (
+        <Badge
+          variant="solid"
           size="sm"
-          onClick={() => setEditing(true)}
-        />
-        <IconButton
-          label={t("delete", { title: task.title })}
-          icon={<TrashIcon size={16} />}
+          className={cx(styles.status, styles.badge)}
+        >
+          {t("active")}
+        </Badge>
+      ) : !task.done ? (
+        <Button
           size="sm"
-          onClick={() => remove(task.id)}
-        />
-      </div>
+          variant="ghost"
+          className={styles.status}
+          onClick={() => setActive(task.id)}
+          aria-label={t("select.label", { title: task.title })}
+        >
+          {t("select.button")}
+        </Button>
+      ) : null}
+      <IconButton
+        label={t("edit", { title: task.title })}
+        icon={<EditIcon size={16} />}
+        size="sm"
+        className={styles.edit}
+        onClick={() => setEditing(true)}
+      />
+      <IconButton
+        label={t("delete", { title: task.title })}
+        icon={<TrashIcon size={16} />}
+        size="sm"
+        className={styles.remove}
+        onClick={() => remove(task.id)}
+      />
     </li>
   );
 }

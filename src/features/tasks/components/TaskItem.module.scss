@@ -1,10 +1,16 @@
 @use "../../../styles/mixins";
 
+// 두 줄 (화면 너비와 관계없이 같음). 손잡이는 두 줄에 걸쳐 가운데,
+// 1줄은 체크박스·제목(한 줄을 다 씀), 2줄은 발바닥(왼쪽) | 선택·수정·삭제(오른쪽)
 .item {
-  display: flex;
+  display: grid;
+  grid-template-areas:
+    "handle title title title title"
+    "handle count status edit remove";
+  grid-template-columns: auto minmax(0, 1fr) auto auto auto;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-1-5) var(--space-2) var(--space-1);
+  gap: var(--space-0-5);
+  padding: var(--space-2) var(--space-1-5) var(--space-1) var(--space-1);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-md);
   // 끌 때 다른 할 일 위를 지나가도 비치지 않게
@@ -28,7 +34,6 @@
 // 끌어서 옮기는 손잡이. 터치로 끌 때 화면이 스크롤되지 않게 막음
 .handle {
   display: inline-flex;
-  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   width: var(--space-6);
@@ -39,6 +44,8 @@
   background: none;
   color: var(--color-text-muted);
   cursor: grab;
+  grid-area: handle;
+  margin-right: var(--space-1-5);
   touch-action: none;
   transition: color var(--duration-base);
 
@@ -71,6 +78,7 @@
 }
 
 .editing {
+  display: block;
   padding: var(--space-2-5);
 }
 
@@ -79,22 +87,34 @@
 }
 
 .check {
+  grid-area: title;
   min-width: 0;
   padding: var(--space-1) 0;
+
+  // 긴 제목(띄어쓰기 없는 영어·주소 등)도 칸을 넘지 않고 줄바꿈
+  > span:last-child {
+    overflow-wrap: anywhere;
+  }
 }
 
-.meta {
-  display: flex;
-  margin-left: auto;
-  flex-shrink: 0;
-  align-items: center;
-  gap: var(--space-0-5);
+// 2줄 왼쪽 끝: 체크박스와 왼쪽 끝을 맞춤
+.count {
+  grid-area: count;
+  justify-self: start;
+}
+
+.status {
+  grid-area: status;
 }
 
 .badge {
   margin-right: var(--space-1);
 }
 
-.count {
-  margin: 0 var(--space-1);
+.edit {
+  grid-area: edit;
+}
+
+.remove {
+  grid-area: remove;
 }
