@@ -8,6 +8,7 @@ export * from "./Dialog/Dialog";
 export * from "./EmptyState/EmptyState";
 export * from "./FieldRow/FieldRow";
 export * from "./IconButton/IconButton";
+export * from "./ImageViewer/ImageViewer";
 export * from "./Kbd/Kbd";
 export * from "./ProgressRing/ProgressRing";
 export * from "./Section/Section";

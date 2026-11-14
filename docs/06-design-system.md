@@ -64,10 +64,11 @@ import { PawIcon } from "@/components/icons";
 |---|---|---|
 | `Card` | 흰 바탕 둥근 카드 (타이머, 할 일 영역) | `as`(div, section, article), `padding`(default, none) |
 | `Badge` | 짧은 정보 배지 | `variant`(solid, soft, medal, outline), `size`(sm, md, lg), `icon` |
-| `Button` | 글자 버튼 | `variant`(primary, secondary, ghost, danger), `size`(sm, md, lg), `icon`, `fullWidth` |
+| `Button` | 글자 버튼 | `variant`(primary, secondary, ghost, danger, overlay: 사진 위 반투명 검은 바탕·흰 글자), `size`(sm, md, lg), `icon`, `fullWidth` |
 | `ButtonLink` | 버튼 모양의 페이지 이동 링크(`next/link`). 모양은 `Button`과 같음 (404의 "타이머로 돌아가기") | `href`, `variant`, `size` |
 | `IconButton` | 아이콘만 있는 동그란 버튼 | `label`(필수, 화면 낭독기용), `icon`, `variant`, `size`(sm~xl), `shortcut`(마우스를 올리면 "시작 (Space)") |
 | `Dialog` | 팝업 창 | `open`, `onClose`, `title`, `footer`, `instant`(등장 효과 없이 바로 보이기: 메뉴에서 설정을 열 때처럼 다른 창이 닫히자마자 열 때). ESC, 바깥 클릭으로 닫힘. 팝업 위에 팝업을 열면 ESC는 맨 위 것만 닫고, 바깥 팝업의 글자 정렬을 물려받지 않음 |
+| `ImageViewer` | 이미지를 화면 가득 크게 보기 (검은 바탕, 비율 유지). 아무 곳이나 누르거나 ESC로 닫힘. 다른 팝업 위에도 열 수 있음 (수료증 크게 보기) | `open`, `src`, `alt`, `onClose` |
 | `ConfirmDialog` | "정말 할까요?" 확인 팝업 | `open`, `title`, `confirmLabel`, `tone`(primary, danger), `onConfirm`, `onClose` |
 | `FieldRow` | 왼쪽 이름·설명, 오른쪽 조작 요소인 한 줄. 좁으면 조작 요소가 다음 줄로 | `label`, `description`, `htmlFor`, `children`(조작 요소) |
 | `Switch` | 켜기/끄기 (`FieldRow` 모양) | `checked`, `onCheckedChange`, `label`, `description` |
@@ -208,3 +209,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-13: `EmptyState` 기본 사진 크기 64px → 120px, 사용법 머리 사진 확대
 - 2026-11-14: 긴 글 페이지 공통 틀 `_doc-page.scss`(사용법과 약관·방침 페이지가 같이 씀)
 - 2026-11-14: `ButtonLink`, `CenteredCard`, 둥근 사진 mixin `photo.round`(로그인·404 작업 중 겹치던 스타일 정리)
+- 2026-11-14: `ImageViewer`, 버튼 `overlay` 모양, `ExpandIcon`. `Dialog`와 `ImageViewer`가 여닫는 방식을 `useModalDialog`로 같이 씀

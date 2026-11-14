@@ -120,6 +120,15 @@ export function CheckIcon(props: IconProps) {
   );
 }
 
+/** 크게 보기 (화면 가득) */
+export function ExpandIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+    </Icon>
+  );
+}
+
 /** 닫기 */
 export function CloseIcon(props: IconProps) {
   return (

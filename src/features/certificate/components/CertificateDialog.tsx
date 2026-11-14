@@ -2,18 +2,31 @@
 
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { useTranslations } from "use-intl";
-import { Button, Dialog, Switch } from "@/components/ui";
+import { ExpandIcon } from "@/components/icons";
+import {
+  Button,
+  Dialog,
+  IconButton,
+  ImageViewer,
+  Switch,
+} from "@/components/ui";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { useTimerStore } from "@/features/timer/store";
+import { isKakaoTalkBrowser } from "@/lib/inAppBrowser";
 import { useHoldAutoPopups } from "@/lib/popupHold";
 import { getCertificate } from "../certificate";
 import { canShareImages, downloadFile, shareFile } from "../share";
 import styles from "./CertificateDialog.module.scss";
 import { useCertificateImage } from "./useCertificateImage";
 
-/** 공유 지원 여부는 바뀌지 않으므로 구독할 것이 없음 */
+/** 브라우저 기능처럼 한 번 정해지면 바뀌지 않는 값: 구독할 것이 없음 */
 const subscribeNever = () => () => {};
+
+/** 브라우저에서만 알 수 있는 값을 읽음. 서버에서 그릴 때와 첫 화면은 false */
+function useBrowserFlag(read: () => boolean): boolean {
+  return useSyncExternalStore(subscribeNever, read, () => false);
+}
 
 type CertificateDialogProps = {
   /** 몇 번째 사이클의 수료증인지 (제 N호). 없으면 가장 최근 사이클 */
@@ -24,6 +37,8 @@ type CertificateDialogProps = {
 /**
  * 수료증 미리보기, 공유, 저장.
  * 열리자마자 이미지를 만들어 둡니다. (공유 창은 버튼을 누른 순간에만 열 수 있음)
+ * 미리보기 오른쪽 위 버튼으로 화면 가득 크게 볼 수 있습니다.
+ * 카카오톡 브라우저는 저장·공유가 안 되므로 버튼을 빼고 크게 보기(스크린샷용)만 남깁니다.
  */
 export function CertificateDialog({ number, onClose }: CertificateDialogProps) {
   // 수료증을 보는 중에 세션이 끝나도 완료 팝업이 덮지 않게
@@ -38,11 +53,9 @@ export function CertificateDialog({ number, onClose }: CertificateDialogProps) {
   const { preview, current, failed } = useCertificateImage(data, showTasks);
   const [shareFailed, setShareFailed] = useState(false);
   // 이미지가 나오기 전부터 정해 두어, 만드는 동안에도 버튼이 최종 모양 그대로 보이게 (B-006)
-  const canShare = useSyncExternalStore(
-    subscribeNever,
-    canShareImages,
-    () => false,
-  );
+  const canShare = useBrowserFlag(canShareImages);
+  const kakao = useBrowserFlag(isKakaoTalkBrowser);
+  const [expanded, setExpanded] = useState(false);
   const t = useTranslations("certificate");
   const title = t("title");
 
@@ -55,9 +68,13 @@ export function CertificateDialog({ number, onClose }: CertificateDialogProps) {
   const status = t(
     failed ? "status.failed" : data ? "status.making" : "status.noCycle",
   );
-  const hint = t(
-    shareFailed ? "hint.shareFailed" : canShare ? "hint.share" : "hint.save",
-  );
+  const hintKey = kakao
+    ? "hint.kakao"
+    : shareFailed
+      ? "hint.shareFailed"
+      : canShare
+        ? "hint.share"
+        : null;
 
   return (
     <Dialog
@@ -66,22 +83,24 @@ export function CertificateDialog({ number, onClose }: CertificateDialogProps) {
       title={title}
       className={styles.dialog}
       footer={
-        <>
-          <Button
-            variant={canShare ? "secondary" : "primary"}
-            disabled={!current}
-            onClick={() =>
-              current && downloadFile(current.url, current.file.name)
-            }
-          >
-            {t("save")}
-          </Button>
-          {canShare ? (
-            <Button disabled={!current} onClick={handleShare}>
-              {t("share")}
+        kakao ? undefined : (
+          <>
+            <Button
+              variant={canShare ? "secondary" : "primary"}
+              disabled={!current}
+              onClick={() =>
+                current && downloadFile(current.url, current.file.name)
+              }
+            >
+              {t("save")}
             </Button>
-          ) : null}
-        </>
+            {canShare ? (
+              <Button disabled={!current} onClick={handleShare}>
+                {t("share")}
+              </Button>
+            ) : null}
+          </>
+        )
       }
     >
       <div className={styles.content}>
@@ -96,6 +115,15 @@ export function CertificateDialog({ number, onClose }: CertificateDialogProps) {
             />
           ) : null}
           {!current ? <p className={styles.status}>{status}</p> : null}
+          {current ? (
+            <IconButton
+              label={t("expand")}
+              icon={<ExpandIcon />}
+              variant="overlay"
+              className={styles.expand}
+              onClick={() => setExpanded(true)}
+            />
+          ) : null}
         </div>
         {data && data.taskTitles.length > 0 ? (
           <Switch
@@ -109,8 +137,16 @@ export function CertificateDialog({ number, onClose }: CertificateDialogProps) {
             }
           />
         ) : null}
-        <p className={styles.hint}>{hint}</p>
+        {hintKey ? <p className={styles.hint}>{t(hintKey)}</p> : null}
       </div>
+      {current ? (
+        <ImageViewer
+          open={expanded}
+          src={current.url}
+          alt={t("preview", { title })}
+          onClose={() => setExpanded(false)}
+        />
+      ) : null}
     </Dialog>
   );
 }

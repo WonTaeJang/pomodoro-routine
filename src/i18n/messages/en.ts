@@ -370,6 +370,7 @@ const en: Messages = {
     todayButton:
       "{count, plural, one {# cycle} other {# cycles}} done today, make certificate",
     save: "Save image",
+    expand: "View full screen",
     share: "Share",
     preview: "{title} preview",
     status: {
@@ -380,7 +381,8 @@ const en: Messages = {
     hint: {
       shareFailed: "Couldn’t share. Save the image and post it instead.",
       share: "Choose Instagram in the share menu to post it to your story.",
-      save: "Save the image and post it to your Instagram story.",
+      kakao:
+        "Saving isn’t available in KakaoTalk’s browser. Open it full screen and take a screenshot.",
     },
     showTasks: {
       label: "Show tasks",

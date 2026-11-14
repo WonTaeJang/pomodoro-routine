@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useId, useRef, type ReactNode } from "react";
 import { useTranslations } from "use-intl";
 import { CloseIcon } from "@/components/icons";
 import { cx } from "@/lib/cx";
 import { IconButton } from "../IconButton/IconButton";
 import styles from "./Dialog.module.scss";
+import { useModalDialog } from "./useModalDialog";
 
 export type DialogProps = {
   open: boolean;
@@ -40,12 +41,7 @@ export function Dialog({
   const titleId = useId();
   const t = useTranslations("common");
 
-  useEffect(() => {
-    const dialog = ref.current;
-    if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
-  }, [open]);
+  useModalDialog(ref, open);
 
   return (
     <dialog

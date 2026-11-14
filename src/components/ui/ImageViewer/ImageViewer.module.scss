@@ -1,0 +1,33 @@
+// 화면 가득, 검은 바탕. 휴대폰 노치·홈 막대 영역은 피해서
+.viewer {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right)
+    env(safe-area-inset-bottom) env(safe-area-inset-left);
+  border: 0;
+  background: #000;
+
+  &::backdrop {
+    background: #000;
+  }
+}
+
+// 비율을 지키며 화면에 맞춤. 길게 눌러 저장도 되게 (전역에서 막은 메뉴를 풀어 줌)
+.image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  -webkit-user-drag: auto;
+  -webkit-touch-callout: default;
+}
+
+// 오른쪽 위 닫기 (IconButton overlay: 반투명 검은 바탕·흰 아이콘)
+.close {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + var(--space-3));
+  right: calc(env(safe-area-inset-right) + var(--space-3));
+}

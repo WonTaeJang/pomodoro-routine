@@ -364,6 +364,7 @@ const ko = {
     make: "수료증 만들기",
     todayButton: "오늘 {count}사이클 완료, 수료증 만들기",
     save: "이미지 저장",
+    expand: "크게 보기",
     share: "공유하기",
     preview: "{title} 미리보기",
     status: {
@@ -374,7 +375,8 @@ const ko = {
     hint: {
       shareFailed: "공유하지 못했어요. 이미지를 저장해서 올려 주세요.",
       share: "공유하기에서 인스타그램을 고르면 스토리에 올릴 수 있어요.",
-      save: "이미지를 저장해서 인스타그램 스토리에 올려 보세요.",
+      kakao:
+        "카카오톡에서는 이미지를 저장할 수 없어요. 크게 보기로 열어 스크린샷을 찍어 주세요.",
     },
     showTasks: {
       label: "할 일 보이기",

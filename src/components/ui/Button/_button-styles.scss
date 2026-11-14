@@ -74,4 +74,14 @@
       background: var(--color-danger-hover);
     }
   }
+
+  // 사진 위에 띄우는 버튼 (크게 보기, 닫기). 사진 색과 관계없이 보이게, 테마와 관계없이 같음
+  &.overlay {
+    background: rgb(0 0 0 / 45%);
+    color: #fff;
+
+    &:hover:not(:disabled) {
+      background: rgb(0 0 0 / 65%);
+    }
+  }
 }
