@@ -18,7 +18,7 @@ export type PetState = {
 export type PetAction =
   | { type: "start" | "advanceIntro" | "pet" | "feed" | "walk"; now: number }
   | { type: "settle"; now: number }
-  | { type: "reset" | "returnHome" };
+  | { type: "returnHome" };
 
 export function createPetState(): PetState {
   return {
@@ -118,7 +118,5 @@ export function petReducer(state: PetState, action: PetAction): PetState {
       };
     case "settle":
       return state;
-    case "reset":
-      return createPetState();
   }
 }

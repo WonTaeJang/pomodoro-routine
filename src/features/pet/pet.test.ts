@@ -39,7 +39,6 @@ describe("산책", () => {
       ] as const) {
         expect(petReducer(walking, { type, now: 60000 })).toBe(walking);
       }
-      expect(petReducer(walking, { type: "reset" })).toBe(walking);
       const home = petReducer(walking, { type: "returnHome" });
       expect(home).toMatchObject({
         location: "home",
@@ -146,14 +145,6 @@ describe("돌봄 반응", () => {
       happyUntil: null,
     });
   });
-
-  it("초기화 뒤에는 이전 반응·종료 예약에 영향받지 않음", () => {
-    const state = petReducer(awakeState(), { type: "pet", now: 100 });
-    const reset = petReducer(state, { type: "reset" });
-    expect(petReducer(reset, { type: "settle", now: 3000 })).toBe(reset);
-    expect(reset).toEqual(createPetState());
-    expect(petReducer(reset, { type: "pet", now: 110 })).toBe(reset);
-  });
 });
 
 describe("첫 만남 수면과 깨우기", () => {
@@ -198,10 +189,10 @@ describe("첫 만남 수면과 깨우기", () => {
     ).toMatchObject({ phase: "awake", introUntil: null, pats: 0 });
   });
 
-  it("다시 만나기는 수면부터 시작하며 이전 깨우기 예약이 새 수면을 끊지 않음", () => {
-    const reset = petReducer(awakeState(), { type: "reset" });
-    expect(petReducer(reset, { type: "advanceIntro", now: 100 })).toBe(reset);
-    const sleeping = petReducer(reset, { type: "start", now: 200 });
+  it("다시 만나면 수면부터 시작하며 장면 준비 전 깨우기 예약은 무시", () => {
+    const fresh = createPetState();
+    expect(petReducer(fresh, { type: "advanceIntro", now: 100 })).toBe(fresh);
+    const sleeping = petReducer(fresh, { type: "start", now: 200 });
     expect(sleeping).toMatchObject({
       phase: "sleeping",
       introUntil: 5200,
@@ -224,17 +215,5 @@ describe("깨우기 반응 중 예약 처리", () => {
     expect(
       petReducer(startled, { type: "advanceIntro", now: 5900 }),
     ).toMatchObject({ phase: "awake", introUntil: null, pats: 0 });
-  });
-  it("반응 도중 재시작해도 이전 종료 예약이 새로운 수면을 끊지 않음", () => {
-    const sleeping = petReducer(createPetState(), { type: "start", now: 0 });
-    const startled = petReducer(sleeping, { type: "pet", now: 100 });
-    const reset = petReducer(startled, { type: "reset" });
-    const again = petReducer(reset, { type: "start", now: 200 });
-    expect(petReducer(again, { type: "advanceIntro", now: 1100 })).toBe(again);
-    expect(again).toMatchObject({
-      phase: "sleeping",
-      pats: 0,
-      introUntil: 5200,
-    });
   });
 });

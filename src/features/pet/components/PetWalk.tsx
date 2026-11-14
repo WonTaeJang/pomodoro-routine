@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type KeyboardEvent } from "react";
+import { useEffect, useState } from "react";
 import {
   Alignment,
   Fit,
@@ -16,33 +16,17 @@ import { cx } from "@/lib/cx";
 import room from "./PetPlayground.module.scss";
 import styles from "./PetWalk.module.scss";
 import { PetRoomArt } from "./PetRoomArt";
+import { stopCareKey } from "./stopCareKey";
 
 // The canvas is sized in CSS to the artboard at the home scale, so Contain is 1:1.
 const LAYOUT = new Layout({ fit: Fit.Contain, alignment: Alignment.Center });
 const LOAD_TIMEOUT_MS = 15000;
 
-function stopCareKey(event: KeyboardEvent<HTMLButtonElement>) {
-  if (event.key === " " || event.key === "Enter") event.stopPropagation();
-}
-
 /** Mounted only while away; the home scene and care state remain alive. */
-export function PetWalk({ onReturn }: { onReturn: () => void }) {
-  const t = useTranslations("pet");
+export function PetWalk() {
   const [attempt, setAttempt] = useState(0);
   return (
-    <div>
-      <WalkScene key={attempt} retry={() => setAttempt((value) => value + 1)} />
-      <div className={styles.controls}>
-        <Button
-          autoFocus
-          variant="secondary"
-          onClick={onReturn}
-          onKeyDown={stopCareKey}
-        >
-          {t("walk.return")}
-        </Button>
-      </div>
-    </div>
+    <WalkScene key={attempt} retry={() => setAttempt((value) => value + 1)} />
   );
 }
 

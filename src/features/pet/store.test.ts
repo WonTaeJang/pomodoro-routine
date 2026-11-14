@@ -273,7 +273,7 @@ describe("돌봄 로컬 저장", () => {
     );
   });
 
-  it("깨우기·연속 입력·재생은 기록을 늘리거나 지우지 않고 인정된 쓰담만 저장", async () => {
+  it("깨우기·연속 입력은 기록을 늘리지 않고 인정된 쓰담만 저장", async () => {
     const f = fixture(),
       saved = f.store();
     await saved.getState().hydrate();
@@ -296,13 +296,10 @@ describe("돌봄 로컬 저장", () => {
     send({ type: "advanceIntro", now: 1010 });
     send({ type: "pet", now: 1020 });
     send({ type: "pet", now: 1030 }); // cooldown
-    send({ type: "reset" });
-    send({ type: "start", now: 2000 });
     await Promise.all(pending);
     expect(pending).toHaveLength(1);
     expect(saved.getState().pet!.totalPats).toBe(1);
     expect(saved.getState().pet!.affinity.points).toBe(2);
-    expect(care.getState().state.phase).toBe("sleeping");
     expect((await f.repository.load())!.totalPats).toBe(1);
   });
 
@@ -570,7 +567,6 @@ describe("친밀도 저장과 재시도", () => {
     send({ type: "pet", now: 8601 });
     send({ type: "feed", now: 8602 });
     send({ type: "pet", now: 8603 });
-    send({ type: "reset" });
     await Promise.all(writes);
     expect(writes).toHaveLength(3);
     expect(saved.getState().pet).toMatchObject({

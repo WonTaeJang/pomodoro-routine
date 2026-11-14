@@ -110,12 +110,6 @@ export function usePetCare(ready: boolean) {
     dragged.current = false;
   }
 
-  function reset() {
-    stroke.current = null;
-    dragged.current = false;
-    dispatch({ type: "reset" });
-  }
-
   return {
     walking: state.location === "walk",
     walk,
@@ -125,7 +119,6 @@ export function usePetCare(ready: boolean) {
     pats,
     pet,
     feed,
-    reset,
     startStroke,
     moveStroke,
     endStroke,

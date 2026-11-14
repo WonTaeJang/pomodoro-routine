@@ -14,8 +14,7 @@ const en: Messages = {
       error: "Could not load the walk.",
     },
     affinity: {
-      label: "Bond",
-      level: "Bond Lv.{level}",
+      level: "Lv.{level}",
       loading: "Loading",
       progress: "Bond level {level}, {points} points",
       points: "{points} / {next} points",
@@ -23,7 +22,8 @@ const en: Messages = {
       today: "Pats today +{earned} / {max}",
       snackHint: "+{points} for every treat",
       hint: "+{points} for each of your first {count} pats daily. Your bond never decreases.",
-      levelUp: "Closer to Kkami · Lv.{level}",
+      levelUpShort: "Level {level}!",
+      maxBadge: "MAX",
       stages: {
         "1": "Getting acquainted",
         "2": "Familiar faces",
@@ -63,7 +63,6 @@ const en: Messages = {
     loading: "Loading…",
     error: "Couldn’t load Kkami.",
     retry: "Try again",
-    reset: "Replay wake-up",
     roomLabel: "KKAMI’S ROOM",
     patCount: "{count, plural, one {# pat} other {# pats}}",
   },

@@ -50,6 +50,22 @@ export function affinityProgress(points: number) {
   };
 }
 
+export const AFFINITY_HEARTS = 5;
+
+/**
+ * Hearts filled toward the next level, in half steps (0..10). Only reached
+ * progress counts, so all hearts fill exactly when the level goes up; the top
+ * level shows them full.
+ */
+export function affinityHalves(points: number): number {
+  const { value, max, next } = affinityProgress(points);
+  if (next === null) return AFFINITY_HEARTS * 2;
+  return Math.min(
+    AFFINITY_HEARTS * 2 - 1,
+    Math.floor((value / max) * AFFINITY_HEARTS * 2),
+  );
+}
+
 export function isAffinity(value: unknown, totalSnacks = 0): value is Affinity {
   if (!value || typeof value !== "object") return false;
   const a = value as Partial<Affinity>;

@@ -22,10 +22,6 @@ $canvas-height: 384px;
 .cover[data-failed="true"] {
   z-index: layer.$dog-layer + 1;
 }
-.controls {
-  padding: var(--space-5);
-  text-align: center;
-}
 @include bp.up(sm) {
   .canvas {
     left: calc(50% - #{$canvas-width * 0.5});

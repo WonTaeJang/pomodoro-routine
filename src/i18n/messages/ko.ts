@@ -14,8 +14,7 @@ const ko = {
       error: "산책길을 불러오지 못했어요.",
     },
     affinity: {
-      label: "친밀도",
-      level: "친밀도 Lv.{level}",
+      level: "Lv.{level}",
       loading: "불러오는 중",
       progress: "친밀도 {level}단계, {points}점",
       points: "{points} / {next}점",
@@ -23,7 +22,8 @@ const ko = {
       today: "오늘 쓰담 +{earned} / {max}",
       snackHint: "간식은 줄 때마다 +{points}",
       hint: "하루 첫 {count}번 쓰담에 +{points}씩. 친밀도는 줄지 않아요.",
-      levelUp: "까미와 더 가까워졌어요 · Lv.{level}",
+      levelUpShort: "Lv.{level} 달성!",
+      maxBadge: "MAX",
       stages: {
         "1": "알아가는 사이",
         "2": "익숙한 사이",
@@ -63,7 +63,6 @@ const ko = {
     loading: "불러오는 중…",
     error: "까미를 불러오지 못했어요.",
     retry: "다시 불러오기",
-    reset: "다시 깨워보기",
     roomLabel: "까미의 방",
     patCount: "{count}번",
   },

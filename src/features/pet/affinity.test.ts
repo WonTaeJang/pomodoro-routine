@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   affinityDay,
+  affinityHalves,
   affinityProgress,
   createAffinity,
   isAffinity,
@@ -27,6 +28,24 @@ describe("친밀도 규칙", () => {
     expect(progress.value).toBeGreaterThanOrEqual(0);
     expect(progress.value).toBeLessThanOrEqual(progress.max);
   });
+
+  it.each([
+    [0, 0],
+    [1, 0],
+    [2, 1], // Lv.1: 2 points = 10% = half a heart
+    [12, 6],
+    [19, 9], // never full before the level up
+    [20, 0], // Lv.2 starts empty
+    [34, 3],
+    [299, 9],
+    [300, 10], // top level: all hearts
+    [5000, 10],
+  ])(
+    "하트는 지금 레벨 진행률만큼 반 칸씩 참: %i점 → 반 칸 %i개",
+    (points, halves) => {
+      expect(affinityHalves(points)).toBe(halves);
+    },
+  );
 
   it("첫 5회만 적립하며 다음 날에도 이전 점수는 유지", () => {
     const first = rewardPats(createAffinity(), 7, "2026-11-11");

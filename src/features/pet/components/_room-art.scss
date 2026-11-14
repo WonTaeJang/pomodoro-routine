@@ -110,12 +110,12 @@ $roomLabel-right: 16px;
 $roomLabel-color: #86755d;
 // 불투명: 강아지가 준비되기 전에는 방(창문, 화분, 말풍선)이 비치지 않게 (B-003)
 $loading-background: #f4efdf;
+// The room fills the device screen below its header; the screen rounds the corners.
 .room {
   position: relative;
+  isolation: isolate;
   height: $room-height;
-  margin: 0 var(--space-3);
   overflow: hidden;
-  border-radius: var(--radius-md);
   background: $room-background;
   color: $room-color;
 }
@@ -365,7 +365,6 @@ $loading-background: #f4efdf;
 @include bp.down(sm) {
   .room {
     height: $small-room-height;
-    margin: 0 var(--space-2);
   }
   .dog {
     width: $small-dog-width;
@@ -384,15 +383,16 @@ $loading-background: #f4efdf;
     height: $small-sleep-target-height;
     left: calc(50% - #{$small-sleep-target-width * 0.5});
   }
+  // The device screen is narrower than the old card, so keep the props at the edges.
   .window {
-    left: 7%;
+    left: 4%;
     top: var(--space-12);
     width: $small-window-width;
     height: $small-window-height;
     border-width: $small-window-border;
   }
   .plant {
-    right: 7%;
+    right: 4%;
     transform: scale(0.85);
     transform-origin: bottom;
   }
