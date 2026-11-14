@@ -1,0 +1,17 @@
+@use "breakpoints" as bp;
+
+// 둥근 까미 사진 (사용법 머리, 로그인, 404 등).
+// $size: 휴대폰 크기, $md-size: 넓은 화면(md 이상) 크기. 없으면 같은 크기
+@mixin round($size, $md-size: null) {
+  width: $size;
+  height: $size;
+  border-radius: 50%;
+  object-fit: cover;
+
+  @if $md-size {
+    @include bp.up(md) {
+      width: $md-size;
+      height: $md-size;
+    }
+  }
+}

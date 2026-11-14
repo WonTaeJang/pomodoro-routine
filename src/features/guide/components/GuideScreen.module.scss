@@ -1,6 +1,6 @@
-@use "../../../styles/breakpoints" as bp;
 @use "../../../styles/doc-page" as doc;
 @use "../../../styles/mixins";
+@use "../../../styles/photo";
 
 // 목차가 있는 글 페이지 공통 틀 (styles/_doc-page.scss)
 .layout {
@@ -17,16 +17,8 @@
 
 // 휴대폰 104px, 넓은 화면 136px. 좁은 화면에서 글 때문에 까미 사진이 줄어들지 않게
 .kkami {
-  width: 104px;
-  height: 104px;
+  @include photo.round(104px, 136px);
   flex-shrink: 0;
-  border-radius: 50%;
-  object-fit: cover;
-
-  @include bp.up(md) {
-    width: 136px;
-    height: 136px;
-  }
 }
 
 .headText {

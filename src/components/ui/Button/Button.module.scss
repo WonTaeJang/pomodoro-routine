@@ -23,6 +23,11 @@
   font-size: var(--font-size-lg);
 }
 
+// ButtonLink: 링크 밑줄 없이 버튼처럼
+.link {
+  text-decoration: none;
+}
+
 .fullWidth {
   width: 100%;
 }

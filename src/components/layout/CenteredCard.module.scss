@@ -1,0 +1,12 @@
+// 두 칸 배치(PageMain)를 가로질러 가운데에, 너비 420px까지
+.page {
+  display: flex;
+  justify-content: center;
+  grid-column: 1 / -1;
+  padding-top: var(--space-6);
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+}

@@ -1,7 +1,6 @@
 import Image, { type StaticImageData } from "next/image";
 import type { ReactNode } from "react";
-import { PageMain } from "@/components/layout/PageMain";
-import { Card } from "@/components/ui";
+import { CenteredCard } from "@/components/layout/CenteredCard";
 import { cx } from "@/lib/cx";
 import styles from "./AuthPage.module.scss";
 
@@ -23,27 +22,23 @@ export function AuthCard({
   children,
 }: AuthCardProps) {
   return (
-    <PageMain>
-      <div className={styles.page}>
-        <Card className={styles.card}>
-          {photo ? (
-            <Image
-              src={photo}
-              alt=""
-              width={120}
-              height={120}
-              sizes="(min-width: 768px) 120px, 104px"
-              className={styles.photo}
-            />
-          ) : null}
-          {title ? (
-            <h1 className={cx(styles.title, hideTitle && styles.hiddenTitle)}>
-              {title}
-            </h1>
-          ) : null}
-          {children}
-        </Card>
-      </div>
-    </PageMain>
+    <CenteredCard className={styles.card}>
+      {photo ? (
+        <Image
+          src={photo}
+          alt=""
+          width={120}
+          height={120}
+          sizes="(min-width: 768px) 120px, 104px"
+          className={styles.photo}
+        />
+      ) : null}
+      {title ? (
+        <h1 className={cx(styles.title, hideTitle && styles.hiddenTitle)}>
+          {title}
+        </h1>
+      ) : null}
+      {children}
+    </CenteredCard>
   );
 }

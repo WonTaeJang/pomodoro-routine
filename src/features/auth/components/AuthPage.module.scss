@@ -1,32 +1,15 @@
-@use "../../../styles/breakpoints" as bp;
 @use "../../../styles/mixins";
+@use "../../../styles/photo";
 
-// 로그인·프로필·돌아오는 화면이 같이 쓰는 가운데 카드
-.page {
-  display: flex;
-  justify-content: center;
-  grid-column: 1 / -1;
-  padding-top: var(--space-6);
-}
-
+// 로그인·프로필·돌아오는 화면이 같이 쓰는 가운데 카드(CenteredCard) 안: 위에서 아래로 쌓기
 .card {
   @include mixins.stack(var(--space-5));
-  width: 100%;
-  max-width: 420px;
 }
 
 // 카드 맨 위 가운데 둥근 사진 (로그인 화면). 휴대폰 104px, 넓은 화면 120px
 .photo {
-  width: 104px;
-  height: 104px;
+  @include photo.round(104px, 120px);
   align-self: center;
-  border-radius: 50%;
-  object-fit: cover;
-
-  @include bp.up(md) {
-    width: 120px;
-    height: 120px;
-  }
 }
 
 .title {

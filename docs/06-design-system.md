@@ -47,6 +47,8 @@
 | `header-panel($width)` | 헤더 버튼 아래로 펼쳐지는 창 (집중 소리 창, ☰ 메뉴) |
 | `page-width` | 페이지 본문 너비: 휴대폰은 좁게, 넓은 화면은 넓게, 가운데 (`PageMain`, `AppFooter`) |
 
+둥근 까미 사진은 `src/styles/_photo.scss`의 `photo.round($size, $md-size)`(휴대폰 크기, 넓은 화면 크기. 사용법 머리·로그인·404).
+
 목차가 있는 긴 글 페이지(사용법, 개인정보처리방침·이용약관)의 틀은 `src/styles/_doc-page.scss`: `doc.layout`(휴대폰은 제목 → 가로 목차 → 본문, 넓은 화면은 왼쪽 고정 목차 | 제목·본문. 영역 이름 head·toc·body), `doc.toc`(목차 칩·세로 목록).
 
 터치 기본 동작 (`globals.scss`): 휴대폰의 파란 탭 강조는 끔. 누르는 요소(버튼, 링크, label, 메뉴 항목, 탭)와 헤더는 꾸욱 눌러도 글자가 선택되지 않고 iOS 길게 누르기 메뉴도 뜨지 않음. 이미지는 끌리지 않음(수료증 이미지만 길게 눌러 저장할 수 있게 풀어 줌). 링크를 길게 눌렀을 때의 브라우저 메뉴는 그대로.
@@ -63,6 +65,7 @@ import { PawIcon } from "@/components/icons";
 | `Card` | 흰 바탕 둥근 카드 (타이머, 할 일 영역) | `as`(div, section, article), `padding`(default, none) |
 | `Badge` | 짧은 정보 배지 | `variant`(solid, soft, medal, outline), `size`(sm, md, lg), `icon` |
 | `Button` | 글자 버튼 | `variant`(primary, secondary, ghost, danger), `size`(sm, md, lg), `icon`, `fullWidth` |
+| `ButtonLink` | 버튼 모양의 페이지 이동 링크(`next/link`). 모양은 `Button`과 같음 (404의 "타이머로 돌아가기") | `href`, `variant`, `size` |
 | `IconButton` | 아이콘만 있는 동그란 버튼 | `label`(필수, 화면 낭독기용), `icon`, `variant`, `size`(sm~xl), `shortcut`(마우스를 올리면 "시작 (Space)") |
 | `Dialog` | 팝업 창 | `open`, `onClose`, `title`, `footer`, `instant`(등장 효과 없이 바로 보이기: 메뉴에서 설정을 열 때처럼 다른 창이 닫히자마자 열 때). ESC, 바깥 클릭으로 닫힘. 팝업 위에 팝업을 열면 ESC는 맨 위 것만 닫고, 바깥 팝업의 글자 정렬을 물려받지 않음 |
 | `ConfirmDialog` | "정말 할까요?" 확인 팝업 | `open`, `title`, `confirmLabel`, `tone`(primary, danger), `onConfirm`, `onClose` |
@@ -89,6 +92,7 @@ import { PawIcon } from "@/components/icons";
 - `AppNav`: 타이머 / 캘린더 메뉴. 아이콘 + 이름, 휴대폰(480px 미만)은 아이콘만(이름은 화면 낭독기와 툴팁). 지금 페이지는 둥근 흰 배경 + 강조색, `aria-current="page"`
 - `AppFooter`: 모든 페이지 맨 아래 오른쪽에 작게 버전과 GitHub 링크. 너비는 `PageMain`과 같아서(`page-width`) 오른쪽 끝이 카드와 맞음. 서버 컴포넌트라 `layout.tsx`에서 그려 `AppShell`의 `footer`로 넘김. 페이지가 짧으면 화면 바닥에 붙음
 - `PageMain`: 페이지 본문. 휴대폰은 위아래로 쌓고, 넓은 화면은 왼쪽(넓게)·오른쪽 두 칸 (타이머 | 할 일, 달력 | 날짜 상세)
+- `CenteredCard`: 두 칸을 가로질러 가운데에 너비 420px까지의 카드 하나 (로그인·프로필, 404). 카드 안 배치는 `className`으로
 - 사용법(`src/features/guide/`, 밖에서는 `index.ts`로): `content.ts`(글의 모양과 지금 언어의 글 `useGuideContent()`), `content.ko.ts`·`content.en.ts`(언어별 글: 섹션 목록, 첫 방문 안내 장, 글 속 아이콘 이름), `onboarding.ts`(안내를 띄울지, 장 고르기, 열림 상태 `useOnboardingStore`), `Onboarding`(앱 틀에서 한 번: 자동으로 띄우기 + 안내 창), `OnboardingArt`(장마다 실제 버튼을 흉내 낸 그림), `ReplayOnboardingButton`(사용법 페이지의 "안내 다시 보기"), `GuideScreen`(목차 + 섹션 카드), `GuideParts`(섹션 아이콘, 글 속 `{paw}` 같은 자리를 앱 아이콘으로 바꾸기, 단축키 섹션에는 `ShortcutList`)
 - `HeaderMenu`(`src/app/_components/`): 헤더 오른쪽 끝 ☰ 메뉴. 맨 위 계정 항목(로그인, 로그인하면 프로필 사진과 닉네임 → 내 프로필. 로그인을 쓸 수 없으면 숨김), 다크 모드 스위치, 언어(한국어 / English, 메뉴를 연 채로 바뀜), 설정(설정 창과 S 단축키도 여기서), 사용법, 안내 다시 보기
 - `NewTabNote`(`src/components/layout/`): 새 탭 링크 뒤의 "(새 탭에서 열림)". 서버 컴포넌트(`AppFooter`) 안에서 번역하려고 따로 둔 작은 클라이언트 컴포넌트
@@ -203,3 +207,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-13: 테스트 모드 배지를 오른쪽 아래 플로팅으로
 - 2026-11-13: `EmptyState` 기본 사진 크기 64px → 120px, 사용법 머리 사진 확대
 - 2026-11-14: 긴 글 페이지 공통 틀 `_doc-page.scss`(사용법과 약관·방침 페이지가 같이 씀)
+- 2026-11-14: `ButtonLink`, `CenteredCard`, 둥근 사진 mixin `photo.round`(로그인·404 작업 중 겹치던 스타일 정리)
