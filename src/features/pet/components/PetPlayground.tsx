@@ -16,6 +16,7 @@ import { petStore, usePetStore } from "../store";
 import { useStoresReady } from "@/lib/useHydrateStores";
 import styles from "./PetPlayground.module.scss";
 import { PetWalk } from "./PetWalk";
+import { PetRoomArt } from "./PetRoomArt";
 import { PetAffinity } from "./PetAffinity";
 import type { PetPose } from "../pet";
 
@@ -134,15 +135,7 @@ function PetRoom({ retry }: { retry: () => void }) {
         {walking && <PetWalk onReturn={returnHome} />}
         <div hidden={walking}>
           <div className={styles.room}>
-            <div className={styles.window} aria-hidden="true">
-              <span />
-              <i />
-            </div>
-            <div className={styles.plant} aria-hidden="true">
-              <i />
-              <span />
-            </div>
-            <div className={styles.rug} aria-hidden="true" />
+            <PetRoomArt />
             <div className={styles.bubble} aria-hidden="true">
               {t(copy.bubble)}
               {snacking ? <PixelSnackIcon /> : <PixelHeartIcon />}

@@ -1,11 +1,8 @@
 @use "../../../styles/breakpoints" as bp;
 @use "../../../styles/mixins";
+@use "room-layers" as *;
 
 // 이 방에서만 쓰는 도트 일러스트의 좌표·팔레트. 일반 UI는 공통 토큰을 사용합니다.
-$interaction-layer: 3;
-$loading-layer: 4;
-// 로딩 덮개보다 위: Rive 시작 화면은 덮개 위에 보여야 함 (누르기는 통과시킴)
-$dog-layer: 5;
 $small-room-height: 316px;
 $small-dog-width: 360px;
 $small-dog-height: 280px;

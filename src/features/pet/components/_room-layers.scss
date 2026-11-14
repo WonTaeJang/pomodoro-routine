@@ -1,0 +1,5 @@
+// 방 안 레이어 순서. 집과 산책이 같은 순서로 Rive 시작 화면을 덮개 위에 보여 줍니다.
+$interaction-layer: 3;
+$loading-layer: 4;
+// 로딩 덮개보다 위: Rive 시작 화면은 덮개 위에 보여야 함 (누르기는 통과시킴)
+$dog-layer: 5;

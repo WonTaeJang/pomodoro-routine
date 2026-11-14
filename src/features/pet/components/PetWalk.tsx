@@ -12,9 +12,13 @@ import { useTranslations } from "use-intl";
 import { Button } from "@/components/ui";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 import { usePageVisible } from "@/lib/usePageVisible";
+import { cx } from "@/lib/cx";
+import room from "./PetPlayground.module.scss";
 import styles from "./PetWalk.module.scss";
+import { PetRoomArt } from "./PetRoomArt";
 
-const LAYOUT = new Layout({ fit: Fit.Cover, alignment: Alignment.Center });
+// The canvas is sized in CSS to the artboard at the home scale, so Contain is 1:1.
+const LAYOUT = new Layout({ fit: Fit.Contain, alignment: Alignment.Center });
 const LOAD_TIMEOUT_MS = 15000;
 
 function stopCareKey(event: KeyboardEvent<HTMLButtonElement>) {
@@ -47,6 +51,7 @@ function WalkScene({ retry }: { retry: () => void }) {
   const visible = usePageVisible();
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
   const [ready, setReady] = useState(false);
+  const [walking, setWalking] = useState(false);
   const [failed, setFailed] = useState(false);
   const { rive, RiveComponent } = useRive({
     src: "/rive/kkami-walk.riv",
@@ -60,13 +65,17 @@ function WalkScene({ retry }: { retry: () => void }) {
   useViewModelInstanceTrigger("sceneReady", rive?.viewModelInstance, {
     onTrigger: () => setReady(true),
   });
+  useViewModelInstanceTrigger("walkStarted", rive?.viewModelInstance, {
+    onTrigger: () => setWalking(true),
+  });
 
   useEffect(() => {
     if (!rive) return;
-    // Startup must play even with reduced motion to deliver sceneReady.
-    if (failed || !visible || (ready && reducedMotion)) rive.pause();
+    // The start (turning from the home pose in the room) plays even with
+    // reduced motion; it then holds the first walking pose.
+    if (failed || !visible || (walking && reducedMotion)) rive.pause();
     else rive.play();
-  }, [rive, failed, visible, ready, reducedMotion]);
+  }, [rive, failed, visible, walking, reducedMotion]);
 
   useEffect(() => {
     if (ready || failed || !visible) return;
@@ -75,31 +84,33 @@ function WalkScene({ retry }: { retry: () => void }) {
   }, [ready, failed, visible]);
 
   return (
-    <div className={styles.scene}>
+    <div className={room.room}>
+      <PetRoomArt />
+      <span className={room.roomLabel} aria-hidden="true">
+        {t("roomLabel")}
+      </span>
       <div className={styles.canvas} role="img" aria-label={t("walk.scene")}>
         <RiveComponent aria-hidden="true" />
       </div>
-      {(!ready || failed) && (
-        <div
-          className={styles.cover}
-          data-failed={failed}
-          role={failed ? "alert" : "status"}
-        >
-          {(!rive || failed) && (
-            <p>{failed ? t("walk.error") : t("loading")}</p>
-          )}
-          {failed && (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={retry}
-              onKeyDown={stopCareKey}
-            >
-              {t("retry")}
-            </Button>
-          )}
-        </div>
-      )}
+      {/* Same cover as home: the Rive startup screen still shows above it. */}
+      <div
+        className={cx(room.loading, styles.cover)}
+        data-hidden={ready && !failed}
+        data-failed={failed}
+        role={failed ? "alert" : "status"}
+      >
+        {(!rive || failed) && <p>{failed ? t("walk.error") : t("loading")}</p>}
+        {failed && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={retry}
+            onKeyDown={stopCareKey}
+          >
+            {t("retry")}
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

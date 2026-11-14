@@ -1,4 +1,5 @@
 import { writeFileSync } from "node:fs";
+import { rect, node, keys } from "./rml.mjs";
 
 // Stable RML identities. Preserve the numbers when adding or rearranging artwork.
 const ID = {
@@ -53,10 +54,6 @@ const BOOLEAN_VALUE_KEY = 634;
 
 // Original Kkami artwork: rectangles on a four-unit grid, no external assets.
 // Rive draws its first child on top, so author back-to-front then reverse.
-const rect = (x, y, width, height, color) =>
-  `<Shape x="${x}" y="${y}"><Rectangle width="${width}" height="${height}" originX="0" originY="0"/><Fill><SolidColor colorValue="FF${color}"/></Fill></Shape>`;
-const node = (name, id, shapes, attrs = "") =>
-  `<Node name="${name}" id="0:${id}" ${attrs}>${shapes.toReversed().join("\n")}</Node>`;
 const ink = "292A30",
   fur = "414249",
   light = "575962",
@@ -236,13 +233,6 @@ const heart = (x, y, id) =>
     ],
     `x="${x}" y="${y}" opacity="0"`,
   );
-const keys = (id, properties) =>
-  `<KeyedObject objectId="0:${id}">${Object.entries(properties)
-    .map(
-      ([property, frames]) =>
-        `<KeyedProperty property="${property}">${frames.map(([frame, value]) => `<KeyFrameDouble frame="${frame}" value="${value}" interpolationType="hold"/>`).join("")}</KeyedProperty>`,
-    )
-    .join("")}</KeyedObject>`;
 const transition = (to, value, property = ID.isHappy) =>
   `<StateTransition stateToId="0:${to}" duration="0"><TransitionViewModelCondition><TransitionPropertyViewModelComparator><BindablePropertyBoolean><DataBindContext sourcePathIds="0:${ID.viewModel}-0:${property}" propertyKey="${BOOLEAN_VALUE_KEY}"/></BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="${value}"/></TransitionViewModelCondition></StateTransition>`;
 // Trigger binding uses the integer value key (rive schema BindablePropertyTrigger).

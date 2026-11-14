@@ -1,42 +1,35 @@
 @use "../../../styles/breakpoints" as bp;
+@use "room-layers" as layer;
 
-// Scene palette follows the Rive artwork; controls use shared UI tokens.
-$walk-sky: #dce9e4;
+// The walk starts in the home room (shared room styles) and the Rive outdoors
+// slides over it. The artboard (680x320) is shown at the home dog scale: 1x on
+// phones, 1.2x from sm. It is taller than the room so the outdoors covers it.
+$small-canvas-width: 680px;
+$small-canvas-height: 320px;
+$canvas-width: 816px;
+$canvas-height: 384px;
 
-.scene {
-  position: relative;
-  height: 316px;
-  overflow: hidden;
-  background: $walk-sky;
-}
 .canvas {
   position: absolute;
-  inset: 0;
-  z-index: 2;
+  z-index: layer.$dog-layer;
+  left: calc(50% - #{$small-canvas-width * 0.5});
+  bottom: 0;
+  width: $small-canvas-width;
+  height: $small-canvas-height;
   pointer-events: none;
 }
-.cover {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  &[data-failed="true"] {
-    z-index: 3;
-  }
+// A failed load keeps the message and retry above whatever the canvas drew.
+.cover[data-failed="true"] {
+  z-index: layer.$dog-layer + 1;
 }
 .controls {
   padding: var(--space-5);
   text-align: center;
 }
 @include bp.up(sm) {
-  .scene {
-    height: 356px;
+  .canvas {
+    left: calc(50% - #{$canvas-width * 0.5});
+    width: $canvas-width;
+    height: $canvas-height;
   }
 }
