@@ -1,0 +1,81 @@
+@use "../../../styles/breakpoints" as bp;
+@use "../../../styles/mixins";
+
+// 두 칸 배치(PageMain)를 가로질러 한 줄로: 제목 · 통계 · 회원 목록
+.page {
+  @include mixins.stack(var(--space-4));
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+// 관리자가 아닐 때·불러오는 중 안내 카드
+.notice {
+  @include mixins.stack(var(--space-2));
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.heading {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+}
+
+.section {
+  @include mixins.stack(var(--space-3));
+}
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+// 통계: 휴대폰 2칸, 넓은 화면 5칸
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+
+  @include bp.up(sm) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  div {
+    padding: var(--space-2-5) var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-hover);
+  }
+
+  dt {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+  }
+
+  dd {
+    margin-top: var(--space-0-5);
+    font-size: var(--font-size-lg);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weight-bold);
+  }
+}
+
+// 회원 목록: 한 줄에 닉네임·자세한 정보 | VIP 스위치
+.users {
+  display: grid;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: var(--space-2-5) 0;
+    border-top: var(--border-width) solid var(--color-border);
+    overflow-wrap: anywhere;
+  }
+}

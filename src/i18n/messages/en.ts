@@ -92,11 +92,38 @@ const en: Messages = {
       guide: "How to use",
       login: "Log in",
       profile: "My profile: {name}",
+      admin: "Admin",
     },
     /** Legal links in the footer and on the login screen */
     legal: {
       privacy: "Privacy",
       terms: "Terms",
+    },
+  },
+  admin: {
+    title: "Admin",
+    loading: "Loading…",
+    notAllowed: "Only admins can see this page.",
+    failed: "Couldn’t load. Please try again in a moment.",
+    retry: "Try again",
+    stats: {
+      title: "Overview",
+      total: "Members",
+      vip: "VIP",
+      newUsers: "New in 7 days",
+      activeUsers: "Focused in 7 days",
+      focusSessions: "Focus sessions in 7 days",
+    },
+    users: {
+      title: "{count, plural, one {# member} other {# members}}",
+      search: "Search nickname or email",
+      empty: "No members found.",
+      noName: "(No name)",
+      joined: "Joined {date}",
+      lastSignIn: "Last sign-in {date}",
+      focus: "{count, plural, one {# focus} other {# focus sessions}}",
+      vipLabel: "VIP for {name}",
+      saveFailed: "Couldn’t change VIP. Please try again in a moment.",
     },
   },
   notFound: {
@@ -534,6 +561,7 @@ const en: Messages = {
         tooLong: "Nicknames can be up to {max} characters.",
         failed: "Couldn’t save. Please try again in a moment.",
       },
+      vip: "VIP",
       signedInWith: "Signed in with {provider}",
       providers: {
         google: "Google",

@@ -13,9 +13,11 @@ import {
   TextField,
   VisuallyHidden,
 } from "@/components/ui";
+import { useAccountFlags } from "@/features/admin";
 import { formatDate } from "@/lib/date";
 import { NICKNAME_MAX, profileOf, type Profile } from "../profile";
 import { deleteAccount, signOut, updateNickname, useAuth } from "../session";
+import { useProviderName } from "../useProviderName";
 import { Avatar } from "./Avatar";
 import styles from "./ProfileScreen.module.scss";
 import { AuthCard } from "./AuthCard";
@@ -68,7 +70,10 @@ function ProfileDetails({ user }: { user: User }) {
         <div className={styles.names}>
           <Nickname profile={profile} />
           {profile.email ? <p className={page.muted}>{profile.email}</p> : null}
-          <ProviderBadge provider={profile.provider} />
+          <div className={styles.badges}>
+            <ProviderBadge provider={profile.provider} />
+            <VipBadge />
+          </div>
         </div>
       </div>
 
@@ -84,14 +89,23 @@ function ProfileDetails({ user }: { user: User }) {
   );
 }
 
+/** VIP 배지. 운영자가 관리자 페이지에서 켠 계정에만 보임 (기능 차이 없음) */
+function VipBadge() {
+  const t = useTranslations("auth.profile");
+  const flags = useAccountFlags();
+  if (!flags?.vip) return null;
+  return (
+    <Badge variant="medal" size="sm">
+      {t("vip")}
+    </Badge>
+  );
+}
+
 /** 로그인 방법 배지 ("Google로 로그인"). 이름을 아는 방법만 번역하고 나머지는 그대로 */
 function ProviderBadge({ provider }: { provider: string | null }) {
   const t = useTranslations("auth.profile");
-  if (!provider) return null;
-  const name =
-    provider === "google" || provider === "kakao" || provider === "email"
-      ? t(`providers.${provider}`)
-      : provider;
+  const name = useProviderName()(provider);
+  if (!name) return null;
   return (
     <Badge variant="soft" size="sm" className={styles.provider}>
       {t("signedInWith", { provider: name })}

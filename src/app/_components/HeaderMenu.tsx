@@ -19,8 +19,10 @@ import {
   MenuIcon,
   MoonIcon,
   SettingsIcon,
+  ShieldIcon,
 } from "@/components/icons";
 import { IconButton, Kbd, SwitchTrack } from "@/components/ui";
+import { useAccountFlags } from "@/features/admin";
 import { Avatar, profileOf, useAuth } from "@/features/auth";
 import { useGuideContent, useOnboardingStore } from "@/features/guide";
 import { SettingsDialog } from "@/features/settings/components/SettingsDialog";
@@ -37,7 +39,7 @@ type HeaderMenuProps = {
 
 /**
  * 헤더 오른쪽 끝의 메뉴(☰). 누르면 아래로 목록이 펼쳐집니다:
- * 로그인(로그인했으면 내 프로필), 다크 모드, 언어, 설정, 사용법, 안내 다시 보기.
+ * 로그인(로그인했으면 내 프로필), (관리자면) 관리자, 다크 모드, 언어, 설정, 사용법, 안내 다시 보기.
  * 바깥을 누르거나 ESC로 닫히고, 위·아래 화살표로 항목을 옮겨 다닙니다.
  * 설정 창은 S 키로도 바로 열립니다.
  */
@@ -80,6 +82,7 @@ export function HeaderMenu({ ready }: HeaderMenuProps) {
         onKeyDown={(e) => moveFocus(e)}
       >
         <AccountItem onNavigate={close} />
+        <AdminItem onNavigate={close} />
         {/* 테마는 메뉴를 연 채로 바뀜 */}
         <button
           type="button"
@@ -223,6 +226,23 @@ function AccountItem({ onNavigate }: { onNavigate: () => void }) {
       onClick={onNavigate}
     >
       <ItemLabel icon={<LogInIcon />}>{t("login")}</ItemLabel>
+    </Link>
+  );
+}
+
+/** 관리자 페이지로 가는 항목. 관리자 계정에만 보임 (권한 확인은 서버가 함) */
+function AdminItem({ onNavigate }: { onNavigate: () => void }) {
+  const t = useTranslations("app.menu");
+  const flags = useAccountFlags();
+  if (!flags?.admin) return null;
+  return (
+    <Link
+      href="/admin"
+      role="menuitem"
+      className={styles.item}
+      onClick={onNavigate}
+    >
+      <ItemLabel icon={<ShieldIcon />}>{t("admin")}</ItemLabel>
     </Link>
   );
 }

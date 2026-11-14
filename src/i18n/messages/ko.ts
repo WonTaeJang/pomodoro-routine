@@ -92,11 +92,39 @@ const ko = {
       guide: "사용법",
       login: "로그인",
       profile: "내 프로필: {name}",
+      admin: "관리자",
     },
     /** 푸터·로그인 화면의 약관 링크 */
     legal: {
       privacy: "개인정보처리방침",
       terms: "이용약관",
+    },
+  },
+  /** 관리자 페이지 (/admin) */
+  admin: {
+    title: "관리자",
+    loading: "불러오는 중…",
+    notAllowed: "관리자만 볼 수 있어요.",
+    failed: "불러오지 못했어요. 잠시 뒤 다시 해 주세요.",
+    retry: "다시 불러오기",
+    stats: {
+      title: "한눈에 보기",
+      total: "전체 회원",
+      vip: "VIP",
+      newUsers: "최근 7일 가입",
+      activeUsers: "최근 7일 집중한 회원",
+      focusSessions: "최근 7일 집중",
+    },
+    users: {
+      title: "회원 {count}명",
+      search: "닉네임·이메일 검색",
+      empty: "찾는 회원이 없어요.",
+      noName: "(이름 없음)",
+      joined: "가입 {date}",
+      lastSignIn: "최근 로그인 {date}",
+      focus: "집중 {count}회",
+      vipLabel: "{name} VIP",
+      saveFailed: "VIP를 바꾸지 못했어요. 잠시 뒤 다시 해 주세요.",
     },
   },
   /** 없는 주소 (404) */
@@ -525,6 +553,7 @@ const ko = {
         tooLong: "{max}자까지 쓸 수 있어요.",
         failed: "저장하지 못했어요. 잠시 뒤 다시 해 주세요.",
       },
+      vip: "VIP",
       signedInWith: "{provider}로 로그인",
       providers: {
         google: "Google",

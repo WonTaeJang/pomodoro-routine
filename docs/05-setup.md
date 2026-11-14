@@ -39,6 +39,7 @@ npm run dev
    - 보안 비밀번호(Client Secret)는 Supabase 대시보드에만 넣고 `.env.local`에는 넣지 않습니다.
 4. `.env.local`을 바꾸면 `npm run dev`를 다시 시작합니다 (값이 빌드할 때 들어감).
 5. 계정에 기록을 저장하려면 Supabase **SQL Editor**에서 `supabase/sync-tables.sql`(표 3개)과 `supabase/delete-account.sql`(회원 탈퇴 함수)을 차례로 한 번씩 실행합니다.
+6. 관리자 페이지(`/admin`)와 VIP 표시를 쓰려면 `supabase/admin.sql`을 한 번 실행한 뒤, 파일 맨 아래 "관리자 지정"의 주석을 풀고 이메일을 본인 것으로 바꿔 한 번 더 실행합니다. 관리자가 되면 ☰ 메뉴에 "관리자"가 보입니다. 관리자는 SQL Editor에서만 넣고 뺍니다 (`public.admins` 표).
 
 ### 테스트 계정 로그인 (개발 서버 전용)
 

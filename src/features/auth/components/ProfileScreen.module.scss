@@ -34,9 +34,16 @@
   font-weight: var(--font-weight-bold);
 }
 
+// 로그인 방법 · VIP 배지 한 줄
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: var(--space-0-5);
+  gap: var(--space-1);
+}
+
 // 카드와 같은 바탕이라 한 단계 진하게 (Badge 기본 모양보다 앞서게 .names 안에서)
 .names .provider {
-  margin-top: var(--space-0-5);
   background: var(--color-surface-hover);
 }
 
