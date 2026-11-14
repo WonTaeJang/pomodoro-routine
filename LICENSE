@@ -28,8 +28,9 @@ The MIT License above applies to the source code only. It does not apply to
 the following files, which may not be used, copied, modified or distributed
 without permission:
 
-- Photos of Kkami: src/assets/kkami/
+- Photos of Kkami: src/assets/kkami/, src/app/opengraph-image.png
 - Kkami mascot illustrations: src/assets/mascot/
+- Pixel Kkami art: public/rive/*.riv, src/assets/kkami-pet/, src/assets/kkami-walk/
 - Screenshots that include the above: docs/images/
 
 Focus sound recordings in public/sounds/ are edited versions of recordings

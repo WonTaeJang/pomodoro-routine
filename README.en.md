@@ -5,7 +5,7 @@
 A pomodoro timer with **Kkami**, a black poodle.
 Focus for 25 minutes, rest for 5, and repeat. After 4 focus sessions, you earn a Kkami certificate.
 
-> There's no hosted site yet. For now, you can [run it on your computer](#getting-started).
+> Use it right away at **https://kkamodoro.vercel.app**. To run it on your computer, see [Getting started](#getting-started).
 
 <!--
 Screenshots: put the images in docs/images/ and uncomment the lines below.
@@ -30,11 +30,9 @@ Screenshots: put the images in docs/images/ and uncomment the lines below.
 
 ### Where is my data saved?
 
-- **Without signing in:** your tasks, history, pet records and settings are saved **only in this browser (localStorage)**. Nothing is sent to a server, and clearing your browser data also deletes your history.
-- **When you sign in:** your tasks, focus history and settings (durations, auto-start, focus sound, etc.) are also saved to your account (Supabase), so you can continue on other devices with the same account. Sound volume, notifications, display settings, theme, language and pet records stay in this browser.
+- **Without signing in:** your tasks, history and settings are saved **only in this browser (localStorage)**. Nothing is sent to a server, and clearing your browser data also deletes your history.
+- **When you sign in:** your tasks, focus history and settings (durations, auto-start, focus sound, etc.) are also saved to your account (Supabase), so you can continue on other devices with the same account. Tasks and history saved in this browser before you sign in are merged into your account when you sign in. Sound volume, notifications, display settings, theme and language stay in this browser.
 - **Logging out** clears tasks, history and the timer in this browser (they stay in your account). **Deleting your account** removes it and all data saved to it.
-
-The pet care prototype is available at `/pet` on the development server. Pet pixel Kkami to see a happy reaction before returning to idle. Total pats are saved in this browser; timer rewards aren't connected yet. [Implementation and asset guide (Korean)](./docs/07-pet-prototype.md)
 
 ## Getting started
 
@@ -68,7 +66,7 @@ To try sign-in, create a Supabase project and put its URL and publishable key in
 | Framework | Next.js 16 (App Router), React 19, TypeScript                                               |
 | Styling   | SCSS Modules + design tokens, [Pretendard](https://github.com/orioncactus/pretendard) font  |
 | State     | Zustand (saved to localStorage, synced across tabs)                                         |
-| Sign-in   | Supabase Auth (Google)                                                                      |
+| Sign-in   | Supabase Auth (Google, Kakao)                                                               |
 | i18n      | use-intl (Korean, English)                                                                  |
 | Other     | dnd-kit (drag to reorder), Web Audio API (alerts, focus sounds), Canvas (certificate image) |
 | Tests     | Vitest                                                                                      |
@@ -90,5 +88,5 @@ The docs are written in Korean.
 
 The code is under the [MIT License](./LICENSE). The following are not covered by it:
 
-- **Photos of Kkami** (`src/assets/kkami/`), **mascot illustrations** (`src/assets/mascot/`) and screenshots that include them (`docs/images/`): may not be used, modified or distributed without permission.
+- **Photos of Kkami** (`src/assets/kkami/`, and the link preview image `src/app/opengraph-image.png`), **mascot illustrations** (`src/assets/mascot/`), **pixel Kkami art** (`public/rive/*.riv`, `src/assets/kkami-pet/`, `src/assets/kkami-walk/`) and screenshots that include them (`docs/images/`): may not be used, modified or distributed without permission.
 - **Focus sound recordings** (`public/sounds/`): edited from Pixabay recordings, so they stay under the [Pixabay Content License](https://pixabay.com/service/terms/) and may not be redistributed as standalone files.
