@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "use-intl";
+import kkami from "@/assets/kkami/kkami-login-001.webp";
 import { Button } from "@/components/ui";
 import { safeNextPath } from "../profile";
 import {
@@ -64,8 +65,7 @@ export function LoginScreen() {
     redirecting !== null || state === "signingIn" || status !== "signedOut";
 
   return (
-    <AuthCard title={t("title")}>
-      <p>{t("intro")}</p>
+    <AuthCard title={t("title")} intro={t("intro")} photo={kkami}>
       {status === "disabled" ? (
         <p className={styles.error} role="alert">
           {t("notConfigured")}

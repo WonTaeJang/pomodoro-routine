@@ -1,3 +1,4 @@
+@use "../../../styles/breakpoints" as bp;
 @use "../../../styles/mixins";
 
 // 로그인·프로필·돌아오는 화면이 같이 쓰는 가운데 카드
@@ -12,6 +13,31 @@
   @include mixins.stack(var(--space-5));
   width: 100%;
   max-width: 420px;
+}
+
+// 사진 | 제목·소개 (로그인 화면). 사진은 글이 길어져도 줄어들지 않게
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+// 휴대폰 80px, 넓은 화면 96px 둥근 사진
+.photo {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+
+  @include bp.up(md) {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+.headText {
+  @include mixins.stack(var(--space-2));
 }
 
 .title {

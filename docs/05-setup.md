@@ -115,6 +115,7 @@ npm run format:check  # 정리 안 된 파일이 있는지 확인만
 | `done` | `kkami-done*.webp` | 집중 완료 팝업 (웃는 모습). 브라우저 알림 아이콘은 `kkami-done.webp` 고정 |
 | `guide` | `kkami-guide-016.webp` | 사용법 페이지 머리 (모자 쓴 까미) |
 | `empty` | `kkami-empty-019.webp` | 기록이 없을 때 (`EmptyState`: 캘린더 날짜, 통계) |
+| `login` | `kkami-login-001.webp` | 로그인 화면 머리 (손바닥에 턱 올리고 빤히. 손이 함께 보이는 게 의도라 자르지 않음) |
 | `certificate` | `kkami-certificate.webp` | 수료증 이미지의 동그란 사진 (800x800) |
 
 - 타이머 화면과 완료 팝업은 묶음 중 한 장을 랜덤으로 보여 줍니다. 묶음은 `src/features/timer/photos/pools.ts`의 `KKAMI_PHOTOS`이고, 사진을 더하려면 파일을 넣고 여기 목록에 추가합니다.
