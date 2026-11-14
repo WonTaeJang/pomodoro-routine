@@ -71,14 +71,8 @@ export function TaskForm({
           min={ESTIMATE_MIN}
           max={ESTIMATE_MAX}
           onChange={setEstimate}
-          prefix={
-            <>
-              <span className={styles.estimateLabel}>
-                {t("tasks.estimate.short")}
-              </span>
-              <PawIcon size={16} />
-            </>
-          }
+          // 글자("예상") 없이 발바닥만. 무엇을 조절하는지는 label로 화면 낭독기에 알림
+          prefix={<PawIcon size={16} />}
         />
         {onCancel ? (
           <Button variant="ghost" onClick={onCancel}>

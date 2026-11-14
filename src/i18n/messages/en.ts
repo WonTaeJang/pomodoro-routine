@@ -209,7 +209,6 @@ const en: Messages = {
     },
     estimate: {
       label: "Estimated pomodoros",
-      short: "Est.",
     },
     active: "Focusing",
     select: {

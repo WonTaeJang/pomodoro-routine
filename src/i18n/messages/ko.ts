@@ -207,7 +207,6 @@ const ko = {
     },
     estimate: {
       label: "예상 뽀모도로 수",
-      short: "예상",
     },
     active: "집중 중",
     select: {
