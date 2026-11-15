@@ -5,8 +5,6 @@ import styles from "./SegmentedControl.module.scss";
 export type SegmentedOption<T extends string> = {
   value: T;
   label: ReactNode;
-  /** 아직 고를 수 없는 항목 (예: 준비 중) */
-  disabled?: boolean;
 };
 
 export type SegmentedControlProps<T extends string> = {
@@ -43,7 +41,6 @@ export function SegmentedControl<T extends string>({
           <label
             key={option.value}
             className={cx(styles.option, selected && styles.selected)}
-            data-disabled={option.disabled || undefined}
           >
             <input
               type="radio"
@@ -51,7 +48,6 @@ export function SegmentedControl<T extends string>({
               name={name}
               value={option.value}
               checked={selected}
-              disabled={option.disabled}
               onChange={() => onChange(option.value)}
             />
             {option.label}

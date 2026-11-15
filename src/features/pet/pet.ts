@@ -16,7 +16,10 @@ export type PetState = {
 };
 
 export type PetAction =
-  | { type: "start" | "advanceIntro" | "pet" | "feed" | "walk"; now: number }
+  | {
+      type: "start" | "advanceIntro" | "pet" | "feed" | "walk" | "cheer";
+      now: number;
+    }
   | { type: "settle"; now: number }
   | { type: "returnHome" };
 
@@ -71,6 +74,7 @@ export function petReducer(state: PetState, action: PetAction): PetState {
     action.type === "pet" ||
     action.type === "feed" ||
     action.type === "walk" ||
+    action.type === "cheer" ||
     action.type === "settle"
   ) {
     state = settleReactions(state, action.now);
@@ -116,6 +120,11 @@ export function petReducer(state: PetState, action: PetAction): PetState {
         snackUntil: action.now + PET_SNACK_MS,
         happyUntil: action.now + PET_SNACK_MS,
       };
+    case "cheer":
+      // Happy about something new, without counting a pat.
+      if (state.phase !== "awake" || nextReactionAt(state) !== null)
+        return state;
+      return { ...state, happyUntil: action.now + PET_HAPPY_MS };
     case "settle":
       return state;
   }

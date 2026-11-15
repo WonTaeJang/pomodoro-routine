@@ -1,5 +1,10 @@
 import { STORAGE_KEYS } from "@/lib/storage";
-import { isLegacyPetProfile, isPetProfile, type PetProfile } from "./profile";
+import {
+  NO_FURNITURE,
+  isLegacyPetProfile,
+  isPetProfile,
+  type PetProfile,
+} from "./profile";
 import { createAffinity, isAffinity } from "./affinity";
 
 export type PetStorageIssue = "load" | "save" | "invalid" | "newer";
@@ -18,7 +23,7 @@ export interface PetRepository {
   clear(): Promise<void>;
 }
 
-const VERSION = 4;
+const VERSION = 5;
 export function decodePet(raw: string | null): PetProfile | null {
   if (raw === null) return null;
   let saved;
@@ -29,9 +34,9 @@ export function decodePet(raw: string | null): PetProfile | null {
   }
   if (saved?.version > VERSION) throw new PetStorageError("newer");
   // v1 has no daily history, so past pats cannot earn affinity retroactively.
-  // v3 and older have no walks or items yet.
+  // v3 and older have no walks or items yet; v4 and older no furniture.
   if (
-    ![1, 2, 3, VERSION].includes(saved?.version) ||
+    ![1, 2, 3, 4, VERSION].includes(saved?.version) ||
     !saved.state ||
     typeof saved.state !== "object" ||
     !("pet" in saved.state)
@@ -43,13 +48,21 @@ export function decodePet(raw: string | null): PetProfile | null {
     !isLegacyPetProfile(pet) ||
     (saved.version === 2 && !isAffinity((pet as PetProfile).affinity)) ||
     (saved.version === 3 &&
-      !isPetProfile({ ...pet, walks: 0, items: {}, itemsSeen: 0 })) ||
+      !isPetProfile({
+        ...pet,
+        walks: 0,
+        items: {},
+        itemsSeen: 0,
+        ...NO_FURNITURE,
+      })) ||
+    (saved.version === 4 && !isPetProfile({ ...pet, ...NO_FURNITURE })) ||
     (saved.version === VERSION && !isPetProfile(pet))
   )
     throw new PetStorageError("invalid");
   const { id, createdAt, totalPats, lastPettedAt, updatedAt } = pet;
   const affinity =
     saved.version === 1 ? createAffinity() : (pet as PetProfile).affinity;
+  const walked = saved.version >= 4 ? (pet as PetProfile) : null;
   const current = saved.version === VERSION ? (pet as PetProfile) : null;
   return {
     id,
@@ -62,9 +75,12 @@ export function decodePet(raw: string | null): PetProfile | null {
       points: affinity.points,
       rewardedPats: { ...affinity.rewardedPats },
     },
-    walks: current?.walks ?? 0,
-    items: { ...current?.items },
-    itemsSeen: current?.itemsSeen ?? 0,
+    walks: walked?.walks ?? 0,
+    items: { ...walked?.items },
+    itemsSeen: walked?.itemsSeen ?? 0,
+    spent: { ...current?.spent },
+    furniture: [...(current?.furniture ?? [])],
+    placed: { ...current?.placed },
   };
 }
 

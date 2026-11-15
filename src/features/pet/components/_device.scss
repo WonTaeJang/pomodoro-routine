@@ -1,4 +1,4 @@
-// 돌봄 기계(본체·액정·버튼)의 고정 팔레트. 변수만 있어 어디서 @use 해도 CSS를 내보내지 않습니다.
+// 돌봄 기계(본체·액정·버튼)의 고정 팔레트. 변수와 믹스인만 있어 어디서 @use 해도 CSS를 내보내지 않습니다.
 // 액정과 버튼은 방 그림처럼 라이트/다크 모드와 관계없이 같은 색이고, 본체만 모드를 따릅니다.
 $bezel: #161210;
 $lcd-wall: #f2efe0;
@@ -10,6 +10,13 @@ $lcd-max: #c4626f;
 $lcd-level-up: #fff1c9;
 $lcd-level-up-shade: #e5c875;
 $lcd-level-up-text: #8a5a12;
+// 액정 색 카드(기록·친밀도·아이템 칸). 믹스인이라 쓰는 곳에서만 CSS가 나옵니다.
+@mixin lcd-card {
+  border-radius: var(--radius-md);
+  background: $lcd-wall;
+  box-shadow: inset 0 -3px 0 $lcd-header-shade;
+  color: $lcd-text;
+}
 $keys: (
   pet: (
     #f7d9d6,
@@ -26,5 +33,25 @@ $keys: (
   box: (
     #d6e4f2,
     #93abc6,
+  ),
+  skip: (
+    #d7e8d2,
+    #9ab793,
+  ),
+  prev: (
+    #e9e1d3,
+    #b9ab94,
+  ),
+  next: (
+    #e9e1d3,
+    #b9ab94,
+  ),
+  ok: (
+    #d7e8d2,
+    #9ab793,
+  ),
+  cancel: (
+    #f7d9d6,
+    #c99a94,
   ),
 );

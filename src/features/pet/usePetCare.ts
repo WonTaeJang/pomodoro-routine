@@ -67,6 +67,11 @@ export function usePetCare(ready: boolean) {
     if (ready) dispatch({ type: "walk", now: performance.now() });
   }
 
+  /** A happy reaction that is not a pat (the room was decorated). */
+  function cheer() {
+    if (ready) dispatch({ type: "cheer", now: performance.now() });
+  }
+
   function returnHome() {
     dispatch({ type: "returnHome" });
   }
@@ -113,6 +118,7 @@ export function usePetCare(ready: boolean) {
     walking: state.location === "walk",
     walk,
     returnHome,
+    cheer,
     pose: petPose(state),
     snackSequence: state.snacks,
     pet,

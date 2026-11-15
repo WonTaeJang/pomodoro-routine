@@ -2,6 +2,7 @@ import { createStore } from "zustand/vanilla";
 import { useStore } from "zustand";
 import { createPetProfile, type PetProfile } from "./profile";
 import { totalItems, type ItemId } from "./items";
+import type { FurnitureId, Slot } from "./furniture";
 import {
   appendCare,
   applyPending,
@@ -30,6 +31,10 @@ type PetStore = {
   recordSnack(): Promise<void>;
   /** A finished walk and the item it brought home. */
   recordWalk(item: ItemId): Promise<void>;
+  /** Make a piece of furniture from the items left over. */
+  recordCraft(furniture: FurnitureId): Promise<void>;
+  /** Put furniture in a slot, or its starting look back with null. */
+  recordPlace(slot: Slot, furniture: FurnitureId | null): Promise<void>;
   /** The item box was opened: clear the new-item dot. */
   markItemsSeen(): Promise<void>;
   retry(): Promise<void>;
@@ -162,6 +167,9 @@ export function createPetStore(
       recordPat: () => recordCare({ kind: "pats" }),
       recordSnack: () => recordCare({ kind: "snacks" }),
       recordWalk: (item) => recordCare({ kind: "walks", item }),
+      recordCraft: (furniture) => recordCare({ kind: "craft", furniture }),
+      recordPlace: (slot, furniture) =>
+        recordCare({ kind: "place", slot, furniture }),
       markItemsSeen: () => {
         const pet = get().pet;
         if (!pet || pet.itemsSeen >= totalItems(pet.items))

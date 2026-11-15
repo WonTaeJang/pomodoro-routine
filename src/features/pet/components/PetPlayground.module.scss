@@ -189,14 +189,30 @@ $dot-size: 12px;
   background: var(--color-danger);
 }
 // 산책 중: 버튼 자리에 스킵 (첫 산책은 끝까지)
-.skip {
+// 첫 산책: 건너뛰기를 못 누르는 이유를 버튼 아래에
+.padHint {
+  margin-top: var(--space-3);
+  text-align: center;
+  font-size: var(--font-size-2xs);
+  color: var(--color-text-muted);
+}
+// 꾸미기 중 헤더 오른쪽: 자리 이름과 고를 수 있는 개수만큼의 점
+.pick {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
-  p {
-    font-size: var(--font-size-2xs);
-    color: var(--color-text-muted);
+  gap: var(--space-1-5);
+  font-size: var(--font-size-2xs);
+}
+.pickDots {
+  display: flex;
+  gap: 3px;
+  i {
+    width: 5px;
+    height: 5px;
+    background: device.$lcd-header-shade;
+    &[data-on="true"] {
+      background: device.$lcd-text;
+    }
   }
 }
 .below {

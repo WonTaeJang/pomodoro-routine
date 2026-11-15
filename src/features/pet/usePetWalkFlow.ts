@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import type { ItemId } from "./items";
 import { petStore } from "./store";
 import type { PetLogEvent } from "./usePetLog";
 import { useWalkTrip } from "./useWalkTrip";
 import { FOUND_CARD_MS } from "./walkTrip";
+import { useMoment } from "./useMoment";
 
 type Options = {
   /** Walks finished so far; the first one cannot be skipped. */
@@ -22,17 +22,12 @@ type Options = {
  * still shows what came back.
  */
 export function usePetWalkFlow({ walks, walk, returnHome, addLog }: Options) {
-  const [card, setCard] = useState<{ item: ItemId; key: number } | null>(null);
-  useEffect(() => {
-    if (!card) return;
-    const timer = setTimeout(() => setCard(null), FOUND_CARD_MS);
-    return () => clearTimeout(timer);
-  }, [card]);
+  const card = useMoment<ItemId>(FOUND_CARD_MS);
 
   const { trip, begin, step, skip, cancel } = useWalkTrip({
     onFound: (item, skipped) => {
       void petStore.getState().recordWalk(item);
-      setCard({ item, key: Date.now() });
+      card.show(item);
       addLog(skipped ? { kind: "skipped", item } : { kind: "found", item });
     },
     onDone: (skipped) => {

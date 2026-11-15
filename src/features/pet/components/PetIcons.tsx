@@ -94,6 +94,19 @@ const STATUS = {
   },
   snacking: BONE,
   walk: PAW,
+  decorate: {
+    rows: [
+      "......##",
+      ".....###",
+      "....###.",
+      "...###..",
+      "..oo#...",
+      ".oooo...",
+      "oooo....",
+      "oo......",
+    ],
+    colors: { "#": "#a6735a", o: "#d0703f" },
+  },
   levelUp: {
     rows: [
       "...##...",
@@ -258,12 +271,64 @@ export function StatusIcon({ status }: { status: PetStatusIcon }) {
   return <PixelIcon art={STATUS[status]} />;
 }
 
-export type PadKind = "pet" | "feed" | "walk" | "box";
+// 꾸미기 모드 버튼: 이전·다음·고르기·취소
+const KEY_INK = { "#": "#5e5246" };
+const PREV = {
+  rows: ["...#", "..##", ".###", "####", ".###", "..##", "...#"],
+  colors: KEY_INK,
+};
+const NEXT = {
+  rows: ["#...", "##..", "###.", "####", "###.", "##..", "#..."],
+  colors: KEY_INK,
+};
+const OK = {
+  rows: [
+    "......##",
+    ".....##.",
+    "#...##..",
+    "##.##...",
+    ".###....",
+    "..#.....",
+  ],
+  colors: { "#": "#3f6b45" },
+};
+const CANCEL = {
+  rows: ["##...##", ".##.##.", "..###..", ".##.##.", "##...##"],
+  colors: { "#": "#a24f5c" },
+};
+
+const SKIP = {
+  rows: [
+    "#...#...",
+    "##..##..",
+    "###.###.",
+    "########",
+    "###.###.",
+    "##..##..",
+    "#...#...",
+  ],
+  colors: { "#": "#3f6b45" },
+};
+
+export type PadKind =
+  "pet" | "feed" | "walk" | "skip" | "box" | "prev" | "next" | "ok" | "cancel";
 
 /** 버튼 위 큰 아이콘 */
 export function PadIcon({ kind }: { kind: PadKind }) {
-  const art = { pet: HEART, feed: BONE, walk: PAW, box: BOX }[kind];
-  return <PixelIcon art={art} size={22} />;
+  const art = {
+    pet: HEART,
+    feed: BONE,
+    walk: PAW,
+    box: BOX,
+    skip: SKIP,
+    prev: PREV,
+    next: NEXT,
+    ok: OK,
+    cancel: CANCEL,
+  }[kind];
+  return (
+    <PixelIcon art={art} size={kind === "ok" || kind === "cancel" ? 16 : 20} />
+  );
 }
 
 // 친밀도 하트: 빈 칸, 왼쪽 절반, 가득. 칠하지 않은 칸은 흐린 색으로 남깁니다.
@@ -281,6 +346,20 @@ const METER = {
   0.5: meterHeart((x) => x < HALF),
   1: meterHeart(() => true),
 };
+
+const LOCK = {
+  rows: [".####.", "##..##", "#....#", "######", "##oo##", "##oo##", "######"],
+  colors: { "#": "#8a7c6c", o: "#5e5246" },
+};
+
+/** 친밀도 설명 줄 앞의 작은 아이콘 */
+export function RuleIcon({ kind }: { kind: "snack" | "lock" }) {
+  return kind === "snack" ? (
+    <PixelIcon art={BONE} size={9} />
+  ) : (
+    <PixelIcon art={LOCK} size={11} />
+  );
+}
 
 /** 친밀도 하트 한 칸. fill은 0(빈 칸), 0.5(왼쪽 절반), 1(가득) */
 export function MeterHeart({ fill }: { fill: keyof typeof METER }) {

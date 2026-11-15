@@ -217,3 +217,15 @@ describe("깨우기 반응 중 예약 처리", () => {
     ).toMatchObject({ phase: "awake", introUntil: null, pats: 0 });
   });
 });
+
+describe("방 꾸미기 반응", () => {
+  it("깨어 있으면 쓰담 횟수 없이 기뻐하고, 자는 중이거나 반응 중이면 무시", () => {
+    const awake = awakeState();
+    const cheered = petReducer(awake, { type: "cheer", now: 10 });
+    expect(petPose(cheered)).toBe("happy");
+    expect(cheered.pats).toBe(0);
+    expect(petReducer(cheered, { type: "cheer", now: 20 })).toBe(cheered);
+    const sleeping = createPetState();
+    expect(petReducer(sleeping, { type: "cheer", now: 10 })).toBe(sleeping);
+  });
+});

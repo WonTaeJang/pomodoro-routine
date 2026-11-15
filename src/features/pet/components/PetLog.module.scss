@@ -3,37 +3,6 @@
 
 $fresh: #fff3cf;
 
-// 기록창: 액정과 같은 색. 모드와 관계없이 같습니다.
-.log {
-  overflow: hidden;
-  border-radius: var(--radius-md);
-  background: device.$lcd-wall;
-  box-shadow: inset 0 -3px 0 device.$lcd-header-shade;
-  color: device.$lcd-text;
-}
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-2) var(--space-3);
-  background: device.$lcd-header;
-  box-shadow: inset 0 -2px 0 device.$lcd-header-shade;
-  h2 {
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-bold);
-  }
-  button {
-    padding: var(--space-1) 0;
-    border: 0;
-    background: none;
-    color: inherit;
-    font: inherit;
-    font-size: var(--font-size-2xs);
-    opacity: 0.8;
-    cursor: pointer;
-    @include mixins.focus-ring;
-  }
-}
 .list {
   list-style: none;
   margin: 0;
@@ -79,6 +48,21 @@ $fresh: #fff3cf;
   place-items: center;
   flex: none;
   width: 18px;
+}
+// 다섯 줄 넘게 쌓이면 맨 아래에서 전부 보기
+.more {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) 0;
+  border: 0;
+  border-top: 1px dashed device.$lcd-header-shade;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--font-size-2xs);
+  opacity: 0.8;
+  cursor: pointer;
+  @include mixins.focus-ring;
 }
 @keyframes fresh {
   from {

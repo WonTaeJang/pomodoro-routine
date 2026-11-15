@@ -14,6 +14,11 @@ function keysOf(value: unknown, prefix = ""): string[] {
 /** 문구에 쓰는 모든 자리의 예시 값 */
 const SAMPLE_VALUES = {
   count: 2,
+  have: 1,
+  need: 3,
+  index: 1,
+  slot: "창문을",
+  to: "꽃 장식 창으로",
   done: 1,
   total: 4,
   position: 1,

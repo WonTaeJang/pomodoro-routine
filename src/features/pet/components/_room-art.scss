@@ -9,11 +9,12 @@ $small-dog-height: 280px;
 $small-target-width: 136px;
 $small-target-height: 170px;
 $small-target-bottom: 42px;
-$small-window-width: 62px;
-$small-window-height: 82px;
-$small-window-border: 5px;
 $small-rug-width: 180px;
 $room-height: 356px;
+// One pixel-art cell: the same size as a cell of the home Kkami (Rive artboard 360 → 432px).
+$room-cell: 4.8px;
+$small-room-cell: 4px;
+$window-top: 38px;
 $room-background: linear-gradient(
   to bottom,
   #f4efdf 0 74%,
@@ -27,49 +28,6 @@ $room-before-background-image: linear-gradient(
   transparent 1px
 );
 $room-before-background-size: 52px 100%;
-$window-top: 38px;
-$window-width: 90px;
-$window-height: 110px;
-$window-border: 7px solid #fdf9ed;
-$window-background: #cbded8;
-$window-box-shadow: 4px 5px 0 #dfd5bf;
-$window-before-window-after-background: #fdf9ed;
-$window-before-width: 6px;
-$window-before-left: calc(50% - 3px);
-$window-after-height: 6px;
-$window-span-width: 20px;
-$window-span-height: 20px;
-$window-span-background: #faf1c4;
-$window-span-right: 10px;
-$window-span-top: 12px;
-$window-span-box-shadow: 4px 4px 0 #e2e7c6;
-$window-i-bottom: 14px;
-$window-i-height: 15px;
-$window-i-background: #b6cfb6;
-$window-i-box-shadow: 12px -7px 0 -2px #b6cfb6;
-$plant-width: 40px;
-$plant-height: 74px;
-$plant-span-left: 8px;
-$plant-span-width: 28px;
-$plant-span-height: 28px;
-$plant-span-background: #bb856e;
-$plant-span-box-shadow:
-  4px -4px 0 #cd9a80,
-  inset -6px 0 #ab755f;
-$plant-i-left: 20px;
-$plant-i-top: 10px;
-$plant-i-width: 5px;
-$plant-i-height: 40px;
-$plant-i-background: #849171;
-$plant-i-before-plant-i-after-width: 16px;
-$plant-i-before-plant-i-after-height: 20px;
-$plant-i-before-plant-i-after-background: #95a380;
-$plant-i-before-left: -14px;
-$plant-i-before-top: 10px;
-$plant-i-before-box-shadow: -4px -4px 0 #a7b492;
-$plant-i-after-left: 5px;
-$plant-i-after-top: -5px;
-$plant-i-after-box-shadow: 4px -4px 0 #a7b492;
 $rug-width: 240px;
 $rug-height: 48px;
 $rug-background: #d5b496;
@@ -116,6 +74,7 @@ $loading-background: #f4efdf;
   isolation: isolate;
   height: $room-height;
   overflow: hidden;
+  --room-cell: #{$room-cell};
   background: $room-background;
   color: $room-color;
 }
@@ -133,99 +92,68 @@ $loading-background: #f4efdf;
   position: absolute;
   top: $window-top;
   left: 9%;
-  width: $window-width;
-  height: $window-height;
-  border: $window-border;
-  background: $window-background;
-  box-shadow: $window-box-shadow;
+  line-height: 0;
 }
 
-.window::before,
-.window::after {
-  content: "";
-  position: absolute;
-  background: $window-before-window-after-background;
-  z-index: var(--z-raised);
-}
-
-.window::before {
-  width: $window-before-width;
-  height: 100%;
-  left: $window-before-left;
-}
-
-.window::after {
-  height: $window-after-height;
-  width: 100%;
-  top: 50%;
-}
-
-.window span {
-  position: absolute;
-  width: $window-span-width;
-  height: $window-span-height;
-  background: $window-span-background;
-  right: $window-span-right;
-  top: $window-span-top;
-  box-shadow: $window-span-box-shadow;
-}
-
-.window i {
-  position: absolute;
-  bottom: $window-i-bottom;
-  left: 0;
-  width: 100%;
-  height: $window-i-height;
-  background: $window-i-background;
-  box-shadow: $window-i-box-shadow;
-}
-
+// Pots stand on the floor line.
 .plant {
   position: absolute;
   right: 10%;
   bottom: 26%;
-  width: $plant-width;
-  height: $plant-height;
+  line-height: 0;
 }
 
-.plant span {
+.pixels {
+  display: block;
+}
+
+// 꾸미기 모드: 고른 자리를 점선으로 깜빡이고 이름표를 붙입니다.
+$slot-outline: 3px dashed #d0703f;
+$slot-tag-background: #5e5246;
+$slot-tag-color: #fffaf0;
+.window,
+.plant {
+  &[data-selected="true"] {
+    z-index: $interaction-layer;
+    outline: $slot-outline;
+    outline-offset: 4px;
+    animation: slot-blink 1s steps(2, jump-none) infinite;
+    @include mixins.reduced-motion {
+      animation: none;
+    }
+  }
+}
+@keyframes slot-blink {
+  50% {
+    outline-color: transparent;
+  }
+}
+.slotPick {
   position: absolute;
-  bottom: 0;
-  left: $plant-span-left;
-  width: $plant-span-width;
-  height: $plant-span-height;
-  background: $plant-span-background;
-  box-shadow: $plant-span-box-shadow;
+  z-index: $interaction-layer;
+  inset: -6px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  @include mixins.focus-ring;
 }
-
-.plant i {
+.slotTag {
   position: absolute;
-  left: $plant-i-left;
-  top: $plant-i-top;
-  width: $plant-i-width;
-  height: $plant-i-height;
-  background: $plant-i-background;
+  top: calc(100% + 10px);
+  left: 0;
+  padding: var(--space-1) var(--space-2);
+  background: $slot-tag-background;
+  color: $slot-tag-color;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.4;
+  white-space: nowrap;
 }
-
-.plant i::before,
-.plant i::after {
-  content: "";
-  position: absolute;
-  width: $plant-i-before-plant-i-after-width;
-  height: $plant-i-before-plant-i-after-height;
-  background: $plant-i-before-plant-i-after-background;
-}
-
-.plant i::before {
-  left: $plant-i-before-left;
-  top: $plant-i-before-top;
-  box-shadow: $plant-i-before-box-shadow;
-}
-
-.plant i::after {
-  left: $plant-i-after-left;
-  top: $plant-i-after-top;
-  box-shadow: $plant-i-after-box-shadow;
+.plant .slotTag {
+  top: auto;
+  bottom: calc(100% + 10px);
+  left: auto;
+  right: 0;
 }
 
 .rug {
@@ -364,6 +292,7 @@ $loading-background: #f4efdf;
 
 @include bp.down(sm) {
   .room {
+    --room-cell: #{$small-room-cell};
     height: $small-room-height;
   }
   .dog {
@@ -387,14 +316,9 @@ $loading-background: #f4efdf;
   .window {
     left: 4%;
     top: var(--space-12);
-    width: $small-window-width;
-    height: $small-window-height;
-    border-width: $small-window-border;
   }
   .plant {
     right: 4%;
-    transform: scale(0.85);
-    transform-origin: bottom;
   }
   .rug {
     width: $small-rug-width;

@@ -12,6 +12,16 @@ import {
   type ItemCounts,
   type ItemId,
 } from "./items";
+import {
+  availableItems,
+  canMake,
+  furnitureById,
+  isFurnitureId,
+  isSlot,
+  type FurnitureId,
+  type Placed,
+  type Slot,
+} from "./furniture";
 
 export type LegacyPetProfile = {
   id: string;
@@ -30,7 +40,16 @@ export type PetProfile = LegacyPetProfile & {
   items: ItemCounts;
   /** Items found when the box was last opened; more shows the new-item dot. */
   itemsSeen: number;
+  /** Items used up making furniture. `items` keeps counting every find. */
+  spent: ItemCounts;
+  /** Furniture made so far, at most one of each. */
+  furniture: FurnitureId[];
+  /** Furniture placed in each slot; a missing slot shows its starting look. */
+  placed: Placed;
 };
+
+/** What a record from before furniture starts with. */
+export const NO_FURNITURE = { spent: {}, furniture: [], placed: {} } as const;
 
 export function createPetProfile(id: string, now: number): PetProfile {
   return {
@@ -44,6 +63,9 @@ export function createPetProfile(id: string, now: number): PetProfile {
     walks: 0,
     items: {},
     itemsSeen: 0,
+    spent: {},
+    furniture: [],
+    placed: {},
   };
 }
 
@@ -102,6 +124,65 @@ export function seeItems(pet: PetProfile, seen: number): PetProfile {
   return itemsSeen === pet.itemsSeen ? pet : { ...pet, itemsSeen };
 }
 
+/** Make a piece from the items left over. Does nothing if made or short. */
+export function makeFurniture(
+  pet: PetProfile,
+  id: FurnitureId,
+  now: number,
+): PetProfile {
+  if (
+    pet.furniture.includes(id) ||
+    !canMake(id, availableItems(pet.items, pet.spent))
+  )
+    return pet;
+  const spent = { ...pet.spent };
+  for (const [item, count] of Object.entries(furnitureById(id).need))
+    spent[item as ItemId] = (spent[item as ItemId] ?? 0) + count;
+  return {
+    ...pet,
+    spent,
+    furniture: [...pet.furniture, id],
+    updatedAt: Math.max(now, pet.updatedAt),
+  };
+}
+
+/** Put a made piece in its slot, or the starting look back with null. */
+export function placeFurniture(
+  pet: PetProfile,
+  slot: Slot,
+  id: FurnitureId | null,
+  now: number,
+): PetProfile {
+  if ((pet.placed[slot] ?? null) === id) return pet;
+  if (id && (!pet.furniture.includes(id) || furnitureById(id).slot !== slot))
+    return pet;
+  const placed = { ...pet.placed };
+  if (id) placed[slot] = id;
+  else delete placed[slot];
+  return { ...pet, placed, updatedAt: Math.max(now, pet.updatedAt) };
+}
+
+function isFurnitureState(p: Partial<PetProfile>): boolean {
+  const { items, spent, furniture, placed } = p;
+  if (!isItemCounts(spent) || !Array.isArray(furniture)) return false;
+  if (!placed || typeof placed !== "object" || Array.isArray(placed))
+    return false;
+  return (
+    Object.entries(spent).every(
+      ([item, count]) => count! <= (items?.[item as ItemId] ?? 0),
+    ) &&
+    furniture.every(isFurnitureId) &&
+    new Set(furniture).size === furniture.length &&
+    Object.entries(placed).every(
+      ([slot, id]) =>
+        isSlot(slot) &&
+        isFurnitureId(id) &&
+        furniture.includes(id) &&
+        furnitureById(id).slot === slot,
+    )
+  );
+}
+
 export function isLegacyPetProfile(value: unknown): value is LegacyPetProfile {
   if (!value || typeof value !== "object") return false;
   const p = value as Partial<LegacyPetProfile>;
@@ -135,6 +216,7 @@ export function isPetProfile(value: unknown): value is PetProfile {
     totalItems(p.items) === p.walks &&
     Number.isSafeInteger(p.itemsSeen) &&
     p.itemsSeen! >= 0 &&
-    p.itemsSeen! <= p.walks!
+    p.itemsSeen! <= p.walks! &&
+    isFurnitureState(p)
   );
 }

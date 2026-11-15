@@ -4,6 +4,8 @@ import { useId, useState } from "react";
 import { useTranslations } from "use-intl";
 import type { PetLogEntry } from "../usePetLog";
 import { ItemIcon, MapIcon, StatusIcon } from "./PetIcons";
+import { LookPicture } from "./PetRoomArt";
+import { PetPanel } from "./PetPanel";
 import styles from "./PetLog.module.scss";
 
 const SHOWN = 5;
@@ -31,6 +33,10 @@ function EntryIcon({ entry }: { entry: PetLogEntry }) {
       return <ItemIcon item={entry.item} size={12} />;
     case "level":
       return <StatusIcon status="levelUp" />;
+    case "craft":
+      return <LookPicture look={entry.furniture} height={12} />;
+    case "place":
+      return <LookPicture look={entry.look} height={12} />;
   }
 }
 
@@ -59,6 +65,15 @@ function EntryText({ entry }: { entry: PetLogEntry }) {
       });
     case "level":
       return t("affinity.levelUpShort", { level: entry.level });
+    case "craft":
+      return t("log.craft", {
+        object: t(`items.furniture.${entry.furniture}.object`),
+      });
+    case "place":
+      return t("log.place", {
+        slot: t(`items.slots.${entry.slot}.object`),
+        to: t(`items.furniture.${entry.look}.to`),
+      });
     default:
       return t(`log.${entry.kind}`);
   }
@@ -67,24 +82,16 @@ function EntryText({ entry }: { entry: PetLogEntry }) {
 /** What happened since the page opened, newest first. */
 export function PetLog({ entries }: { entries: PetLogEntry[] }) {
   const t = useTranslations("pet.log");
-  const [open, setOpen] = useState(false);
+  const [folded, setFolded] = useState(false);
+  const [all, setAll] = useState(false);
   const listId = useId();
-  const shown = open ? entries : entries.slice(0, SHOWN);
+  const shown = all ? entries : entries.slice(0, SHOWN);
   return (
-    <section className={styles.log} aria-labelledby={`${listId}-title`}>
-      <header className={styles.header}>
-        <h2 id={`${listId}-title`}>{t("title")}</h2>
-        {entries.length > SHOWN && (
-          <button
-            type="button"
-            aria-expanded={open}
-            aria-controls={listId}
-            onClick={() => setOpen((value) => !value)}
-          >
-            {t(open ? "less" : "more")}
-          </button>
-        )}
-      </header>
+    <PetPanel
+      title={t("title")}
+      open={!folded}
+      onToggle={() => setFolded((value) => !value)}
+    >
       <ol id={listId} className={styles.list}>
         {shown.map((entry) => (
           <li key={entry.id}>
@@ -100,6 +107,17 @@ export function PetLog({ entries }: { entries: PetLogEntry[] }) {
           </li>
         ))}
       </ol>
-    </section>
+      {entries.length > SHOWN && (
+        <button
+          type="button"
+          className={styles.more}
+          aria-expanded={all}
+          aria-controls={listId}
+          onClick={() => setAll((value) => !value)}
+        >
+          {all ? t("less") : t("more", { count: entries.length - SHOWN })}
+        </button>
+      )}
+    </PetPanel>
   );
 }

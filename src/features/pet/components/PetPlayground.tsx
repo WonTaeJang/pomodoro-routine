@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState, type Ref } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 import { usePetRive, usePetRivePose } from "../usePetRive";
 import { Button, VisuallyHidden } from "@/components/ui";
@@ -17,7 +17,13 @@ import styles from "./PetPlayground.module.scss";
 import { PetWalk } from "./PetWalk";
 import { PetRoomArt } from "./PetRoomArt";
 import { PetAffinityDetail, PetHearts, usePetAffinity } from "./PetAffinity";
-import { PadIcon, StatusIcon, type PadKind } from "./PetIcons";
+import { StatusIcon } from "./PetIcons";
+import { PetPad } from "./PetPad";
+import { DecoratePads, DecoratePick, decorateTag } from "./PetDecorate";
+import { usePetDecorate } from "../usePetDecorate";
+import { useFocusAfter, useMoment } from "../useMoment";
+import { PET_HAPPY_MS } from "../pet";
+import type { FurnitureId, Slot } from "../furniture";
 import { PetFoundCard, PetWalkMap } from "./PetTrip";
 import { PetItemBox } from "./PetItemBox";
 import { PetLog } from "./PetLog";
@@ -81,6 +87,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     walking,
     walk,
     returnHome,
+    cheer,
     snackSequence,
     pet,
     feed,
@@ -98,11 +105,7 @@ function PetRoom({ retry }: { retry: () => void }) {
   const canCare = ready && !startled && !happy;
 
   const walkButton = useRef<HTMLButtonElement>(null);
-  const wasWalking = useRef(false);
-  useEffect(() => {
-    if (wasWalking.current && !walking) walkButton.current?.focus();
-    wasWalking.current = walking;
-  }, [walking]);
+  useFocusAfter(walking, walkButton);
 
   // Once home is showing, fetch the walk scene so walks start without a download.
   useEffect(() => {
@@ -116,7 +119,8 @@ function PetRoom({ retry }: { retry: () => void }) {
   });
 
   const affinity = usePetAffinity();
-  const [infoOpen, setInfoOpen] = useState(false);
+  // Shown from the start; the hearts and the card's bar both fold it.
+  const [infoOpen, setInfoOpen] = useState(true);
   const infoId = useId();
   const levelUp = affinity.leveledUp;
   const record = usePetStore((s) => s.pet);
@@ -144,15 +148,42 @@ function PetRoom({ retry }: { retry: () => void }) {
 
   const [boxOpen, setBoxOpen] = useState(false);
   const newItems = record ? record.itemsSeen < totalItems(record.items) : false;
+  const boxButton = useRef<HTMLButtonElement>(null);
   function openBox() {
     setBoxOpen(true);
     void petStore.getState().markItemsSeen();
   }
-  const hudIcon = levelUp !== null ? "levelUp" : walking ? "walk" : pose;
-  const hudLabel =
+  function craft(furniture: FurnitureId) {
+    void petStore.getState().recordCraft(furniture);
+    addLog({ kind: "craft", furniture });
+  }
+
+  // Decorating: pick a slot, then a look; Kkami is pleased with the change.
+  const decorated = useMoment<true>(PET_HAPPY_MS);
+  const decor = usePetDecorate({
+    furniture: record?.furniture ?? [],
+    placed: record?.placed ?? {},
+    addLog,
+    onPlaced: () => {
+      cheer();
+      decorated.show(true);
+    },
+  });
+  const decorating = decor.mode !== null;
+  useFocusAfter(decorating, boxButton);
+
+  // One status at a time in the header: a level up, then the mode, then the pose.
+  const hud =
     levelUp !== null
-      ? t("affinity.levelUpShort", { level: levelUp })
-      : t(walking ? "walk.status" : copy.status);
+      ? {
+          icon: "levelUp" as const,
+          label: t("affinity.levelUpShort", { level: levelUp }),
+        }
+      : walking
+        ? { icon: "walk" as const, label: t("walk.status") }
+        : decorating
+          ? { icon: "decorate" as const, label: t("decorate.status") }
+          : { icon: pose, label: t(copy.status) };
 
   return (
     <main className={styles.page}>
@@ -169,11 +200,13 @@ function PetRoom({ retry }: { retry: () => void }) {
           <div className={styles.lcd}>
             <div className={styles.hud} data-level-up={levelUp !== null}>
               <span className={styles.state} role="status">
-                <StatusIcon status={hudIcon} />
-                {hudLabel}
+                <StatusIcon status={hud.icon} />
+                {hud.label}
               </span>
               {walking && trip ? (
                 <PetWalkMap progress={trip.progress} item={trip.item} />
+              ) : decor.mode ? (
+                <DecoratePick mode={decor.mode} looks={decor.looks} />
               ) : (
                 <PetHearts
                   {...affinity}
@@ -183,14 +216,31 @@ function PetRoom({ retry }: { retry: () => void }) {
                 />
               )}
             </div>
-            {outing.card && (
-              <PetFoundCard key={outing.card.key} item={outing.card.item} />
+            {outing.card.value && (
+              <PetFoundCard key={outing.card.key} item={outing.card.value} />
             )}
             {walking && <PetWalk onStep={outing.step} onHome={outing.leave} />}
             <div className={styles.room} hidden={walking}>
-              <PetRoomArt />
+              <PetRoomArt
+                preview={decor.preview}
+                decorating={
+                  decor.mode
+                    ? {
+                        selected: decor.mode.slot,
+                        tag: decorateTag(t, decor.mode, decor.looks),
+                        label: (slot: Slot) =>
+                          t("decorate.pick", {
+                            name: t(`items.slots.${slot}.name`),
+                          }),
+                        onSelect: decor.select,
+                      }
+                    : undefined
+                }
+              />
               <div className={styles.bubble} aria-hidden="true">
-                {t(copy.bubble)}
+                {decorated.value && pose === "happy"
+                  ? t("decorate.bubble")
+                  : t(copy.bubble)}
                 {snacking ? <PixelSnackIcon /> : <PixelHeartIcon />}
               </div>
               <div className={styles.dog} aria-hidden="true">
@@ -201,7 +251,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                 aria-describedby="pet-keyboard-help"
                 data-sleeping={sleeping || startled}
                 aria-label={t(copy.label)}
-                disabled={!canCare}
+                disabled={!canCare || decorating}
                 onPointerDown={startStroke}
                 onPointerMove={moveStroke}
                 onPointerUp={endStroke}
@@ -237,57 +287,64 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
         </div>
         <div className={styles.pads}>
-          {walking ? (
-            <div className={styles.skip}>
-              <Button
-                autoFocus
-                variant="secondary"
-                onClick={outing.skip}
-                disabled={!trip?.canSkip}
-                aria-describedby={trip?.canSkip ? undefined : `${infoId}-skip`}
-                onKeyDown={stopCareKey}
-              >
-                {t("walk.skip")} ▸▸
-              </Button>
-              {!trip?.canSkip && (
-                <p id={`${infoId}-skip`}>{t("walk.skipFirst")}</p>
-              )}
-            </div>
+          {decor.mode ? (
+            <DecoratePads
+              mode={decor.mode}
+              onPrev={decor.prev}
+              onNext={decor.next}
+              onConfirm={decor.confirm}
+              onBack={decor.back}
+            />
           ) : (
             <>
+              {/* While away, the other keys rest and walk becomes skip. */}
               <PetPad
                 kind="pet"
                 label={t(copy.action)}
                 onClick={pet}
-                disabled={!canCare}
+                disabled={!canCare || walking}
               />
               <PetPad
                 kind="feed"
                 label={t("feed")}
                 onClick={feed}
-                disabled={!canCare || sleeping}
+                disabled={!canCare || sleeping || walking}
               />
               <PetPad
                 ref={walkButton}
-                kind="walk"
-                label={t("walk.start")}
-                onClick={outing.start}
-                disabled={!ready || pose !== "idle"}
+                kind={walking ? "skip" : "walk"}
+                label={t(walking ? "walk.skip" : "walk.start")}
+                onClick={walking ? outing.skip : outing.start}
+                disabled={walking ? !trip?.canSkip : !ready || pose !== "idle"}
+                aria-describedby={
+                  walking && !trip?.canSkip ? `${infoId}-skip` : undefined
+                }
               />
               <PetPad
+                ref={boxButton}
                 kind="box"
                 label={t("items.button")}
                 onClick={openBox}
-                disabled={!record}
+                disabled={!record || walking}
                 dot={newItems ? t("items.newItems") : undefined}
               />
             </>
           )}
         </div>
+        {walking && !trip?.canSkip && (
+          <p id={`${infoId}-skip`} className={styles.padHint}>
+            {t("walk.skipFirst")}
+          </p>
+        )}
       </section>
 
       <div className={styles.below}>
-        {infoOpen && <PetAffinityDetail id={infoId} {...affinity} />}
+        <PetAffinityDetail
+          id={infoId}
+          {...affinity}
+          open={infoOpen}
+          onToggle={() => setInfoOpen((open) => !open)}
+        />
         <PetLog entries={log.entries} />
         {storageIssue && (
           <div className={styles.storageIssue} role="alert">
@@ -308,44 +365,14 @@ function PetRoom({ retry }: { retry: () => void }) {
         <PetItemBox
           open={boxOpen}
           onClose={() => setBoxOpen(false)}
-          items={record.items}
-          walks={record.walks}
+          pet={record}
+          onCraft={craft}
+          onDecorate={() => {
+            setBoxOpen(false);
+            decor.start();
+          }}
         />
       )}
     </main>
-  );
-}
-
-/** A round handheld button with a pixel icon and a short name under it. */
-function PetPad({
-  kind,
-  label,
-  dot,
-  ...props
-}: {
-  kind: PadKind;
-  label: string;
-  onClick: () => void;
-  disabled: boolean;
-  /** A small red dot with this screen-reader text (e.g. new items). */
-  dot?: string;
-  ref?: Ref<HTMLButtonElement>;
-}) {
-  return (
-    <button
-      type="button"
-      className={styles.pad}
-      data-kind={kind}
-      aria-describedby="pet-keyboard-help"
-      onKeyDown={stopCareKey}
-      {...props}
-    >
-      <span className={styles.key} aria-hidden="true">
-        <PadIcon kind={kind} />
-        {dot && <i className={styles.dot} />}
-      </span>
-      {label}
-      {dot && <VisuallyHidden>{dot}</VisuallyHidden>}
-    </button>
   );
 }

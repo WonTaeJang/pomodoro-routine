@@ -90,6 +90,9 @@ describe("친밀도 규칙", () => {
       walks: 0,
       items: {},
       itemsSeen: 0,
+      spent: {},
+      furniture: [],
+      placed: {},
     });
   });
 
@@ -117,7 +120,16 @@ describe("친밀도 규칙", () => {
     };
     expect(
       decodePet(JSON.stringify({ version: 2, state: { pet: oldPet } })),
-    ).toEqual({ ...oldPet, totalSnacks: 0, walks: 0, items: {}, itemsSeen: 0 });
+    ).toEqual({
+      ...oldPet,
+      totalSnacks: 0,
+      walks: 0,
+      items: {},
+      itemsSeen: 0,
+      spent: {},
+      furniture: [],
+      placed: {},
+    });
   });
 
   it.each([-1, 1.5, 3])(

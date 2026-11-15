@@ -14,7 +14,8 @@ import {
   DAILY_AFFINITY_PATS,
 } from "../affinity";
 import { petStore, usePetStore } from "../store";
-import { MeterHeart } from "./PetIcons";
+import { MeterHeart, RuleIcon } from "./PetIcons";
+import { PetPanel } from "./PetPanel";
 import styles from "./PetAffinity.module.scss";
 
 const LEVEL_NOTICE_MS = 3500;
@@ -99,39 +100,89 @@ export function PetHearts({
   );
 }
 
-/** How affinity grows; shown under the device when the hearts are pressed. */
+const BAR_CELLS = 20;
+
+/** How affinity grows: a card under the device, folded by its bar or the hearts. */
 export function PetAffinityDetail({
   id,
   affinity,
   progress,
   earned,
-}: Affinity & { id: string }) {
+  open,
+  onToggle,
+}: Affinity & { id: string; open: boolean; onToggle: () => void }) {
   const t = useTranslations("pet.affinity");
+  const { level, next, value, max } = progress;
+  const filled = Math.floor((value / max) * BAR_CELLS);
+  const dailyMax = DAILY_AFFINITY_PATS * AFFINITY_PER_PAT;
   return (
-    <div id={id} className={styles.detail}>
+    <PetPanel title={t("title")} open={open} onToggle={onToggle} bodyId={id}>
       {affinity && (
-        <>
-          <strong>
-            {t(`stages.${progress.level}`)} ·{" "}
-            {progress.next === null
-              ? t("max", { points: affinity.points })
-              : t("points", { points: affinity.points, next: progress.next })}
-          </strong>
-          <span>
-            {t("today", {
-              earned,
-              max: DAILY_AFFINITY_PATS * AFFINITY_PER_PAT,
-            })}
+        <div className={styles.detailBody}>
+          <p className={styles.stage}>
+            <strong>
+              {t("level", { level })} {t(`stages.${level}`)}
+            </strong>
+            <small>
+              {next === null
+                ? t("maxStage")
+                : t("nextStage", {
+                    name: t(`stages.${(level + 1) as 2 | 3 | 4 | 5}`),
+                  })}
+            </small>
+          </p>
+          <span className={styles.bar} aria-hidden="true">
+            {Array.from({ length: BAR_CELLS }, (_, cell) => (
+              <i key={cell} data-on={cell < filled} />
+            ))}
           </span>
-          <span>
-            {t("hint", {
-              count: DAILY_AFFINITY_PATS,
-              points: AFFINITY_PER_PAT,
-            })}
-          </span>
-          <span>{t("snackHint", { points: AFFINITY_PER_SNACK })}</span>
-        </>
+          <p className={styles.row}>
+            <span>
+              {next === null
+                ? t("max", { points: affinity.points })
+                : t("points", { points: affinity.points, next })}
+            </span>
+            {next !== null && (
+              <span>{t("left", { count: next - affinity.points })}</span>
+            )}
+          </p>
+          <hr className={styles.dots} />
+          <p className={styles.today}>
+            <strong>{t("todayTitle")}</strong>
+            <span aria-hidden="true">
+              {Array.from({ length: DAILY_AFFINITY_PATS }, (_, pat) => (
+                <MeterHeart
+                  key={pat}
+                  fill={pat < earned / AFFINITY_PER_PAT ? 1 : 0}
+                />
+              ))}
+            </span>
+          </p>
+          <p className={styles.row}>
+            <span>
+              {t("todayRule", {
+                count: DAILY_AFFINITY_PATS,
+                points: AFFINITY_PER_PAT,
+              })}
+            </span>
+            {earned >= dailyMax ? (
+              <span className={styles.done}>{t("todayDone")} ✓</span>
+            ) : (
+              <span>{t("todayLeft", { earned, max: dailyMax })}</span>
+            )}
+          </p>
+          <ul className={styles.rules}>
+            <li>
+              <RuleIcon kind="snack" />
+              {t("snackHint", { points: AFFINITY_PER_SNACK })}
+            </li>
+            <li>
+              <RuleIcon kind="lock" />
+              {t("noDecay")}
+            </li>
+          </ul>
+        </div>
       )}
-    </div>
+    </PetPanel>
   );
 }

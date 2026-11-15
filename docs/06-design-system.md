@@ -212,4 +212,5 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-14: `ImageViewer`, 버튼 `overlay` 모양, `ExpandIcon`. `Dialog`와 `ImageViewer`가 여닫는 방식을 `useModalDialog`로 같이 씀
 - 2026-11-14: `ProgressRing`에 `underlay`(띠 뒤에 까는 내용) 추가. 타이머 원의 집중 소리 분위기(I-052)가 씀
 - 2026-11-15: 돌봄 화면을 휴대용 게임기 모양으로(본체·액정 헤더·둥근 버튼). 공통 `Card`·`Button` 대신 돌봄 전용 `PetPad`·`PetHearts`와 도트 아이콘 `PetIcons`, 고정 팔레트 `_device.scss`. 본체 색만 `--color-border`·`--color-text`에서 섞어 모드를 따름
-- 2026-11-15: `SegmentedControl` 항목에 `disabled`(준비 중인 항목). 돌봄 아이템 상자의 만들기 탭이 씀
+- 2026-11-15: 방의 창문·화분을 CSS 도형에서 도트 그림(`roomArt.ts`, 칸 크기 `--room-cell`)으로. 꾸미기 모드 버튼(◀ ▶ ✓ ✕)은 같은 `PetPad`에 키 색만 추가하고, 고른 자리는 점선 테두리·이름표(방 팔레트). 아이템 상자 만들기 탭은 공통 `Dialog`·`SegmentedControl`·`Button` 사용. 만들기 탭이 열리면서 `SegmentedControl`의 `disabled` 항목은 쓰는 곳이 없어 되돌림
+- 2026-11-15: 돌봄 친밀도 상세를 공통 표면 색 상자에서 기록창과 같은 액정 카드(헤더·도트 막대·점선 구분)로. 두 카드의 틀은 접기/펼치기가 있는 `PetPanel` 하나로 합침. 액정 색 카드 모양은 `_device.scss`의 `lcd-card` 믹스인으로 기록·친밀도·아이템 칸이 함께 씀
