@@ -26,7 +26,6 @@
 }
 .detail {
   @include mixins.stack(var(--space-1));
-  margin-top: var(--space-3);
   padding: var(--space-3-5) var(--space-4);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-md);

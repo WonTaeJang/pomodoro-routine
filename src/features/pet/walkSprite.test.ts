@@ -13,6 +13,7 @@ import {
   poseAt,
   frontCells,
 } from "../../../scripts/walk-sprite.mjs";
+import { TRIP } from "./walkTrip";
 
 const read = (path: string) =>
   readFileSync(new URL(path, import.meta.url), "utf8");
@@ -163,80 +164,158 @@ describe("산책 그림이 집 화면과 같은 도트", () => {
 });
 
 describe("산책 Rive 재생 계약", () => {
-  const animation = (name: string) =>
-    walkRml.match(
-      new RegExp(`<LinearAnimation\\b[^>]*name="${name}"[^>]*>`),
-    )?.[0] ?? "";
-  const prop = (tag: string, name: string) =>
-    Number(tag.match(new RegExp(`${name}="(\\d+)"`))?.[1]);
+  const animations = new Map(
+    [
+      ...walkRml.matchAll(
+        /<LinearAnimation name="([^"]+)" id="0:(\d+)" fps="(\d+)" duration="(\d+)"[^>]*>([\s\S]*?)<\/LinearAnimation>/g,
+      ),
+    ].map(([, name, id, fps, frames, body]) => [
+      id,
+      { name, fps: Number(fps), frames: Number(frames), body },
+    ]),
+  );
+  const byName = (name: string) =>
+    [...animations.values()].find((a) => a.name === name)!;
+  const seconds = (a: { fps: number; frames: number }) => a.frames / a.fps;
+  /** Animations a layer plays, in order. */
+  const layer = (name: string) => {
+    const markup = walkRml.match(
+      new RegExp(
+        `<StateMachineLayer name="${name}"[\\s\\S]*?</StateMachineLayer>`,
+      ),
+    )![0];
+    return {
+      markup,
+      steps: [...markup.matchAll(/animationId="0:(\d+)"/g)].map(([, id]) =>
+        animations.get(id)!,
+      ),
+    };
+  };
+  const xKeys = (body: string, objectId: number) =>
+    [
+      ...(
+        body.match(
+          new RegExp(
+            `<KeyedObject objectId="0:${objectId}"><KeyedProperty property="x">([\\s\\S]*?)</KeyedProperty>`,
+          ),
+        )?.[1] ?? ""
+      ).matchAll(/frame="(\d+)" value="(-?\d+)"/g),
+    ].map(([, frame, value]) => [Number(frame), Number(value)]);
+  const attr = (name: string, key: string) =>
+    Number(
+      walkRml.match(
+        new RegExp(`<Node name="${name}" id="0:\\d+"[^>]*\\b${key}="(-?\\d+)"`),
+      )?.[1],
+    );
 
-  it("걷기와 길이 같은 박자로 프레임 단위 이동", () => {
-    const walking = animation("Walking");
-    expect(prop(walking, "fps")).toBe(FPS);
-    expect(prop(walking, "duration")).toBe(FRAMES);
-    for (const [name, step] of [
-      ["Path", CELL],
-      ["Trees", CELL],
-      ["Clouds", CELL],
+  it("한 번의 산책이 화면 타이머(TRIP)와 같은 길이로 진행", () => {
+    const kkami = layer("Kkami");
+    expect(kkami.steps.map((a) => a.name)).toEqual([
+      "Prepare",
+      "Start",
+      "Walk out",
+      "Pick up",
+      "Walk home",
+      "Arrive",
+    ]);
+    const [, start, out, pick, home, arrive] = kkami.steps;
+    expect(start.frames).toBe(FRONT_FRAMES + TURN_FRAMES);
+    expect(seconds(out) * 1000).toBe(TRIP.toSpot);
+    expect(seconds(pick) * 1000).toBe(TRIP.pick);
+    expect(seconds(home) * 1000).toBe(TRIP.toHome);
+    expect(seconds(arrive) * 1000).toBe(TRIP.arrive);
+    // sceneReady as the front pose shows; walkStarted with the first step,
+    // where the page starts its own trip clock.
+    for (const [step, trigger] of [
+      [start, 42],
+      [out, 43],
     ] as const) {
-      const tag = animation(name);
-      const body = walkRml.slice(walkRml.indexOf(tag));
-      const distance = -Number(
-        body.match(/KeyFrameDouble frame="\d+" value="(-\d+)"/)?.[1],
+      const id = [...animations].find(([, a]) => a === step)![0];
+      expect(kkami.markup).toMatch(
+        new RegExp(
+          `animationId="0:${id}" id="0:\\d+"><StateMachineFireTrigger viewModelPathIds="0:40-0:${trigger}"`,
+        ),
       );
-      expect(tag).toContain('quantize="true"');
-      expect(distance / prop(tag, "duration")).toBe(step);
     }
-    expect(CELL * prop(animation("Path"), "fps")).toBe(PATH_SPEED);
   });
 
-  it("집 자세로 시작해 돌아선 뒤 걷고, 길은 걷기 시작과 함께 움직임", () => {
-    expect(prop(animation("Start"), "duration")).toBe(
-      FRONT_FRAMES + TURN_FRAMES,
-    );
-    expect(prop(animation("Pause"), "duration")).toBe(
-      prop(animation("Start"), "duration"),
-    );
-    // sceneReady fires as the start begins; walkStarted as the first step begins.
-    expect(walkRml).toMatch(
-      /animationId="0:53" id="0:14"><StateMachineFireTrigger viewModelPathIds="0:40-0:42"/,
-    );
-    expect(walkRml).toMatch(
-      /animationId="0:50" id="0:13"><StateMachineFireTrigger viewModelPathIds="0:40-0:43"/,
-    );
-    // Path, trees, clouds and the outdoors all wait out the start.
-    expect(
-      walkRml.match(/animationId="0:56" id="0:\d+"><StateTransition/g),
-    ).toHaveLength(4);
+  it("각 단계는 자기 애니메이션이 끝날 때 다음으로 넘어감 (exitTime은 ms)", () => {
+    const chained = [
+      ...walkRml.matchAll(
+        /animationId="0:(\d+)" id="0:\d+">(?:<StateMachineFireTrigger[^>]*\/>)?<StateTransition [^>]*exitTime="(\d+)"/g,
+      ),
+    ];
+    expect(chained.length).toBeGreaterThan(0);
+    for (const [, id, exitTime] of chained)
+      expect(Number(exitTime)).toBe(
+        Math.round(seconds(animations.get(id)!) * 1000),
+      );
+    // Every transition in the walk is one of these chained exits.
+    expect(walkRml.match(/exitTime="/g)).toHaveLength(chained.length);
   });
 
-  it("방에서 출발하면 바깥이 오른쪽에서 칸 단위로 밀려 들어와 방을 덮음", () => {
+  it("풍경은 출발 장면이 끝나야 움직이고, 길은 걷는 동안 한 칸씩·줍는 동안 멈춤", () => {
+    const start = seconds(byName("Start"));
+    for (const name of ["Outdoors", "Path", "Trees", "Clouds"]) {
+      const [prepare, pause] = layer(name).steps;
+      expect([prepare.name, pause.name]).toEqual(["Prepare", "Pause"]);
+      expect(seconds(pause)).toBe(start);
+    }
+    expect(CELL * FPS).toBe(PATH_SPEED);
+    for (const [name, fps] of [
+      ["Path", FPS],
+      ["Trees", FPS / 2],
+    ] as const) {
+      const [, , out, stop, home] = layer(name).steps;
+      for (const moving of [out, home]) {
+        const [[, from], [frames, to]] = xKeys(
+          moving.body,
+          name === "Path" ? 33 : 32,
+        );
+        expect(moving.fps).toBe(fps);
+        expect((from - to) / frames).toBe(CELL);
+      }
+      expect(seconds(out) * 1000).toBe(TRIP.toSpot);
+      expect(seconds(stop) * 1000).toBe(TRIP.pick);
+      expect(xKeys(stop.body, name === "Path" ? 33 : 32)[0][1]).toBe(
+        xKeys(out.body, name === "Path" ? 33 : 32).at(-1)![1],
+      );
+    }
+  });
+
+  it("바깥은 오른쪽에서 들어오고, 집에 도착하는 순간 왼쪽으로 빠짐", () => {
     const width = Number(walkRml.match(/<Artboard width="(\d+)"/)?.[1]);
     const height = Number(walkRml.match(/<Artboard[^>]*height="(\d+)"/)?.[1]);
-    // Covers the 316px phone room at 1x.
-    expect(height).toBeGreaterThanOrEqual(316);
-    const outdoors = walkRml.match(
-      /<Node name="Outdoors" id="0:35" ([^>]*)>/,
-    )?.[1];
-    expect(outdoors).toContain(`x="${width}"`); // off to the right at first
-    const enter = animation("Go outside");
-    expect(enter).toContain('loopValue="oneShot"');
-    expect(enter).toContain('quantize="true"');
-    const body = walkRml.slice(walkRml.indexOf(enter));
-    const keys = [
-      ...body
-        .slice(0, body.indexOf("</LinearAnimation>"))
-        .matchAll(/KeyFrameDouble frame="(\d+)" value="(-?\d+)"/g),
-    ].map(([, frame, value]) => [Number(frame), Number(value)]);
-    expect(keys).toEqual([
-      [0, width],
-      [prop(enter, "duration"), 0],
+    expect(height).toBeGreaterThanOrEqual(316); // covers the phone room at 1x
+    expect(attr("Outdoors", "x")).toBe(width);
+    const outdoors = layer("Outdoors").steps;
+    expect(outdoors.map((a) => a.name)).toEqual([
+      "Prepare",
+      "Pause",
+      "Go outside",
+      "Outside",
+      "Go inside",
     ]);
-    expect((width / prop(enter, "duration")) % CELL).toBe(0);
-    // It enters with the first step: after the same pause as the scenery.
-    expect(walkRml).toMatch(
-      /animationId="0:56" id="0:38"><StateTransition stateToId="0:39"/,
-    );
-    expect(walkRml).toContain('animationId="0:57" id="0:39"');
+    const [, , goOut, , goIn] = outdoors;
+    expect(xKeys(goOut.body, 35)).toEqual([
+      [0, width],
+      [goOut.frames, 0],
+    ]);
+    expect(xKeys(goIn.body, 35)).toEqual([
+      [0, 0],
+      [goIn.frames, -width],
+    ]);
+    expect((width / goOut.frames) % CELL).toBe(0);
+    const until = (steps: { fps: number; frames: number }[], count: number) =>
+      steps.slice(0, count).reduce((sum, a) => sum + seconds(a), 0);
+    expect(until(outdoors, 4)).toBeCloseTo(until(layer("Kkami").steps, 5));
+    expect(seconds(goIn)).toBeLessThanOrEqual(TRIP.arrive / 1000);
+  });
+
+  it("반짝이는 자리는 까미가 멈출 때 코끝에 옴", () => {
+    const [, , out] = layer("Path").steps;
+    const pathStop = xKeys(out.body, 33).at(-1)![1];
+    const nose = attr("Kkami", "x") + 42 * CELL;
+    expect(attr("Find", "x") + pathStop).toBe(nose);
   });
 });

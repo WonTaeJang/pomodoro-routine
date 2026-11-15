@@ -13,6 +13,7 @@ $pads-height: 96px;
 $pad-width: 88px;
 $key-size: 60px;
 $key-depth: 6px;
+$dot-size: 12px;
 
 .page {
   max-width: $page-max;
@@ -66,6 +67,7 @@ $key-depth: 6px;
 }
 // 헤더와 방이 한 장의 액정. 둥근 모서리는 액정 바깥에만 둡니다.
 .lcd {
+  position: relative;
   overflow: hidden;
   border-radius: var(--radius-sm);
   background: device.$lcd-wall;
@@ -106,16 +108,21 @@ $key-depth: 6px;
   display: flex;
   justify-content: space-around;
   align-items: flex-start;
+  gap: var(--space-1);
   min-height: $pads-height;
   padding: var(--space-5) var(--space-1) 0;
 }
 .pad {
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
   align-items: center;
   gap: var(--space-2-5);
-  width: $pad-width;
+  min-width: 0;
+  max-width: $pad-width;
   padding: 0;
+  text-align: center;
+  word-break: keep-all;
   border: 0;
   background: none;
   color: var(--color-text);
@@ -151,6 +158,7 @@ $key-depth: 6px;
   }
 }
 .key {
+  position: relative;
   display: grid;
   place-items: center;
   width: $key-size;
@@ -165,23 +173,34 @@ $key-depth: 6px;
     transition: none;
   }
 }
+// 새 아이템 표시
+.dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: $dot-size;
+  height: $dot-size;
+  border: 2px solid var(--shell);
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
+}
+// 산책 중: 버튼 자리에 스킵 (첫 산책은 끝까지)
+.skip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  p {
+    font-size: var(--font-size-2xs);
+    color: var(--color-text-muted);
+  }
+}
 .below {
+  display: grid;
+  gap: var(--space-3);
   max-width: $device-max;
   margin: 0 auto;
   padding: var(--space-4) var(--space-2) 0;
-}
-.count {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  strong {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    font-variant-numeric: tabular-nums;
-    color: var(--color-text);
-  }
 }
 .storageIssue {
   margin-top: var(--space-3);

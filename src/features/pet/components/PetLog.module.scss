@@ -1,0 +1,87 @@
+@use "../../../styles/mixins";
+@use "device";
+
+$fresh: #fff3cf;
+
+// 기록창: 액정과 같은 색. 모드와 관계없이 같습니다.
+.log {
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: device.$lcd-wall;
+  box-shadow: inset 0 -3px 0 device.$lcd-header-shade;
+  color: device.$lcd-text;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  background: device.$lcd-header;
+  box-shadow: inset 0 -2px 0 device.$lcd-header-shade;
+  h2 {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+  }
+  button {
+    padding: var(--space-1) 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: var(--font-size-2xs);
+    opacity: 0.8;
+    cursor: pointer;
+    @include mixins.focus-ring;
+  }
+}
+.list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-1) var(--space-3) var(--space-2);
+  li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) 0;
+    border-bottom: 1px dashed device.$lcd-header-shade;
+    font-size: var(--font-size-xs);
+    // 맨 위에 새로 생긴 줄만 잠깐 강조 (펼쳐서 보이는 옛 줄은 그대로)
+    &:first-child {
+      animation: fresh 2s ease-out;
+      @include mixins.reduced-motion {
+        animation: none;
+      }
+    }
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+  time {
+    flex: none;
+    width: 34px;
+    font-size: var(--font-size-2xs);
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+  }
+  em {
+    margin-left: var(--space-1);
+    font-style: normal;
+    font-weight: var(--font-weight-semibold);
+    color: device.$lcd-max;
+  }
+  small {
+    margin-left: var(--space-1);
+    opacity: 0.75;
+  }
+}
+.icon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 18px;
+}
+@keyframes fresh {
+  from {
+    background: $fresh;
+  }
+}

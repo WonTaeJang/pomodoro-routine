@@ -22,15 +22,30 @@ import { stopCareKey } from "./stopCareKey";
 const LAYOUT = new Layout({ fit: Fit.Contain, alignment: Alignment.Center });
 const LOAD_TIMEOUT_MS = 15000;
 
+type WalkEvents = {
+  /** Kkami's first step: the page starts its trip clock. */
+  onStep: () => void;
+  /** Give up after a failed load and go back without an item. */
+  onHome: () => void;
+};
+
 /** Mounted only while away; the home scene and care state remain alive. */
-export function PetWalk() {
+export function PetWalk(events: WalkEvents) {
   const [attempt, setAttempt] = useState(0);
   return (
-    <WalkScene key={attempt} retry={() => setAttempt((value) => value + 1)} />
+    <WalkScene
+      key={attempt}
+      retry={() => setAttempt((value) => value + 1)}
+      {...events}
+    />
   );
 }
 
-function WalkScene({ retry }: { retry: () => void }) {
+function WalkScene({
+  retry,
+  onStep,
+  onHome,
+}: WalkEvents & { retry: () => void }) {
   const t = useTranslations("pet");
   const visible = usePageVisible();
   const reducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
@@ -50,13 +65,17 @@ function WalkScene({ retry }: { retry: () => void }) {
     onTrigger: () => setReady(true),
   });
   useViewModelInstanceTrigger("walkStarted", rive?.viewModelInstance, {
-    onTrigger: () => setWalking(true),
+    onTrigger: () => {
+      setWalking(true);
+      onStep();
+    },
   });
 
   useEffect(() => {
     if (!rive) return;
     // The start (turning from the home pose in the room) plays even with
-    // reduced motion; it then holds the first walking pose.
+    // reduced motion; it then holds the first walking pose while the page's
+    // trip clock, map and find card carry on.
     if (failed || !visible || (walking && reducedMotion)) rive.pause();
     else rive.play();
   }, [rive, failed, visible, walking, reducedMotion]);
@@ -85,14 +104,24 @@ function WalkScene({ retry }: { retry: () => void }) {
       >
         {(!rive || failed) && <p>{failed ? t("walk.error") : t("loading")}</p>}
         {failed && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={retry}
-            onKeyDown={stopCareKey}
-          >
-            {t("retry")}
-          </Button>
+          <div className={styles.failActions}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={retry}
+              onKeyDown={stopCareKey}
+            >
+              {t("retry")}
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onHome}
+              onKeyDown={stopCareKey}
+            >
+              {t("walk.home")}
+            </Button>
+          </div>
         )}
       </div>
     </div>

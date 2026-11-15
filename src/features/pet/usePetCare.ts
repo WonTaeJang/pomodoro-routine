@@ -10,7 +10,7 @@ import {
 import { useStore } from "zustand";
 import { PET_STROKE_DISTANCE, nextReactionAt, petPose } from "./pet";
 import { createPetCareStore } from "./careStore";
-import { petStore, usePetStore } from "./store";
+import { petStore } from "./store";
 
 /** 포인터·타이머는 페이지별 상태, 인정된 쓰담·간식은 영구 기록으로 전달. */
 export function usePetCare(ready: boolean) {
@@ -26,7 +26,6 @@ export function usePetCare(ready: boolean) {
   );
   const state = useStore(careStore, (s) => s.state);
   const dispatch = careStore.getState().dispatch;
-  const pats = usePetStore((s) => s.pet?.totalPats ?? 0);
   const stroke = useRef<{ id: number; x: number; y: number } | null>(null);
   const dragged = useRef(false);
   const reactionAt = nextReactionAt(state);
@@ -116,7 +115,6 @@ export function usePetCare(ready: boolean) {
     returnHome,
     pose: petPose(state),
     snackSequence: state.snacks,
-    pats,
     pet,
     feed,
     startStroke,

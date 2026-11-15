@@ -1,0 +1,74 @@
+@use "../../../styles/mixins";
+@use "device";
+
+$card-border: 3px;
+$card-shadow: 4px;
+
+// 산책 지도: 헤더 오른쪽. 액정 색이라 모드와 관계없이 같습니다.
+.map {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+}
+.leg {
+  width: 30px;
+  height: 2px;
+  background: linear-gradient(
+      90deg,
+      device.$lcd-header-shade 50%,
+      transparent 50%
+    )
+    0 0 / 4px 2px;
+  &[data-done="true"] {
+    background: device.$lcd-text;
+  }
+}
+.find {
+  display: inline-grid;
+  place-items: center;
+  width: 14px;
+}
+.walker {
+  position: absolute;
+  top: 4px;
+  display: inline-grid;
+  padding: 0 1px;
+  background: device.$lcd-header;
+  line-height: 0;
+}
+.card {
+  position: absolute;
+  z-index: 6;
+  top: 56px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  padding: var(--space-2-5) var(--space-3-5);
+  border: $card-border solid device.$lcd-text;
+  background: device.$lcd-header-light;
+  box-shadow: $card-shadow $card-shadow 0 rgb(0 0 0 / 20%);
+  color: device.$lcd-text;
+  white-space: nowrap;
+  animation: card-in var(--duration-base) both;
+  @include mixins.reduced-motion {
+    animation: none;
+  }
+  strong {
+    display: block;
+    font-size: var(--font-size-sm);
+  }
+  span {
+    font-size: var(--font-size-2xs);
+    opacity: 0.8;
+  }
+}
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -4px);
+  }
+}

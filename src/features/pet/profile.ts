@@ -6,6 +6,12 @@ import {
   rewardPats,
   type Affinity,
 } from "./affinity";
+import {
+  isItemCounts,
+  totalItems,
+  type ItemCounts,
+  type ItemId,
+} from "./items";
 
 export type LegacyPetProfile = {
   id: string;
@@ -19,6 +25,11 @@ export type LegacyPetProfile = {
 export type PetProfile = LegacyPetProfile & {
   affinity: Affinity;
   totalSnacks: number;
+  /** Finished walks. Every walk brings home exactly one item. */
+  walks: number;
+  items: ItemCounts;
+  /** Items found when the box was last opened; more shows the new-item dot. */
+  itemsSeen: number;
 };
 
 export function createPetProfile(id: string, now: number): PetProfile {
@@ -30,6 +41,9 @@ export function createPetProfile(id: string, now: number): PetProfile {
     lastPettedAt: null,
     updatedAt: now,
     affinity: createAffinity(),
+    walks: 0,
+    items: {},
+    itemsSeen: 0,
   };
 }
 
@@ -65,6 +79,29 @@ export function addSnacks(
   };
 }
 
+export function addWalks(
+  pet: PetProfile,
+  item: ItemId,
+  amount: number,
+  now: number,
+): PetProfile {
+  return {
+    ...pet,
+    walks: pet.walks + amount,
+    items: { ...pet.items, [item]: (pet.items[item] ?? 0) + amount },
+    updatedAt: Math.max(now, pet.updatedAt),
+  };
+}
+
+/** Never moves back, and never past what was actually found. */
+export function seeItems(pet: PetProfile, seen: number): PetProfile {
+  const itemsSeen = Math.min(
+    totalItems(pet.items),
+    Math.max(pet.itemsSeen, seen),
+  );
+  return itemsSeen === pet.itemsSeen ? pet : { ...pet, itemsSeen };
+}
+
 export function isLegacyPetProfile(value: unknown): value is LegacyPetProfile {
   if (!value || typeof value !== "object") return false;
   const p = value as Partial<LegacyPetProfile>;
@@ -92,6 +129,12 @@ export function isPetProfile(value: unknown): value is PetProfile {
     typeof p.totalSnacks === "number" &&
     Number.isSafeInteger(p.totalSnacks) &&
     p.totalSnacks >= 0 &&
-    isAffinity(p.affinity, p.totalSnacks)
+    isAffinity(p.affinity, p.totalSnacks) &&
+    Number.isSafeInteger(p.walks) &&
+    isItemCounts(p.items) &&
+    totalItems(p.items) === p.walks &&
+    Number.isSafeInteger(p.itemsSeen) &&
+    p.itemsSeen! >= 0 &&
+    p.itemsSeen! <= p.walks!
   );
 }

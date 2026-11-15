@@ -1,12 +1,13 @@
 import { createStore } from "zustand/vanilla";
 import { useStore } from "zustand";
 import { createPetProfile, type PetProfile } from "./profile";
+import { totalItems, type ItemId } from "./items";
 import {
   appendCare,
   applyPending,
   careEntry,
   pendingCounts,
-  type CareKind,
+  type CareInput,
   type PendingCare,
 } from "./pendingCare";
 import {
@@ -27,6 +28,10 @@ type PetStore = {
   meet(): Promise<void>;
   recordPat(): Promise<void>;
   recordSnack(): Promise<void>;
+  /** A finished walk and the item it brought home. */
+  recordWalk(item: ItemId): Promise<void>;
+  /** The item box was opened: clear the new-item dot. */
+  markItemsSeen(): Promise<void>;
   retry(): Promise<void>;
   clear(): Promise<void>;
 };
@@ -129,8 +134,8 @@ export function createPetStore(
       }
       set({ hydrated: true });
     }
-    function recordCare(kind: CareKind) {
-      const entry = careEntry(kind, now());
+    function recordCare(input: CareInput) {
+      const entry = careEntry(input, now());
       return enqueue(async () => {
         if (!get().hydrated) return;
         basePet ??= createPetProfile(id(), entry.at);
@@ -154,8 +159,15 @@ export function createPetStore(
           set({ pet: basePet });
           await flush();
         }),
-      recordPat: () => recordCare("pats"),
-      recordSnack: () => recordCare("snacks"),
+      recordPat: () => recordCare({ kind: "pats" }),
+      recordSnack: () => recordCare({ kind: "snacks" }),
+      recordWalk: (item) => recordCare({ kind: "walks", item }),
+      markItemsSeen: () => {
+        const pet = get().pet;
+        if (!pet || pet.itemsSeen >= totalItems(pet.items))
+          return Promise.resolve();
+        return recordCare({ kind: "seen", count: totalItems(pet.items) });
+      },
       retry: () =>
         enqueue(() => {
           if (get().retryOperation === "clear") return clearRecord();

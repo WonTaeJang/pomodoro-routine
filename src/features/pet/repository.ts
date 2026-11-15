@@ -18,7 +18,7 @@ export interface PetRepository {
   clear(): Promise<void>;
 }
 
-const VERSION = 3;
+const VERSION = 4;
 export function decodePet(raw: string | null): PetProfile | null {
   if (raw === null) return null;
   let saved;
@@ -29,10 +29,9 @@ export function decodePet(raw: string | null): PetProfile | null {
   }
   if (saved?.version > VERSION) throw new PetStorageError("newer");
   // v1 has no daily history, so past pats cannot earn affinity retroactively.
+  // v3 and older have no walks or items yet.
   if (
-    (saved?.version !== 1 &&
-      saved?.version !== 2 &&
-      saved?.version !== VERSION) ||
+    ![1, 2, 3, VERSION].includes(saved?.version) ||
     !saved.state ||
     typeof saved.state !== "object" ||
     !("pet" in saved.state)
@@ -43,24 +42,29 @@ export function decodePet(raw: string | null): PetProfile | null {
   if (
     !isLegacyPetProfile(pet) ||
     (saved.version === 2 && !isAffinity((pet as PetProfile).affinity)) ||
+    (saved.version === 3 &&
+      !isPetProfile({ ...pet, walks: 0, items: {}, itemsSeen: 0 })) ||
     (saved.version === VERSION && !isPetProfile(pet))
   )
     throw new PetStorageError("invalid");
   const { id, createdAt, totalPats, lastPettedAt, updatedAt } = pet;
   const affinity =
     saved.version === 1 ? createAffinity() : (pet as PetProfile).affinity;
+  const current = saved.version === VERSION ? (pet as PetProfile) : null;
   return {
     id,
     createdAt,
     totalPats,
-    totalSnacks:
-      saved.version === VERSION ? (pet as PetProfile).totalSnacks : 0,
+    totalSnacks: saved.version >= 3 ? (pet as PetProfile).totalSnacks : 0,
     lastPettedAt,
     updatedAt,
     affinity: {
       points: affinity.points,
       rewardedPats: { ...affinity.rewardedPats },
     },
+    walks: current?.walks ?? 0,
+    items: { ...current?.items },
+    itemsSeen: current?.itemsSeen ?? 0,
   };
 }
 

@@ -17,7 +17,13 @@ import styles from "./PetPlayground.module.scss";
 import { PetWalk } from "./PetWalk";
 import { PetRoomArt } from "./PetRoomArt";
 import { PetAffinityDetail, PetHearts, usePetAffinity } from "./PetAffinity";
-import { PadIcon, StatusIcon } from "./PetIcons";
+import { PadIcon, StatusIcon, type PadKind } from "./PetIcons";
+import { PetFoundCard, PetWalkMap } from "./PetTrip";
+import { PetItemBox } from "./PetItemBox";
+import { PetLog } from "./PetLog";
+import { usePetLog } from "../usePetLog";
+import { usePetWalkFlow } from "../usePetWalkFlow";
+import { totalItems } from "../items";
 import { stopCareKey } from "./stopCareKey";
 import type { PetPose } from "../pet";
 
@@ -75,7 +81,6 @@ function PetRoom({ retry }: { retry: () => void }) {
     walk,
     returnHome,
     snackSequence,
-    pats,
     pet,
     feed,
     startStroke,
@@ -108,6 +113,35 @@ function PetRoom({ retry }: { retry: () => void }) {
   const [infoOpen, setInfoOpen] = useState(false);
   const infoId = useId();
   const levelUp = affinity.leveledUp;
+  const record = usePetStore((s) => s.pet);
+  const log = usePetLog();
+  const addLog = log.add;
+
+  // Log waking up and level ups as they happen.
+  const wasAsleep = useRef(true);
+  useEffect(() => {
+    const asleep = pose === "sleeping" || pose === "startled";
+    if (wasAsleep.current && !asleep) addLog({ kind: "wake" });
+    wasAsleep.current = asleep;
+  }, [pose, addLog]);
+  useEffect(() => {
+    if (levelUp !== null) addLog({ kind: "level", level: levelUp });
+  }, [levelUp, addLog]);
+
+  const outing = usePetWalkFlow({
+    walks: record?.walks ?? 0,
+    walk,
+    returnHome,
+    addLog,
+  });
+  const trip = outing.trip;
+
+  const [boxOpen, setBoxOpen] = useState(false);
+  const newItems = record ? record.itemsSeen < totalItems(record.items) : false;
+  function openBox() {
+    setBoxOpen(true);
+    void petStore.getState().markItemsSeen();
+  }
   const hudIcon = levelUp !== null ? "levelUp" : walking ? "walk" : pose;
   const hudLabel =
     levelUp !== null
@@ -132,14 +166,21 @@ function PetRoom({ retry }: { retry: () => void }) {
                 <StatusIcon status={hudIcon} />
                 {hudLabel}
               </span>
-              <PetHearts
-                {...affinity}
-                open={infoOpen}
-                onToggle={() => setInfoOpen((open) => !open)}
-                controls={infoId}
-              />
+              {walking && trip ? (
+                <PetWalkMap progress={trip.progress} item={trip.item} />
+              ) : (
+                <PetHearts
+                  {...affinity}
+                  open={infoOpen}
+                  onToggle={() => setInfoOpen((open) => !open)}
+                  controls={infoId}
+                />
+              )}
             </div>
-            {walking && <PetWalk />}
+            {outing.card && (
+              <PetFoundCard key={outing.card.key} item={outing.card.item} />
+            )}
+            {walking && <PetWalk onStep={outing.step} onHome={outing.leave} />}
             <div className={styles.room} hidden={walking}>
               <PetRoomArt />
               <div className={styles.bubble} aria-hidden="true">
@@ -191,14 +232,21 @@ function PetRoom({ retry }: { retry: () => void }) {
         </div>
         <div className={styles.pads}>
           {walking ? (
-            <Button
-              autoFocus
-              variant="secondary"
-              onClick={returnHome}
-              onKeyDown={stopCareKey}
-            >
-              {t("walk.return")}
-            </Button>
+            <div className={styles.skip}>
+              <Button
+                autoFocus
+                variant="secondary"
+                onClick={outing.skip}
+                disabled={!trip?.canSkip}
+                aria-describedby={trip?.canSkip ? undefined : `${infoId}-skip`}
+                onKeyDown={stopCareKey}
+              >
+                {t("walk.skip")} ▸▸
+              </Button>
+              {!trip?.canSkip && (
+                <p id={`${infoId}-skip`}>{t("walk.skipFirst")}</p>
+              )}
+            </div>
           ) : (
             <>
               <PetPad
@@ -217,8 +265,15 @@ function PetRoom({ retry }: { retry: () => void }) {
                 ref={walkButton}
                 kind="walk"
                 label={t("walk.start")}
-                onClick={walk}
+                onClick={outing.start}
                 disabled={!ready || pose !== "idle"}
+              />
+              <PetPad
+                kind="box"
+                label={t("items.button")}
+                onClick={openBox}
+                disabled={!record}
+                dot={newItems ? t("items.newItems") : undefined}
               />
             </>
           )}
@@ -226,13 +281,8 @@ function PetRoom({ retry }: { retry: () => void }) {
       </section>
 
       <div className={styles.below}>
-        <p className={styles.count}>
-          {t("count")}
-          <strong>
-            {storesReady && hydrated ? t("patCount", { count: pats }) : "—"}
-          </strong>
-        </p>
         {infoOpen && <PetAffinityDetail id={infoId} {...affinity} />}
+        <PetLog entries={log.entries} />
         {storageIssue && (
           <div className={styles.storageIssue} role="alert">
             <span>{t(`storageIssue.${storageIssue}`)}</span>
@@ -248,6 +298,14 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
         )}
       </div>
+      {record && (
+        <PetItemBox
+          open={boxOpen}
+          onClose={() => setBoxOpen(false)}
+          items={record.items}
+          walks={record.walks}
+        />
+      )}
     </main>
   );
 }
@@ -256,12 +314,15 @@ function PetRoom({ retry }: { retry: () => void }) {
 function PetPad({
   kind,
   label,
+  dot,
   ...props
 }: {
-  kind: "pet" | "feed" | "walk";
+  kind: PadKind;
   label: string;
   onClick: () => void;
   disabled: boolean;
+  /** A small red dot with this screen-reader text (e.g. new items). */
+  dot?: string;
   ref?: Ref<HTMLButtonElement>;
 }) {
   return (
@@ -275,8 +336,10 @@ function PetPad({
     >
       <span className={styles.key} aria-hidden="true">
         <PadIcon kind={kind} />
+        {dot && <i className={styles.dot} />}
       </span>
       {label}
+      {dot && <VisuallyHidden>{dot}</VisuallyHidden>}
     </button>
   );
 }

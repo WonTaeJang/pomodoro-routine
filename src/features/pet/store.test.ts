@@ -263,10 +263,13 @@ describe("돌봄 로컬 저장", () => {
       "affinity",
       "createdAt",
       "id",
+      "items",
+      "itemsSeen",
       "lastPettedAt",
       "totalPats",
       "totalSnacks",
       "updatedAt",
+      "walks",
     ]);
     expect(second.getState().pet!.lastPettedAt).toBe(
       second.getState().pet!.updatedAt,
@@ -648,7 +651,7 @@ describe("친밀도 저장과 재시도", () => {
       rewardedPats: { "2026-11-11": 5, "2026-11-12": 2 },
     });
     expect((await f.repository.load())!.totalPats).toBe(7);
-    expect(JSON.parse(f.storage.getItem(STORAGE_KEYS.pet)!).version).toBe(3);
+    expect(JSON.parse(f.storage.getItem(STORAGE_KEYS.pet)!).version).toBe(4);
   });
 
   it("최초 저장 실패 시 임시 친밀도를 중복 저장하지 않음", async () => {
@@ -674,5 +677,46 @@ describe("친밀도 저장과 재시도", () => {
     await a.getState().clear();
     await a.getState().meet();
     expect(a.getState().pet!.affinity).toEqual({ points: 0, rewardedPats: {} });
+  });
+
+  it("산책 아이템을 저장하고 상자를 열면 새 아이템 표시를 지움", async () => {
+    const f = fixture(),
+      a = f.store(),
+      b = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    await a.getState().recordWalk("leaf");
+    await a.getState().recordWalk("leaf");
+    await a.getState().recordWalk("ball");
+    expect(a.getState().pet).toMatchObject({
+      walks: 3,
+      items: { leaf: 2, ball: 1 },
+      itemsSeen: 0,
+    });
+    await a.getState().markItemsSeen();
+    await b.getState().hydrate();
+    expect(b.getState().pet).toMatchObject({ walks: 3, itemsSeen: 3 });
+    // Another tab's new find shows the dot again after it is loaded.
+    await b.getState().recordWalk("stone");
+    await a.getState().hydrate();
+    expect(a.getState().pet).toMatchObject({ walks: 4, itemsSeen: 3 });
+    expect(JSON.parse(f.storage.getItem(STORAGE_KEYS.pet)!).version).toBe(4);
+  });
+
+  it("저장 실패 뒤 재시도해도 산책 아이템을 두 번 넣지 않음", async () => {
+    const f = fixture(),
+      a = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    f.blockWrite(true);
+    await a.getState().recordWalk("flower");
+    expect(a.getState().pet!.items).toEqual({ flower: 1 });
+    f.blockWrite(false);
+    await a.getState().retry();
+    await a.getState().retry();
+    expect((await f.repository.load())!).toMatchObject({
+      walks: 1,
+      items: { flower: 1 },
+    });
   });
 });

@@ -212,3 +212,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-14: `ImageViewer`, 버튼 `overlay` 모양, `ExpandIcon`. `Dialog`와 `ImageViewer`가 여닫는 방식을 `useModalDialog`로 같이 씀
 - 2026-11-14: `ProgressRing`에 `underlay`(띠 뒤에 까는 내용) 추가. 타이머 원의 집중 소리 분위기(I-052)가 씀
 - 2026-11-15: 돌봄 화면을 휴대용 게임기 모양으로(본체·액정 헤더·둥근 버튼). 공통 `Card`·`Button` 대신 돌봄 전용 `PetPad`·`PetHearts`와 도트 아이콘 `PetIcons`, 고정 팔레트 `_device.scss`. 본체 색만 `--color-border`·`--color-text`에서 섞어 모드를 따름
+- 2026-11-15: `SegmentedControl` 항목에 `disabled`(준비 중인 항목). 돌봄 아이템 상자의 만들기 탭이 씀

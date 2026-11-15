@@ -83,7 +83,14 @@ describe("친밀도 규칙", () => {
     };
     expect(
       decodePet(JSON.stringify({ version: 1, state: { pet: legacy } })),
-    ).toEqual({ ...legacy, totalSnacks: 0, affinity: createAffinity() });
+    ).toEqual({
+      ...legacy,
+      totalSnacks: 0,
+      affinity: createAffinity(),
+      walks: 0,
+      items: {},
+      itemsSeen: 0,
+    });
   });
 
   it.each([
@@ -110,7 +117,7 @@ describe("친밀도 규칙", () => {
     };
     expect(
       decodePet(JSON.stringify({ version: 2, state: { pet: oldPet } })),
-    ).toEqual({ ...oldPet, totalSnacks: 0 });
+    ).toEqual({ ...oldPet, totalSnacks: 0, walks: 0, items: {}, itemsSeen: 0 });
   });
 
   it.each([-1, 1.5, 3])(
