@@ -17,6 +17,7 @@ import room from "./PetPlayground.module.scss";
 import styles from "./PetWalk.module.scss";
 import { PetRoomArt } from "./PetRoomArt";
 import { stopCareKey } from "./stopCareKey";
+import { WALK_SRC, preloadedWalk } from "../walkFile";
 
 // The canvas is sized in CSS to the artboard at the home scale, so Contain is 1:1.
 const LAYOUT = new Layout({ fit: Fit.Contain, alignment: Alignment.Center });
@@ -52,8 +53,13 @@ function WalkScene({
   const [ready, setReady] = useState(false);
   const [walking, setWalking] = useState(false);
   const [failed, setFailed] = useState(false);
+  // The page downloads the scene while Kkami is home; without it, load here.
+  const [file] = useState(() => {
+    const buffer = preloadedWalk();
+    return buffer ? { buffer } : { src: WALK_SRC };
+  });
   const { rive, RiveComponent } = useRive({
-    src: "/rive/kkami-walk.riv",
+    ...file,
     artboard: "Walk",
     stateMachine: "Walk",
     autoplay: false,

@@ -25,6 +25,7 @@ import { usePetLog } from "../usePetLog";
 import { usePetWalkFlow } from "../usePetWalkFlow";
 import { totalItems } from "../items";
 import { stopCareKey } from "./stopCareKey";
+import { preloadWalk } from "../walkFile";
 import type { PetPose } from "../pet";
 
 const POSE_COPY = {
@@ -102,6 +103,11 @@ function PetRoom({ retry }: { retry: () => void }) {
     if (wasWalking.current && !walking) walkButton.current?.focus();
     wasWalking.current = walking;
   }, [walking]);
+
+  // Once home is showing, fetch the walk scene so walks start without a download.
+  useEffect(() => {
+    if (ready) preloadWalk();
+  }, [ready]);
 
   usePetRivePose(animation, {
     active: !walking,

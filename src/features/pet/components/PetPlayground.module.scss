@@ -6,6 +6,10 @@
 
 $page-max: 780px;
 $device-max: 520px;
+// Wide screens: the log sits right of the device, which stays centered.
+$log-min: 240px;
+$log-max: 320px;
+$page-wide-max: 1200px;
 $shell-radius-top: 42px;
 $shell-radius-bottom: 34px;
 $hud-height: 30px;
@@ -219,5 +223,34 @@ $dot-size: 12px;
   }
   .bezel {
     padding: var(--space-2-5);
+  }
+}
+// 넓은 화면: 본체는 가운데 그대로, 기록창은 오른쪽 칸에. 양쪽 칸 너비가 같아
+// 본체가 화면 중앙에 오고, 칸이 좁아지면 본체가 먼저 줄어듭니다.
+@include bp.up(lg) {
+  .page {
+    display: grid;
+    grid-template-columns:
+      minmax($log-min, 1fr) minmax(0, $device-max)
+      minmax($log-min, 1fr);
+    column-gap: var(--space-6);
+    align-items: start;
+    max-width: $page-wide-max;
+  }
+  .topline {
+    grid-column: 1 / -1;
+  }
+  .device {
+    grid-row: 2;
+    grid-column: 2;
+    width: 100%;
+  }
+  .below {
+    grid-row: 2;
+    grid-column: 3;
+    width: 100%;
+    max-width: $log-max;
+    margin: 0;
+    padding: 0;
   }
 }
