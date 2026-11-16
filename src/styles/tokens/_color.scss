@@ -66,6 +66,8 @@ $palette: (
   );
   --color-focus-ring: #{palette(ink-900)};
   --color-backdrop: rgb(0 0 0 / 0.45);
+  // 팝업 테두리. 밝은 모드는 그림자로 충분해 없고, 어두운 모드에서만 보임
+  --color-dialog-border: transparent;
 
   // 상태
   --color-danger: #{palette(red-500)};
@@ -110,6 +112,14 @@ $palette: (
   --color-text-muted: #{palette(stone-400)};
   --color-border: #{palette(night-700)};
   --color-focus-ring: #{palette(paper-100)};
+  // 어두운 바탕에서는 그림자가 안 보여 팝업이 뒤 화면(돌봄 본체 등)과 섞이므로
+  // 바탕을 더 어둡게 덮고 팝업에 밝은 테두리를 둠
+  --color-backdrop: rgb(0 0 0 / 0.62);
+  --color-dialog-border: color-mix(
+    in srgb,
+    var(--color-text) 16%,
+    var(--color-surface)
+  );
 
   color-scheme: dark;
 }

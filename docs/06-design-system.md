@@ -20,7 +20,7 @@
 
 | 묶음 | 토큰 |
 |---|---|
-| 바탕, 글자, 테두리 | `--color-bg`, `--color-surface`, `--color-surface-hover`, `--color-text`, `--color-text-muted`, `--color-border`, `--color-border-strong`, `--color-focus-ring`, `--color-backdrop` |
+| 바탕, 글자, 테두리 | `--color-bg`, `--color-surface`, `--color-surface-hover`, `--color-text`, `--color-text-muted`, `--color-border`, `--color-border-strong`, `--color-focus-ring`, `--color-backdrop`, `--color-dialog-border`(어두운 모드에서만 보이는 팝업 테두리) |
 | 상태 | `--color-danger`, `--color-danger-hover`, `--color-on-danger` |
 | 타이머 모드 | `--color-focus`, `--color-short-break`, `--color-long-break` |
 | 강조색 (모드에 따라 바뀜) | `--color-accent`, `-contrast`, `-hover`, `-tint`(화면 배경), `-subtle`(선택된 항목 배경), `-faint`(반투명), `-border`, `-track`(진행 띠 지나간 부분) |
@@ -217,3 +217,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-16: `PetPad`에 `resting`(꺼진 버튼 색이지만 눌림, 눌린 모양은 아님). 오늘 산책을 다 한 산책하기 버튼이 씀
 - 2026-11-16: 까미 말풍선의 하트·뼈 아이콘을 빼고 글만 남김. 쓰는 곳이 없어진 `PixelHeartIcon`·`PixelSnackIcon` 삭제. 말풍선은 까미 머리 바로 위로 내림
 - 2026-11-16: 까미 말풍선 꼬리를 회전한 네모에서 말풍선 아이콘 같은 직각삼각형 SVG로(상자와 같은 테두리·그림자 색). 위치는 머리와 겹치지 않게 다시 20px 올림
+- 2026-11-16: 어두운 모드에서 팝업이 뒤 화면(돌봄 본체)과 섞이지 않게 `--color-backdrop`을 더 어둡게, `Dialog`에 `--color-dialog-border` 테두리. 아이템 상자 탭은 색 전환 효과를 뺌
