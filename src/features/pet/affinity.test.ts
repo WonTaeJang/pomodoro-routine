@@ -3,12 +3,21 @@ import {
   affinityDay,
   affinityHalves,
   affinityProgress,
+  levelHearts,
   createAffinity,
   isAffinity,
   rewardPats,
 } from "./affinity";
 import { createPetProfile } from "./profile";
 import { decodePet, PetStorageError } from "./repository";
+
+describe("레벨 하트", () => {
+  it("Lv.2부터 레벨마다 하나씩, 모두 4개", () => {
+    expect([0, 19, 20, 60, 139, 140, 300, 9999].map(levelHearts)).toEqual([
+      0, 0, 1, 2, 2, 3, 4, 4,
+    ]);
+  });
+});
 
 describe("친밀도 규칙", () => {
   it.each([

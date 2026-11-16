@@ -26,6 +26,8 @@ export function usePetAffinity() {
   const pet = usePetStore((s) => s.pet);
   const today = useToday();
   const [leveledUp, setLeveledUp] = useState<number | null>(null);
+  // A level's heart not yet seen in the item box, during this visit.
+  const [newHeart, setNewHeart] = useState(false);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | undefined;
@@ -33,6 +35,7 @@ export function usePetAffinity() {
       if (!next.pet || next.pet.id !== previous.pet?.id) {
         clearTimeout(timer);
         setLeveledUp(null);
+        setNewHeart(false);
         return;
       }
       const before = affinityProgress(previous.pet.affinity.points).level;
@@ -40,6 +43,7 @@ export function usePetAffinity() {
       if (after <= before) return;
       clearTimeout(timer);
       setLeveledUp(after);
+      setNewHeart(true);
       timer = setTimeout(() => setLeveledUp(null), LEVEL_NOTICE_MS);
     });
     return () => {
@@ -58,6 +62,8 @@ export function usePetAffinity() {
     progress: affinityProgress(affinity?.points ?? 0),
     earned,
     leveledUp,
+    newHeart,
+    seeHeart: () => setNewHeart(false),
   };
 }
 

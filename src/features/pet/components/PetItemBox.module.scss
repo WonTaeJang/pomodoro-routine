@@ -50,6 +50,12 @@
     @include device.lcd-card;
   }
 }
+// 아이콘 높이를 맞춰 이름 줄이 가지런하게 (하트는 다른 아이템보다 낮음)
+.icon {
+  display: grid;
+  place-items: center;
+  height: 30px;
+}
 .summary {
   margin-top: var(--space-3);
   text-align: center;

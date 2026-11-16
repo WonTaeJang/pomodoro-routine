@@ -222,6 +222,13 @@ const ITEM_ART = {
   },
 } satisfies Record<ItemId, Pixels>;
 
+const silhouette = ({ rows, colors }: Pixels): Pixels => ({
+  rows,
+  colors: Object.fromEntries(
+    Object.keys(colors).map((key) => [key, "#6b5f55"]),
+  ),
+});
+
 /** A found item, or its silhouette while it has not been found yet. */
 export function ItemIcon({
   item,
@@ -233,21 +240,18 @@ export function ItemIcon({
   unknown?: boolean;
 }) {
   const art = ITEM_ART[item];
-  return (
-    <PixelIcon
-      art={
-        unknown
-          ? {
-              rows: art.rows,
-              colors: Object.fromEntries(
-                Object.keys(art.colors).map((key) => [key, "#6b5f55"]),
-              ),
-            }
-          : art
-      }
-      size={size}
-    />
-  );
+  return <PixelIcon art={unknown ? silhouette(art) : art} size={size} />;
+}
+
+/** A heart earned by reaching a level, or its silhouette before the first. */
+export function HeartItemIcon({
+  size = 14,
+  unknown = false,
+}: {
+  size?: number;
+  unknown?: boolean;
+}) {
+  return <PixelIcon art={unknown ? silhouette(HEART) : HEART} size={size} />;
 }
 
 const MAP = {

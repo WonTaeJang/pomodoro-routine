@@ -3,7 +3,7 @@
 import { useId, useState } from "react";
 import { useTranslations } from "use-intl";
 import type { PetLogEntry } from "../usePetLog";
-import { ItemIcon, MapIcon, StatusIcon } from "./PetIcons";
+import { HeartItemIcon, ItemIcon, MapIcon, StatusIcon } from "./PetIcons";
 import { LookPicture } from "./PetRoomArt";
 import { PetPanel } from "./PetPanel";
 import styles from "./PetLog.module.scss";
@@ -33,7 +33,7 @@ function EntryIcon({ entry }: { entry: PetLogEntry }) {
     case "skipped":
       return <ItemIcon item={entry.item} size={12} />;
     case "level":
-      return <StatusIcon status="levelUp" />;
+      return <HeartItemIcon size={11} />;
     case "craft":
       return <LookPicture look={entry.furniture} height={12} />;
     case "place":
@@ -65,7 +65,7 @@ function EntryText({ entry }: { entry: PetLogEntry }) {
         object: t(`items.${entry.item}.object`),
       });
     case "level":
-      return t("affinity.levelUpShort", { level: entry.level });
+      return t("log.levelHeart", { level: entry.level });
     case "walkLimit":
       return t("log.walkLimit", { count: entry.count });
     case "craft":

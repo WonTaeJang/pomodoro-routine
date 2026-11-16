@@ -150,10 +150,13 @@ function PetRoom({ retry }: { retry: () => void }) {
   const trip = outing.trip;
 
   const [boxOpen, setBoxOpen] = useState(false);
-  const newItems = record ? record.itemsSeen < totalItems(record.items) : false;
+  const newItems =
+    affinity.newHeart ||
+    (record ? record.itemsSeen < totalItems(record.items) : false);
   const boxButton = useRef<HTMLButtonElement>(null);
   function openBox() {
     setBoxOpen(true);
+    affinity.seeHeart();
     void petStore.getState().markItemsSeen();
   }
   function craft(furniture: FurnitureId) {
@@ -197,7 +200,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     levelUp !== null
       ? {
           icon: "levelUp" as const,
-          label: t("affinity.levelUpShort", { level: levelUp }),
+          label: t("affinity.levelUpHeart", { level: levelUp }),
         }
       : walking
         ? { icon: "walk" as const, label: t("walk.status") }

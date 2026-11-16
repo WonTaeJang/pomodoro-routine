@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslations } from "use-intl";
 import {
   Button,
@@ -18,8 +18,9 @@ import {
   type FurnitureId,
   type Slot,
 } from "../furniture";
+import { levelHearts } from "../affinity";
 import type { PetProfile } from "../profile";
-import { ItemIcon } from "./PetIcons";
+import { HeartItemIcon, ItemIcon } from "./PetIcons";
 import { LookPicture } from "./PetRoomArt";
 import styles from "./PetItemBox.module.scss";
 
@@ -42,7 +43,7 @@ export function PetItemBox({
   const [tab, setTab] = useState<"list" | "craft">("list");
   const [slot, setSlot] = useState<Slot>(SLOTS[0]);
   const left = availableItems(pet.items, pet.spent);
-  const kinds = ITEMS.filter(({ id }) => pet.items[id]).length;
+  const hearts = levelHearts(pet.affinity.points);
   return (
     <Dialog open={open} onClose={onClose} title={t("title")}>
       <SegmentedControl
@@ -56,24 +57,27 @@ export function PetItemBox({
         ]}
       />
       {tab === "list" ? (
-        <>
-          <ul className={styles.grid}>
-            {ITEMS.map(({ id }) => {
-              const found = (pet.items[id] ?? 0) > 0;
-              const count = left[id] ?? 0;
-              return (
-                <li key={id} className={styles.slot} data-found={found}>
-                  <ItemIcon item={id} size={30} unknown={!found} />
-                  <strong>{found ? t(`${id}.name`) : t("unknown")}</strong>
-                  <span>{found ? t("count", { count }) : t("notFound")}</span>
-                </li>
-              );
-            })}
-          </ul>
-          <p className={styles.summary}>
-            {t("summary", { walks: pet.walks, kinds })}
-          </p>
-        </>
+        <ul className={styles.grid}>
+          {ITEMS.map(({ id }) => {
+            const found = (pet.items[id] ?? 0) > 0;
+            const count = left[id] ?? 0;
+            return (
+              <BoxSlot
+                key={id}
+                icon={<ItemIcon item={id} size={30} unknown={!found} />}
+                name={found ? t(`${id}.name`) : null}
+                count={found ? t("count", { count }) : t("notFound")}
+              />
+            );
+          })}
+          <BoxSlot
+            icon={<HeartItemIcon size={23} unknown={hearts === 0} />}
+            name={hearts > 0 ? t("heart.name") : null}
+            count={
+              hearts > 0 ? t("count", { count: hearts }) : t("heartLocked")
+            }
+          />
+        </ul>
       ) : (
         <>
           <SegmentedControl
@@ -174,6 +178,27 @@ function Recipe({
           {ready ? t("make") : t("short")}
         </Button>
       )}
+    </li>
+  );
+}
+
+/** One cell of the item list: an item not found yet shows as "???". */
+function BoxSlot({
+  icon,
+  name,
+  count,
+}: {
+  icon: ReactNode;
+  /** null until found. */
+  name: string | null;
+  count: string;
+}) {
+  const t = useTranslations("pet.items");
+  return (
+    <li className={styles.slot} data-found={name !== null}>
+      <span className={styles.icon}>{icon}</span>
+      <strong>{name ?? t("unknown")}</strong>
+      <span>{count}</span>
     </li>
   );
 }

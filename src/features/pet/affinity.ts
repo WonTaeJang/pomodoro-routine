@@ -59,6 +59,13 @@ export function affinityProgress(points: number) {
   };
 }
 
+/**
+ * Hearts earned by reaching each level after the first (four in all).
+ * Affinity never drops, so they are never lost.
+ */
+export const levelHearts = (points: number) =>
+  affinityProgress(points).level - 1;
+
 export const AFFINITY_HEARTS = 5;
 
 /**
