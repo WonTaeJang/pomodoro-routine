@@ -27,14 +27,14 @@ const encode = (version: number, pet: object) =>
 
 describe("가구 만들기", () => {
   it("재료가 있으면 만들고, 쓴 만큼 남은 아이템이 줄어듦", () => {
-    const pet = withItems({ twig: 5, leaf: 2 });
+    const pet = withItems({ twig: 3, leaf: 1 });
     expect(canMake("twigWindow", availableItems(pet.items, pet.spent))).toBe(
       true,
     );
     const made = makeFurniture(pet, "twigWindow", 9);
     expect(made).toMatchObject({
-      items: { twig: 5, leaf: 2 }, // every find still counts
-      spent: { twig: 4, leaf: 2 },
+      items: { twig: 3, leaf: 1 }, // every find still counts
+      spent: { twig: 2, leaf: 1 },
       furniture: ["twigWindow"],
       updatedAt: 9,
     });
@@ -42,7 +42,7 @@ describe("가구 만들기", () => {
   });
 
   it("재료가 모자라거나 이미 만든 것은 그대로 둠", () => {
-    const short = withItems({ twig: 3, leaf: 2 });
+    const short = withItems({ twig: 1, leaf: 1 });
     expect(makeFurniture(short, "twigWindow", 9)).toBe(short);
     const made = makeFurniture(
       withItems({ twig: 8, leaf: 4 }),
@@ -59,15 +59,17 @@ describe("가구 만들기", () => {
     ).toEqual(["plainWindow", "twigWindow", "stoneWindow"]);
   });
 
-  it("레시피는 자리마다 3개", () => {
+  it("레시피는 자리마다 3개, 재료는 모두 3개씩", () => {
     for (const slot of ["window", "pot"])
       expect(FURNITURE.filter((piece) => piece.slot === slot)).toHaveLength(3);
+    for (const { need } of FURNITURE)
+      expect(Object.values(need).reduce((sum, n) => sum + n, 0)).toBe(3);
   });
 });
 
 describe("가구 놓기", () => {
   const owner = makeFurniture(
-    withItems({ flower: 3, twig: 2 }),
+    withItems({ flower: 2, twig: 1 }),
     "flowerWindow",
     5,
   );
@@ -106,7 +108,7 @@ describe("가구 놓기", () => {
       careEntry({ kind: "place", slot: "window", furniture: null }, 4),
     );
     expect(pending.map((p) => p.kind)).toEqual(["craft", "place"]);
-    const pet = applyPending(withItems({ flower: 3, twig: 2 }), pending);
+    const pet = applyPending(withItems({ flower: 2, twig: 1 }), pending);
     expect(pet).toMatchObject({ furniture: ["flowerWindow"], placed: {} });
   });
 });
@@ -115,17 +117,21 @@ describe("가구 저장 형식", () => {
   it("v4 기록은 가구 없이 이전", () => {
     const { spent, furniture, placed, ...v4 } = withItems({ leaf: 2 });
     void [spent, furniture, placed];
-    expect(decodePet(encode(4, v4))).toEqual(withItems({ leaf: 2 }));
+    expect(decodePet(encode(4, v4))).toEqual({
+      ...withItems({ leaf: 2 }),
+      walkDay: null,
+      walksOnDay: 0,
+    });
   });
 
-  it("v5 기록을 그대로 복원", () => {
+  it("v6 기록을 그대로 복원", () => {
     const pet = placeFurniture(
-      makeFurniture(withItems({ stone: 5, leaf: 1 }), "succulentPot", 3),
+      makeFurniture(withItems({ stone: 3, leaf: 1 }), "succulentPot", 3),
       "pot",
       "succulentPot",
       4,
     );
-    expect(decodePet(encode(5, pet))).toEqual(pet);
+    expect(decodePet(encode(6, pet))).toEqual(pet);
   });
 
   it.each<Partial<PetProfile>>([
@@ -137,6 +143,6 @@ describe("가구 저장 형식", () => {
     { placed: [] as never },
   ])("손상된 가구 기록을 거부: %j", (broken) => {
     const pet = { ...withItems({ leaf: 2 }), ...broken };
-    expect(() => decodePet(encode(5, pet))).toThrow(PetStorageError);
+    expect(() => decodePet(encode(6, pet))).toThrow(PetStorageError);
   });
 });

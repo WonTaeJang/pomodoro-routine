@@ -145,19 +145,23 @@ $dot-size: 12px;
     transform: translateY($key-depth - 2px);
     box-shadow: 0 2px 0 var(--key-edge);
   }
-  // 못 누를 때: 눌린 채 꺼진 버튼
+  // 꺼진 색: 쉬는 버튼(오늘 산책을 다 함, 눌리고 기록창에만 답함)과 못 누르는 버튼
+  &[data-resting],
   &:disabled {
     --key-face: color-mix(in srgb, var(--shell) 70%, var(--color-text) 14%);
     --key-edge: var(--shell-shade);
-    cursor: default;
     color: var(--color-text-muted);
-    .key {
-      box-shadow: 0 2px 0 var(--key-edge);
-      transform: translateY($key-depth - 2px);
-    }
     svg {
       opacity: 0.4;
       filter: grayscale(1);
+    }
+  }
+  // 못 누를 때는 눌린 채로
+  &:disabled {
+    cursor: default;
+    .key {
+      box-shadow: 0 2px 0 var(--key-edge);
+      transform: translateY($key-depth - 2px);
     }
   }
 }

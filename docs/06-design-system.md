@@ -101,7 +101,7 @@ import { PawIcon } from "@/components/icons";
 
 ### 기능별 컴포넌트
 특정 기능에서만 쓰는 컴포넌트는 `src/features/<기능>/components/`에 둡니다.
-- 돌봄(`src/features/pet/`): `components/PetPlayground`는 화면 조합, `usePetRive`·`usePetRivePose`는 Rive 로드·구독·재생, `pet.ts`는 시각을 인자로 받는 순수 돌봄 규칙, `usePetCare`는 포인터·타이머 연결. 문구는 `pet` 사전, UI는 `Button`·`Card`·`VisuallyHidden`과 `PixelHeartIcon`을 사용합니다. `_room-art.scss`의 이름 붙인 Sass 값은 방 일러스트 전용 좌표·팔레트이며 일반 UI 토큰과 구분합니다.
+- 돌봄(`src/features/pet/`): `components/PetPlayground`는 화면 조합, `usePetRive`·`usePetRivePose`는 Rive 로드·구독·재생, `pet.ts`는 시각을 인자로 받는 순수 돌봄 규칙, `usePetCare`는 포인터·타이머 연결. 문구는 `pet` 사전, UI는 `Button`·`Card`·`VisuallyHidden`을 사용하고, 돌봄 도트 아이콘은 `components/PetIcons`에 둡니다. `_room-art.scss`의 이름 붙인 Sass 값은 방 일러스트 전용 좌표·팔레트이며 일반 UI 토큰과 구분합니다.
 - 산책(`PetWalk`): 기존 `Button`·`PawIcon`으로 진입/복귀합니다. 집 화면을 숨겨 유지하고 별도 Rive 산책 장면을 진입 시 로드합니다. 안내 글은 상태·로딩/오류만 표시하며, 실패 중에도 복귀 버튼을 유지합니다. 산책 배경색은 Rive 아트 팔레트, 나머지 UI는 공통 토큰을 사용합니다.
 - 타이머: `TimerScreen`(페이지), `TimerRuntime`(앱 틀에서 한 번), `TimerPanel`(카드 조립), `ModeSwitcher`(모드 탭 + 전환 확인), `TimerRing`(진행 띠 + 효과), `KkamiPhoto`(상황별 사진 묶음에서 랜덤, 새 사진을 전 사진 위로 서서히 겹침), `TimerControls`, `CycleProgress`, `CompletionDialog`(+ `useCompletionDialog.ts`: 언제 보일지, 자동 시작 카운트다운), `Celebration`, `TestModeBadge`(개발용, 화면 오른쪽 아래 플로팅)
 - 할 일: `TaskPanel`, `SortableTaskList`(끌어서 순서 바꾸기, 묶음마다 하나), `TaskForm`, `TaskItem`, `TaskDoneCheck`, `PawCount`(🐾 완료/예상)
@@ -214,3 +214,6 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-15: 돌봄 화면을 휴대용 게임기 모양으로(본체·액정 헤더·둥근 버튼). 공통 `Card`·`Button` 대신 돌봄 전용 `PetPad`·`PetHearts`와 도트 아이콘 `PetIcons`, 고정 팔레트 `_device.scss`. 본체 색만 `--color-border`·`--color-text`에서 섞어 모드를 따름
 - 2026-11-15: 방의 창문·화분을 CSS 도형에서 도트 그림(`roomArt.ts`, 칸 크기 `--room-cell`)으로. 꾸미기 모드 버튼(◀ ▶ ✓ ✕)은 같은 `PetPad`에 키 색만 추가하고, 고른 자리는 점선 테두리·이름표(방 팔레트). 아이템 상자 만들기 탭은 공통 `Dialog`·`SegmentedControl`·`Button` 사용. 만들기 탭이 열리면서 `SegmentedControl`의 `disabled` 항목은 쓰는 곳이 없어 되돌림
 - 2026-11-15: 돌봄 친밀도 상세를 공통 표면 색 상자에서 기록창과 같은 액정 카드(헤더·도트 막대·점선 구분)로. 두 카드의 틀은 접기/펼치기가 있는 `PetPanel` 하나로 합침. 액정 색 카드 모양은 `_device.scss`의 `lcd-card` 믹스인으로 기록·친밀도·아이템 칸이 함께 씀
+- 2026-11-16: `PetPad`에 `resting`(꺼진 버튼 색이지만 눌림, 눌린 모양은 아님). 오늘 산책을 다 한 산책하기 버튼이 씀
+- 2026-11-16: 까미 말풍선의 하트·뼈 아이콘을 빼고 글만 남김. 쓰는 곳이 없어진 `PixelHeartIcon`·`PixelSnackIcon` 삭제. 말풍선은 까미 머리 바로 위로 내림
+- 2026-11-16: 까미 말풍선 꼬리를 회전한 네모에서 말풍선 아이콘 같은 직각삼각형 SVG로(상자와 같은 테두리·그림자 색). 위치는 머리와 겹치지 않게 다시 20px 올림

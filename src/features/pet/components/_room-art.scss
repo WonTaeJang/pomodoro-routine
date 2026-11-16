@@ -49,20 +49,16 @@ $small-sleep-target-width: 200px;
 $small-sleep-target-height: 96px;
 $petTarget-focus-visible-outline: 3px dashed #986e50;
 $petTarget-focus-visible-outline-offset: 8px;
-$bubble-top: 24px;
-$bubble-background: #fffcf5;
-$bubble-border: 1px solid #e3d9c4;
-$bubble-box-shadow: 0 3px 0 #e5dcc7;
-$bubble-after-left: calc(50% - 4px);
-$bubble-after-bottom: -7px;
-$bubble-after-width: 10px;
-$bubble-after-height: 10px;
-$bubble-after-background: #fffcf5;
-$bubble-after-border-right: 1px solid #e3d9c4;
-$bubble-after-border-bottom: 1px solid #e3d9c4;
-$bubble-svg-width: 12px;
-$bubble-svg-height: 12px;
-$bubble-svg-color: #cc8e80;
+// Above Kkami's head (home idle head top: 88 artboard units into the dog box).
+$bubble-top: 34px; // clear of the head as Kkami bobs
+$bubble-paper: #fffcf5;
+$bubble-line: #e3d9c4;
+$bubble-shade: #e5dcc7;
+$bubble-border: 1px solid $bubble-line;
+$bubble-box-shadow: 0 3px 0 $bubble-shade;
+// Icon-style tail: the right side drops straight down to Kkami's head.
+$bubble-tail-width: 16px;
+$bubble-tail-height: 14px;
 $roomLabel-bottom: 12px;
 $roomLabel-right: 16px;
 $roomLabel-color: #86755d;
@@ -225,33 +221,30 @@ $slot-tag-color: #fffaf0;
   left: 50%;
   transform: translateX(-50%);
   padding: var(--space-2-5) var(--space-3-5);
-  background: $bubble-background;
+  background: $bubble-paper;
   border: $bubble-border;
   box-shadow: $bubble-box-shadow;
   white-space: nowrap;
   font-size: var(--font-size-2xs);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2-5);
 }
 
-.bubble::after {
-  content: "";
+.bubbleTail {
   position: absolute;
-  left: $bubble-after-left;
-  bottom: $bubble-after-bottom;
-  width: $bubble-after-width;
-  height: $bubble-after-height;
-  background: $bubble-after-background;
-  border-right: $bubble-after-border-right;
-  border-bottom: $bubble-after-border-bottom;
-  transform: rotate(45deg);
-}
-
-.bubble svg {
-  width: $bubble-svg-width;
-  height: $bubble-svg-height;
-  color: $bubble-svg-color;
+  top: calc(100% - 1px); // over the bottom line, so the tail opens into the box
+  left: calc(50% - #{$bubble-tail-width});
+  width: $bubble-tail-width + 1px;
+  height: $bubble-tail-height + 4px;
+  overflow: visible;
+  .shade {
+    fill: $bubble-shade;
+  }
+  .paper {
+    fill: $bubble-paper;
+  }
+  .line {
+    fill: none;
+    stroke: $bubble-line;
+  }
 }
 
 .roomLabel {

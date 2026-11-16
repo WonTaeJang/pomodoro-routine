@@ -3,6 +3,7 @@ import {
   AFFINITY_PER_SNACK,
   createAffinity,
   isAffinity,
+  isDayKey,
   rewardPats,
   type Affinity,
 } from "./affinity";
@@ -46,7 +47,15 @@ export type PetProfile = LegacyPetProfile & {
   furniture: FurnitureId[];
   /** Furniture placed in each slot; a missing slot shows its starting look. */
   placed: Placed;
+  /** Walks on the latest walking day (local date), for the daily limit. */
+  walkDay: string | null;
+  walksOnDay: number;
 };
+
+/** Walks a day; the walk key rests after that until the next day. */
+export const DAILY_WALKS = 5;
+/** What a record from before the daily limit starts with. */
+export const NO_DAILY_WALKS = { walkDay: null, walksOnDay: 0 } as const;
 
 /** What a record from before furniture starts with. */
 export const NO_FURNITURE = { spent: {}, furniture: [], placed: {} } as const;
@@ -66,6 +75,7 @@ export function createPetProfile(id: string, now: number): PetProfile {
     spent: {},
     furniture: [],
     placed: {},
+    ...NO_DAILY_WALKS,
   };
 }
 
@@ -106,13 +116,27 @@ export function addWalks(
   item: ItemId,
   amount: number,
   now: number,
+  day = affinityDay(now),
 ): PetProfile {
+  // A newer day starts the count again; a late save for an older day keeps it.
+  const daily =
+    pet.walkDay === null || day > pet.walkDay
+      ? { walkDay: day, walksOnDay: amount }
+      : day === pet.walkDay
+        ? { walkDay: day, walksOnDay: pet.walksOnDay + amount }
+        : {};
   return {
     ...pet,
+    ...daily,
     walks: pet.walks + amount,
     items: { ...pet.items, [item]: (pet.items[item] ?? 0) + amount },
     updatedAt: Math.max(now, pet.updatedAt),
   };
+}
+
+/** Walks taken on `day` (a local YYYY-MM-DD date). */
+export function walksOn(pet: PetProfile, day: string): number {
+  return pet.walkDay === day ? pet.walksOnDay : 0;
 }
 
 /** Never moves back, and never past what was actually found. */
@@ -160,6 +184,12 @@ export function placeFurniture(
   if (id) placed[slot] = id;
   else delete placed[slot];
   return { ...pet, placed, updatedAt: Math.max(now, pet.updatedAt) };
+}
+
+function isDailyWalks({ walkDay, walksOnDay, walks }: Partial<PetProfile>) {
+  if (!Number.isSafeInteger(walksOnDay) || walksOnDay! < 0) return false;
+  if (walkDay === null) return walksOnDay === 0;
+  return isDayKey(walkDay) && walksOnDay! <= walks!;
 }
 
 function isFurnitureState(p: Partial<PetProfile>): boolean {
@@ -217,6 +247,7 @@ export function isPetProfile(value: unknown): value is PetProfile {
     Number.isSafeInteger(p.itemsSeen) &&
     p.itemsSeen! >= 0 &&
     p.itemsSeen! <= p.walks! &&
-    isFurnitureState(p)
+    isFurnitureState(p) &&
+    isDailyWalks(p)
   );
 }

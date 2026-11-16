@@ -12,6 +12,7 @@ export type PetLogEvent =
   | { kind: "snack"; points: number }
   | { kind: "found" | "skipped"; item: ItemId }
   | { kind: "level"; level: number }
+  | { kind: "walkLimit"; count: number }
   | { kind: "craft"; furniture: FurnitureId }
   | { kind: "place"; slot: Slot; look: LookId };
 export type PetLogEntry = PetLogEvent & { id: number; at: number };

@@ -347,18 +347,9 @@ const METER = {
   1: meterHeart(() => true),
 };
 
-const LOCK = {
-  rows: [".####.", "##..##", "#....#", "######", "##oo##", "##oo##", "######"],
-  colors: { "#": "#8a7c6c", o: "#5e5246" },
-};
-
-/** 친밀도 설명 줄 앞의 작은 아이콘 */
-export function RuleIcon({ kind }: { kind: "snack" | "lock" }) {
-  return kind === "snack" ? (
-    <PixelIcon art={BONE} size={9} />
-  ) : (
-    <PixelIcon art={LOCK} size={11} />
-  );
+/** 친밀도 설명의 간식 줄 앞 작은 뼈 */
+export function SnackRuleIcon() {
+  return <PixelIcon art={BONE} size={9} />;
 }
 
 /** 친밀도 하트 한 칸. fill은 0(빈 칸), 0.5(왼쪽 절반), 1(가득) */

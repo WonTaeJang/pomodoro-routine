@@ -25,6 +25,7 @@ function EntryIcon({ entry }: { entry: PetLogEntry }) {
     case "snack":
       return <StatusIcon status="snacking" />;
     case "walkOut":
+    case "walkLimit":
       return <StatusIcon status="walk" />;
     case "home":
       return <MapIcon stop="home" />;
@@ -65,6 +66,8 @@ function EntryText({ entry }: { entry: PetLogEntry }) {
       });
     case "level":
       return t("affinity.levelUpShort", { level: entry.level });
+    case "walkLimit":
+      return t("log.walkLimit", { count: entry.count });
     case "craft":
       return t("log.craft", {
         object: t(`items.furniture.${entry.furniture}.object`),

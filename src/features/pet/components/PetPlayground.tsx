@@ -5,11 +5,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 import { usePetRive, usePetRivePose } from "../usePetRive";
 import { Button, VisuallyHidden } from "@/components/ui";
-import {
-  PixelHeartIcon,
-  PixelSnackIcon,
-  ChevronLeftIcon,
-} from "@/components/icons";
+import { ChevronLeftIcon } from "@/components/icons";
 import { usePetCare } from "../usePetCare";
 import { petStore, usePetStore } from "../store";
 import { useStoresReady } from "@/lib/useHydrateStores";
@@ -19,6 +15,7 @@ import { PetRoomArt } from "./PetRoomArt";
 import { PetAffinityDetail, PetHearts, usePetAffinity } from "./PetAffinity";
 import { StatusIcon } from "./PetIcons";
 import { PetPad } from "./PetPad";
+import { PetSpeechBubble } from "./PetSpeechBubble";
 import { DecoratePads, DecoratePick, decorateTag } from "./PetDecorate";
 import { usePetDecorate } from "../usePetDecorate";
 import { useFocusAfter, useMoment, useUntil } from "../useMoment";
@@ -145,7 +142,7 @@ function PetRoom({ retry }: { retry: () => void }) {
   }, [levelUp, addLog]);
 
   const outing = usePetWalkFlow({
-    walks: record?.walks ?? 0,
+    pet: record ?? null,
     walk,
     returnHome,
     addLog,
@@ -208,6 +205,9 @@ function PetRoom({ retry }: { retry: () => void }) {
           ? { icon: "decorate" as const, label: t("decorate.status") }
           : { icon: pose, label: t(copy.status) };
 
+  // The first walk is walked to the end, so skip stays off.
+  const skipLocked = walking && !trip?.canSkip;
+
   return (
     <main className={styles.page}>
       <div className={styles.topline}>
@@ -260,10 +260,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                     : undefined
                 }
               />
-              <div className={styles.bubble} aria-hidden="true">
-                {speech}
-                {snacking ? <PixelSnackIcon /> : <PixelHeartIcon />}
-              </div>
+              <PetSpeechBubble text={speech} />
               <div className={styles.dog} aria-hidden="true">
                 <RiveComponent />
               </div>
@@ -336,10 +333,9 @@ function PetRoom({ retry }: { retry: () => void }) {
                 kind={walking ? "skip" : "walk"}
                 label={t(walking ? "walk.skip" : "walk.start")}
                 onClick={walking ? outing.skip : outing.start}
+                resting={!walking && outing.outOfWalks}
                 disabled={walking ? !trip?.canSkip : !ready || pose !== "idle"}
-                aria-describedby={
-                  walking && !trip?.canSkip ? `${infoId}-skip` : undefined
-                }
+                aria-describedby={skipLocked ? `${infoId}-skip` : undefined}
               />
               <PetPad
                 ref={boxButton}
@@ -352,7 +348,7 @@ function PetRoom({ retry }: { retry: () => void }) {
             </>
           )}
         </div>
-        {walking && !trip?.canSkip && (
+        {skipLocked && (
           <p id={`${infoId}-skip`} className={styles.padHint}>
             {t("walk.skipFirst")}
           </p>

@@ -1,6 +1,9 @@
 "use client";
 
 import type { ItemId } from "./items";
+import { affinityDay } from "./affinity";
+import { DAILY_WALKS, walksOn, type PetProfile } from "./profile";
+import { useToday } from "@/lib/useNow";
 import { petStore } from "./store";
 import type { PetLogEvent } from "./usePetLog";
 import { useWalkTrip } from "./useWalkTrip";
@@ -8,8 +11,8 @@ import { FOUND_CARD_MS } from "./walkTrip";
 import { useMoment } from "./useMoment";
 
 type Options = {
-  /** Walks finished so far; the first one cannot be skipped. */
-  walks: number;
+  /** The saved record: past walks (the first cannot be skipped) and today's. */
+  pet: PetProfile | null;
   /** Care state: leave the room and come back. */
   walk: () => void;
   returnHome: () => void;
@@ -21,8 +24,14 @@ type Options = {
  * writes the log and shows the find card, which outlives the walk so a skip
  * still shows what came back.
  */
-export function usePetWalkFlow({ walks, walk, returnHome, addLog }: Options) {
+export function usePetWalkFlow({ pet, walk, returnHome, addLog }: Options) {
   const card = useMoment<ItemId>(FOUND_CARD_MS);
+  // Five walks a day (local date); more wait until tomorrow.
+  const today = useToday();
+  const outOfWalks =
+    pet !== null &&
+    today !== null &&
+    walksOn(pet, affinityDay(today)) >= DAILY_WALKS;
 
   const { trip, begin, step, skip, cancel } = useWalkTrip({
     onFound: (item, skipped) => {
@@ -36,8 +45,13 @@ export function usePetWalkFlow({ walks, walk, returnHome, addLog }: Options) {
     },
   });
 
+  /** Out of walks, the key only answers with a line in the log. */
   function start() {
-    begin(walks > 0);
+    if (outOfWalks) {
+      addLog({ kind: "walkLimit", count: DAILY_WALKS });
+      return;
+    }
+    begin((pet?.walks ?? 0) > 0);
     addLog({ kind: "walkOut" });
     walk();
   }
@@ -47,5 +61,5 @@ export function usePetWalkFlow({ walks, walk, returnHome, addLog }: Options) {
     returnHome();
   }
 
-  return { trip, card, start, step, skip, leave };
+  return { trip, card, outOfWalks, start, step, skip, leave };
 }

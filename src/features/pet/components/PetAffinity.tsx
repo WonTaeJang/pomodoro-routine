@@ -14,7 +14,7 @@ import {
   DAILY_AFFINITY_PATS,
 } from "../affinity";
 import { petStore, usePetStore } from "../store";
-import { MeterHeart, RuleIcon } from "./PetIcons";
+import { MeterHeart, SnackRuleIcon } from "./PetIcons";
 import { PetPanel } from "./PetPanel";
 import styles from "./PetAffinity.module.scss";
 
@@ -171,16 +171,10 @@ export function PetAffinityDetail({
               <span>{t("todayLeft", { earned, max: dailyMax })}</span>
             )}
           </p>
-          <ul className={styles.rules}>
-            <li>
-              <RuleIcon kind="snack" />
-              {t("snackHint", { points: AFFINITY_PER_SNACK })}
-            </li>
-            <li>
-              <RuleIcon kind="lock" />
-              {t("noDecay")}
-            </li>
-          </ul>
+          <p className={styles.rule}>
+            <SnackRuleIcon />
+            {t("snackHint", { points: AFFINITY_PER_SNACK })}
+          </p>
         </div>
       )}
     </PetPanel>

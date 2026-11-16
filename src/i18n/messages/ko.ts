@@ -174,6 +174,7 @@ const ko = {
       skipped: "산책을 건너뛰고 {object} 주워 왔어요",
       craft: "{object} 만들었어요",
       place: "{slot} {to} 바꿨어요",
+      walkLimit: "오늘 산책 {count}번을 다 했어요. 내일 또 가요!",
     },
     affinity: {
       title: "친밀도",
@@ -190,7 +191,6 @@ const ko = {
       todayDone: "오늘 다 받았어요",
       todayLeft: "+{earned} / {max}",
       snackHint: "간식은 줄 때마다 +{points} (횟수 제한 없음)",
-      noDecay: "친밀도는 줄어들지 않아요",
       levelUpShort: "Lv.{level} 달성!",
       maxBadge: "MAX",
       stages: {

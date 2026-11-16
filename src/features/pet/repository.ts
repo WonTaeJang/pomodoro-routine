@@ -1,5 +1,6 @@
 import { STORAGE_KEYS } from "@/lib/storage";
 import {
+  NO_DAILY_WALKS,
   NO_FURNITURE,
   isLegacyPetProfile,
   isPetProfile,
@@ -23,7 +24,7 @@ export interface PetRepository {
   clear(): Promise<void>;
 }
 
-const VERSION = 5;
+const VERSION = 6;
 export function decodePet(raw: string | null): PetProfile | null {
   if (raw === null) return null;
   let saved;
@@ -34,9 +35,10 @@ export function decodePet(raw: string | null): PetProfile | null {
   }
   if (saved?.version > VERSION) throw new PetStorageError("newer");
   // v1 has no daily history, so past pats cannot earn affinity retroactively.
-  // v3 and older have no walks or items yet; v4 and older no furniture.
+  // v3 and older have no walks or items yet; v4 and older no furniture;
+  // v5 and older no daily walk count.
   if (
-    ![1, 2, 3, 4, VERSION].includes(saved?.version) ||
+    ![1, 2, 3, 4, 5, VERSION].includes(saved?.version) ||
     !saved.state ||
     typeof saved.state !== "object" ||
     !("pet" in saved.state)
@@ -54,8 +56,11 @@ export function decodePet(raw: string | null): PetProfile | null {
         items: {},
         itemsSeen: 0,
         ...NO_FURNITURE,
+        ...NO_DAILY_WALKS,
       })) ||
-    (saved.version === 4 && !isPetProfile({ ...pet, ...NO_FURNITURE })) ||
+    (saved.version === 4 &&
+      !isPetProfile({ ...pet, ...NO_FURNITURE, ...NO_DAILY_WALKS })) ||
+    (saved.version === 5 && !isPetProfile({ ...pet, ...NO_DAILY_WALKS })) ||
     (saved.version === VERSION && !isPetProfile(pet))
   )
     throw new PetStorageError("invalid");
@@ -63,6 +68,7 @@ export function decodePet(raw: string | null): PetProfile | null {
   const affinity =
     saved.version === 1 ? createAffinity() : (pet as PetProfile).affinity;
   const walked = saved.version >= 4 ? (pet as PetProfile) : null;
+  const furnished = saved.version >= 5 ? (pet as PetProfile) : null;
   const current = saved.version === VERSION ? (pet as PetProfile) : null;
   return {
     id,
@@ -78,9 +84,11 @@ export function decodePet(raw: string | null): PetProfile | null {
     walks: walked?.walks ?? 0,
     items: { ...walked?.items },
     itemsSeen: walked?.itemsSeen ?? 0,
-    spent: { ...current?.spent },
-    furniture: [...(current?.furniture ?? [])],
-    placed: { ...current?.placed },
+    spent: { ...furnished?.spent },
+    furniture: [...(furnished?.furniture ?? [])],
+    placed: { ...furnished?.placed },
+    walkDay: current?.walkDay ?? null,
+    walksOnDay: current?.walksOnDay ?? 0,
   };
 }
 

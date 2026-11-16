@@ -11,6 +11,7 @@ export function PetPad({
   kind,
   label,
   dot,
+  resting = false,
   "aria-describedby": describedBy = "pet-keyboard-help",
   ...props
 }: {
@@ -20,6 +21,8 @@ export function PetPad({
   disabled: boolean;
   /** A small red dot with this screen-reader text (e.g. new items). */
   dot?: string;
+  /** Greyed like an off key, but still pressable (it only answers in the log). */
+  resting?: boolean;
   ref?: Ref<HTMLButtonElement>;
   /** Replaces the keyboard help as the description (e.g. why it is off). */
   "aria-describedby"?: string;
@@ -29,6 +32,7 @@ export function PetPad({
       type="button"
       className={styles.pad}
       data-kind={kind}
+      data-resting={resting || undefined}
       aria-describedby={describedBy}
       onKeyDown={stopCareKey}
       {...props}

@@ -93,6 +93,8 @@ describe("친밀도 규칙", () => {
       spent: {},
       furniture: [],
       placed: {},
+      walkDay: null,
+      walksOnDay: 0,
     });
   });
 
@@ -129,6 +131,8 @@ describe("친밀도 규칙", () => {
       spent: {},
       furniture: [],
       placed: {},
+      walkDay: null,
+      walksOnDay: 0,
     });
   });
 

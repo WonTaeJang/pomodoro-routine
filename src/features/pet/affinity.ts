@@ -14,6 +14,15 @@ export function createAffinity(): Affinity {
 }
 
 /** A calendar date in the device's timezone, captured when the pat happens. */
+/** A real local date written as YYYY-MM-DD (the keys of daily counts). */
+export function isDayKey(day: unknown): day is string {
+  if (typeof day !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(day)) return false;
+  const date = new Date(`${day}T00:00:00Z`);
+  return (
+    Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === day
+  );
+}
+
 export function affinityDay(at: number): string {
   const date = new Date(at);
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -79,13 +88,7 @@ export function isAffinity(value: unknown, totalSnacks = 0): value is Affinity {
     return false;
   let sum = 0;
   for (const [day, count] of Object.entries(a.rewardedPats)) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return false;
-    const date = new Date(`${day}T00:00:00Z`);
-    if (
-      !Number.isFinite(date.getTime()) ||
-      date.toISOString().slice(0, 10) !== day
-    )
-      return false;
+    if (!isDayKey(day)) return false;
     if (!Number.isInteger(count) || count < 1 || count > DAILY_AFFINITY_PATS)
       return false;
     sum += count;

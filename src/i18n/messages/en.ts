@@ -195,6 +195,7 @@ const en: Messages = {
       skipped: "Skipped the walk and brought back {object}",
       craft: "Made {object}",
       place: "Changed the {slot} to {to}",
+      walkLimit: "That’s all {count} walks for today. More tomorrow!",
     },
     affinity: {
       title: "Affinity",
@@ -211,7 +212,6 @@ const en: Messages = {
       todayDone: "All earned today",
       todayLeft: "+{earned} / {max}",
       snackHint: "+{points} for every treat (no limit)",
-      noDecay: "Your bond never decreases",
       levelUpShort: "Level {level}!",
       maxBadge: "MAX",
       stages: {

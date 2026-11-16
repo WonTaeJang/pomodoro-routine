@@ -4,14 +4,14 @@ import { isItemId, type ItemCounts, type ItemId } from "./items";
 export const SLOTS = ["window", "pot"] as const;
 export type Slot = (typeof SLOTS)[number];
 
-/** Furniture made from walk finds. Amounts are a first guess (I-035). */
+/** Furniture made from walk finds: three items each, two of one kind. */
 export const FURNITURE = [
-  { id: "twigWindow", slot: "window", need: { twig: 4, leaf: 2 } },
-  { id: "flowerWindow", slot: "window", need: { flower: 3, twig: 2 } },
-  { id: "stoneWindow", slot: "window", need: { stone: 3, twig: 3 } },
-  { id: "flowerPot", slot: "pot", need: { flower: 3, stone: 2 } },
-  { id: "pinePot", slot: "pot", need: { pinecone: 3, leaf: 2 } },
-  { id: "succulentPot", slot: "pot", need: { stone: 4, leaf: 1 } },
+  { id: "twigWindow", slot: "window", need: { twig: 2, leaf: 1 } },
+  { id: "flowerWindow", slot: "window", need: { flower: 2, twig: 1 } },
+  { id: "stoneWindow", slot: "window", need: { stone: 2, twig: 1 } },
+  { id: "flowerPot", slot: "pot", need: { flower: 2, stone: 1 } },
+  { id: "pinePot", slot: "pot", need: { pinecone: 2, leaf: 1 } },
+  { id: "succulentPot", slot: "pot", need: { stone: 2, leaf: 1 } },
 ] as const satisfies readonly {
   id: string;
   slot: Slot;

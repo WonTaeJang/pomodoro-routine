@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { isItemCounts, ITEMS, pickItem, totalItems } from "./items";
-import { addWalks, createPetProfile, seeItems } from "./profile";
+import {
+  addWalks,
+  createPetProfile,
+  DAILY_WALKS,
+  seeItems,
+  walksOn,
+} from "./profile";
 import { decodePet, PetStorageError } from "./repository";
 
 describe("산책 아이템", () => {
@@ -63,7 +69,11 @@ describe("아이템 저장 형식", () => {
       ...addWalks(createPetProfile("a", 1), "pinecone", 2, 3),
       itemsSeen: 1,
     };
-    expect(decodePet(encode(4, pet))).toEqual(pet);
+    expect(decodePet(encode(4, pet))).toEqual({
+      ...pet,
+      walkDay: null,
+      walksOnDay: 0,
+    });
   });
 
   it.each([
@@ -74,5 +84,51 @@ describe("아이템 저장 형식", () => {
   ])("손상된 v4 산책 기록을 거부: %j", (broken) => {
     const pet = { ...createPetProfile("a", 1), ...broken };
     expect(() => decodePet(encode(4, pet))).toThrow(PetStorageError);
+  });
+});
+
+describe("하루 산책 횟수", () => {
+  const encode = (version: number, pet: object) =>
+    JSON.stringify({ version, state: { pet } });
+  const day = (d: number) => new Date(2026, 10, d, 12).getTime();
+  const walk = (pet: ReturnType<typeof createPetProfile>, at: number) =>
+    addWalks(pet, "leaf", 1, at);
+
+  it("같은 날은 쌓이고, 다음 날이면 다시 1부터", () => {
+    let pet = createPetProfile("a", 1);
+    for (let i = 0; i < DAILY_WALKS; i++) pet = walk(pet, day(16));
+    expect(walksOn(pet, "2026-11-16")).toBe(DAILY_WALKS);
+    pet = walk(pet, day(17));
+    expect(walksOn(pet, "2026-11-17")).toBe(1);
+    expect(walksOn(pet, "2026-11-16")).toBe(0);
+    expect(pet.walks).toBe(DAILY_WALKS + 1);
+  });
+
+  it("늦게 저장된 지난날 산책은 오늘 횟수를 바꾸지 않음", () => {
+    const today = walk(walk(createPetProfile("a", 1), day(17)), day(17));
+    const late = addWalks(today, "leaf", 1, day(17), "2026-11-16");
+    expect(walksOn(late, "2026-11-17")).toBe(2);
+    expect(late.walks).toBe(3);
+  });
+
+  it("v5 기록은 오늘 산책 0번으로 이전, 손상된 횟수는 거부", () => {
+    const { walkDay, walksOnDay, ...v5 } = walk(
+      createPetProfile("a", 1),
+      day(16),
+    );
+    void [walkDay, walksOnDay];
+    expect(decodePet(encode(5, v5))).toMatchObject({
+      walks: 1,
+      walkDay: null,
+      walksOnDay: 0,
+    });
+    for (const broken of [
+      { walkDay: null, walksOnDay: 1 },
+      { walkDay: "11/16", walksOnDay: 1 },
+      { walkDay: "2026-11-16", walksOnDay: 2 }, // more than all walks
+    ])
+      expect(() => decodePet(encode(6, { ...v5, ...broken }))).toThrow(
+        PetStorageError,
+      );
   });
 });
