@@ -6,6 +6,7 @@ import {
   Fit,
   Layout,
   useRive,
+  useViewModelInstanceBoolean,
   useViewModelInstanceTrigger,
 } from "@rive-app/react-webgl2";
 import { useTranslations } from "use-intl";
@@ -18,6 +19,7 @@ import styles from "./PetWalk.module.scss";
 import { PetRoomArt } from "./PetRoomArt";
 import { stopCareKey } from "./stopCareKey";
 import { WALK_SRC, preloadedWalk } from "../walkFile";
+import { useTimeOfDay } from "../useTimeOfDay";
 
 // The canvas is sized in CSS to the artboard at the home scale, so Contain is 1:1.
 const LAYOUT = new Layout({ fit: Fit.Contain, alignment: Alignment.Center });
@@ -67,6 +69,19 @@ function WalkScene({
     layout: LAYOUT,
     onLoadError: () => setFailed(true),
   });
+  // The outdoors shows the same time of day as the home window.
+  const time = useTimeOfDay();
+  const dawn = useViewModelInstanceBoolean("isDawn", rive?.viewModelInstance);
+  const dusk = useViewModelInstanceBoolean("isDusk", rive?.viewModelInstance);
+  const night = useViewModelInstanceBoolean("isNight", rive?.viewModelInstance);
+  const setDawn = dawn.setValue;
+  const setDusk = dusk.setValue;
+  const setNight = night.setValue;
+  useEffect(() => {
+    setDawn(time === "dawn");
+    setDusk(time === "dusk");
+    setNight(time === "night");
+  }, [time, setDawn, setDusk, setNight]);
   useViewModelInstanceTrigger("sceneReady", rive?.viewModelInstance, {
     onTrigger: () => setReady(true),
   });

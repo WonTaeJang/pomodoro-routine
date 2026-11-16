@@ -319,3 +319,78 @@ describe("산책 Rive 재생 계약", () => {
     expect(attr("Find", "x") + pathStop).toBe(nose);
   });
 });
+
+describe("산책 바깥 시간대", () => {
+  const layer = walkRml.match(
+    /<StateMachineLayer name="Sky"[\s\S]*?<\/StateMachineLayer>/,
+  )![0];
+  const flag = (name: string) =>
+    walkRml.match(
+      new RegExp(`<ViewModelPropertyBoolean name="${name}" id="0:(\\d+)"`),
+    )![1];
+  const goesTo = (markup: string) =>
+    [
+      ...markup.matchAll(
+        /<StateTransition stateToId="0:(\d+)"[^>]*>(.*?)<\/StateTransition>|<StateTransition stateToId="0:(\d+)"\/>/g,
+      ),
+    ].map(([, to, condition, plain]) => ({
+      to: to ?? plain,
+      flag: condition?.match(/sourcePathIds="0:40-0:(\d+)"/)?.[1] ?? null,
+    }));
+
+  it("페이지가 새벽·해질녘·밤 값을 넘기고, 아무것도 아니면 낮", () => {
+    for (const name of ["isDawn", "isDusk", "isNight"])
+      expect(walkRml).toContain(
+        `viewModelPropertyId="0:${flag(name)}" propertyValue="false"`,
+      );
+    const entry = layer.match(/<EntryState[^>]*>([\s\S]*?)<\/EntryState>/)![1];
+    const choices = goesTo(entry);
+    // Conditions first, the plain day transition last.
+    expect(choices.map((c) => c.flag)).toEqual([
+      flag("isDawn"),
+      flag("isDusk"),
+      flag("isNight"),
+      null,
+    ]);
+  });
+
+  it("시간대마다 그 하늘만 보이고 밤에는 구름을 숨김", () => {
+    const sky = (time: string) =>
+      walkRml.match(new RegExp(`<Node name="Sky ${time}" id="0:(\\d+)"`))![1];
+    const clouds = walkRml.match(/<Node name="Clouds" id="0:(\d+)"/)![1];
+    for (const time of ["day", "dawn", "dusk", "night"]) {
+      const body = walkRml.match(
+        new RegExp(
+          `<LinearAnimation name="Sky ${time}"[^>]*>([\\s\\S]*?)</LinearAnimation>`,
+        ),
+      )![1];
+      const opacity = (id: string) =>
+        Number(
+          body.match(
+            new RegExp(
+              `objectId="0:${id}"><KeyedProperty property="opacity"><KeyFrameDouble frame="0" value="(\\d)"`,
+            ),
+          )![1],
+        );
+      for (const other of ["day", "dawn", "dusk", "night"])
+        expect(opacity(sky(other))).toBe(other === time ? 1 : 0);
+      expect(opacity(clouds)).toBe(time === "night" ? 0 : 1);
+    }
+  });
+
+  it("낮 상태에서도 늦게 넘어온 값을 따라감", () => {
+    const day = walkRml.match(
+      /<LinearAnimation name="Sky day" id="0:(\d+)"/,
+    )![1];
+    const state = layer.match(
+      new RegExp(
+        `animationId="0:${day}" id="0:\\d+">([\\s\\S]*?)</AnimationState>`,
+      ),
+    )![1];
+    expect(goesTo(state).map((c) => c.flag)).toEqual([
+      flag("isDawn"),
+      flag("isDusk"),
+      flag("isNight"),
+    ]);
+  });
+});

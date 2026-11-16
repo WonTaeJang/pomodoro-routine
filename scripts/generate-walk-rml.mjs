@@ -48,6 +48,21 @@ const ID = {
   instance: 41,
   ready: 42,
   walkStarted: 43,
+  // Time of day: a sky per time and a shade over the ground (I-054).
+  skyDay: 44,
+  skyDawn: 45,
+  skyDusk: 46,
+  skyNight: 47,
+  shadeDawn: 48,
+  shadeDusk: 49,
+  shadeNight: 50,
+  isDawn: 51,
+  isDusk: 52,
+  isNight: 53,
+  treesDay: 54,
+  treesDawn: 55,
+  treesDusk: 56,
+  treesNight: 57,
   legBase: 100, // + leg * 16 + pose (pose 12 = standing still)
   // State machine: layers, states and animations.
   layerBase: 200,
@@ -258,17 +273,18 @@ const arrive = [
 ];
 
 // --- Scenery (4-unit grid; each layer steps a whole cell per frame) ---------
-const tree = (x, y, dark = false) => {
+const tree = (x, y, dark = false, tint = (color) => color) => {
+  const paint = (x0, y0, w, h, color) => rect(x0, y0, w, h, tint(color));
   const leaf = dark ? "7F9E77" : "9CB28B";
   return [
-    rect(x + 32, y + 64, 12, 56, "98856B"),
-    rect(x + 40, y + 72, 4, 48, "7E705D"),
-    rect(x + 8, y + 20, 64, 64, leaf),
-    rect(x + 20, y + 4, 40, 92, leaf),
-    rect(x, y + 36, 80, 32, leaf),
-    rect(x + 16, y + 24, 12, 16, dark ? "9DB88D" : "B6C79E"),
-    rect(x + 28, y + 12, 24, 8, dark ? "9DB88D" : "B6C79E"),
-    rect(x + 56, y + 52, 16, 24, dark ? "6D8F68" : "8CA27E"),
+    paint(x + 32, y + 64, 12, 56, "98856B"),
+    paint(x + 40, y + 72, 4, 48, "7E705D"),
+    paint(x + 8, y + 20, 64, 64, leaf),
+    paint(x + 20, y + 4, 40, 92, leaf),
+    paint(x, y + 36, 80, 32, leaf),
+    paint(x + 16, y + 24, 12, 16, dark ? "9DB88D" : "B6C79E"),
+    paint(x + 28, y + 12, 24, 8, dark ? "9DB88D" : "B6C79E"),
+    paint(x + 56, y + 52, 16, 24, dark ? "6D8F68" : "8CA27E"),
   ];
 };
 const cloud = (x, y) => [
@@ -292,7 +308,7 @@ for (const [x, y, dark] of [
   [472, GROUND - 156],
   [664, GROUND - 164],
 ]) {
-  if (x + 80 <= WIDTH + TREES_TRIP) trees.push(...tree(x, y, dark));
+  if (x + 80 <= WIDTH + TREES_TRIP) trees.push([x, y, dark]);
 }
 clouds.push(...cloud(80, 60), ...cloud(392, 40));
 const path = [];
@@ -341,19 +357,118 @@ path.push(
 // page draws the room behind the transparent canvas), slides in as he sets
 // off, and slides away to the left as he gets home.
 const SLIDE = 10; // frames, 68 units (17 cells) each
+// The sky follows the device clock like the home window: dawn, day, dusk and
+// night. Each has its own sky; the ground below gets a light shade instead.
+// Sun and moon stay in the middle: phones show only units ~150–530.
+const SKY_BOTTOM = GROUND - 100; // the meadow covers the sky from here
+const bands = (colors) =>
+  colors.map((color, i) =>
+    rect(0, i * 44, WIDTH, i === colors.length - 1 ? HEIGHT : 44, color),
+  );
+const SKIES = {
+  day: {
+    id: ID.skyDay,
+    art: [rect(0, 0, WIDTH, HEIGHT, "DCE9E4"), rect(468, 52, 32, 32, "F7EDC7")],
+  },
+  dawn: {
+    id: ID.skyDawn,
+    art: [
+      ...bands(["B9B6D8", "D8C3D6", "F0D3C8", "F7E3C8"]),
+      rect(200, SKY_BOTTOM - 16, 48, 16, "F6C27A"), // rising sun
+      rect(208, SKY_BOTTOM - 24, 32, 8, "F6C27A"),
+      rect(476, 44, 12, 12, "ECE8F4"), // the moon, fading
+    ],
+  },
+  dusk: {
+    id: ID.skyDusk,
+    art: [
+      ...bands(["A99FCB", "D9A3AE", "EDB291", "F5CC96"]),
+      rect(452, SKY_BOTTOM - 56, 40, 40, "EF9A5C"), // setting sun
+      rect(452, SKY_BOTTOM - 56, 40, 12, "F4B074"),
+      rect(400, 76, 96, 4, "F4C2AC"),
+    ],
+  },
+  night: {
+    id: ID.skyNight,
+    art: [
+      ...bands(["283152", "2E3859", "343F62", "3B476B"]),
+      ...[
+        [480, 44, 12, 4],
+        [472, 48, 12, 4],
+        [468, 52, 8, 16],
+        [472, 68, 12, 4],
+        [480, 72, 12, 4],
+      ].map(([x, y, w, h]) => rect(x, y, w, h, "F3E7B5")), // crescent moon
+      ...[
+        [84, 36],
+        [196, 88],
+        [300, 28],
+        [404, 72],
+        [620, 104],
+        [28, 120],
+      ].map(([x, y]) => rect(x, y, 4, 4, "FDF6D8")), // stars
+    ],
+  },
+};
+const sky = Object.entries(SKIES).map(([time, { id, art }]) =>
+  node(`Sky ${time}`, id, art, time === "day" ? "" : 'opacity="0"'),
+);
+/** A see-through colour over the ground (aa = alpha in hex). */
+const shadeRect = (color, alpha) =>
+  `<Shape x="0" y="${SKY_BOTTOM}"><Rectangle width="${WIDTH}" height="${HEIGHT - SKY_BOTTOM}" originX="0" originY="0"/><Fill><SolidColor colorValue="${alpha}${color}"/></Fill></Shape>`;
+const SHADES = {
+  dawn: { id: ID.shadeDawn, color: "8E9AC2", alpha: "2E" },
+  dusk: { id: ID.shadeDusk, color: "E0875A", alpha: "29" },
+  night: { id: ID.shadeNight, color: "1E2747", alpha: "73" },
+};
+/** A colour seen through a shade: the same mix the ground gets. */
+const through = ({ color, alpha }) => {
+  const a = parseInt(alpha, 16) / 255;
+  return (base) =>
+    [0, 2, 4]
+      .map((i) => {
+        const mix =
+          parseInt(base.slice(i, i + 2), 16) * (1 - a) +
+          parseInt(color.slice(i, i + 2), 16) * a;
+        return Math.round(mix).toString(16).padStart(2, "0");
+      })
+      .join("")
+      .toUpperCase();
+};
+// Tree tops reach above the shaded ground, so each time has its own trees.
+const TREE_IDS = {
+  day: ID.treesDay,
+  dawn: ID.treesDawn,
+  dusk: ID.treesDusk,
+  night: ID.treesNight,
+};
+const treeVariants = Object.entries(TREE_IDS).map(([time, id]) =>
+  node(
+    `Trees ${time}`,
+    id,
+    trees.flatMap(([x, y, dark]) =>
+      tree(x, y, dark, time === "day" ? undefined : through(SHADES[time])),
+    ),
+    time === "day" ? "" : 'opacity="0"',
+  ),
+);
+const shades = Object.entries(SHADES).map(([time, { id, color, alpha }]) =>
+  node(`Shade ${time}`, id, [shadeRect(color, alpha)], 'opacity="0"'),
+);
 const outdoors = [
-  rect(0, 0, WIDTH, HEIGHT, "DCE9E4"), // sky
-  rect(536, 52, 32, 32, "F7EDC7"), // sun
+  ...sky,
   node("Clouds", ID.clouds, clouds),
   rect(0, GROUND - 100, WIDTH, 76, "B7C9A2"), // meadow
   rect(0, GROUND - 60, WIDTH, 20, "A8BE92"),
-  node("Passing trees", ID.trees, trees),
   rect(0, GROUND - 24, WIDTH, 64, "E8D5B5"), // path
   rect(0, GROUND - 24, WIDTH, 4, "D4C29E"),
   rect(0, GROUND + 36, WIDTH, 4, "CFB993"),
   rect(0, GROUND + 40, WIDTH, HEIGHT - GROUND - 40, "B7C9A2"), // verge
   node("Path details", ID.path, path),
   rect(DOG_X + 5 * CELL, GROUND, 34 * CELL, CELL, "CBB38F"), // Kkami's shadow
+  ...shades,
+  // Above the shade: each time has its own tinted trees. They end above the path.
+  node("Passing trees", ID.trees, treeVariants),
 ];
 const art = [node("Outdoors", ID.outdoors, outdoors, `x="${WIDTH}"`), dog];
 
@@ -415,6 +530,41 @@ const layer = (name, steps, fire = {}) => {
 const STOP = TRIP.toSpot; // the path stops where the find is
 const startId = animation("Start", { frames: START, body: start });
 const walkOutId = animation("Walk out", { frames: TRIP.toSpot, body: walkOut });
+// The sky layer: entry picks the time the page set; day also follows a late
+// setting (the page may set it right after the first frame).
+const BOOLEAN_VALUE_KEY = 634;
+const when = (to, property) =>
+  `<StateTransition stateToId="0:${to}" duration="0"><TransitionViewModelCondition><TransitionPropertyViewModelComparator><BindablePropertyBoolean><DataBindContext sourcePathIds="0:${ID.model}-0:${property}" propertyKey="${BOOLEAN_VALUE_KEY}"/></BindablePropertyBoolean></TransitionPropertyViewModelComparator><TransitionValueBooleanComparator value="true"/></TransitionViewModelCondition></StateTransition>`;
+const TIMES = ["day", "dawn", "dusk", "night"];
+const FLAG = { dawn: ID.isDawn, dusk: ID.isDusk, night: ID.isNight };
+const skyLayer = () => {
+  const id = nextLayer++;
+  const state = Object.fromEntries(TIMES.map((time) => [time, nextState++]));
+  const look = (time) =>
+    animation(`Sky ${time}`, {
+      frames: 1,
+      body: [
+        ...TIMES.map((t) =>
+          keys(SKIES[t].id, { opacity: [[0, t === time ? 1 : 0]] }),
+        ),
+        ...Object.entries(SHADES).map(([t, { id: shade }]) =>
+          keys(shade, { opacity: [[0, t === time ? 1 : 0]] }),
+        ),
+        ...TIMES.map((t) =>
+          keys(TREE_IDS[t], { opacity: [[0, t === time ? 1 : 0]] }),
+        ),
+        keys(ID.clouds, { opacity: [[0, time === "night" ? 0 : 1]] }),
+      ],
+    });
+  const toOthers = TIMES.filter((t) => t !== "day")
+    .map((t) => when(state[t], FLAG[t]))
+    .join("");
+  const states = TIMES.map(
+    (time, index) =>
+      `<AnimationState x="${180 + index * 220}" y="0" animationId="0:${look(time)}" id="0:${state[time]}">${time === "day" ? toOthers : ""}</AnimationState>`,
+  ).join("");
+  return `<StateMachineLayer name="Sky" id="0:${id}"><AnyState x="0" y="-120"/><ExitState x="0" y="120"/><EntryState x="0" y="0">${toOthers}<StateTransition stateToId="0:${state.day}"/></EntryState>${states}</StateMachineLayer>`;
+};
 const layers = [
   layer(
     "Kkami",
@@ -499,6 +649,9 @@ const layers = [
   ]),
 ];
 
+// Built last so the other layers keep their identities.
+layers.push(skyLayer());
+
 const scene = `<Rive version="1" kind="fragment">
 <Artboard width="${WIDTH}" height="${HEIGHT}" name="Walk" id="0:${ID.board}" styleId="0:${ID.style}" defaultStateMachineId="0:${ID.machine}" viewModelId="0:${ID.model}" viewModelInstanceId="0:${ID.instance}">
 <LayoutComponentStyle name="Artboard Style" id="0:${ID.style}"/>
@@ -508,7 +661,7 @@ ${layers.join("\n")}
 </StateMachine>
 ${animations.join("\n")}
 </Artboard>
-<ViewModel name="WalkModel" id="0:${ID.model}" defaultInstanceId="0:${ID.instance}"><ViewModelPropertyTrigger name="sceneReady" id="0:${ID.ready}"/><ViewModelPropertyTrigger name="walkStarted" id="0:${ID.walkStarted}"/><ViewModelInstance name="Default" id="0:${ID.instance}" exports="true"><ViewModelInstanceTrigger viewModelPropertyId="0:${ID.ready}"/><ViewModelInstanceTrigger viewModelPropertyId="0:${ID.walkStarted}"/></ViewModelInstance></ViewModel>
+<ViewModel name="WalkModel" id="0:${ID.model}" defaultInstanceId="0:${ID.instance}"><ViewModelPropertyTrigger name="sceneReady" id="0:${ID.ready}"/><ViewModelPropertyTrigger name="walkStarted" id="0:${ID.walkStarted}"/><ViewModelPropertyBoolean name="isDawn" id="0:${ID.isDawn}"/><ViewModelPropertyBoolean name="isDusk" id="0:${ID.isDusk}"/><ViewModelPropertyBoolean name="isNight" id="0:${ID.isNight}"/><ViewModelInstance name="Default" id="0:${ID.instance}" exports="true"><ViewModelInstanceTrigger viewModelPropertyId="0:${ID.ready}"/><ViewModelInstanceTrigger viewModelPropertyId="0:${ID.walkStarted}"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isDawn}" propertyValue="false"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isDusk}" propertyValue="false"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isNight}" propertyValue="false"/></ViewModelInstance></ViewModel>
 </Rive>`;
 writeFileSync(
   new URL("../src/assets/kkami-walk/scene.rml", import.meta.url),

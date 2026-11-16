@@ -41,7 +41,7 @@
 - 남기는 일: 까미를 만나러 왔어요(페이지 진입), 까미가 일어났어요, 쓰다듬었어요(+점수·누적 N번), 간식을 줬어요(+3), 산책을 나갔어요, … 주웠어요, 집에 돌아왔어요, 산책을 건너뛰고 … 주워 왔어요, Lv.N 달성!, … 만들었어요, 창문을 …로 바꿨어요. 무시된 입력과 상자 열기 같은 조작은 남기지 않습니다.
 - 쓰담·간식은 저장된 기록이 늘어날 때 남깁니다. 시각은 시:분입니다. 화면 낭독기는 새 줄을 읽지 않고, 줍기 카드와 헤더 상태가 알립니다.
 
-`components/PetWalk.tsx`는 산책 재생·로딩·재시도·집으로 UI를, `components/PetTrip.tsx`는 산책 지도와 줍기 카드를 담당합니다. `public/rive/kkami-walk.riv`는 별도 산책 에셋이며 Artboard/State machine은 `Walk`, View model은 `WalkModel`, 준비 트리거는 `sceneReady`, 첫 걸음 트리거는 `walkStarted`입니다.
+`components/PetWalk.tsx`는 산책 재생·로딩·재시도·집으로 UI를, `components/PetTrip.tsx`는 산책 지도와 줍기 카드를 담당합니다. `public/rive/kkami-walk.riv`는 별도 산책 에셋이며 Artboard/State machine은 `Walk`, View model은 `WalkModel`, 준비 트리거는 `sceneReady`, 첫 걸음 트리거는 `walkStarted`입니다. 시간대 boolean `isDawn`·`isDusk`·`isNight`(모두 false면 낮)를 페이지가 기기 시계(`useTimeOfDay`, 집 창밖과 같은 경계)로 넘기면 `Sky` 레이어가 하늘(새벽 띠·떠오르는 해, 노을·지는 해, 밤하늘·초승달·별)을 바꾸고, 땅에는 같은 색의 반투명 그늘, 나무는 그 그늘을 미리 섞은 색으로 바꿉니다. 밤에는 구름을 숨깁니다. 진입 때 값을 고르고, 첫 프레임 뒤에 넘어온 값도 낮 상태에서 따라갑니다(I-054).
 
 산책 까미는 집 까미와 같은 방식으로 직접 그립니다. `scripts/walk-sprite.mjs`가 도트 데이터와 자세 계산을, `scripts/generate-walk-rml.mjs`가 Rive 장면을 만듭니다. 사각형·노드·키프레임 RML 도우미는 집 생성기와 함께 `scripts/rml.mjs`를 씁니다. 한 칸은 4단위로 집과 같은 격자이고, 색은 집 팔레트(먹색·털색·밝은 털·크림·목줄·태그)만 씁니다. 머리는 집의 대기 머리를 그대로 가져와 눈과 주둥이만 걷는 방향으로 두 칸 옮긴 3/4 모습이고, 먼 귀는 머리 뒤로 접습니다. 같은 색은 하나의 복합 경로로 묶고, 먹색 실루엣을 아래에 깔아 색 경계의 렌더링 틈을 막습니다.
 
