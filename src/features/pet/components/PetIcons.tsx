@@ -204,18 +204,21 @@ const ITEM_ART = {
     ],
     colors: { "#": "#e48aa0", y: "#f2c94c", g: "#6f9c5a" },
   },
+  // 야구공: 다른 아이템보다 한 칸 큰 10×10이라 휜 솔기가 또렷합니다.
   ball: {
     rows: [
-      "..####..",
-      ".#o####.",
-      "########",
-      "wwwwwwww",
-      "########",
-      "########",
-      ".######.",
-      "..####..",
+      "...####...",
+      ".##rwwr##.",
+      ".#rwwwwr#.",
+      "#wrwwwwrw#",
+      "#wwrwwrww#",
+      "#wwrwwrww#",
+      "#wrwwwwrw#",
+      ".#rwwwwr#.",
+      ".##rssr##.",
+      "...####...",
     ],
-    colors: { "#": "#d9534f", o: "#f3a6a3", w: "#f7f1e3" },
+    colors: { "#": "#8a7f72", w: "#fbf8f1", r: "#d9534f", s: "#ddd3c2" },
   },
 } satisfies Record<ItemId, Pixels>;
 
