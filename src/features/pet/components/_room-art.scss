@@ -84,6 +84,26 @@ $loading-background: #f4efdf;
   background-size: $room-before-background-size;
 }
 
+// 만든 벽·바닥: 방 CSS 배경과 세로줄 위를 반복 무늬로 덮습니다(기본 벽·바닥이면 비어 있음).
+.walls {
+  position: absolute;
+  inset: 0;
+  // 무늬(z-index -1)를 이 안에 가두기. 칸 자체는 z-index 그대로라 창문·화분 아래
+  isolation: isolate;
+}
+// 무늬는 벽·바닥 칸 안에서 맨 아래(-1): 고른 자리 테두리가 그 위에 보임
+.wall,
+.floor {
+  position: absolute;
+  z-index: -1;
+}
+.wall {
+  inset: 0 0 26%;
+}
+.floor {
+  inset: 74% 0 0;
+}
+
 .window {
   position: absolute;
   top: $window-top;
@@ -108,7 +128,9 @@ $slot-outline: 3px dashed #d0703f;
 $slot-tag-background: #5e5246;
 $slot-tag-color: #fffaf0;
 .window,
-.plant {
+.plant,
+.rug,
+.walls {
   &[data-selected="true"] {
     z-index: $interaction-layer;
     outline: $slot-outline;
@@ -118,6 +140,11 @@ $slot-tag-color: #fffaf0;
       animation: none;
     }
   }
+}
+// 벽·바닥은 방 전체라 테두리를 안쪽에 두고, 위로 올리지 않아 창문·화분을 가리지 않음
+.walls[data-selected="true"] {
+  z-index: auto;
+  outline-offset: -6px;
 }
 @keyframes slot-blink {
   50% {
@@ -151,6 +178,19 @@ $slot-tag-color: #fffaf0;
   left: auto;
   right: 0;
 }
+// 벽을 누르면 벽·바닥: 창문·화분·러그 버튼은 DOM에서 뒤라 그 위에 있음
+.walls .slotPick {
+  inset: 0;
+}
+.walls .slotTag {
+  top: 12px;
+  left: 12px;
+}
+.rug .slotTag {
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
 
 .rug {
   position: absolute;
@@ -162,6 +202,20 @@ $slot-tag-color: #fffaf0;
   left: $rug-left;
   bottom: $rug-bottom;
   border-radius: 50%;
+}
+// 만든 러그는 도트 그림 크기 그대로, 가운데 정렬
+.rug:not([data-look="plainRug"]) {
+  width: auto;
+  height: auto;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 0;
+  border-radius: 0;
+  background: none;
+  line-height: 0;
+  &:not([data-selected="true"]) {
+    outline: 0;
+  }
 }
 
 .dog {
@@ -199,8 +253,10 @@ $slot-tag-color: #fffaf0;
   cursor: grabbing;
 }
 
+// 꾸미는 동안 등 꺼져 있을 때는 아래 러그·벽 버튼이 눌리게
 .petTarget:disabled {
   cursor: default;
+  pointer-events: none;
 }
 
 .petTarget[data-sleeping="true"] {

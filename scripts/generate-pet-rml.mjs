@@ -579,7 +579,6 @@ ${node("Wake exclamation", ID.wakeExclamation, [rect(-8, -32, 16, 28, ink), rect
 ${heart(92, 92, ID.leftHeart)}${heart(244, 72, ID.rightHeart)}
 ${node("Resting Kkami", ID.restingDog, restingDog, 'x="180" y="208" opacity="0"')}
 ${node("Kkami", ID.dog, dog, 'x="180" y="164"')}
-${rect(124, 240, 112, 8, "D9C6A8")}${rect(136, 248, 88, 4, "E6D5BA")}
 <StateMachine name="Pet" id="0:${ID.stateMachine}"><StateMachineLayer name="Mood" id="0:${ID.moodLayer}">
 <AnyState x="0" y="-120"/><ExitState x="440" y="-120"/>
 <EntryState x="0" y="0"><StateTransition stateToId="0:${ID.bootState}"/></EntryState>

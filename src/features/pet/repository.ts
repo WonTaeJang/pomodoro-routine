@@ -24,7 +24,7 @@ export interface PetRepository {
   clear(): Promise<void>;
 }
 
-const VERSION = 6;
+const VERSION = 7;
 export function decodePet(raw: string | null): PetProfile | null {
   if (raw === null) return null;
   let saved;
@@ -36,9 +36,10 @@ export function decodePet(raw: string | null): PetProfile | null {
   if (saved?.version > VERSION) throw new PetStorageError("newer");
   // v1 has no daily history, so past pats cannot earn affinity retroactively.
   // v3 and older have no walks or items yet; v4 and older no furniture;
-  // v5 and older no daily walk count.
+  // v5 and older no daily walk count. v7 adds walls, floors and rugs: same
+  // shape as v6, but older builds would not know the new furniture.
   if (
-    ![1, 2, 3, 4, 5, VERSION].includes(saved?.version) ||
+    ![1, 2, 3, 4, 5, 6, VERSION].includes(saved?.version) ||
     !saved.state ||
     typeof saved.state !== "object" ||
     !("pet" in saved.state)
@@ -61,7 +62,7 @@ export function decodePet(raw: string | null): PetProfile | null {
     (saved.version === 4 &&
       !isPetProfile({ ...pet, ...NO_FURNITURE, ...NO_DAILY_WALKS })) ||
     (saved.version === 5 && !isPetProfile({ ...pet, ...NO_DAILY_WALKS })) ||
-    (saved.version === VERSION && !isPetProfile(pet))
+    (saved.version >= 6 && !isPetProfile(pet))
   )
     throw new PetStorageError("invalid");
   const { id, createdAt, totalPats, lastPettedAt, updatedAt } = pet;
@@ -69,7 +70,7 @@ export function decodePet(raw: string | null): PetProfile | null {
     saved.version === 1 ? createAffinity() : (pet as PetProfile).affinity;
   const walked = saved.version >= 4 ? (pet as PetProfile) : null;
   const furnished = saved.version >= 5 ? (pet as PetProfile) : null;
-  const current = saved.version === VERSION ? (pet as PetProfile) : null;
+  const current = saved.version >= 6 ? (pet as PetProfile) : null;
   return {
     id,
     createdAt,

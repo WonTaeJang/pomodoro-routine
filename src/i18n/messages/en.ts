@@ -22,6 +22,7 @@ const en: Messages = {
       newItems: "New items",
       title: "Item box",
       tabs: "Item box view",
+      slotTabs: "Place to make for",
       list: "Items",
       craft: "Craft",
       unknown: "???",
@@ -42,8 +43,10 @@ const en: Messages = {
       decorate: "Decorate the room",
       decorateHint: "Make a piece of furniture to start decorating",
       slots: {
+        room: { name: "Walls & floor", object: "walls and floor" },
         window: { name: "Window", object: "window" },
         pot: { name: "Plant", object: "plant" },
+        rug: { name: "Rug", object: "rug" },
       },
       furniture: {
         plainWindow: {
@@ -85,6 +88,46 @@ const en: Messages = {
           name: "Stone pot succulent",
           object: "a stone pot succulent",
           to: "the stone pot succulent",
+        },
+        plainRoom: {
+          name: "Plain walls & floor",
+          object: "plain walls and floor",
+          to: "the plain walls and floor",
+        },
+        cabinRoom: {
+          name: "Log cabin",
+          object: "a log cabin room",
+          to: "the log cabin room",
+        },
+        floralRoom: {
+          name: "Pastel flowers",
+          object: "a pastel flower room",
+          to: "the pastel flower room",
+        },
+        stripeRoom: {
+          name: "Classic stripes",
+          object: "a classic stripe room",
+          to: "the classic stripe room",
+        },
+        plainRug: {
+          name: "Plain rug",
+          object: "a plain rug",
+          to: "the plain rug",
+        },
+        braidRug: {
+          name: "Braided rug",
+          object: "a braided rug",
+          to: "the braided rug",
+        },
+        pinkRug: {
+          name: "Pink wavy rug",
+          object: "a pink wavy rug",
+          to: "the pink wavy rug",
+        },
+        fringeRug: {
+          name: "Blue tassel rug",
+          object: "a blue tassel rug",
+          to: "the blue tassel rug",
         },
       },
     },

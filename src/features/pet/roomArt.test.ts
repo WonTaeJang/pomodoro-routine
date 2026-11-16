@@ -2,11 +2,16 @@ import { describe, expect, it } from "vitest";
 import { DEFAULT_LOOK, FURNITURE, SLOTS } from "./furniture";
 import {
   POTS,
+  ROOMS,
   TIME_STARTS,
+  paintArt,
+  patternUrl,
   WINDOW_HEIGHT,
   WINDOW_WIDTH,
   lookArt,
   msUntilNextTime,
+  roomPicture,
+  rugArt,
   timeOfDay,
   windowArt,
   type TimeOfDay,
@@ -80,5 +85,46 @@ describe("창문·화분 도트", () => {
       for (const cell of rows.join(""))
         if (cell !== ".") expect(colors).toHaveProperty(cell);
     }
+  });
+});
+
+describe("벽·바닥·러그 도트", () => {
+  it("벽·바닥 세트마다 반복 무늬와 바닥선 띠가 있음", () => {
+    for (const look of FURNITURE.filter((p) => p.slot === "room").map(
+      (p) => p.id,
+    )) {
+      const { wall, floor } = ROOMS[look as keyof typeof ROOMS];
+      for (const { width, height, paint } of [wall.tile, floor.tile]) {
+        // every cell of a tile is painted, so the pattern has no holes
+        expect(cells(paintArt(width, height, paint)).size).toBe(width * height);
+      }
+      expect(wall.edge).toBeDefined();
+      expect(floor.edge).toBeDefined();
+    }
+  });
+
+  it("작은 그림은 바닥선 위아래로 벽과 바닥", () => {
+    const art = roomPicture("cabinRoom");
+    expect([art.width, art.height]).toEqual([16, 16]);
+    const c = cells(art);
+    expect(c.get("1,9")).toBe("#c4a67c"); // the panelling's bottom rail
+    expect(c.get("0,10")).toBe("#a98660"); // the floor line
+    expect(cells(roomPicture("stripeRoom")).get("1,0")).toBe("#f6efdc");
+  });
+
+  it("러그는 바닥에서 방 칸 크기로, 작은 그림은 더 작게", () => {
+    for (const look of ["braidRug", "pinkRug", "fringeRug"] as const) {
+      const floor = rugArt(look);
+      const small = rugArt(look, "small");
+      expect([floor.width, floor.height]).toEqual([45, 12]);
+      expect(small.width).toBeLessThan(floor.width);
+      expect(cells(small).size).toBeGreaterThan(0);
+    }
+  });
+
+  it("CSS 배경 이미지는 SVG 데이터 주소", () => {
+    const url = patternUrl(ROOMS.stripeRoom.wall.tile);
+    expect(url.startsWith('url("data:image/svg+xml,')).toBe(true);
+    expect(decodeURIComponent(url)).toContain('viewBox="0 0 12 1"');
   });
 });

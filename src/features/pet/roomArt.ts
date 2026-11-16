@@ -1,6 +1,6 @@
 import type { LookId } from "./furniture";
 
-// 방의 창문·화분 도트 그림. 집 까미와 같은 칸 크기로 그립니다(_room-art.scss의 --room-cell).
+// 방의 창문·화분·벽과 바닥·러그 도트 그림. 집 까미와 같은 칸 크기로 그립니다(_room-art.scss의 --room-cell).
 // 창은 창밖(하늘·해·달·언덕)을 먼저 그리고 창틀을 덮어, 어떤 창에도 시간대가 들어갑니다.
 
 export type TimeOfDay = "dawn" | "day" | "dusk" | "night";
@@ -48,6 +48,20 @@ function toArt(cells: Cells, width: number, height: number): PixelArt {
     byColor.set(color, `${byColor.get(color) ?? ""}M${x} ${y}h1v1h-1z`);
   }
   return { width, height, paths: [...byColor] };
+}
+
+/** A color for each cell, or null to leave it empty. */
+type Paint = (x: number, y: number) => string | null;
+
+/** A drawing from a color for each cell. */
+export function paintArt(width: number, height: number, paint: Paint) {
+  const cells: Cells = new Map();
+  for (let y = 0; y < height; y++)
+    for (let x = 0; x < width; x++) {
+      const color = paint(x, y);
+      if (color) cells.set(`${x},${y}`, color);
+    }
+  return toArt(cells, width, height);
 }
 
 // --- Window -------------------------------------------------------------------
@@ -371,18 +385,240 @@ export const POTS: Record<
 
 export function potArt(look: PotLook): PixelArt {
   const { rows, colors } = POTS[look];
-  const cells: Cells = new Map();
-  rows.forEach((row, y) =>
-    [...row].forEach((cell, x) => {
-      if (colors[cell]) cells.set(`${x},${y}`, colors[cell]);
-    }),
+  return paintArt(
+    rows[0].length,
+    rows.length,
+    (x, y) => colors[rows[y][x]] ?? null,
   );
-  return toArt(cells, rows[0].length, rows.length);
+}
+
+// --- Walls and floor -------------------------------------------------------------
+// 벽과 바닥은 방 크기를 모르니 반복 무늬(tile)로 그리고, 벽 아래 띠·바닥 첫 줄(edge)을 덧댑니다.
+type RoomLook = Extract<
+  LookId,
+  "plainRoom" | "cabinRoom" | "floralRoom" | "stripeRoom"
+>;
+/** A pattern to repeat: its size in cells and a color for each cell. */
+export type Pattern = { width: number; height: number; paint: Paint };
+/** A repeating pattern, plus an optional strip along the floor line. */
+export type Surface = { tile: Pattern; edge?: Pattern };
+export type RoomSurfaces = { wall: Surface; floor: Surface };
+
+const pattern = (width: number, height: number, paint: Paint): Pattern => ({
+  width,
+  height,
+  paint,
+});
+const strip = (colors: string[]) =>
+  pattern(1, colors.length, (_, y) => colors[y]);
+const mod = (n: number, m: number) => ((n % m) + m) % m;
+
+export const ROOMS: Record<RoomLook, RoomSurfaces> = {
+  // The starting room: the room's own CSS draws it; this is for small pictures.
+  plainRoom: {
+    wall: {
+      tile: pattern(11, 1, (x) => (x === 0 ? "#e9e2d0" : "#f4efdf")),
+    },
+    floor: { edge: strip(["#dfd1ba"]), tile: strip(["#e9ddc6"]) },
+  },
+  // Cream wall with faint dots over wood panelling; wooden boards.
+  cabinRoom: {
+    wall: {
+      tile: pattern(8, 16, (x, y) =>
+        (y === 3 && x === 0) || (y === 11 && x === 4) ? "#e7dcc3" : "#f4efdf",
+      ),
+      edge: pattern(13, 11, (x, y) => {
+        if (y === 0) return "#ecdcbc";
+        if (y === 1 || y === 10 || x === 0)
+          return y === 1 ? "#c9a97f" : "#c4a67c";
+        return x === 1 ? "#e8d6b5" : "#dcc39d";
+      }),
+    },
+    floor: {
+      edge: strip(["#a98660"]),
+      tile: pattern(18, 8, (x, y) => {
+        const board = Math.floor(y / 4);
+        const row = y % 4;
+        if (row === 3 || (x + (board ? 9 : 0)) % 18 === 0) return "#c29e72";
+        if (row === 1 && (x * 7 + board * 5) % 13 === 0) return "#cba67a";
+        return board ? "#dabd94" : "#d3b388";
+      }),
+    },
+  },
+  // Blush wall with little four-petal flowers; beige checked tiles.
+  floralRoom: {
+    wall: {
+      tile: pattern(16, 24, (x, y) => {
+        const row = Math.floor(y / 12);
+        const dx = mod(x - row * 8, 16) - 8;
+        const dy = y - (row * 12 + 6);
+        if (dx === 0 && dy === 0) return "#f3d68e";
+        if (Math.abs(dx) + Math.abs(dy) === 1) return "#f0c9cd";
+        if (dx === 2 && dy === 2) return "#cddcbd";
+        return "#f8efe9";
+      }),
+      edge: strip(["#ead8cf", "#d9bfb6"]),
+    },
+    floor: {
+      edge: strip(["#cdb79a"]),
+      tile: pattern(12, 12, (x, y) =>
+        (Math.floor(x / 6) + Math.floor(y / 6)) % 2 ? "#f1e7d6" : "#e7d8c0",
+      ),
+    },
+  },
+  // Two-tone cream stripes over a skirting board; herringbone boards.
+  stripeRoom: {
+    wall: {
+      tile: pattern(12, 1, (x) =>
+        x === 0 ? "#e2d3b3" : Math.floor(x / 6) ? "#f0e5ca" : "#f6efdc",
+      ),
+      edge: strip(["#f2e8d2", "#cdb38d", "#b89a72"]),
+    },
+    floor: {
+      edge: strip(["#a07c55"]),
+      tile: pattern(8, 8, (x, y) => {
+        const d = Math.floor(x / 4) % 2 ? (x + y) % 8 : mod(x - y, 8);
+        if (d === 0) return "#b8956a";
+        return d < 4 ? "#d1ae82" : "#c8a477";
+      }),
+    },
+  },
+};
+
+/** A pattern drawn once, as a CSS image for repeating backgrounds. */
+export function patternUrl({ width, height, paint }: Pattern) {
+  return artUrl(paintArt(width, height, paint));
+}
+
+/** A drawing as a CSS image. */
+export function artUrl(art: PixelArt) {
+  const paths = art.paths
+    .map(([color, d]) => `<path fill="${color}" d="${d}"/>`)
+    .join("");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${art.width} ${art.height}" shape-rendering="crispEdges">${paths}</svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+
+/** A corner of the room where the wall meets the floor, for small pictures. */
+export function roomPicture(look: RoomLook, size = 16): PixelArt {
+  const { wall, floor } = ROOMS[look];
+  const floorTop = Math.round(size * 0.62);
+  const tiled = ({ width, height, paint }: Pattern, x: number, y: number) =>
+    paint(x % width, y % height);
+  return paintArt(size, size, (x, y) => {
+    if (y < floorTop) {
+      const up = floorTop - 1 - y; // rows above the floor line
+      if (wall.edge && up < wall.edge.height)
+        return tiled(wall.edge, x, wall.edge.height - 1 - up);
+      return tiled(wall.tile, x, y);
+    }
+    const down = y - floorTop;
+    if (floor.edge && down < floor.edge.height)
+      return tiled(floor.edge, x, down);
+    return tiled(floor.tile, x, down);
+  });
+}
+
+// --- Rugs -------------------------------------------------------------------------
+type RugLook = Extract<
+  LookId,
+  "plainRug" | "braidRug" | "pinkRug" | "fringeRug"
+>;
+/** Rug sizes in cells: on the floor, and as a small picture. */
+const RUG_SIZE = { room: [45, 12], small: [23, 7] } as const;
+
+/** An oval: `paint` gets the distance from the middle (1 at the edge). */
+const oval =
+  (
+    width: number,
+    height: number,
+    paint: (r: number, angle: number, x: number, y: number) => string | null,
+  ): Paint =>
+  (x, y) => {
+    const dx = (x + 0.5 - width / 2) / (width / 2);
+    const dy = (y + 0.5 - height / 2) / (height / 2);
+    return paint(Math.hypot(dx, dy), Math.atan2(dy, dx), x, y);
+  };
+
+const RUGS: Record<RugLook, (width: number, height: number) => Paint> = {
+  // The starting rug: the room's own CSS draws it; this is for small pictures.
+  plainRug: (w, h) =>
+    oval(w, h, (r) => {
+      if (r > 1) return null;
+      if (r > 0.86) return "#d5b496";
+      return r > 0.7 ? "#e0c3a8" : "#d5b496";
+    }),
+  // Braided rings: brick, cream, sage.
+  braidRug: (w, h) =>
+    oval(w, h, (r, _, x, y) => {
+      if (r > 1) return null;
+      const twist = (x + y) % 2 === 1;
+      if (r > 0.86) return twist ? "#a8584a" : "#8f4a3e";
+      if (r > 0.72) return "#ead5ab";
+      if (r > 0.58) return twist ? "#8fa37a" : "#7d9168";
+      if (r > 0.44) return "#ead5ab";
+      return r > 0.3 ? "#c98a6a" : "#ead5ab";
+    }),
+  // Pink with a wavy edge and little dots.
+  pinkRug: (w, h) =>
+    oval(w, h, (r, angle, x, y) => {
+      const edge = 0.93 + 0.06 * Math.cos(angle * 16);
+      if (r > edge) return null;
+      if (r > edge - 0.12) return "#dc909a";
+      if (r > edge - 0.2) return "#f6d3d3";
+      if (r < 0.7 && (x + y * 3) % 7 === 0) return "#e8a2ab";
+      return "#f2c2c4";
+    }),
+  // Blue and square, with a diamond in the middle and tassels at both ends.
+  fringeRug: (w, h) => {
+    const fringe = w > 30 ? 2 : 1;
+    const inner = w - fringe * 2;
+    return (x, y) => {
+      if (x < fringe || x >= w - fringe)
+        return y % 2 === 0 && y > 0 && y < h - 1 ? "#efe3c8" : null;
+      const ix = x - fringe;
+      const ring = Math.min(ix, inner - 1 - ix, y, h - 1 - y);
+      if (ring === 0) return "#efe3c8";
+      if (ring === 1) return "#c9785f";
+      const diamond =
+        Math.abs(ix + 0.5 - inner / 2) / 2 + Math.abs(y + 0.5 - h / 2);
+      if (diamond < 1) return "#efe3c8";
+      if (diamond < 2) return "#c9785f";
+      if (diamond < 3 && h > 8) return "#efe3c8";
+      return "#7d94b2";
+    };
+  },
+};
+
+export function rugArt(look: RugLook, size: keyof typeof RUG_SIZE = "room") {
+  const [width, height] = RUG_SIZE[size];
+  return paintArt(width, height, RUGS[look](width, height));
 }
 
 const isWindowLook = (look: LookId): look is WindowLook =>
   look.endsWith("Window");
+export const isRoomLook = (look: LookId): look is RoomLook =>
+  look.endsWith("Room");
+export const isRugLook = (look: LookId): look is RugLook =>
+  look.endsWith("Rug");
 
-/** The drawing for any look, in any slot. */
-export const lookArt = (look: LookId, time: TimeOfDay): PixelArt =>
-  isWindowLook(look) ? windowArt(look, time) : potArt(look as PotLook);
+const drawn = new Map<string, PixelArt>();
+/** Draw once, then reuse: looks are fixed drawings. */
+function cached(key: string, draw: () => PixelArt) {
+  let art = drawn.get(key);
+  if (!art) drawn.set(key, (art = draw()));
+  return art;
+}
+
+/** The drawing for any look, in any slot: walls and rugs as small pictures. */
+export function lookArt(look: LookId, time: TimeOfDay): PixelArt {
+  if (isWindowLook(look))
+    return cached(`${look}:${time}`, () => windowArt(look, time));
+  if (isRoomLook(look)) return cached(look, () => roomPicture(look));
+  if (isRugLook(look)) return cached(look, () => rugArt(look, "small"));
+  return cached(look, () => potArt(look as PotLook));
+}
+
+/** A rug as it lies on the floor. */
+export const floorRugArt = (look: RugLook) =>
+  cached(`${look}:floor`, () => rugArt(look));

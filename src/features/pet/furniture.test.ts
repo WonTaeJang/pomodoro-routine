@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   FURNITURE,
+  SLOTS,
   availableItems,
   canMake,
   looksFor,
@@ -50,6 +51,44 @@ describe("가구 만들기", () => {
       9,
     );
     expect(makeFurniture(made, "twigWindow", 10)).toBe(made);
+  });
+
+  it("벽·바닥과 카펫도 만들어 자리에 놓음", () => {
+    const made = makeFurniture(
+      makeFurniture(
+        withItems({ twig: 2, pinecone: 3, ball: 1 }),
+        "cabinRoom",
+        3,
+      ),
+      "fringeRug",
+      4,
+    );
+    expect(made.furniture).toEqual(["cabinRoom", "fringeRug"]);
+    const placed = placeFurniture(
+      placeFurniture(made, "room", "cabinRoom", 5),
+      "rug",
+      "fringeRug",
+      6,
+    );
+    expect(placed.placed).toEqual({ room: "cabinRoom", rug: "fringeRug" });
+    expect(placeFurniture(placed, "rug", "cabinRoom", 7)).toBe(placed); // wrong slot
+    expect(looksFor("room", placed.furniture)).toEqual([
+      "plainRoom",
+      "cabinRoom",
+    ]);
+    expect(looksFor("rug", [])).toEqual(["plainRug"]);
+  });
+
+  it("자리마다 만들 것이 3개씩, 재료 조합은 서로 다름", () => {
+    for (const slot of SLOTS)
+      expect(FURNITURE.filter((piece) => piece.slot === slot)).toHaveLength(3);
+    const recipes = FURNITURE.map(({ need }) =>
+      Object.entries(need)
+        .map(([item, count]) => `${item}${count}`)
+        .sort()
+        .join(),
+    );
+    expect(new Set(recipes).size).toBe(FURNITURE.length);
   });
 
   it("고를 수 있는 모양은 기본 모양과 만든 것만", () => {
@@ -124,7 +163,7 @@ describe("가구 저장 형식", () => {
     });
   });
 
-  it("v6 기록을 그대로 복원", () => {
+  it("v6 기록을 그대로 복원(v7과 같은 모양)", () => {
     const pet = placeFurniture(
       makeFurniture(withItems({ stone: 3, leaf: 1 }), "succulentPot", 3),
       "pot",
@@ -132,6 +171,13 @@ describe("가구 저장 형식", () => {
       4,
     );
     expect(decodePet(encode(6, pet))).toEqual(pet);
+    expect(decodePet(encode(7, pet))).toEqual(pet);
+  });
+
+  it("v8 이상은 새 버전이라 건드리지 않음", () => {
+    expect(() => decodePet(encode(8, withItems({ leaf: 1 })))).toThrow(
+      PetStorageError,
+    );
   });
 
   it.each<Partial<PetProfile>>([
@@ -143,6 +189,6 @@ describe("가구 저장 형식", () => {
     { placed: [] as never },
   ])("손상된 가구 기록을 거부: %j", (broken) => {
     const pet = { ...withItems({ leaf: 2 }), ...broken };
-    expect(() => decodePet(encode(6, pet))).toThrow(PetStorageError);
+    expect(() => decodePet(encode(7, pet))).toThrow(PetStorageError);
   });
 });

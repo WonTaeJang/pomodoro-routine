@@ -10,6 +10,16 @@
     transition: none;
   }
 }
+// 만들기 안의 자리 탭: 위의 아이템·만들기 탭보다 한 단계 작게
+.tabs.slotTabs {
+  margin-bottom: var(--space-3);
+  padding: 2px;
+  > label {
+    height: 28px;
+    padding: 0 var(--space-2);
+    font-size: var(--font-size-xs);
+  }
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -44,12 +54,6 @@
   margin-top: var(--space-3);
   text-align: center;
   font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-}
-.group {
-  margin: var(--space-3) 0 var(--space-2);
-  font-size: var(--font-size-xs);
-  font-weight: normal;
   color: var(--color-text-muted);
 }
 .recipes {

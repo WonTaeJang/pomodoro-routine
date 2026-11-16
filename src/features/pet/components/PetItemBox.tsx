@@ -8,13 +8,15 @@ import {
   SegmentedControl,
   VisuallyHidden,
 } from "@/components/ui";
-import { ITEMS, type ItemId } from "../items";
+import { cx } from "@/lib/cx";
+import { ITEMS, type ItemCounts, type ItemId } from "../items";
 import {
   FURNITURE,
   SLOTS,
   availableItems,
   canMake,
   type FurnitureId,
+  type Slot,
 } from "../furniture";
 import type { PetProfile } from "../profile";
 import { ItemIcon } from "./PetIcons";
@@ -38,6 +40,7 @@ export function PetItemBox({
 }) {
   const t = useTranslations("pet.items");
   const [tab, setTab] = useState<"list" | "craft">("list");
+  const [slot, setSlot] = useState<Slot>(SLOTS[0]);
   const left = availableItems(pet.items, pet.spent);
   const kinds = ITEMS.filter(({ id }) => pet.items[id]).length;
   return (
@@ -73,67 +76,27 @@ export function PetItemBox({
         </>
       ) : (
         <>
-          {SLOTS.map((slot) => (
-            <section key={slot} aria-labelledby={`craft-${slot}`}>
-              <h3 id={`craft-${slot}`} className={styles.group}>
-                {t(`slots.${slot}.name`)}
-              </h3>
-              <ul className={styles.recipes}>
-                {FURNITURE.filter((piece) => piece.slot === slot).map(
-                  ({ id, need }) => {
-                    const made = pet.furniture.includes(id);
-                    const ready = canMake(id, left);
-                    return (
-                      <li key={id} className={styles.recipe}>
-                        <span className={styles.art}>
-                          <LookPicture look={id} cell={2} />
-                        </span>
-                        <span className={styles.recipeText}>
-                          <strong>{t(`furniture.${id}.name`)}</strong>
-                          <span className={styles.need}>
-                            {Object.entries(need).map(([item, count]) => {
-                              const have = left[item as ItemId] ?? 0;
-                              const name = t(`${item as ItemId}.name`);
-                              return (
-                                <span
-                                  key={item}
-                                  data-short={!made && have < count}
-                                >
-                                  <ItemIcon item={item as ItemId} size={12} />
-                                  <span aria-hidden="true">
-                                    {have}/{count}
-                                  </span>
-                                  <VisuallyHidden>
-                                    {t("needLabel", {
-                                      name,
-                                      have,
-                                      need: count,
-                                    })}
-                                  </VisuallyHidden>
-                                </span>
-                              );
-                            })}
-                          </span>
-                        </span>
-                        {made ? (
-                          <span className={styles.made}>{t("made")} ✓</span>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant={ready ? "primary" : "secondary"}
-                            disabled={!ready}
-                            onClick={() => onCraft(id)}
-                          >
-                            {ready ? t("make") : t("short")}
-                          </Button>
-                        )}
-                      </li>
-                    );
-                  },
-                )}
-              </ul>
-            </section>
-          ))}
+          <SegmentedControl
+            className={cx(styles.tabs, styles.slotTabs)}
+            label={t("slotTabs")}
+            value={slot}
+            onChange={setSlot}
+            options={SLOTS.map((value) => ({
+              value,
+              label: t(`slots.${value}.name`),
+            }))}
+          />
+          <ul className={styles.recipes}>
+            {FURNITURE.filter((piece) => piece.slot === slot).map((piece) => (
+              <Recipe
+                key={piece.id}
+                piece={piece}
+                left={left}
+                made={pet.furniture.includes(piece.id)}
+                onCraft={onCraft}
+              />
+            ))}
+          </ul>
           <Button
             className={styles.decorate}
             variant="secondary"
@@ -153,5 +116,64 @@ export function PetItemBox({
         </>
       )}
     </Dialog>
+  );
+}
+
+/** One thing to make: picture, name, items left / needed, and its button. */
+function Recipe({
+  piece: { id, need },
+  left,
+  made,
+  onCraft,
+}: {
+  piece: (typeof FURNITURE)[number];
+  left: ItemCounts;
+  made: boolean;
+  onCraft: (furniture: FurnitureId) => void;
+}) {
+  const t = useTranslations("pet.items");
+  const ready = canMake(id, left);
+  return (
+    <li className={styles.recipe}>
+      <span className={styles.art}>
+        <LookPicture look={id} cell={2} />
+      </span>
+      <span className={styles.recipeText}>
+        <strong>{t(`furniture.${id}.name`)}</strong>
+        <span className={styles.need}>
+          {Object.entries(need).map(([key, count]) => {
+            const item = key as ItemId;
+            const have = left[item] ?? 0;
+            return (
+              <span key={item} data-short={!made && have < count}>
+                <ItemIcon item={item} size={12} />
+                <span aria-hidden="true">
+                  {have}/{count}
+                </span>
+                <VisuallyHidden>
+                  {t("needLabel", {
+                    name: t(`${item}.name`),
+                    have,
+                    need: count,
+                  })}
+                </VisuallyHidden>
+              </span>
+            );
+          })}
+        </span>
+      </span>
+      {made ? (
+        <span className={styles.made}>{t("made")} ✓</span>
+      ) : (
+        <Button
+          size="sm"
+          variant={ready ? "primary" : "secondary"}
+          disabled={!ready}
+          onClick={() => onCraft(id)}
+        >
+          {ready ? t("make") : t("short")}
+        </Button>
+      )}
+    </li>
   );
 }

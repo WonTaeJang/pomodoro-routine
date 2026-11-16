@@ -1,7 +1,10 @@
 import { isItemId, type ItemCounts, type ItemId } from "./items";
 
-/** Places in the room that hold one piece of furniture each. */
-export const SLOTS = ["window", "pot"] as const;
+/**
+ * Places in the room that hold one piece of furniture each, in decorating
+ * order: the walls and floor as one set, then the window, pot and rug.
+ */
+export const SLOTS = ["room", "window", "pot", "rug"] as const;
 export type Slot = (typeof SLOTS)[number];
 
 /** Furniture made from walk finds: three items each, two of one kind. */
@@ -12,6 +15,12 @@ export const FURNITURE = [
   { id: "flowerPot", slot: "pot", need: { flower: 2, stone: 1 } },
   { id: "pinePot", slot: "pot", need: { pinecone: 2, leaf: 1 } },
   { id: "succulentPot", slot: "pot", need: { stone: 2, leaf: 1 } },
+  { id: "cabinRoom", slot: "room", need: { twig: 2, pinecone: 1 } },
+  { id: "floralRoom", slot: "room", need: { flower: 2, leaf: 1 } },
+  { id: "stripeRoom", slot: "room", need: { stone: 2, pinecone: 1 } },
+  { id: "braidRug", slot: "rug", need: { leaf: 2, flower: 1 } },
+  { id: "pinkRug", slot: "rug", need: { flower: 2, ball: 1 } },
+  { id: "fringeRug", slot: "rug", need: { pinecone: 2, ball: 1 } },
 ] as const satisfies readonly {
   id: string;
   slot: Slot;
@@ -21,8 +30,10 @@ export const FURNITURE = [
 export type FurnitureId = (typeof FURNITURE)[number]["id"];
 /** What a slot shows: its starting look or a made piece. */
 export const DEFAULT_LOOK = {
+  room: "plainRoom",
   window: "plainWindow",
   pot: "plainPot",
+  rug: "plainRug",
 } as const satisfies Record<Slot, string>;
 export type LookId = FurnitureId | (typeof DEFAULT_LOOK)[Slot];
 export type Placed = Partial<Record<Slot, FurnitureId>>;

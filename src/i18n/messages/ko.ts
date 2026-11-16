@@ -22,6 +22,7 @@ const ko = {
       newItems: "새 아이템이 있어요",
       title: "아이템 상자",
       tabs: "아이템 상자 보기",
+      slotTabs: "만들 자리",
       list: "아이템",
       craft: "만들기",
       unknown: "???",
@@ -41,8 +42,10 @@ const ko = {
       decorate: "방 꾸미기",
       decorateHint: "가구를 하나 만들면 방을 꾸밀 수 있어요",
       slots: {
+        room: { name: "벽·바닥", object: "벽·바닥을" },
         window: { name: "창문", object: "창문을" },
         pot: { name: "화분", object: "화분을" },
+        rug: { name: "카펫", object: "카펫을" },
       },
       furniture: {
         plainWindow: {
@@ -80,6 +83,46 @@ const ko = {
           name: "돌 화분 다육이",
           object: "돌 화분 다육이를",
           to: "돌 화분 다육이로",
+        },
+        plainRoom: {
+          name: "기본 벽·바닥",
+          object: "기본 벽·바닥을",
+          to: "기본 벽·바닥으로",
+        },
+        cabinRoom: {
+          name: "나무 오두막",
+          object: "나무 오두막을",
+          to: "나무 오두막으로",
+        },
+        floralRoom: {
+          name: "파스텔 꽃무늬",
+          object: "파스텔 꽃무늬를",
+          to: "파스텔 꽃무늬로",
+        },
+        stripeRoom: {
+          name: "줄무늬 클래식",
+          object: "줄무늬 클래식을",
+          to: "줄무늬 클래식으로",
+        },
+        plainRug: {
+          name: "기본 러그",
+          object: "기본 러그를",
+          to: "기본 러그로",
+        },
+        braidRug: {
+          name: "꼬임 러그",
+          object: "꼬임 러그를",
+          to: "꼬임 러그로",
+        },
+        pinkRug: {
+          name: "분홍 물결 러그",
+          object: "분홍 물결 러그를",
+          to: "분홍 물결 러그로",
+        },
+        fringeRug: {
+          name: "술 달린 푸른 러그",
+          object: "술 달린 푸른 러그를",
+          to: "술 달린 푸른 러그로",
         },
       },
     },

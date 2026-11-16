@@ -1,7 +1,18 @@
 "use client";
 
-import { lookOf, type LookId, type Slot } from "../furniture";
-import { lookArt, type PixelArt } from "../roomArt";
+import type { CSSProperties, ReactNode } from "react";
+import { DEFAULT_LOOK, lookOf, type LookId, type Slot } from "../furniture";
+import {
+  ROOMS,
+  floorRugArt,
+  isRoomLook,
+  isRugLook,
+  lookArt,
+  patternUrl,
+  type Pattern,
+  type PixelArt,
+  type Surface,
+} from "../roomArt";
 import { usePetStore } from "../store";
 import { useTimeOfDay } from "../useTimeOfDay";
 import styles from "./PetPlayground.module.scss";
@@ -52,9 +63,35 @@ export type RoomDecorating = {
   onSelect: (slot: Slot) => void;
 };
 
+/** Repeat a surface's pattern, with its strip along the floor line. */
+function surfaceStyle({ tile, edge }: Surface, edgeAt: "top" | "bottom") {
+  const layers = edge ? [edge, tile] : [tile];
+  const size = ({ width, height }: Pattern) =>
+    `calc(var(--room-cell) * ${width}) calc(var(--room-cell) * ${height})`;
+  return {
+    backgroundImage: layers.map(patternUrl).join(", "),
+    backgroundSize: layers.map(size).join(", "),
+    backgroundRepeat: edge ? "repeat-x, repeat" : "repeat",
+    backgroundPosition: edge ? `left ${edgeAt}, left top` : "left top",
+  } satisfies CSSProperties;
+}
+const surfaceStyles = new Map<LookId, [CSSProperties, CSSProperties]>();
+/** Wall and floor backgrounds; none for the starting room (the room's CSS). */
+function roomStyles(look: LookId) {
+  if (!isRoomLook(look) || look === DEFAULT_LOOK.room) return null;
+  let styles = surfaceStyles.get(look);
+  if (!styles) {
+    const { wall, floor } = ROOMS[look];
+    styles = [surfaceStyle(wall, "bottom"), surfaceStyle(floor, "top")];
+    surfaceStyles.set(look, styles);
+  }
+  return styles;
+}
+
 /**
- * The room's window, plant and rug, shared by home and the start of a walk.
- * Shows the placed furniture, or `preview` looks while decorating.
+ * The room's walls and floor, window, plant and rug, shared by home and the
+ * start of a walk. Shows the placed furniture, or `preview` looks while
+ * decorating. The starting walls and rug are the room's own CSS.
  */
 export function PetRoomArt({
   preview,
@@ -65,13 +102,16 @@ export function PetRoomArt({
 }) {
   const placed = usePetStore((s) => s.pet?.placed);
   const time = useTimeOfDay();
-  const slot = (name: Slot, className: string) => {
+  const look = (name: Slot) => preview?.[name] ?? lookOf(name, placed ?? {});
+  const slot = (name: Slot, className: string, art: ReactNode) => {
     const selected = decorating?.selected === name;
     return (
-      <div className={className} data-selected={selected}>
-        <Pixels
-          art={lookArt(preview?.[name] ?? lookOf(name, placed ?? {}), time)}
-        />
+      <div
+        className={className}
+        data-selected={selected}
+        data-look={look(name)}
+      >
+        {art}
         {decorating && (
           <button
             type="button"
@@ -89,11 +129,33 @@ export function PetRoomArt({
       </div>
     );
   };
+  const room = roomStyles(look("room"));
+  const rug = look("rug");
   return (
     <>
-      {slot("window", styles.window)}
-      {slot("pot", styles.plant)}
-      <div className={styles.rug} aria-hidden="true" />
+      {slot(
+        "room",
+        styles.walls,
+        room && (
+          <>
+            <div className={styles.wall} style={room[0]} />
+            <div className={styles.floor} style={room[1]} />
+          </>
+        ),
+      )}
+      {slot(
+        "window",
+        styles.window,
+        <Pixels art={lookArt(look("window"), time)} />,
+      )}
+      {slot("pot", styles.plant, <Pixels art={lookArt(look("pot"), time)} />)}
+      {slot(
+        "rug",
+        styles.rug,
+        isRugLook(rug) && rug !== DEFAULT_LOOK.rug && (
+          <Pixels art={floorRugArt(rug)} />
+        ),
+      )}
     </>
   );
 }
