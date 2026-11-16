@@ -47,11 +47,15 @@ export function LookPicture({
   look,
   cell,
   height,
+  fit = Infinity,
 }: {
   look: LookId;
+  /** Widest it may be, in pixels: wide pictures (the cone) shrink to fit. */
+  fit?: number;
 } & ({ cell: number; height?: never } | { height: number; cell?: never })) {
   const art = lookArt(look, "day");
-  return <Pixels art={art} cell={cell ?? height! / art.height} />;
+  const size = cell ?? height! / art.height;
+  return <Pixels art={art} cell={Math.min(size, fit / art.width)} />;
 }
 
 export type RoomDecorating = {
@@ -156,6 +160,8 @@ export function PetRoomArt({
           <Pixels art={floorRugArt(rug)} />
         ),
       )}
+      {/* What Kkami wears is drawn by Rive; this only marks where to pick it. */}
+      {decorating && slot("outfit", styles.outfitSlot, null)}
     </>
   );
 }

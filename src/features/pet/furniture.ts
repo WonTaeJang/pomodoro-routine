@@ -2,12 +2,20 @@ import { isItemId, type ItemCounts, type ItemId } from "./items";
 
 /**
  * Places in the room that hold one piece of furniture each, in decorating
- * order: the walls and floor as one set, then the window, pot and rug.
+ * order: the walls and floor as one set, then the window, pot and rug, and
+ * what Kkami wears.
  */
-export const SLOTS = ["room", "window", "pot", "rug"] as const;
+export const SLOTS = ["room", "window", "pot", "rug", "outfit"] as const;
 export type Slot = (typeof SLOTS)[number];
 
-/** Furniture made from walk finds: three items each, two of one kind. */
+/** What things are made from: walk finds, and hearts from level ups. */
+export type Material = ItemId | "heart";
+export type MaterialCounts = Partial<Record<Material, number>>;
+
+/**
+ * Furniture made from walk finds: three each, two of one kind. Outfits take
+ * a heart and two finds; the brown hat is everyone's from the start (free).
+ */
 export const FURNITURE = [
   { id: "twigWindow", slot: "window", need: { twig: 2, leaf: 1 } },
   { id: "flowerWindow", slot: "window", need: { flower: 2, twig: 1 } },
@@ -21,10 +29,16 @@ export const FURNITURE = [
   { id: "braidRug", slot: "rug", need: { leaf: 2, flower: 1 } },
   { id: "pinkRug", slot: "rug", need: { flower: 2, ball: 1 } },
   { id: "fringeRug", slot: "rug", need: { pinecone: 2, ball: 1 } },
+  { id: "brownHat", slot: "outfit", need: {}, free: true },
+  { id: "ginghamBib", slot: "outfit", need: { heart: 1, flower: 2 } },
+  { id: "creamScarf", slot: "outfit", need: { heart: 1, leaf: 2 } },
+  { id: "checkShirt", slot: "outfit", need: { heart: 1, stone: 2 } },
+  { id: "coneCollar", slot: "outfit", need: { heart: 1, ball: 2 } },
 ] as const satisfies readonly {
   id: string;
   slot: Slot;
-  need: Partial<Record<ItemId, number>>;
+  need: MaterialCounts;
+  free?: true;
 }[];
 
 export type FurnitureId = (typeof FURNITURE)[number]["id"];
@@ -34,12 +48,28 @@ export const DEFAULT_LOOK = {
   window: "plainWindow",
   pot: "plainPot",
   rug: "plainRug",
+  outfit: "plainOutfit",
 } as const satisfies Record<Slot, string>;
 export type LookId = FurnitureId | (typeof DEFAULT_LOOK)[Slot];
 export type Placed = Partial<Record<Slot, FurnitureId>>;
 
 export const furnitureById = (id: FurnitureId) =>
   FURNITURE.find((piece) => piece.id === id)!;
+
+/** Owned without being made (the brown hat). */
+export const isFree = (id: FurnitureId) => "free" in furnitureById(id);
+/** Made, or free to everyone. */
+export const owns = (made: readonly FurnitureId[], id: FurnitureId) =>
+  made.includes(id) || isFree(id);
+/** What can be made, in catalog order. */
+export const RECIPES = FURNITURE.filter((piece) => !("free" in piece));
+
+/** Hearts used on what was made. */
+export const heartsSpent = (furniture: readonly FurnitureId[]) =>
+  furniture.reduce(
+    (sum, id) => sum + ((furnitureById(id).need as MaterialCounts).heart ?? 0),
+    0,
+  );
 
 export function isFurnitureId(value: unknown): value is FurnitureId {
   return FURNITURE.some((piece) => piece.id === value);
@@ -54,7 +84,7 @@ export function looksFor(slot: Slot, owned: readonly FurnitureId[]): LookId[] {
   return [
     DEFAULT_LOOK[slot],
     ...FURNITURE.filter(
-      (piece) => piece.slot === slot && owned.includes(piece.id),
+      (piece) => piece.slot === slot && owns(owned, piece.id),
     ).map((piece) => piece.id),
   ];
 }
@@ -75,8 +105,8 @@ export function availableItems(
   );
 }
 
-export function canMake(id: FurnitureId, available: ItemCounts): boolean {
+export function canMake(id: FurnitureId, available: MaterialCounts): boolean {
   return Object.entries(furnitureById(id).need).every(
-    ([item, count]) => (available[item as ItemId] ?? 0) >= count,
+    ([material, count]) => (available[material as Material] ?? 0) >= count,
   );
 }

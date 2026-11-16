@@ -11,6 +11,8 @@ import {
   useViewModelInstanceTrigger,
 } from "@rive-app/react-webgl2";
 import { useMediaQuery } from "@/lib/useMediaQuery";
+import type { LookId } from "./furniture";
+import { OUTFIT_FLAGS } from "./outfits";
 import type { PetPose } from "./pet";
 
 const LOAD_TIMEOUT_MS = 15000;
@@ -146,4 +148,20 @@ export function usePetRivePose(
     setSleeping,
     setStartled,
   ]);
+}
+
+/** Dress the home Kkami: only the outfit's flag is on (none for the collar). */
+export function usePetRiveOutfit(
+  animation: ReturnType<typeof usePetRive>,
+  look: LookId,
+) {
+  const { rive, loaded } = animation;
+  useEffect(() => {
+    const model = loaded ? rive?.viewModelInstance : null;
+    if (!model) return;
+    for (const [id, flag] of Object.entries(OUTFIT_FLAGS)) {
+      const shown = model.boolean(flag);
+      if (shown) shown.value = id === look;
+    }
+  }, [rive, loaded, look]);
 }

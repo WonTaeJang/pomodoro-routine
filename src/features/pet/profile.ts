@@ -4,6 +4,7 @@ import {
   createAffinity,
   isAffinity,
   isDayKey,
+  levelHearts,
   rewardPats,
   type Affinity,
 } from "./affinity";
@@ -17,9 +18,13 @@ import {
   availableItems,
   canMake,
   furnitureById,
+  heartsSpent,
+  isFree,
   isFurnitureId,
   isSlot,
+  owns,
   type FurnitureId,
+  type MaterialCounts,
   type Placed,
   type Slot,
 } from "./furniture";
@@ -148,7 +153,16 @@ export function seeItems(pet: PetProfile, seen: number): PetProfile {
   return itemsSeen === pet.itemsSeen ? pet : { ...pet, itemsSeen };
 }
 
-/** Make a piece from the items left over. Does nothing if made or short. */
+/** Finds and hearts left to make things with. */
+export function materialsLeft(pet: PetProfile): MaterialCounts {
+  const hearts = levelHearts(pet.affinity.points) - heartsSpent(pet.furniture);
+  return {
+    ...availableItems(pet.items, pet.spent),
+    ...(hearts > 0 && { heart: hearts }),
+  };
+}
+
+/** Make a piece from what is left. Does nothing if made, free or short. */
 export function makeFurniture(
   pet: PetProfile,
   id: FurnitureId,
@@ -156,12 +170,15 @@ export function makeFurniture(
 ): PetProfile {
   if (
     pet.furniture.includes(id) ||
-    !canMake(id, availableItems(pet.items, pet.spent))
+    isFree(id) ||
+    !canMake(id, materialsLeft(pet))
   )
     return pet;
+  // Hearts are counted from what was made; finds are counted as spent.
   const spent = { ...pet.spent };
-  for (const [item, count] of Object.entries(furnitureById(id).need))
-    spent[item as ItemId] = (spent[item as ItemId] ?? 0) + count;
+  for (const [material, count] of Object.entries(furnitureById(id).need))
+    if (material !== "heart")
+      spent[material as ItemId] = (spent[material as ItemId] ?? 0) + count;
   return {
     ...pet,
     spent,
@@ -178,7 +195,7 @@ export function placeFurniture(
   now: number,
 ): PetProfile {
   if ((pet.placed[slot] ?? null) === id) return pet;
-  if (id && (!pet.furniture.includes(id) || furnitureById(id).slot !== slot))
+  if (id && (!owns(pet.furniture, id) || furnitureById(id).slot !== slot))
     return pet;
   const placed = { ...pet.placed };
   if (id) placed[slot] = id;
@@ -193,7 +210,7 @@ function isDailyWalks({ walkDay, walksOnDay, walks }: Partial<PetProfile>) {
 }
 
 function isFurnitureState(p: Partial<PetProfile>): boolean {
-  const { items, spent, furniture, placed } = p;
+  const { items, spent, furniture, placed, affinity } = p;
   if (!isItemCounts(spent) || !Array.isArray(furniture)) return false;
   if (!placed || typeof placed !== "object" || Array.isArray(placed))
     return false;
@@ -201,13 +218,15 @@ function isFurnitureState(p: Partial<PetProfile>): boolean {
     Object.entries(spent).every(
       ([item, count]) => count! <= (items?.[item as ItemId] ?? 0),
     ) &&
-    furniture.every(isFurnitureId) &&
+    furniture.every((id) => isFurnitureId(id) && !isFree(id)) &&
     new Set(furniture).size === furniture.length &&
+    // Hearts come from level ups only.
+    heartsSpent(furniture) <= levelHearts(affinity?.points ?? 0) &&
     Object.entries(placed).every(
       ([slot, id]) =>
         isSlot(slot) &&
         isFurnitureId(id) &&
-        furniture.includes(id) &&
+        owns(furniture, id) &&
         furnitureById(id).slot === slot,
     )
   );

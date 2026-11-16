@@ -130,7 +130,8 @@ $slot-tag-color: #fffaf0;
 .window,
 .plant,
 .rug,
-.walls {
+.walls,
+.outfitSlot {
   &[data-selected="true"] {
     z-index: $interaction-layer;
     outline: $slot-outline;
@@ -186,6 +187,12 @@ $slot-tag-color: #fffaf0;
   top: 12px;
   left: 12px;
 }
+// 옷 자리(꾸밀 때만)는 까미를 누르는 영역과 같은 곳 (.petTarget과 함께 정의)
+.outfitSlot .slotTag {
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+}
 .rug .slotTag {
   top: calc(100% + 8px);
   left: 50%;
@@ -234,16 +241,19 @@ $slot-tag-color: #fffaf0;
   display: block;
 }
 
-.petTarget {
+.petTarget,
+.outfitSlot {
   position: absolute;
-  z-index: $interaction-layer;
   width: $petTarget-width;
   height: $petTarget-height;
   bottom: $petTarget-bottom;
   left: $petTarget-left;
+  border-radius: 35%;
+}
+.petTarget {
+  z-index: $interaction-layer;
   border: 0;
   background: transparent;
-  border-radius: 35%;
   cursor: grab;
   touch-action: none;
   -webkit-tap-highlight-color: transparent;
@@ -350,7 +360,8 @@ $slot-tag-color: #fffaf0;
     left: calc(50% - #{$small-dog-width * 0.5});
     bottom: var(--space-3);
   }
-  .petTarget {
+  .petTarget,
+  .outfitSlot {
     width: $small-target-width;
     height: $small-target-height;
     left: calc(50% - #{$small-target-width * 0.5});

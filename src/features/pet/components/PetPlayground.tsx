@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
-import { usePetRive, usePetRivePose } from "../usePetRive";
+import { usePetRive, usePetRiveOutfit, usePetRivePose } from "../usePetRive";
 import { Button, VisuallyHidden } from "@/components/ui";
 import { ChevronLeftIcon } from "@/components/icons";
 import { usePetCare } from "../usePetCare";
@@ -28,7 +28,7 @@ import {
   type SpeechLevel,
 } from "../speech";
 import { PET_HAPPY_MS } from "../pet";
-import type { FurnitureId, Slot } from "../furniture";
+import { lookOf, type FurnitureId, type Slot } from "../furniture";
 import { PetFoundCard, PetWalkMap } from "./PetTrip";
 import { PetItemBox } from "./PetItemBox";
 import { PetLog } from "./PetLog";
@@ -177,6 +177,11 @@ function PetRoom({ retry }: { retry: () => void }) {
   });
   const decorating = decor.mode !== null;
   useFocusAfter(decorating, boxButton);
+  // What Kkami wears, or tries on while decorating.
+  usePetRiveOutfit(
+    animation,
+    decor.preview?.outfit ?? lookOf("outfit", record?.placed ?? {}),
+  );
 
   // What Kkami says (I-058).
   const time = useTimeOfDay();

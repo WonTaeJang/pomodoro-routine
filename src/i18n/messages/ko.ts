@@ -41,12 +41,12 @@ const ko = {
       made: "만들었어요",
       short: "재료 부족",
       decorate: "방 꾸미기",
-      decorateHint: "가구를 하나 만들면 방을 꾸밀 수 있어요",
       slots: {
         room: { name: "벽·바닥", object: "벽·바닥을" },
         window: { name: "창문", object: "창문을" },
         pot: { name: "화분", object: "화분을" },
         rug: { name: "카펫", object: "카펫을" },
+        outfit: { name: "옷", object: "옷을" },
       },
       furniture: {
         plainWindow: {
@@ -125,6 +125,32 @@ const ko = {
           object: "술 달린 푸른 러그를",
           to: "술 달린 푸른 러그로",
         },
+        plainOutfit: {
+          name: "기본 목줄",
+          object: "기본 목줄을",
+          to: "기본 목줄로",
+        },
+        brownHat: {
+          name: "갈색 모자",
+          object: "갈색 모자를",
+          to: "갈색 모자로",
+        },
+        ginghamBib: {
+          name: "파란 깅엄 스카프",
+          object: "파란 깅엄 스카프를",
+          to: "파란 깅엄 스카프로",
+        },
+        creamScarf: {
+          name: "크림 스카프",
+          object: "크림 스카프를",
+          to: "크림 스카프로",
+        },
+        checkShirt: {
+          name: "하늘색 체크 셔츠",
+          object: "하늘색 체크 셔츠를",
+          to: "하늘색 체크 셔츠로",
+        },
+        coneCollar: { name: "넥카라", object: "넥카라를", to: "넥카라로" },
       },
     },
     decorate: {

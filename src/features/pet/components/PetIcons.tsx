@@ -1,3 +1,4 @@
+import type { Slot } from "../furniture";
 import type { ItemId } from "../items";
 
 // 돌봄 기계의 도트 아이콘. 한 글자가 한 칸이고 '.'은 비워 둡니다.
@@ -362,4 +363,89 @@ export function SnackRuleIcon() {
 /** 친밀도 하트 한 칸. fill은 0(빈 칸), 0.5(왼쪽 절반), 1(가득) */
 export function MeterHeart({ fill }: { fill: keyof typeof METER }) {
   return <PixelIcon art={METER[fill]} size={11} />;
+}
+
+// 만들기 탭의 자리 아이콘: 벽·바닥, 창문, 화분, 카펫, 옷
+const SLOT_ART = {
+  room: {
+    rows: [
+      "wwlwwlwwlw",
+      "wwlwwlwwlw",
+      "wwlwwlwwlw",
+      "wwlwwlwwlw",
+      "wwlwwlwwlw",
+      "kkkkkkkkkk",
+      "ffffbfffff",
+      "ffffffffff",
+      "fbffffffbf",
+      "ffffffffff",
+    ],
+    colors: {
+      w: "#f4efdf",
+      l: "#d8cbb0",
+      k: "#a98660",
+      f: "#d3b388",
+      b: "#b8956a",
+    },
+  },
+  window: {
+    rows: [
+      "#########",
+      "#sss#sss#",
+      "#sss#sss#",
+      "#sss#sss#",
+      "#########",
+      "#sss#sss#",
+      "#ggg#ggg#",
+      "#ggg#ggg#",
+      "#########",
+      "bbbbbbbbb",
+    ],
+    colors: { "#": "#fdf9ed", s: "#c4dbd7", g: "#a3c1a4", b: "#a6735a" },
+  },
+  pot: {
+    rows: [
+      "...g.g...",
+      "..ggg.g..",
+      ".g.ggg.g.",
+      "..g.g.g..",
+      "....g....",
+      ".PPPPPPP.",
+      ".PPPPPPd.",
+      "..PPPPd..",
+      "..PPPPd..",
+      "..PPPPd..",
+    ],
+    colors: { g: "#8fbf7a", P: "#cd9a80", d: "#ab755f" },
+  },
+  rug: {
+    rows: [
+      "...rrrrr...",
+      ".rrcccccrr.",
+      "rcccrrrcccr",
+      "rcccrrrcccr",
+      ".rrcccccrr.",
+      "...rrrrr...",
+    ],
+    colors: { r: "#c98a6a", c: "#ead5ab" },
+  },
+  outfit: {
+    rows: [
+      "..##..##..",
+      ".#cc##cc#.",
+      "#cccccccc#",
+      "#c#cccc#c#",
+      "..#cccc#..",
+      "..#cccc#..",
+      "..#cccc#..",
+      "..######..",
+    ],
+    colors: { "#": "#3f4f75", c: "#c9d8ee" },
+  },
+} satisfies Record<Slot, Pixels>;
+
+export function SlotIcon({ slot }: { slot: Slot }) {
+  const art = SLOT_ART[slot];
+  // The same 2px cell for all, so the rug stays low and flat.
+  return <PixelIcon art={art} size={art.rows.length * 2} />;
 }

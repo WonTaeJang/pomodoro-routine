@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  FURNITURE,
+  RECIPES,
   SLOTS,
   availableItems,
   canMake,
@@ -11,6 +11,7 @@ import {
   addWalks,
   createPetProfile,
   makeFurniture,
+  materialsLeft,
   placeFurniture,
   type PetProfile,
 } from "./profile";
@@ -79,16 +80,20 @@ describe("가구 만들기", () => {
     expect(looksFor("rug", [])).toEqual(["plainRug"]);
   });
 
-  it("자리마다 만들 것이 3개씩, 재료 조합은 서로 다름", () => {
+  it("자리마다 만들 것이 3개씩(옷은 4개), 재료 조합은 서로 다름", () => {
     for (const slot of SLOTS)
-      expect(FURNITURE.filter((piece) => piece.slot === slot)).toHaveLength(3);
-    const recipes = FURNITURE.map(({ need }) =>
+      expect(RECIPES.filter((piece) => piece.slot === slot)).toHaveLength(
+        slot === "outfit" ? 4 : 3,
+      );
+    for (const { need } of RECIPES)
+      expect(Object.values(need).reduce((a, b) => a + b, 0)).toBe(3);
+    const recipes = RECIPES.map(({ need }) =>
       Object.entries(need)
         .map(([item, count]) => `${item}${count}`)
         .sort()
         .join(),
     );
-    expect(new Set(recipes).size).toBe(FURNITURE.length);
+    expect(new Set(recipes).size).toBe(RECIPES.length);
   });
 
   it("고를 수 있는 모양은 기본 모양과 만든 것만", () => {
@@ -96,13 +101,6 @@ describe("가구 만들기", () => {
     expect(
       looksFor("window", ["stoneWindow", "pinePot", "twigWindow"]),
     ).toEqual(["plainWindow", "twigWindow", "stoneWindow"]);
-  });
-
-  it("레시피는 자리마다 3개, 재료는 모두 3개씩", () => {
-    for (const slot of ["window", "pot"])
-      expect(FURNITURE.filter((piece) => piece.slot === slot)).toHaveLength(3);
-    for (const { need } of FURNITURE)
-      expect(Object.values(need).reduce((sum, n) => sum + n, 0)).toBe(3);
   });
 });
 
@@ -152,6 +150,59 @@ describe("가구 놓기", () => {
   });
 });
 
+describe("까미 옷", () => {
+  // Twenty treats reach Lv.3 (60 points), which earns two hearts.
+  const atLevel3 = (pet: PetProfile): PetProfile => ({
+    ...pet,
+    totalSnacks: 20,
+    affinity: { ...pet.affinity, points: 60 },
+  });
+
+  it("갈색 모자는 만들지 않아도 바로 입음", () => {
+    const pet = withItems({ leaf: 1 });
+    expect(looksFor("outfit", [])).toEqual(["plainOutfit", "brownHat"]);
+    expect(makeFurniture(pet, "brownHat", 3)).toBe(pet);
+    expect(placeFurniture(pet, "outfit", "brownHat", 4).placed).toEqual({
+      outfit: "brownHat",
+    });
+  });
+
+  it("옷은 하트 1개와 아이템 2개로 만들고, 하트는 받은 만큼만", () => {
+    const pet = atLevel3(withItems({ flower: 2, leaf: 2, stone: 2 }));
+    expect(materialsLeft(pet)).toMatchObject({ heart: 2 });
+    const two = makeFurniture(
+      makeFurniture(pet, "ginghamBib", 3),
+      "creamScarf",
+      4,
+    );
+    expect(two.furniture).toEqual(["ginghamBib", "creamScarf"]);
+    expect(two.spent).toEqual({ flower: 2, leaf: 2 }); // hearts are not items
+    expect(materialsLeft(two).heart).toBeUndefined();
+    expect(makeFurniture(two, "checkShirt", 5)).toBe(two); // out of hearts
+    expect(
+      makeFurniture(withItems({ flower: 2 }), "ginghamBib", 3).furniture,
+    ).toEqual([]); // Lv.1 has no heart
+  });
+
+  it("v8 기록을 복원하고, 받은 것보다 하트를 많이 쓴 기록은 거부", () => {
+    const made = placeFurniture(
+      makeFurniture(atLevel3(withItems({ ball: 2 })), "coneCollar", 3),
+      "outfit",
+      "coneCollar",
+      4,
+    );
+    expect(decodePet(encode(8, made))).toEqual(made);
+    const overspent = {
+      ...made,
+      totalSnacks: 0,
+      affinity: { ...made.affinity, points: 0 },
+    };
+    expect(() => decodePet(encode(8, overspent))).toThrow(PetStorageError);
+    const hat = { ...withItems({ leaf: 1 }), furniture: ["brownHat"] };
+    expect(() => decodePet(encode(8, hat))).toThrow(PetStorageError); // free, never made
+  });
+});
+
 describe("가구 저장 형식", () => {
   it("v4 기록은 가구 없이 이전", () => {
     const { spent, furniture, placed, ...v4 } = withItems({ leaf: 2 });
@@ -174,8 +225,8 @@ describe("가구 저장 형식", () => {
     expect(decodePet(encode(7, pet))).toEqual(pet);
   });
 
-  it("v8 이상은 새 버전이라 건드리지 않음", () => {
-    expect(() => decodePet(encode(8, withItems({ leaf: 1 })))).toThrow(
+  it("v9 이상은 새 버전이라 건드리지 않음", () => {
+    expect(() => decodePet(encode(9, withItems({ leaf: 1 })))).toThrow(
       PetStorageError,
     );
   });

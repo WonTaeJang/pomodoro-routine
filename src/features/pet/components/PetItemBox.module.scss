@@ -56,12 +56,6 @@
   place-items: center;
   height: 30px;
 }
-.summary {
-  margin-top: var(--space-3);
-  text-align: center;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-}
 .recipes {
   display: grid;
   gap: var(--space-2);
@@ -110,11 +104,12 @@
     font-weight: var(--font-weight-bold);
   }
 }
+// 만든 것: 체크 표시만 (글자는 화면 낭독기용)
 .made {
-  font-size: var(--font-size-xs);
+  padding-right: var(--space-2);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
   color: #3f6b45;
-  white-space: nowrap;
 }
 .decorate {
   width: 100%;

@@ -1,4 +1,5 @@
 import type { LookId } from "./furniture";
+import OUTFIT_PICTURES from "./outfitPictures.json";
 
 // 방의 창문·화분·벽과 바닥·러그 도트 그림. 집 까미와 같은 칸 크기로 그립니다(_room-art.scss의 --room-cell).
 // 창은 창밖(하늘·해·달·언덕)을 먼저 그리고 창틀을 덮어, 어떤 창에도 시간대가 들어갑니다.
@@ -595,6 +596,26 @@ export function rugArt(look: RugLook, size: keyof typeof RUG_SIZE = "room") {
   return paintArt(width, height, RUGS[look](width, height));
 }
 
+// --- Outfits --------------------------------------------------------------------
+// 까미 옷은 Rive 장면에 그려지고(scripts/pet-outfits.mjs), 상자·기록창에는
+// 생성 스크립트가 함께 내보낸 작은 그림(outfitPictures.json)을 씁니다.
+type OutfitLook = keyof typeof OUTFIT_PICTURES;
+/** The starting collar and tag, as worn today. */
+const PLAIN_OUTFIT = paintArt(14, 4, (x, y) => {
+  if (y < 2) return "#d98770";
+  return x >= 6 && x <= 7 ? "#e5b95b" : null;
+});
+export const isOutfitLook = (
+  look: LookId,
+): look is OutfitLook | "plainOutfit" =>
+  look === "plainOutfit" || look in OUTFIT_PICTURES;
+function outfitArt(look: OutfitLook | "plainOutfit") {
+  if (look === "plainOutfit") return PLAIN_OUTFIT;
+  const { width, height, cells } = OUTFIT_PICTURES[look];
+  const colors = new Map(cells.map(([x, y, c]) => [`${x},${y}`, c as string]));
+  return paintArt(width, height, (x, y) => colors.get(`${x},${y}`) ?? null);
+}
+
 const isWindowLook = (look: LookId): look is WindowLook =>
   look.endsWith("Window");
 export const isRoomLook = (look: LookId): look is RoomLook =>
@@ -616,6 +637,7 @@ export function lookArt(look: LookId, time: TimeOfDay): PixelArt {
     return cached(`${look}:${time}`, () => windowArt(look, time));
   if (isRoomLook(look)) return cached(look, () => roomPicture(look));
   if (isRugLook(look)) return cached(look, () => rugArt(look, "small"));
+  if (isOutfitLook(look)) return cached(look, () => outfitArt(look));
   return cached(look, () => potArt(look as PotLook));
 }
 

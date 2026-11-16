@@ -1,5 +1,6 @@
 import { writeFileSync } from "node:fs";
 import { rect, node, keys } from "./rml.mjs";
+import { outfits, picture, toRects } from "./pet-outfits.mjs";
 
 // Stable RML identities. Preserve the numbers when adding or rearranging artwork.
 const ID = {
@@ -48,6 +49,19 @@ const ID = {
   biscuitMiddle: 74,
   crumbs: 75,
   snackMouth: 76,
+};
+// Outfits (I-061), in order: hat, gingham bib, scarf, shirt, cone. Each has a
+// flag, a standing and a lying node, a layer with off/on states and their
+// one-frame animations, numbered from these bases by position.
+const OUTFIT_ID = {
+  flag: 90,
+  upright: 100,
+  resting: 105,
+  layer: 110,
+  off: 120,
+  on: 125,
+  offAnimation: 130,
+  onAnimation: 135,
 };
 // BindablePropertyBoolean.propertyValue (verified with rive schema).
 const BOOLEAN_VALUE_KEY = 634;
@@ -138,23 +152,18 @@ const head = [
     'opacity="0"',
   ),
 ];
-const dog = [
-  node("Tail", ID.tail, [
-    rect(36, 28, 28, 12, ink),
-    rect(56, 16, 12, 20, ink),
-    rect(60, 8, 12, 12, fur),
-  ]),
-  rect(-36, 12, 72, 56, ink),
-  rect(-44, 36, 88, 24, ink),
-  rect(-28, 16, 56, 44, fur),
-  rect(-16, 20, 32, 32, light),
-  rect(-40, 60, 28, 16, ink),
-  rect(12, 60, 28, 16, ink),
-  rect(-36, 60, 20, 8, fur),
-  rect(16, 60, 20, 8, fur),
-  rect(-28, 12, 56, 8, "D98770"),
-  rect(-4, 20, 8, 8, "E5B95B"),
-  node("Head", ID.head, head, 'y="-28"'),
+// Body rectangles as [x, y, width, height, color]: the shirt follows them.
+const DOG_BODY = [
+  [-36, 12, 72, 56, ink],
+  [-44, 36, 88, 24, ink],
+  [-28, 16, 56, 44, fur],
+  [-16, 20, 32, 32, light],
+  [-40, 60, 28, 16, ink],
+  [12, 60, 28, 16, ink],
+  [-36, 60, 20, 8, fur],
+  [16, 60, 20, 8, fur],
+  [-28, 12, 56, 8, "D98770"],
+  [-4, 20, 8, 8, "E5B95B"],
 ];
 // A separate prone silhouette: long body behind the face, chin on front paws.
 // Its geometry is authored directly, rather than squashing the upright dog.
@@ -196,28 +205,88 @@ const restingHead = [
   rect(-4, 8, 4, 4, "797B83"),
   rect(-4, 16, 8, 4, ink),
 ];
-const restingDog = [
+const RESTING_BACK = [
   // Curled tail and haunch are behind the head and shoulders.
-  rect(64, -12, 24, 12, ink),
-  rect(80, -20, 12, 20, ink),
-  rect(84, -24, 12, 12, fur),
-  rect(-4, -28, 68, 8, ink),
-  rect(-12, -20, 88, 40, ink),
-  rect(0, 20, 68, 8, ink),
-  rect(0, -20, 64, 36, fur),
-  rect(12, -24, 36, 8, light),
-  rect(60, -8, 12, 24, fur),
-  rect(40, 12, 36, 16, ink),
-  rect(48, 16, 24, 8, light),
-  node("Resting head", ID.restingHead, restingHead, 'x="-28" y="-8"'),
-  // Two front paws remain visible just below the resting chin.
-  rect(-76, 20, 36, 12, ink),
-  rect(-20, 20, 36, 12, ink),
-  rect(-72, 20, 28, 8, fur),
-  rect(-16, 20, 28, 8, fur),
-  rect(-64, 24, 4, 4, light),
-  rect(-8, 24, 4, 4, light),
+  [64, -12, 24, 12, ink],
+  [80, -20, 12, 20, ink],
+  [84, -24, 12, 12, fur],
+  [-4, -28, 68, 8, ink],
+  [-12, -20, 88, 40, ink],
+  [0, 20, 68, 8, ink],
+  [0, -20, 64, 36, fur],
+  [12, -24, 36, 8, light],
+  [60, -8, 12, 24, fur],
+  [40, 12, 36, 16, ink],
+  [48, 16, 24, 8, light],
 ];
+// Two front paws remain visible just below the resting chin.
+const RESTING_PAWS = [
+  [-76, 20, 36, 12, ink],
+  [-20, 20, 36, 12, ink],
+  [-72, 20, 28, 8, fur],
+  [-16, 20, 28, 8, fur],
+  [-64, 24, 4, 4, light],
+  [-8, 24, 4, 4, light],
+];
+// Outfits: the hat rides on the head, the rest on the body under the head.
+const shapes = (rects) => rects.map((r) => rect(...r));
+const dogBody = shapes(DOG_BODY);
+const restingBack = shapes(RESTING_BACK);
+const restingPaws = shapes(RESTING_PAWS);
+const OUTFITS = outfits({
+  standing: DOG_BODY,
+  resting: [...RESTING_BACK, ...RESTING_PAWS],
+}).map((outfit, index) => ({
+  ...outfit,
+  id: Object.fromEntries(
+    Object.entries(OUTFIT_ID).map(([key, base]) => [key, base + index]),
+  ),
+}));
+const outfitNode = (outfit, pose) =>
+  node(
+    `${outfit.look} ${pose}`,
+    outfit.id[pose],
+    toRects(outfit[pose]).map(([x, y, w, h, color]) =>
+      rect(x, y, w, h, color.slice(1).toUpperCase()),
+    ),
+    'opacity="0"',
+  );
+const worn = (pose, onHead) =>
+  OUTFITS.filter((outfit) => outfit.onHead === onHead).map((outfit) =>
+    outfitNode(outfit, pose),
+  );
+const dog = [
+  node("Tail", ID.tail, [
+    rect(36, 28, 28, 12, ink),
+    rect(56, 16, 12, 20, ink),
+    rect(60, 8, 12, 12, fur),
+  ]),
+  ...dogBody,
+  ...worn("upright", false),
+  node("Head", ID.head, [...head, ...worn("upright", true)], 'y="-28"'),
+];
+const restingDog = [
+  ...restingBack,
+  ...worn("resting", false),
+  node(
+    "Resting head",
+    ID.restingHead,
+    [...restingHead, ...worn("resting", true)],
+    'x="-28" y="-8"',
+  ),
+  ...restingPaws,
+];
+// One layer per outfit: shown while its flag is on, standing or lying down.
+const outfitLayer = ({ look, id }) =>
+  `<StateMachineLayer name="Outfit ${look}" id="0:${id.layer}"><AnyState x="0" y="-120"/><ExitState x="440" y="-120"/><EntryState x="0" y="0">${transition(id.on, true, id.flag)}<StateTransition stateToId="0:${id.off}"/></EntryState><AnimationState x="180" y="0" animationId="0:${id.offAnimation}" id="0:${id.off}">${transition(id.on, true, id.flag)}</AnimationState><AnimationState x="400" y="0" animationId="0:${id.onAnimation}" id="0:${id.on}">${transition(id.off, false, id.flag)}</AnimationState></StateMachineLayer>`;
+const outfitAnimations = ({ look, id }) =>
+  [0, 1]
+    .map(
+      (shown) =>
+        `<LinearAnimation name="${look} ${shown ? "on" : "off"}" id="0:${shown ? id.onAnimation : id.offAnimation}" fps="12" duration="1" loopValue="oneShot" quantize="true">${keys(id.upright, { opacity: [[0, shown]] })}${keys(id.resting, { opacity: [[0, shown]] })}</LinearAnimation>`,
+    )
+    .join("");
+
 const heart = (x, y, id) =>
   node(
     "Heart",
@@ -589,17 +658,18 @@ ${node("Kkami", ID.dog, dog, 'x="180" y="164"')}
 <AnimationState x="180" y="220" animationId="0:${ID.happyAnimation}" reset="true" id="0:${ID.happyState}">${transition(ID.sleepingState, true, ID.isSleeping)}${transition(ID.snackingState, true, ID.isSnacking)}${transition(ID.idleState, false)}</AnimationState>
 <AnimationState x="620" y="220" animationId="0:${ID.snackingAnimation}" reset="true" id="0:${ID.snackingState}">${transition(ID.sleepingState, true, ID.isSleeping)}${transition(ID.idleState, false, ID.isSnacking)}${repeatSnack(ID.snackingRepeatState)}</AnimationState>
 <AnimationState x="620" y="440" animationId="0:${ID.snackingAnimation}" reset="true" id="0:${ID.snackingRepeatState}">${transition(ID.sleepingState, true, ID.isSleeping)}${transition(ID.idleState, false, ID.isSnacking)}${repeatSnack(ID.snackingState)}</AnimationState>
-</StateMachineLayer></StateMachine>
+</StateMachineLayer>${OUTFITS.map(outfitLayer).join("")}</StateMachine>
 <LinearAnimation name="Sleeping" id="0:${ID.sleepingAnimation}" fps="12" duration="24" loopValue="loop" quantize="true">${sleeping.join("")}</LinearAnimation>
 <LinearAnimation name="Startled" id="0:${ID.startledAnimation}" fps="12" duration="5" loopValue="oneShot" quantize="true">${startled.join("")}</LinearAnimation>
 <LinearAnimation name="Idle" id="0:${ID.idleAnimation}" fps="12" duration="36" loopValue="loop" quantize="true">${idle.join("")}</LinearAnimation>
 <LinearAnimation name="Happy" id="0:${ID.happyAnimation}" fps="12" duration="16" loopValue="loop" quantize="true">${happy.join("")}</LinearAnimation>
 <LinearAnimation name="Snacking" id="0:${ID.snackingAnimation}" fps="20" duration="36" loopValue="oneShot" quantize="true">${snacking.join("")}</LinearAnimation>
+${OUTFITS.map(outfitAnimations).join("")}
 </Artboard>
 <ViewModel name="PetModel" id="0:${ID.viewModel}" defaultInstanceId="0:${ID.defaultInstance}">
 <ViewModelPropertyBoolean name="isHappy" id="0:${ID.isHappy}"/><ViewModelPropertyBoolean name="isSleeping" id="0:${ID.isSleeping}"/><ViewModelPropertyBoolean name="isStartled" id="0:${ID.isStartled}"/><ViewModelPropertyTrigger name="sceneReady" id="0:${ID.sceneReady}"/>
-<ViewModelPropertyBoolean name="isSnacking" id="0:${ID.isSnacking}"/><ViewModelPropertyTrigger name="snackAgain" id="0:${ID.snackAgain}"/>
-<ViewModelInstance name="Default" id="0:${ID.defaultInstance}" exports="true"><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isHappy}" propertyValue="false"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isSleeping}" propertyValue="true"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isStartled}" propertyValue="false"/><ViewModelInstanceTrigger viewModelPropertyId="0:${ID.sceneReady}"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isSnacking}" propertyValue="false"/><ViewModelInstanceTrigger viewModelPropertyId="0:${ID.snackAgain}"/></ViewModelInstance>
+<ViewModelPropertyBoolean name="isSnacking" id="0:${ID.isSnacking}"/><ViewModelPropertyTrigger name="snackAgain" id="0:${ID.snackAgain}"/>${OUTFITS.map(({ flag, id }) => `<ViewModelPropertyBoolean name="${flag}" id="0:${id.flag}"/>`).join("")}
+<ViewModelInstance name="Default" id="0:${ID.defaultInstance}" exports="true"><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isHappy}" propertyValue="false"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isSleeping}" propertyValue="true"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isStartled}" propertyValue="false"/><ViewModelInstanceTrigger viewModelPropertyId="0:${ID.sceneReady}"/><ViewModelInstanceBoolean viewModelPropertyId="0:${ID.isSnacking}" propertyValue="false"/><ViewModelInstanceTrigger viewModelPropertyId="0:${ID.snackAgain}"/>${OUTFITS.map(({ id }) => `<ViewModelInstanceBoolean viewModelPropertyId="0:${id.flag}" propertyValue="false"/>`).join("")}</ViewModelInstance>
 </ViewModel>
 </Rive>`;
 writeFileSync(
@@ -607,3 +677,14 @@ writeFileSync(
   scene,
 );
 console.log("Generated src/assets/kkami-pet/scene.rml");
+
+// Small pictures of each outfit for the item box and the log.
+writeFileSync(
+  new URL("../src/features/pet/outfitPictures.json", import.meta.url),
+  `${JSON.stringify(
+    Object.fromEntries(
+      OUTFITS.map(({ look, upright }) => [look, picture(upright)]),
+    ),
+  )}\n`,
+);
+console.log("Generated src/features/pet/outfitPictures.json");

@@ -1,2 +1,4 @@
 package-lock.json
 docs/
+# Written by scripts/generate-pet-rml.mjs
+src/features/pet/outfitPictures.json

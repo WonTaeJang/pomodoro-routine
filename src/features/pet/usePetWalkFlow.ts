@@ -10,6 +10,9 @@ import { useWalkTrip } from "./useWalkTrip";
 import { FOUND_CARD_MS } from "./walkTrip";
 import { useMoment } from "./useMoment";
 
+// Development only: walk as often as needed to test, past the daily limit.
+const DAILY_LIMIT = process.env.NODE_ENV !== "development";
+
 type Options = {
   /** The saved record: past walks (the first cannot be skipped) and today's. */
   pet: PetProfile | null;
@@ -29,6 +32,7 @@ export function usePetWalkFlow({ pet, walk, returnHome, addLog }: Options) {
   // Five walks a day (local date); more wait until tomorrow.
   const today = useToday();
   const outOfWalks =
+    DAILY_LIMIT &&
     pet !== null &&
     today !== null &&
     walksOn(pet, affinityDay(today)) >= DAILY_WALKS;

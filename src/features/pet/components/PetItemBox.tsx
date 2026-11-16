@@ -9,18 +9,19 @@ import {
   VisuallyHidden,
 } from "@/components/ui";
 import { cx } from "@/lib/cx";
-import { ITEMS, type ItemCounts, type ItemId } from "../items";
+import { ITEMS } from "../items";
 import {
-  FURNITURE,
+  RECIPES,
   SLOTS,
-  availableItems,
   canMake,
   type FurnitureId,
+  type Material,
+  type MaterialCounts,
   type Slot,
 } from "../furniture";
 import { levelHearts } from "../affinity";
-import type { PetProfile } from "../profile";
-import { HeartItemIcon, ItemIcon } from "./PetIcons";
+import { materialsLeft, type PetProfile } from "../profile";
+import { HeartItemIcon, ItemIcon, SlotIcon } from "./PetIcons";
 import { LookPicture } from "./PetRoomArt";
 import styles from "./PetItemBox.module.scss";
 
@@ -42,8 +43,8 @@ export function PetItemBox({
   const t = useTranslations("pet.items");
   const [tab, setTab] = useState<"list" | "craft">("list");
   const [slot, setSlot] = useState<Slot>(SLOTS[0]);
-  const left = availableItems(pet.items, pet.spent);
-  const hearts = levelHearts(pet.affinity.points);
+  const left = materialsLeft(pet);
+  const heartsEarned = levelHearts(pet.affinity.points) > 0;
   return (
     <Dialog open={open} onClose={onClose} title={t("title")}>
       <SegmentedControl
@@ -71,10 +72,12 @@ export function PetItemBox({
             );
           })}
           <BoxSlot
-            icon={<HeartItemIcon size={23} unknown={hearts === 0} />}
-            name={hearts > 0 ? t("heart.name") : null}
+            icon={<HeartItemIcon size={23} unknown={!heartsEarned} />}
+            name={heartsEarned ? t("heart.name") : null}
             count={
-              hearts > 0 ? t("count", { count: hearts }) : t("heartLocked")
+              heartsEarned
+                ? t("count", { count: left.heart ?? 0 })
+                : t("heartLocked")
             }
           />
         </ul>
@@ -87,11 +90,16 @@ export function PetItemBox({
             onChange={setSlot}
             options={SLOTS.map((value) => ({
               value,
-              label: t(`slots.${value}.name`),
+              label: (
+                <>
+                  <SlotIcon slot={value} />
+                  <VisuallyHidden>{t(`slots.${value}.name`)}</VisuallyHidden>
+                </>
+              ),
             }))}
           />
           <ul className={styles.recipes}>
-            {FURNITURE.filter((piece) => piece.slot === slot).map((piece) => (
+            {RECIPES.filter((piece) => piece.slot === slot).map((piece) => (
               <Recipe
                 key={piece.id}
                 piece={piece}
@@ -101,22 +109,14 @@ export function PetItemBox({
               />
             ))}
           </ul>
+          {/* Always open: everyone has the brown hat to try on. */}
           <Button
             className={styles.decorate}
             variant="secondary"
-            disabled={pet.furniture.length === 0}
-            aria-describedby={
-              pet.furniture.length === 0 ? "decorate-hint" : undefined
-            }
             onClick={onDecorate}
           >
             {t("decorate")}
           </Button>
-          {pet.furniture.length === 0 && (
-            <p id="decorate-hint" className={styles.summary}>
-              {t("decorateHint")}
-            </p>
-          )}
         </>
       )}
     </Dialog>
@@ -130,8 +130,8 @@ function Recipe({
   made,
   onCraft,
 }: {
-  piece: (typeof FURNITURE)[number];
-  left: ItemCounts;
+  piece: (typeof RECIPES)[number];
+  left: MaterialCounts;
   made: boolean;
   onCraft: (furniture: FurnitureId) => void;
 }) {
@@ -140,17 +140,21 @@ function Recipe({
   return (
     <li className={styles.recipe}>
       <span className={styles.art}>
-        <LookPicture look={id} cell={2} />
+        <LookPicture look={id} cell={2} fit={44} />
       </span>
       <span className={styles.recipeText}>
         <strong>{t(`furniture.${id}.name`)}</strong>
         <span className={styles.need}>
           {Object.entries(need).map(([key, count]) => {
-            const item = key as ItemId;
+            const item = key as Material;
             const have = left[item] ?? 0;
             return (
               <span key={item} data-short={!made && have < count}>
-                <ItemIcon item={item} size={12} />
+                {item === "heart" ? (
+                  <HeartItemIcon size={10} />
+                ) : (
+                  <ItemIcon item={item} size={12} />
+                )}
                 <span aria-hidden="true">
                   {have}/{count}
                 </span>
@@ -167,7 +171,10 @@ function Recipe({
         </span>
       </span>
       {made ? (
-        <span className={styles.made}>{t("made")} ✓</span>
+        <span className={styles.made}>
+          <span aria-hidden="true">✓</span>
+          <VisuallyHidden>{t("made")}</VisuallyHidden>
+        </span>
       ) : (
         <Button
           size="sm"

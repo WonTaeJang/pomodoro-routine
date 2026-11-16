@@ -41,12 +41,12 @@ const en: Messages = {
       made: "Made",
       short: "Not enough",
       decorate: "Decorate the room",
-      decorateHint: "Make a piece of furniture to start decorating",
       slots: {
         room: { name: "Walls & floor", object: "walls and floor" },
         window: { name: "Window", object: "window" },
         pot: { name: "Plant", object: "plant" },
         rug: { name: "Rug", object: "rug" },
+        outfit: { name: "Outfit", object: "outfit" },
       },
       furniture: {
         plainWindow: {
@@ -128,6 +128,36 @@ const en: Messages = {
           name: "Blue tassel rug",
           object: "a blue tassel rug",
           to: "the blue tassel rug",
+        },
+        plainOutfit: {
+          name: "Plain collar",
+          object: "a plain collar",
+          to: "the plain collar",
+        },
+        brownHat: {
+          name: "Brown hat",
+          object: "a brown hat",
+          to: "the brown hat",
+        },
+        ginghamBib: {
+          name: "Blue gingham scarf",
+          object: "a blue gingham scarf",
+          to: "the blue gingham scarf",
+        },
+        creamScarf: {
+          name: "Cream scarf",
+          object: "a cream scarf",
+          to: "the cream scarf",
+        },
+        checkShirt: {
+          name: "Blue check shirt",
+          object: "a blue check shirt",
+          to: "the blue check shirt",
+        },
+        coneCollar: {
+          name: "Cone collar",
+          object: "a cone collar",
+          to: "the cone collar",
         },
       },
     },
