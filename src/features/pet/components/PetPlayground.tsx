@@ -21,7 +21,15 @@ import { StatusIcon } from "./PetIcons";
 import { PetPad } from "./PetPad";
 import { DecoratePads, DecoratePick, decorateTag } from "./PetDecorate";
 import { usePetDecorate } from "../usePetDecorate";
-import { useFocusAfter, useMoment } from "../useMoment";
+import { useFocusAfter, useMoment, useUntil } from "../useMoment";
+import { useKkamiSpeech } from "../useKkamiSpeech";
+import { useTimeOfDay } from "../useTimeOfDay";
+import {
+  HOME_LINE_MS,
+  WAKE_LINE_MS,
+  speechSituation,
+  type SpeechLevel,
+} from "../speech";
 import { PET_HAPPY_MS } from "../pet";
 import type { FurnitureId, Slot } from "../furniture";
 import { PetFoundCard, PetWalkMap } from "./PetTrip";
@@ -37,32 +45,28 @@ import type { PetPose } from "../pet";
 const POSE_COPY = {
   sleeping: {
     status: "sleeping",
-    bubble: "sleepBubble",
     action: "wake",
     label: "wakeLabel",
   },
   startled: {
     status: "startled",
-    bubble: "startleBubble",
     action: "startled",
     label: "startled",
   },
-  idle: { status: "idle", bubble: "bubble", action: "pet", label: "petLabel" },
+  idle: { status: "idle", action: "pet", label: "petLabel" },
   happy: {
     status: "happy",
-    bubble: "happyBubble",
     action: "pet",
     label: "petLabel",
   },
   snacking: {
     status: "snackHappy",
-    bubble: "snackBubble",
     action: "pet",
     label: "petLabel",
   },
 } as const satisfies Record<
   PetPose,
-  { status: string; bubble: string; action: string; label: string }
+  { status: string; action: string; label: string }
 >;
 
 export function PetPlayground() {
@@ -88,6 +92,8 @@ function PetRoom({ retry }: { retry: () => void }) {
     walk,
     returnHome,
     cheer,
+    awakeAt,
+    homeAt,
     snackSequence,
     pet,
     feed,
@@ -172,6 +178,23 @@ function PetRoom({ retry }: { retry: () => void }) {
   const decorating = decor.mode !== null;
   useFocusAfter(decorating, boxButton);
 
+  // What Kkami says (I-058).
+  const time = useTimeOfDay();
+  const greeting = useUntil(awakeAt, WAKE_LINE_MS);
+  const backHome = useUntil(homeAt, HOME_LINE_MS);
+  const situation = speechSituation({
+    pose,
+    levelUp: levelUp !== null,
+    decorated: decorated.value === true,
+    greeting,
+    backHome,
+  });
+  const speech = useKkamiSpeech(
+    situation,
+    (levelUp ?? affinity.progress.level) as SpeechLevel,
+    time,
+  );
+
   // One status at a time in the header: a level up, then the mode, then the pose.
   const hud =
     levelUp !== null
@@ -238,9 +261,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                 }
               />
               <div className={styles.bubble} aria-hidden="true">
-                {decorated.value && pose === "happy"
-                  ? t("decorate.bubble")
-                  : t(copy.bubble)}
+                {speech}
                 {snacking ? <PixelSnackIcon /> : <PixelHeartIcon />}
               </div>
               <div className={styles.dog} aria-hidden="true">

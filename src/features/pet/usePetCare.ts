@@ -73,7 +73,7 @@ export function usePetCare(ready: boolean) {
   }
 
   function returnHome() {
-    dispatch({ type: "returnHome" });
+    dispatch({ type: "returnHome", now: performance.now() });
   }
 
   function startStroke(event: PointerEvent<HTMLButtonElement>) {
@@ -116,6 +116,8 @@ export function usePetCare(ready: boolean) {
 
   return {
     walking: state.location === "walk",
+    awakeAt: state.awakeAt,
+    homeAt: state.homeAt,
     walk,
     returnHome,
     cheer,

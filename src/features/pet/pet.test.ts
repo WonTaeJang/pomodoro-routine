@@ -39,7 +39,7 @@ describe("산책", () => {
       ] as const) {
         expect(petReducer(walking, { type, now: 60000 })).toBe(walking);
       }
-      const home = petReducer(walking, { type: "returnHome" });
+      const home = petReducer(walking, { type: "returnHome", now: 0 });
       expect(home).toMatchObject({
         location: "home",
         phase: "awake",
@@ -48,7 +48,7 @@ describe("산책", () => {
         snacks: active.snacks,
       });
       expect(petPose(home)).toBe("idle");
-      expect(petReducer(home, { type: "returnHome" })).toBe(home);
+      expect(petReducer(home, { type: "returnHome", now: 0 })).toBe(home);
       expect(petReducer(home, { type: "feed", now: 60000 }).snacks).toBe(
         active.snacks + 1,
       );
@@ -69,7 +69,7 @@ describe("산책", () => {
       dispatch({ type: "walk", now: round });
       dispatch({ type: "pet", now: round });
       dispatch({ type: "feed", now: round });
-      dispatch({ type: "returnHome" });
+      dispatch({ type: "returnHome", now: 0 });
     }
     expect({ pats, snacks }).toEqual({ pats: 0, snacks: 0 });
     expect(store.getState().state.location).toBe("home");
@@ -227,5 +227,15 @@ describe("방 꾸미기 반응", () => {
     expect(petReducer(cheered, { type: "cheer", now: 20 })).toBe(cheered);
     const sleeping = createPetState();
     expect(petReducer(sleeping, { type: "cheer", now: 10 })).toBe(sleeping);
+  });
+});
+
+describe("말풍선을 위한 시각", () => {
+  it("깨어난 시각과 산책에서 돌아온 시각을 남김", () => {
+    const awake = awakeState();
+    expect(awake.awakeAt).toBe(0);
+    const walking = petReducer(awake, { type: "walk", now: 10 });
+    const home = petReducer(walking, { type: "returnHome", now: 9000 });
+    expect(home).toMatchObject({ location: "home", homeAt: 9000 });
   });
 });

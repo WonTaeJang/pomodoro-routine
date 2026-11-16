@@ -13,6 +13,9 @@ export type PetState = {
   lastPatAt: number | null;
   happyUntil: number | null;
   snackUntil: number | null;
+  /** When Kkami last woke up and came back from a walk (what he says next). */
+  awakeAt: number | null;
+  homeAt: number | null;
 };
 
 export type PetAction =
@@ -21,7 +24,7 @@ export type PetAction =
       now: number;
     }
   | { type: "settle"; now: number }
-  | { type: "returnHome" };
+  | { type: "returnHome"; now: number };
 
 export function createPetState(): PetState {
   return {
@@ -33,6 +36,8 @@ export function createPetState(): PetState {
     lastPatAt: null,
     happyUntil: null,
     snackUntil: null,
+    awakeAt: null,
+    homeAt: null,
   };
 }
 
@@ -67,7 +72,7 @@ function settleReactions(state: PetState, now: number): PetState {
 export function petReducer(state: PetState, action: PetAction): PetState {
   if (state.location === "walk") {
     return action.type === "returnHome"
-      ? { ...state, location: "home" }
+      ? { ...state, location: "home", homeAt: action.now }
       : state;
   }
   if (
@@ -92,7 +97,12 @@ export function petReducer(state: PetState, action: PetAction): PetState {
     case "advanceIntro":
       if (state.introUntil === null || action.now < state.introUntil)
         return state;
-      return { ...state, phase: "awake", introUntil: null };
+      return {
+        ...state,
+        phase: "awake",
+        introUntil: null,
+        awakeAt: action.now,
+      };
     case "pet":
       if (state.phase === "sleeping") {
         // Loading has no deadline yet, so cannot consume the first interaction.
