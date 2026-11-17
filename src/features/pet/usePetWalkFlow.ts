@@ -1,17 +1,13 @@
 "use client";
 
 import type { ItemId } from "./items";
-import { affinityDay } from "./affinity";
 import { DAILY_WALKS, walksOn, type PetProfile } from "./profile";
-import { useToday } from "@/lib/useNow";
 import { petStore } from "./store";
+import { useDailyLimitReached } from "./useDailyLimit";
 import type { PetLogEvent } from "./usePetLog";
 import { useWalkTrip } from "./useWalkTrip";
 import { FOUND_CARD_MS } from "./walkTrip";
 import { useMoment } from "./useMoment";
-
-// Development only: walk as often as needed to test, past the daily limit.
-const DAILY_LIMIT = process.env.NODE_ENV !== "development";
 
 type Options = {
   /** The saved record: past walks (the first cannot be skipped) and today's. */
@@ -29,13 +25,7 @@ type Options = {
  */
 export function usePetWalkFlow({ pet, walk, returnHome, addLog }: Options) {
   const card = useMoment<ItemId>(FOUND_CARD_MS);
-  // Five walks a day (local date); more wait until tomorrow.
-  const today = useToday();
-  const outOfWalks =
-    DAILY_LIMIT &&
-    pet !== null &&
-    today !== null &&
-    walksOn(pet, affinityDay(today)) >= DAILY_WALKS;
+  const outOfWalks = useDailyLimitReached(pet, walksOn, DAILY_WALKS);
 
   const { trip, begin, step, skip, cancel } = useWalkTrip({
     onFound: (item, skipped) => {

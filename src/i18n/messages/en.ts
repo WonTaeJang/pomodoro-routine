@@ -270,6 +270,7 @@ const en: Messages = {
       craft: "Made {object}",
       place: "Changed the {slot} to {to}",
       walkLimit: "That’s all {count} walks for today. More tomorrow!",
+      snackLimit: "That’s all {count} treats for today. More tomorrow!",
     },
     affinity: {
       title: "Affinity",
@@ -285,7 +286,7 @@ const en: Messages = {
       todayRule: "First {count} pats a day · +{points} each",
       todayDone: "All earned today",
       todayLeft: "+{earned} / {max}",
-      snackHint: "+{points} for every treat (no limit)",
+      snackHint: "Up to {count} treats a day · +{points} each",
       levelUpHeart: "Level {level}! Heart +1",
       maxBadge: "MAX",
       stages: {
@@ -305,7 +306,6 @@ const en: Messages = {
     retrySave: "Retry",
     startled: "Surprised!",
 
-    back: "Timer",
     label: "Kkami’s little room",
     name: "Kkami",
     idle: "Relaxed",
@@ -339,6 +339,7 @@ const en: Messages = {
       label: "Pages",
       timer: "Timer",
       calendar: "Calendar",
+      pet: "Pet",
     },
     menu: {
       label: "Menu",

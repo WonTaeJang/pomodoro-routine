@@ -211,6 +211,8 @@ describe("가구 저장 형식", () => {
       ...withItems({ leaf: 2 }),
       walkDay: null,
       walksOnDay: 0,
+      snackDay: null,
+      snacksOnDay: 0,
     });
   });
 
@@ -225,8 +227,8 @@ describe("가구 저장 형식", () => {
     expect(decodePet(encode(7, pet))).toEqual(pet);
   });
 
-  it("v9 이상은 새 버전이라 건드리지 않음", () => {
-    expect(() => decodePet(encode(9, withItems({ leaf: 1 })))).toThrow(
+  it("v10 이상은 새 버전이라 건드리지 않음", () => {
+    expect(() => decodePet(encode(10, withItems({ leaf: 1 })))).toThrow(
       PetStorageError,
     );
   });

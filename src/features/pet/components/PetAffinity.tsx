@@ -13,6 +13,7 @@ import {
   AFFINITY_PER_SNACK,
   DAILY_AFFINITY_PATS,
 } from "../affinity";
+import { DAILY_SNACKS } from "../profile";
 import { petStore, usePetStore } from "../store";
 import { MeterHeart, SnackRuleIcon } from "./PetIcons";
 import { PetPanel } from "./PetPanel";
@@ -179,7 +180,10 @@ export function PetAffinityDetail({
           </p>
           <p className={styles.rule}>
             <SnackRuleIcon />
-            {t("snackHint", { points: AFFINITY_PER_SNACK })}
+            {t("snackHint", {
+              count: DAILY_SNACKS,
+              points: AFFINITY_PER_SNACK,
+            })}
           </p>
         </div>
       )}

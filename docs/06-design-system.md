@@ -90,7 +90,7 @@ import { PawIcon } from "@/components/icons";
 
 ### 화면 틀 (`src/components/layout/`, `src/app/_components/`)
 - `AppHeader`: 로고 + `nav`(페이지 메뉴) + 오른쪽 버튼들. 좁은 휴대폰에서는 로고 글자를 숨김
-- `AppNav`: 타이머 / 캘린더 메뉴. 아이콘 + 이름, 휴대폰(480px 미만)은 아이콘만(이름은 화면 낭독기와 툴팁). 지금 페이지는 둥근 흰 배경 + 강조색, `aria-current="page"`
+- `AppNav`: 타이머 / 캘린더 / 다마고치(돌봄, `PetDeviceIcon`) 메뉴. 아이콘 + 이름, 휴대폰(480px 미만)은 아이콘만(이름은 화면 낭독기와 툴팁). 지금 페이지는 둥근 흰 배경 + 강조색, `aria-current="page"`
 - `AppFooter`: 모든 페이지 맨 아래 오른쪽에 작게 버전과 GitHub 링크. 너비는 `PageMain`과 같아서(`page-width`) 오른쪽 끝이 카드와 맞음. 서버 컴포넌트라 `layout.tsx`에서 그려 `AppShell`의 `footer`로 넘김. 페이지가 짧으면 화면 바닥에 붙음
 - `PageMain`: 페이지 본문. 휴대폰은 위아래로 쌓고, 넓은 화면은 왼쪽(넓게)·오른쪽 두 칸 (타이머 | 할 일, 달력 | 날짜 상세)
 - `CenteredCard`: 두 칸을 가로질러 가운데에 너비 420px까지의 카드 하나 (로그인·프로필, 404). 카드 안 배치는 `className`으로
@@ -220,3 +220,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-16: 어두운 모드에서 팝업이 뒤 화면(돌봄 본체)과 섞이지 않게 `--color-backdrop`을 더 어둡게, `Dialog`에 `--color-dialog-border` 테두리. 아이템 상자 탭은 색 전환 효과를 뺌
 - 2026-11-16: 방 벽·바닥을 도트 반복 무늬(SVG 데이터 주소 CSS 배경, 칸 크기 `--room-cell`)로, 카펫을 도트 그림으로 만들어 꾸미기 자리로 고름. 아이템 상자 만들기 탭은 두 번째 `SegmentedControl`(자리 탭)로 3개씩. 꺼진 까미 누르기 영역(`petTarget:disabled`)은 눌림을 통과
 - 2026-11-16: 아이템 상자 만들기 탭의 자리 탭을 도트 아이콘(`SlotIcon`, 2px 칸)으로, 이름은 `VisuallyHidden`
+- 2026-11-18: 헤더 메뉴에 다마고치(돌봄 페이지, `PetDeviceIcon`) 추가. 돌봄 페이지 위의 "< 타이머" 돌아가기 링크는 헤더 메뉴로 대신해 뺌

@@ -353,6 +353,17 @@ export function CalendarIcon(props: IconProps) {
   );
 }
 
+/** 둥근 휴대용 돌봄 기계 (돌봄 페이지) */
+export function PetDeviceIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 2.5c4.4 0 7.5 4.2 7.5 9.6 0 5.2-3.1 9.4-7.5 9.4s-7.5-4.2-7.5-9.4c0-5.4 3.1-9.6 7.5-9.6Z" />
+      <rect x="8" y="7.5" width="8" height="6" rx="1" />
+      <path d="M9 17.5h.01M12 18h.01M15 17.5h.01" />
+    </Icon>
+  );
+}
+
 /** 라이트 모드 */
 export function SunIcon(props: IconProps) {
   return (

@@ -23,6 +23,7 @@ function EntryIcon({ entry }: { entry: PetLogEntry }) {
     case "pat":
       return <StatusIcon status="happy" />;
     case "snack":
+    case "snackLimit":
       return <StatusIcon status="snacking" />;
     case "walkOut":
     case "walkLimit":
@@ -68,6 +69,8 @@ function EntryText({ entry }: { entry: PetLogEntry }) {
       return t("log.levelHeart", { level: entry.level });
     case "walkLimit":
       return t("log.walkLimit", { count: entry.count });
+    case "snackLimit":
+      return t("log.snackLimit", { count: entry.count });
     case "craft":
       return t("log.craft", {
         object: t(`items.furniture.${entry.furniture}.object`),

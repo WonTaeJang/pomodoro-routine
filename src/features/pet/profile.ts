@@ -55,12 +55,34 @@ export type PetProfile = LegacyPetProfile & {
   /** Walks on the latest walking day (local date), for the daily limit. */
   walkDay: string | null;
   walksOnDay: number;
+  /** Treats on the latest treat day (local date), for the daily limit. */
+  snackDay: string | null;
+  snacksOnDay: number;
 };
 
 /** Walks a day; the walk key rests after that until the next day. */
 export const DAILY_WALKS = 5;
 /** What a record from before the daily limit starts with. */
 export const NO_DAILY_WALKS = { walkDay: null, walksOnDay: 0 } as const;
+
+/** Treats a day; the treat key rests after that until the next day. */
+export const DAILY_SNACKS = 5;
+/** What a record from before the daily treat limit starts with. */
+export const NO_DAILY_SNACKS = { snackDay: null, snacksOnDay: 0 } as const;
+
+/**
+ * Count for the latest day: a newer day starts again, the same day adds, and
+ * a late save for an older day changes nothing (null).
+ */
+function countForDay(
+  latest: string | null,
+  count: number,
+  day: string,
+  amount: number,
+): [string, number] | null {
+  if (latest === null || day > latest) return [day, amount];
+  return day === latest ? [day, count + amount] : null;
+}
 
 /** What a record from before furniture starts with. */
 export const NO_FURNITURE = { spent: {}, furniture: [], placed: {} } as const;
@@ -81,6 +103,7 @@ export function createPetProfile(id: string, now: number): PetProfile {
     furniture: [],
     placed: {},
     ...NO_DAILY_WALKS,
+    ...NO_DAILY_SNACKS,
   };
 }
 
@@ -104,9 +127,12 @@ export function addSnacks(
   pet: PetProfile,
   amount: number,
   now: number,
+  day = affinityDay(now),
 ): PetProfile {
+  const daily = countForDay(pet.snackDay, pet.snacksOnDay, day, amount);
   return {
     ...pet,
+    ...(daily && { snackDay: daily[0], snacksOnDay: daily[1] }),
     totalSnacks: pet.totalSnacks + amount,
     updatedAt: Math.max(now, pet.updatedAt),
     affinity: {
@@ -123,16 +149,10 @@ export function addWalks(
   now: number,
   day = affinityDay(now),
 ): PetProfile {
-  // A newer day starts the count again; a late save for an older day keeps it.
-  const daily =
-    pet.walkDay === null || day > pet.walkDay
-      ? { walkDay: day, walksOnDay: amount }
-      : day === pet.walkDay
-        ? { walkDay: day, walksOnDay: pet.walksOnDay + amount }
-        : {};
+  const daily = countForDay(pet.walkDay, pet.walksOnDay, day, amount);
   return {
     ...pet,
-    ...daily,
+    ...(daily && { walkDay: daily[0], walksOnDay: daily[1] }),
     walks: pet.walks + amount,
     items: { ...pet.items, [item]: (pet.items[item] ?? 0) + amount },
     updatedAt: Math.max(now, pet.updatedAt),
@@ -142,6 +162,11 @@ export function addWalks(
 /** Walks taken on `day` (a local YYYY-MM-DD date). */
 export function walksOn(pet: PetProfile, day: string): number {
   return pet.walkDay === day ? pet.walksOnDay : 0;
+}
+
+/** Treats given on a day; 0 for any other day. */
+export function snacksOn(pet: PetProfile, day: string): number {
+  return pet.snackDay === day ? pet.snacksOnDay : 0;
 }
 
 /** Never moves back, and never past what was actually found. */
@@ -203,10 +228,11 @@ export function placeFurniture(
   return { ...pet, placed, updatedAt: Math.max(now, pet.updatedAt) };
 }
 
-function isDailyWalks({ walkDay, walksOnDay, walks }: Partial<PetProfile>) {
-  if (!Number.isSafeInteger(walksOnDay) || walksOnDay! < 0) return false;
-  if (walkDay === null) return walksOnDay === 0;
-  return isDayKey(walkDay) && walksOnDay! <= walks!;
+/** A latest day and its count: none before the first, never above the total. */
+function isDailyCount(day: unknown, count: unknown, total: number) {
+  if (!Number.isSafeInteger(count) || (count as number) < 0) return false;
+  if (day === null) return count === 0;
+  return isDayKey(day) && (count as number) <= total;
 }
 
 function isFurnitureState(p: Partial<PetProfile>): boolean {
@@ -267,6 +293,7 @@ export function isPetProfile(value: unknown): value is PetProfile {
     p.itemsSeen! >= 0 &&
     p.itemsSeen! <= p.walks! &&
     isFurnitureState(p) &&
-    isDailyWalks(p)
+    isDailyCount(p.walkDay, p.walksOnDay, p.walks!) &&
+    isDailyCount(p.snackDay, p.snacksOnDay, p.totalSnacks)
   );
 }

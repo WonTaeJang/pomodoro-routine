@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { isItemCounts, ITEMS, pickItem, totalItems } from "./items";
 import {
+  addSnacks,
   addWalks,
   createPetProfile,
+  DAILY_SNACKS,
   DAILY_WALKS,
   seeItems,
+  snacksOn,
   walksOn,
 } from "./profile";
 import { decodePet, PetStorageError } from "./repository";
@@ -73,6 +76,8 @@ describe("아이템 저장 형식", () => {
       ...pet,
       walkDay: null,
       walksOnDay: 0,
+      snackDay: null,
+      snacksOnDay: 0,
     });
   });
 
@@ -109,6 +114,39 @@ describe("하루 산책 횟수", () => {
     const late = addWalks(today, "leaf", 1, day(17), "2026-11-16");
     expect(walksOn(late, "2026-11-17")).toBe(2);
     expect(late.walks).toBe(3);
+  });
+
+  it("간식은 하루 단위로 세고, 다음 날 다시 셈", () => {
+    const fed = addSnacks(createPetProfile("a", 1), DAILY_SNACKS, day(16));
+    expect(snacksOn(fed, "2026-11-16")).toBe(DAILY_SNACKS);
+    const next = addSnacks(fed, 1, day(17));
+    expect(snacksOn(next, "2026-11-17")).toBe(1);
+    expect(snacksOn(next, "2026-11-16")).toBe(0);
+    // A late save for the day before adds to the total only.
+    const late = addSnacks(next, 1, day(16), "2026-11-16");
+    expect(snacksOn(late, "2026-11-17")).toBe(1);
+    expect(late.totalSnacks).toBe(DAILY_SNACKS + 2);
+  });
+
+  it("v8 기록은 오늘 간식 0번으로 이전, 손상된 횟수는 거부", () => {
+    const { snackDay, snacksOnDay, ...v8 } = addSnacks(
+      createPetProfile("a", 1),
+      2,
+      day(16),
+    );
+    void [snackDay, snacksOnDay];
+    expect(decodePet(encode(8, v8))).toMatchObject({
+      totalSnacks: 2,
+      snackDay: null,
+      snacksOnDay: 0,
+    });
+    for (const broken of [
+      { snackDay: null, snacksOnDay: 1 },
+      { snackDay: "2026-11-16", snacksOnDay: 3 }, // more than all treats
+    ])
+      expect(() => decodePet(encode(9, { ...v8, ...broken }))).toThrow(
+        PetStorageError,
+      );
   });
 
   it("v5 기록은 오늘 산책 0번으로 이전, 손상된 횟수는 거부", () => {

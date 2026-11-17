@@ -24,21 +24,6 @@ $dot-size: 12px;
   margin: 0 auto;
   padding: var(--space-5) var(--space-3-5) var(--space-8);
 }
-.topline {
-  margin-bottom: var(--space-6);
-}
-.back {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-  text-decoration: none;
-  @include mixins.focus-ring;
-  &:hover {
-    color: var(--color-text);
-  }
-}
 // 휴대용 게임기 모양 본체. 본체 색은 모드를 따르고 액정·버튼은 고정 팔레트(_device.scss)입니다.
 .device {
   --shell: color-mix(in srgb, var(--color-border) 82%, var(--color-text) 6%);
@@ -257,16 +242,13 @@ $dot-size: 12px;
     align-items: start;
     max-width: $page-wide-max;
   }
-  .topline {
-    grid-column: 1 / -1;
-  }
   .device {
-    grid-row: 2;
+    grid-row: 1;
     grid-column: 2;
     width: 100%;
   }
   .below {
-    grid-row: 2;
+    grid-row: 1;
     grid-column: 3;
     width: 100%;
     max-width: $log-max;

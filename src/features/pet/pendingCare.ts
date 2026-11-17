@@ -87,7 +87,7 @@ export function applyPending(
       case "pats":
         return addPats(pet, entry.count, entry.at, entry.day);
       case "snacks":
-        return addSnacks(pet, entry.count, entry.at);
+        return addSnacks(pet, entry.count, entry.at, entry.day);
       case "walks":
         return addWalks(pet, entry.item, entry.count, entry.at, entry.day);
       case "seen":

@@ -246,6 +246,7 @@ const ko = {
       craft: "{object} 만들었어요",
       place: "{slot} {to} 바꿨어요",
       walkLimit: "오늘 산책 {count}번을 다 했어요. 내일 또 가요!",
+      snackLimit: "오늘 간식 {count}번을 다 줬어요. 내일 또 줄게요!",
     },
     affinity: {
       title: "친밀도",
@@ -261,7 +262,7 @@ const ko = {
       todayRule: "하루 첫 {count}번 · 한 번에 +{points}",
       todayDone: "오늘 다 받았어요",
       todayLeft: "+{earned} / {max}",
-      snackHint: "간식은 줄 때마다 +{points} (횟수 제한 없음)",
+      snackHint: "간식은 하루 {count}번까지 · 한 번에 +{points}",
       levelUpHeart: "Lv.{level} 달성! 하트 +1",
       maxBadge: "MAX",
       stages: {
@@ -281,7 +282,6 @@ const ko = {
     retrySave: "재시도",
     startled: "깜짝!",
 
-    back: "타이머",
     label: "까미의 작은 방",
     name: "까미",
     idle: "편안해요",
@@ -315,6 +315,7 @@ const ko = {
       label: "페이지",
       timer: "타이머",
       calendar: "캘린더",
+      pet: "다마고치",
     },
     menu: {
       label: "메뉴",

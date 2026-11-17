@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
 import { usePetRive, usePetRiveOutfit, usePetRivePose } from "../usePetRive";
 import { Button, VisuallyHidden } from "@/components/ui";
-import { ChevronLeftIcon } from "@/components/icons";
 import { usePetCare } from "../usePetCare";
 import { petStore, usePetStore } from "../store";
 import { useStoresReady } from "@/lib/useHydrateStores";
@@ -34,6 +33,8 @@ import { PetItemBox } from "./PetItemBox";
 import { PetLog } from "./PetLog";
 import { usePetLog } from "../usePetLog";
 import { usePetWalkFlow } from "../usePetWalkFlow";
+import { useDailyLimitReached } from "../useDailyLimit";
+import { DAILY_SNACKS, snacksOn } from "../profile";
 import { totalItems } from "../items";
 import { stopCareKey } from "./stopCareKey";
 import { preloadWalk } from "../walkFile";
@@ -66,10 +67,25 @@ const POSE_COPY = {
   { status: string; action: string; label: string }
 >;
 
+const PET_PATH = "/pet";
+
 export function PetPlayground() {
   const [attempt, setAttempt] = useState(0);
+  // The router keeps a page it leaves (hidden, with its state) for a quick
+  // way back. Coming back is a new visit: Kkami starts asleep again, the
+  // log starts over and Rive loads afresh.
+  const pathname = usePathname();
+  const [shownAt, setShownAt] = useState(pathname);
+  const [visit, setVisit] = useState(0);
+  if (pathname !== shownAt) {
+    setShownAt(pathname);
+    if (pathname === PET_PATH) setVisit((value) => value + 1);
+  }
   return (
-    <PetRoom key={attempt} retry={() => setAttempt((value) => value + 1)} />
+    <PetRoom
+      key={`${visit}-${attempt}`}
+      retry={() => setAttempt((value) => value + 1)}
+    />
   );
 }
 
@@ -141,6 +157,14 @@ function PetRoom({ retry }: { retry: () => void }) {
     if (levelUp !== null) addLog({ kind: "level", level: levelUp });
   }, [levelUp, addLog]);
 
+  // Five treats a day: after that the key rests and only says so in the log.
+  const outOfSnacks = useDailyLimitReached(
+    record ?? null,
+    snacksOn,
+    DAILY_SNACKS,
+  );
+  const giveSnack = () =>
+    outOfSnacks ? addLog({ kind: "snackLimit", count: DAILY_SNACKS }) : feed();
   const outing = usePetWalkFlow({
     pet: record ?? null,
     walk,
@@ -218,11 +242,6 @@ function PetRoom({ retry }: { retry: () => void }) {
 
   return (
     <main className={styles.page}>
-      <div className={styles.topline}>
-        <Link href="/" className={styles.back}>
-          <ChevronLeftIcon size={16} /> {t("back")}
-        </Link>
-      </div>
       <VisuallyHidden id="pet-keyboard-help">{t("keyboard")}</VisuallyHidden>
 
       <section className={styles.device} aria-label={t("label")}>
@@ -333,7 +352,8 @@ function PetRoom({ retry }: { retry: () => void }) {
               <PetPad
                 kind="feed"
                 label={t("feed")}
-                onClick={feed}
+                onClick={giveSnack}
+                resting={outOfSnacks}
                 disabled={!canCare || sleeping || walking}
               />
               <PetPad
