@@ -23,7 +23,7 @@ const content: LegalContent = {
           id: "collect",
           title: "1. Information we process",
           blocks: [
-            "If you don’t log in, your tasks, history and settings stay in your browser and are never sent to Kkamodoro’s servers.",
+            "If you don’t log in, your tasks, history, settings and Kkami care records stay in your browser and are never sent to Kkamodoro’s servers.",
             {
               text: "When you log in, we process the following.",
               items: [
@@ -33,6 +33,7 @@ const content: LegalContent = {
                 "Tasks: title, estimated and completed pomodoros, done status, order, and when each was created, completed, cleared or deleted",
                 "Focus history: session type, end time, duration, the task title selected at the time, and whether it completed a cycle",
                 "Settings: focus and break lengths, long break interval, auto start, chosen focus sound, whether tasks show on certificates, and the currently selected task",
+                "Kkami care records: pat, treat and walk counts with their dates and times, affinity, items found, and furniture and outfits made or placed",
                 "Information created automatically: sign-up and last login time, and access logs (such as IP address)",
               ],
             },
@@ -47,7 +48,7 @@ const content: LegalContent = {
               text: "We use this information only to:",
               items: [
                 "Log you in and tell accounts apart",
-                "Save your tasks, history and settings to your account and keep them in sync across devices",
+                "Save your tasks, history, settings and Kkami care records to your account and keep them in sync across devices",
                 "Show your nickname, photo, email and login method on your profile",
                 "Answer your questions and investigate errors",
               ],
@@ -60,7 +61,7 @@ const content: LegalContent = {
           id: "retention",
           title: "3. Retention and deletion",
           blocks: [
-            "Information saved to your account is kept until you delete your account. When you delete your account or the Service shuts down, your account, tasks, history and settings are deleted from the database right away and can’t be recovered.",
+            "Information saved to your account is kept until you delete your account. When you delete your account or the Service shuts down, your account, tasks, history, settings and Kkami care records are deleted from the database right away and can’t be recovered.",
             "Access logs and backups in the providers’ systems are deleted after the periods the providers below set.",
           ],
         },
@@ -73,7 +74,7 @@ const content: LegalContent = {
               text: "Supabase Inc. (login and data storage)",
               items: [
                 "Server location: Seoul, Republic of Korea",
-                "Information: login information, tasks, history, settings and access logs listed in section 1",
+                "Information: login information, tasks, history, settings, Kkami care records and access logs listed in section 1",
                 "Retention: until you delete your account (access logs and backups follow the provider’s policy)",
               ],
             },
@@ -149,7 +150,7 @@ const content: LegalContent = {
           title: "1. The Service",
           blocks: [
             "The Service offers a pomodoro timer, task list, focus history and stats, certificates, focus sounds and Kkami care for free. There are no ads or paid features.",
-            "Every feature works without logging in. Logging in saves your tasks, history and settings to your account so you can continue on other devices.",
+            "Every feature works without logging in. Logging in saves your tasks, history, settings and Kkami care records to your account so you can continue on other devices.",
           ],
         },
         {

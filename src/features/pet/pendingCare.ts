@@ -1,6 +1,11 @@
-import { affinityDay } from "./affinity";
-import type { ItemId } from "./items";
-import type { FurnitureId, Slot } from "./furniture";
+import { affinityDay, isDayKey } from "./affinity";
+import { isItemId, type ItemId } from "./items";
+import {
+  isFurnitureId,
+  isSlot,
+  type FurnitureId,
+  type Slot,
+} from "./furniture";
 import {
   addPats,
   addSnacks,
@@ -31,6 +36,36 @@ export type PendingCare = {
   | { kind: "craft"; furniture: FurnitureId }
   | { kind: "place"; slot: Slot; furniture: FurnitureId | null }
 );
+
+const isCount = (n: unknown): n is number =>
+  Number.isSafeInteger(n) && (n as number) >= 0;
+
+/** A saved entry read back (this browser's queue or the account): only known kinds and fields. */
+export function readCare(value: unknown): PendingCare | null {
+  if (!value || typeof value !== "object") return null;
+  const c = value as Record<string, unknown>;
+  if (!isDayKey(c.day) || !isCount(c.count) || !isCount(c.at)) return null;
+  const base = { day: c.day, count: c.count, at: c.at };
+  switch (c.kind) {
+    case "pats":
+    case "snacks":
+    case "seen":
+      return { ...base, kind: c.kind };
+    case "walks":
+      return isItemId(c.item) ? { ...base, kind: c.kind, item: c.item } : null;
+    case "craft":
+      return isFurnitureId(c.furniture)
+        ? { ...base, kind: c.kind, furniture: c.furniture }
+        : null;
+    case "place":
+      return isSlot(c.slot) &&
+        (c.furniture === null || isFurnitureId(c.furniture))
+        ? { ...base, kind: c.kind, slot: c.slot, furniture: c.furniture }
+        : null;
+    default:
+      return null;
+  }
+}
 
 export function careEntry(input: CareInput, at: number): PendingCare {
   return { count: 1, ...input, at, day: affinityDay(at) };

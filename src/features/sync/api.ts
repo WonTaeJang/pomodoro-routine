@@ -13,6 +13,15 @@ import {
   type SyncedSettings,
 } from "./settingsRows";
 import { TASK_COLUMNS, type RemoteTaskRow, type TaskRow } from "./taskRows";
+import { PET_STORAGE_VERSION } from "@/features/pet/repository";
+import type { PetProfile } from "@/features/pet/profile";
+import {
+  PET_GAME_COLUMNS,
+  PET_HISTORY_COLUMNS,
+  type PetGameRow,
+  type PetHistoryInsert,
+  type PetHistoryRow,
+} from "./petRows";
 
 // 계정(Supabase 표)에 읽고 쓰는 조회문. 표마다 RLS가 "로그인한 본인 행만" 허용하므로
 // 조건에 사용자 id를 넣지 않아도 내 것만 오고, 남의 것은 쓸 수 없음 (supabase/sync-tables.sql).
@@ -149,4 +158,76 @@ export async function uploadSettings(
     { onConflict: "user_id" },
   );
   if (error) throw error;
+}
+
+// 까미 ---------------------------------------------------------------------
+
+/** 계정의 정리한 까미 기록. 아직 없으면 null */
+export async function fetchPetGame(
+  supabase: SupabaseClient,
+): Promise<PetGameRow | null> {
+  const { data, error } = await supabase
+    .from("pet_game")
+    .select(PET_GAME_COLUMNS)
+    .maybeSingle();
+  if (error) throw error;
+  return data as PetGameRow | null;
+}
+
+/** 계정에 까미를 처음 올립니다. 이미 있으면(다른 기기가 먼저 올림) false */
+export async function createPetGame(
+  supabase: SupabaseClient,
+  userId: string,
+  pet: PetProfile,
+): Promise<boolean> {
+  const { error } = await supabase
+    .from("pet_game")
+    .insert({ user_id: userId, pet, version: PET_STORAGE_VERSION });
+  // 23505: 같은 키가 이미 있음
+  if ((error as { code?: string } | null)?.code === "23505") return false;
+  if (error) throw error;
+  return true;
+}
+
+/**
+ * 돌봄 기록을 정리한 까미로 바꿉니다. 다른 기기가 이미 더 뒤까지 정리했으면 바꾸지 않음
+ * (늦게 끝난 정리가 앞선 정리를 되돌리지 않게)
+ */
+export async function compactPetGame(
+  supabase: SupabaseClient,
+  userId: string,
+  pet: PetProfile,
+  until: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("pet_game")
+    .update({ pet, version: PET_STORAGE_VERSION, history_until: until })
+    .eq("user_id", userId)
+    .or(`history_until.is.null,history_until.lt."${until}"`);
+  if (error) throw error;
+}
+
+/** after 뒤에 서버에 들어온 돌봄 기록을 들어온 순서대로. after가 없으면 전부 */
+export function fetchPetHistory(
+  supabase: SupabaseClient,
+  after: string | null,
+): Promise<PetHistoryRow[]> {
+  return fetchAllPages<PetHistoryRow>((from, to) => {
+    let query = supabase.from("pet_game_history").select(PET_HISTORY_COLUMNS);
+    if (after) query = query.gt("created_at", after);
+    return query.order("created_at").order("seq").range(from, to);
+  });
+}
+
+/** 돌봄 기록을 올립니다. 이미 올린 것(같은 id)은 건너뜀 */
+export function uploadPetHistory(
+  supabase: SupabaseClient,
+  rows: PetHistoryInsert[],
+): Promise<void> {
+  return writeInChunks(rows, (part) =>
+    supabase.from("pet_game_history").upsert(part, {
+      onConflict: "user_id,id",
+      ignoreDuplicates: true,
+    }),
+  );
 }

@@ -10,4 +10,4 @@ export const LEGAL_OPERATOR = {
 };
 
 /** 시행일 (YYYY-MM-DD). 확정한 날 기준이며, 실제 공개(배포)일과 다르면 맞춥니다 */
-export const LEGAL_EFFECTIVE_DATE = "2026-11-14";
+export const LEGAL_EFFECTIVE_DATE = "2026-11-18";

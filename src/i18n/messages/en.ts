@@ -829,7 +829,7 @@ const en: Messages = {
       logout: "Log out",
       logoutTitle: "Log out?",
       logoutNote:
-        "Logging out clears your tasks, history and timer in this browser. They stay in your account and come back when you log in again.",
+        "Logging out clears your tasks, history, timer and Kkami in this browser. They stay in your account and come back when you log in again.",
       deleteAccount: {
         button: "Delete account",
         title: "Delete your account?",

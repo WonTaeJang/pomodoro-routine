@@ -85,19 +85,22 @@ export function createPetStore(
       // A new save supersedes a previously failed deletion.
       set({ retryOperation: "save" });
       try {
-        const saved = await repository.update((current) => {
-          // Check under the write lock: the storage event may not have arrived.
-          // Retry discards old work; an explicit new action can start a new record.
-          if (remotelyReset(current)) {
-            pending = fresh ? [fresh] : [];
-            basePet =
-              current ?? (fresh ? createPetProfile(id(), fresh.at) : null);
-            persistedId = current?.id ?? null;
-            showPending();
-          }
-          const base = current ?? basePet;
-          return base ? applyPending(base, pending) : null;
-        });
+        const saved = await repository.update(
+          (current) => {
+            // Check under the write lock: the storage event may not have arrived.
+            // Retry discards old work; an explicit new action can start a new record.
+            if (remotelyReset(current)) {
+              pending = fresh ? [fresh] : [];
+              basePet =
+                current ?? (fresh ? createPetProfile(id(), fresh.at) : null);
+              persistedId = current?.id ?? null;
+              showPending();
+            }
+            const base = current ?? basePet;
+            return base ? applyPending(base, pending) : null;
+          },
+          () => pending,
+        );
         acceptSaved(saved);
       } catch (error) {
         fail(error);
@@ -186,6 +189,8 @@ export function createPetStore(
   });
 }
 
-export const petStore = createPetStore(createLocalPetRepository());
+/** 이 브라우저의 까미 저장소. 계정 맞추기(src/features/sync)도 같은 것을 씀 */
+export const petRepository = createLocalPetRepository();
+export const petStore = createPetStore(petRepository);
 export const usePetStore = <T>(selector: (state: PetStore) => T): T =>
   useStore(petStore, selector);

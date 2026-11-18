@@ -118,10 +118,10 @@ const content: GuideContent = {
       title: "Where is my data saved?",
       points: [
         "Everything works without signing in. In that case your tasks and history are saved only in this browser, and clearing your browser data deletes them too.",
-        "Sign in from the {menu} menu to save your tasks, focus history and timer and focus sound settings to your account. They carry over when you sign in on another device.",
-        "Tasks and history saved in this browser before you sign in are merged into your account when you sign in.",
+        "Sign in from the {menu} menu to save your tasks, focus history, timer and focus sound settings, and Kkami to your account. They carry over when you sign in on another device.",
+        "Tasks and history saved in this browser before you sign in are merged into your account when you sign in. Kkami goes up only if your account has no Kkami yet; otherwise this browser switches to your account's Kkami.",
         "Display settings like theme, language and alerts stay in this browser, not in your account.",
-        "Logging out clears this browser's tasks, history and timer. They stay in your account and come back when you sign in again. Deleting your account deletes its records too.",
+        "Logging out clears this browser's tasks, history, timer and Kkami. They stay in your account and come back when you sign in again. Deleting your account deletes its records too.",
         "Under 'Data' in Settings, you can reset settings to their defaults.",
       ],
     },

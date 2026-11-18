@@ -4,7 +4,7 @@
 -- 계정(auth.users)은 브라우저의 공개 키로 지울 수 없어서, 관리자 권한으로 실행되지만
 -- "지금 로그인한 본인(auth.uid())의 계정만" 지우는 함수를 둡니다. 지울 id는 브라우저가 보내는 값이 아니라
 -- 서버가 로그인 토큰에서 꺼낸 값이라 남의 계정은 지울 수 없습니다.
--- 계정이 지워지면 tasks·sessions·user_settings의 본인 행도 on delete cascade로 함께 지워집니다.
+-- 계정이 지워지면 tasks·sessions·user_settings·pet_game·pet_game_history의 본인 행도 on delete cascade로 함께 지워집니다.
 -- 브라우저에서는 supabase.rpc("delete_my_account")로 부릅니다.
 
 create or replace function public.delete_my_account()

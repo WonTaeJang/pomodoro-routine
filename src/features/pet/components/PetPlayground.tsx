@@ -7,6 +7,7 @@ import { usePetRive, usePetRiveOutfit, usePetRivePose } from "../usePetRive";
 import { Button, VisuallyHidden } from "@/components/ui";
 import { usePetCare } from "../usePetCare";
 import { petStore, usePetStore } from "../store";
+import { petScreenOpened } from "../visits";
 import { useStoresReady } from "@/lib/useHydrateStores";
 import styles from "./PetPlayground.module.scss";
 import { PetWalk } from "./PetWalk";
@@ -81,6 +82,7 @@ export function PetPlayground() {
     setShownAt(pathname);
     if (pathname === PET_PATH) setVisit((value) => value + 1);
   }
+  useEffect(() => petScreenOpened(), [visit]);
   return (
     <PetRoom
       key={`${visit}-${attempt}`}

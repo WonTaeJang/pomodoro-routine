@@ -18,6 +18,7 @@ vi.hoisted(() => {
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { useTimerStore } from "@/features/timer/store";
+import { petStore } from "@/features/pet/store";
 import { STORAGE_KEYS } from "@/lib/storage";
 import { clearLocalAccountData } from "./clearLocalData";
 
@@ -30,7 +31,7 @@ describe("로그아웃할 때 지우기", () => {
     useTimerStore.getState().resetTimer();
   });
 
-  it("할 일·기록·타이머·맞추기 기억은 지우고, 설정과 다른 저장 값은 남김", () => {
+  it("할 일·기록·타이머·까미·맞추기 기억은 지우고, 설정과 다른 저장 값은 남김", async () => {
     useTasksStore.getState().add("보고서", 2);
     useHistoryStore
       .getState()
@@ -42,6 +43,8 @@ describe("로그아웃할 때 지우기", () => {
     localStorage.setItem(STORAGE_KEYS.theme, "dark");
 
     clearLocalAccountData();
+    // 까미 기록은 다른 탭과 잠금을 나눠 쓰므로 순서대로 지워짐: 뒤에 넣은 일을 기다림
+    await petStore.getState().hydrate();
 
     expect(useTasksStore.getState().tasks).toEqual([]);
     expect(useTasksStore.getState().activeTaskId).toBeNull();
@@ -50,7 +53,8 @@ describe("로그아웃할 때 지우기", () => {
     expect(timer.status).toBe("idle");
     expect(settings.focusMinutes).toBe(50);
     expect(localStorage.getItem(STORAGE_KEYS.accountSync)).toBeNull();
-    expect(localStorage.getItem(STORAGE_KEYS.pet)).toBe("pet");
+    expect(localStorage.getItem(STORAGE_KEYS.pet)).toBeNull();
+    expect(petStore.getState().pet).toBeNull();
     expect(localStorage.getItem(STORAGE_KEYS.theme)).toBe("dark");
   });
 });

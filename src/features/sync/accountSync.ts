@@ -2,7 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { useTimerStore } from "@/features/timer/store";
+import { petRepository, petStore } from "@/features/pet/store";
+import { onPetScreenOpen } from "@/features/pet/visits";
 import {
+  compactPetGame,
+  createPetGame,
+  fetchPetGame,
+  fetchPetHistory,
+  uploadPetHistory,
   fetchSessions,
   fetchSettings,
   fetchTasksSince,
@@ -12,6 +19,7 @@ import {
   uploadTasks,
 } from "./api";
 import { readSyncMemory, updateSyncMemory } from "./memory";
+import { createPetSync, hasUnsent } from "./petSync";
 import { createSessionSync } from "./sessionSync";
 import { pickSyncedSettings, SYNCED_SETTING_KEYS } from "./settingsRows";
 import { createSettingsSync } from "./settingsSync";
@@ -24,9 +32,10 @@ const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 const SAVE_DELAY_MS = 800;
 
 /**
- * 한 계정의 집중 기록·할 일·설정을 이 브라우저의 store와 맞추기 시작합니다. 그만두는 함수를 돌려줌.
+ * 한 계정의 집중 기록·할 일·설정·까미를 이 브라우저의 store와 맞추기 시작합니다. 그만두는 함수를 돌려줌.
  * - 시작하면: 서버에서 받아 합치고, 이 브라우저에서 생기거나 바뀐 것을 올림
- * - 기록이 생기면 바로, 할 일·설정을 고치면 잠깐 모았다가 올림
+ * - 기록이 생기면 바로, 할 일·설정·돌봄은 잠깐 모았다가 올림
+ * - 다마고치 화면에 들어오면 까미 돌봄 기록을 받아 정리함
  * - 인터넷이 다시 연결되거나 탭으로 돌아오면 못 올린 것을 다시 올림
  *   (탭으로 돌아오면 5분에 한 번까지 서버에서 다시 받음)
  */
@@ -69,9 +78,23 @@ export function startAccountSync(
     writeMemory: (shape) => updateSyncMemory(userId, { settings: shape }),
   });
 
+  const pet = createPetSync({
+    userId,
+    fetchGame: () => fetchPetGame(supabase),
+    createGame: (value) => createPetGame(supabase, userId, value),
+    compactGame: (value, until) =>
+      compactPetGame(supabase, userId, value, until),
+    fetchHistory: (after) => fetchPetHistory(supabase, after),
+    uploadHistory: (rows) => uploadPetHistory(supabase, rows),
+    loadRecord: () => petRepository.loadRecord(),
+    updateRecord: (change) => petRepository.updateRecord(change),
+    reload: () => void petStore.getState().hydrate(),
+  });
+
   /** 할 일을 먼저 맞춰야 설정의 "지금 집중할 할 일"을 고를 수 있음 */
   const syncAll = async (refresh = false) => {
     void sessions.sync({ refresh });
+    void pet.sync();
     await tasks.sync({ refresh });
     await settings.sync({ refresh });
   };
@@ -104,6 +127,17 @@ export function startAccountSync(
       );
       if (changed) later("settings", () => void settings.sync());
     }),
+    // 돌봄이 생겼거나 아직 계정에 없는 까미면 올림 (받아서 바꾼 것만이면 올릴 게 없음)
+    petStore.subscribe((state, previous) => {
+      if (state.pet === previous.pet) return;
+      void petRepository
+        .loadRecord()
+        .then((record) => {
+          if (hasUnsent(record, userId)) later("pet", () => void pet.sync());
+        })
+        .catch(() => {});
+    }),
+    onPetScreenOpen(() => void pet.sync({ refresh: true })),
   ];
   const onOnline = () => void syncAll();
   const onVisible = () => {
@@ -120,6 +154,7 @@ export function startAccountSync(
     sessions.stop();
     tasks.stop();
     settings.stop();
+    pet.stop();
     for (const timer of timers.values()) clearTimeout(timer);
     unsubscribes.forEach((unsubscribe) => unsubscribe());
     window.removeEventListener("online", onOnline);
