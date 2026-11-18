@@ -110,9 +110,6 @@ function WalkScene({
   return (
     <div className={room.room}>
       <PetRoomArt />
-      <span className={room.roomLabel} aria-hidden="true">
-        {t("roomLabel")}
-      </span>
       <div className={styles.canvas} role="img" aria-label={t("walk.scene")}>
         <RiveComponent aria-hidden="true" />
       </div>

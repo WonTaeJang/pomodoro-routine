@@ -8,7 +8,11 @@ import { Button, VisuallyHidden } from "@/components/ui";
 import { usePetCare } from "../usePetCare";
 import { petStore, usePetStore } from "../store";
 import { petScreenOpened } from "../visits";
+import { useTimerStore } from "@/features/timer/store";
+import { isOnBreak } from "@/features/timer/timer";
+import { PATHS } from "@/lib/paths";
 import { useStoresReady } from "@/lib/useHydrateStores";
+import { PetBreakTimer } from "./PetBreakTimer";
 import styles from "./PetPlayground.module.scss";
 import { PetWalk } from "./PetWalk";
 import { PetRoomArt } from "./PetRoomArt";
@@ -23,6 +27,7 @@ import { useKkamiSpeech } from "../useKkamiSpeech";
 import { useTimeOfDay } from "../useTimeOfDay";
 import {
   HOME_LINE_MS,
+  REST_LINE_MS,
   WAKE_LINE_MS,
   speechSituation,
   type SpeechLevel,
@@ -68,8 +73,6 @@ const POSE_COPY = {
   { status: string; action: string; label: string }
 >;
 
-const PET_PATH = "/pet";
-
 export function PetPlayground() {
   const [attempt, setAttempt] = useState(0);
   // The router keeps a page it leaves (hidden, with its state) for a quick
@@ -80,7 +83,7 @@ export function PetPlayground() {
   const [visit, setVisit] = useState(0);
   if (pathname !== shownAt) {
     setShownAt(pathname);
-    if (pathname === PET_PATH) setVisit((value) => value + 1);
+    if (pathname === PATHS.pet) setVisit((value) => value + 1);
   }
   useEffect(() => petScreenOpened(), [visit]);
   return (
@@ -100,6 +103,8 @@ function PetRoom({ retry }: { retry: () => void }) {
     if (storesReady) void petStore.getState().meet();
   }, [storesReady]);
   const animation = usePetRive(storesReady && hydrated);
+  // 휴식 중에 오면 까미가 깨어서 쉬자고 반김
+  const resting = useTimerStore((s) => isOnBreak(s.timer));
   const { RiveComponent, loaded, ready, failed } = animation;
   const {
     pose,
@@ -116,7 +121,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     moveStroke,
     endStroke,
     clickPet,
-  } = usePetCare(ready);
+  } = usePetCare(ready, resting);
   const sleeping = pose === "sleeping";
   const startled = pose === "startled";
   const snacking = pose === "snacking";
@@ -211,7 +216,7 @@ function PetRoom({ retry }: { retry: () => void }) {
 
   // What Kkami says (I-058).
   const time = useTimeOfDay();
-  const greeting = useUntil(awakeAt, WAKE_LINE_MS);
+  const greeting = useUntil(awakeAt, resting ? REST_LINE_MS : WAKE_LINE_MS);
   const backHome = useUntil(homeAt, HOME_LINE_MS);
   const situation = speechSituation({
     pose,
@@ -219,6 +224,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     decorated: decorated.value === true,
     greeting,
     backHome,
+    resting,
   });
   const speech = useKkamiSpeech(
     situation,
@@ -246,6 +252,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     <main className={styles.page}>
       <VisuallyHidden id="pet-keyboard-help">{t("keyboard")}</VisuallyHidden>
 
+      <PetBreakTimer />
       <section className={styles.device} aria-label={t("label")}>
         <h1 className={styles.name}>{t("name")}</h1>
         <div className={styles.bezel}>
@@ -327,9 +334,6 @@ function PetRoom({ retry }: { retry: () => void }) {
                   </>
                 )}
               </div>
-              <span className={styles.roomLabel} aria-hidden="true">
-                {t("roomLabel")}
-              </span>
             </div>
           </div>
         </div>

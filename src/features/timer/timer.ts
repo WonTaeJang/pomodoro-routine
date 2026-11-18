@@ -245,6 +245,22 @@ export function applySettings(
 }
 
 /** 남은 시간을 "mm:ss"로. 초는 올림해서 0초가 되는 순간 끝나 보이게 합니다. */
+/** 휴식 중인지 (시작한 뒤, 일시정지 포함) */
+export const isOnBreak = (state: TimerState) =>
+  state.mode !== "focus" && state.status !== "idle";
+
+/** 방금 휴식을 시작했으면 그 휴식. 일시정지했다가 다시 시작한 것은 아님 */
+export function startedBreak(
+  before: TimerState,
+  after: TimerState,
+): TimerMode | null {
+  return after.mode !== "focus" &&
+    after.status === "running" &&
+    before.status === "idle"
+    ? after.mode
+    : null;
+}
+
 export function formatRemaining(ms: number): string {
   const totalSeconds = Math.ceil(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);

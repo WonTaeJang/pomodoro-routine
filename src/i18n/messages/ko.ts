@@ -213,6 +213,13 @@ const ko = {
         lv4: ["또 가고 싶어!", "다리가 신났어"],
         lv5: ["같이 걸어서 좋았어", "너랑 걷는 게 제일 좋아"],
       },
+      rest: {
+        lv1: ["멍!", "왈왈!", "킁킁… 멍!"],
+        lv2: ["멍! 쉬는 시간!", "왈! 놀자!"],
+        lv3: ["수고했어!", "쉬는 시간이다!", "잠깐 놀다 가"],
+        lv4: ["열심히 했네! 같이 쉬자", "기지개 한번 켜자"],
+        lv5: ["수고했어! 같이 쉬자", "쉬는 동안 옆에 있을게"],
+      },
       decorated: {
         lv1: ["멍?!", "킁킁… 왈!"],
         lv2: ["멍! 예뻐!", "왈, 새거다!"],
@@ -297,7 +304,8 @@ const ko = {
     loading: "불러오는 중…",
     error: "까미를 불러오지 못했어요.",
     retry: "다시 불러오기",
-    roomLabel: "까미의 방",
+    breakTimer: "{mode} {time} 남음",
+    breakPaused: "{mode} 멈춤 · {time} 남음",
   },
   common: {
     cancel: "취소",
@@ -452,6 +460,11 @@ const ko = {
       later: "나중에",
       startNext: "{mode} 시작 →",
       autoStart: "{seconds}초 후 {mode} 시작",
+    },
+    breakSnack: {
+      short: "짧은 휴식! 까미랑 놀까요?",
+      long: "긴 휴식! 까미랑 산책 갈까요?",
+      go: "보러 가기",
     },
     testMode: {
       badge: "테스트 모드 · {seconds}초",

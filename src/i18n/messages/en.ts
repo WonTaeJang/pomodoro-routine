@@ -237,6 +237,13 @@ const en: Messages = {
         lv4: ["Let’s go again!", "My legs are happy"],
         lv5: ["Loved walking together", "Walks with you are best"],
       },
+      rest: {
+        lv1: ["Woof!", "Arf arf!", "Sniff… woof!"],
+        lv2: ["Woof! Break time!", "Arf! Let's play!"],
+        lv3: ["Good work!", "Break time!", "Stay and play a bit"],
+        lv4: ["Hard work! Let's rest", "Let's have a stretch"],
+        lv5: ["Good work! Rest with me", "I'm right here, rest up"],
+      },
       decorated: {
         lv1: ["Woof?!", "Sniff… arf!"],
         lv2: ["Woof! Pretty!", "Arf, something new!"],
@@ -321,7 +328,8 @@ const en: Messages = {
     loading: "Loading…",
     error: "Couldn’t load Kkami.",
     retry: "Try again",
-    roomLabel: "KKAMI’S ROOM",
+    breakTimer: "{mode} · {time} left",
+    breakPaused: "{mode} paused · {time} left",
   },
   common: {
     cancel: "Cancel",
@@ -476,6 +484,11 @@ const en: Messages = {
       later: "Later",
       startNext: "Start {mode} →",
       autoStart: "{mode} starts in {seconds}s",
+    },
+    breakSnack: {
+      short: "Short break! Play with Kkami?",
+      long: "Long break! Walk with Kkami?",
+      go: "Go see",
     },
     testMode: {
       badge: "Test mode · {seconds}s",

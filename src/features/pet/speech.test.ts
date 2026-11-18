@@ -12,7 +12,15 @@ import {
 
 const lines: SpeechLines = ko.pet.speech;
 const LEVELS: SpeechLevel[] = [1, 2, 3, 4, 5];
-const BY_LEVEL = ["idle", "pat", "snack", "wake", "home", "decorated"] as const;
+const BY_LEVEL = [
+  "idle",
+  "pat",
+  "snack",
+  "wake",
+  "home",
+  "rest",
+  "decorated",
+] as const;
 
 describe("까미 말풍선 고르기", () => {
   it("레벨 문장이 기본이고, 아래 레벨 문장은 따로 모아 둠", () => {
@@ -109,5 +117,21 @@ describe("말할 상황 고르기", () => {
     );
     expect(speechSituation({ ...base, backHome: true })).toBe("home");
     expect(speechSituation(base)).toBe("idle");
+  });
+
+  it("휴식 중에 만나면 깨어나는 인사 대신 쉬자는 인사", () => {
+    expect(speechSituation({ ...base, greeting: true, resting: true })).toBe(
+      "rest",
+    );
+    // 인사가 끝나면 평소 말
+    expect(speechSituation({ ...base, resting: true })).toBe("idle");
+    expect(
+      speechSituation({
+        ...base,
+        pose: "happy",
+        greeting: true,
+        resting: true,
+      }),
+    ).toBe("pat");
   });
 });

@@ -59,9 +59,6 @@ $bubble-box-shadow: 0 3px 0 $bubble-shade;
 // Icon-style tail: the right side drops straight down to Kkami's head.
 $bubble-tail-width: 16px;
 $bubble-tail-height: 14px;
-$roomLabel-bottom: 12px;
-$roomLabel-right: 16px;
-$roomLabel-color: #86755d;
 // 불투명: 강아지가 준비되기 전에는 방(창문, 화분, 말풍선)이 비치지 않게 (B-003)
 $loading-background: #f4efdf;
 // The room fills the device screen below its header; the screen rounds the corners.
@@ -311,15 +308,6 @@ $slot-tag-color: #fffaf0;
     fill: none;
     stroke: $bubble-line;
   }
-}
-
-.roomLabel {
-  position: absolute;
-  bottom: $roomLabel-bottom;
-  right: $roomLabel-right;
-  font-size: var(--font-size-2xs);
-  color: $roomLabel-color;
-  letter-spacing: 0.1em;
 }
 
 .loading {

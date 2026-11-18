@@ -12,8 +12,11 @@ import { PET_STROKE_DISTANCE, nextReactionAt, petPose } from "./pet";
 import { createPetCareStore } from "./careStore";
 import { petStore } from "./store";
 
-/** 포인터·타이머는 페이지별 상태, 인정된 쓰담·간식은 영구 기록으로 전달. */
-export function usePetCare(ready: boolean) {
+/**
+ * 포인터·타이머는 페이지별 상태, 인정된 쓰담·간식은 영구 기록으로 전달.
+ * resting: 휴식 중에 만나면 자고 있지 않고 깨어서 반김
+ */
+export function usePetCare(ready: boolean, resting = false) {
   const [careStore] = useState(() =>
     createPetCareStore(
       () => {
@@ -29,10 +32,11 @@ export function usePetCare(ready: boolean) {
   const stroke = useRef<{ id: number; x: number; y: number } | null>(null);
   const dragged = useRef(false);
   const reactionAt = nextReactionAt(state);
-
+  // Start only acts once, before the intro: a break that begins later wakes nobody.
   useEffect(() => {
-    if (ready) dispatch({ type: "start", now: performance.now() });
-  }, [ready, state.phase, state.introUntil, dispatch]);
+    if (ready)
+      dispatch({ type: "start", now: performance.now(), awake: resting });
+  }, [ready, resting, state.phase, state.introUntil, dispatch]);
 
   useEffect(() => {
     if (!ready || state.introUntil === null) return;

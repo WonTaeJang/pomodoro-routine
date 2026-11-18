@@ -164,6 +164,24 @@ describe("첫 만남 수면과 깨우기", () => {
     ).toMatchObject({ phase: "awake", introUntil: null, pats: 0 });
   });
 
+  it("휴식 중에 만나면 자지 않고 바로 깨어 있음", () => {
+    const awake = petReducer(createPetState(), {
+      type: "start",
+      now: 10000,
+      awake: true,
+    });
+    expect(awake).toMatchObject({
+      phase: "awake",
+      introUntil: null,
+      awakeAt: 10000,
+    });
+    expect(petPose(awake)).toBe("idle");
+    // 이미 깬 뒤에는 다시 시작해도 그대로
+    expect(petReducer(awake, { type: "start", now: 11000 })).toBe(awake);
+    // 바로 쓰담으로 셈
+    expect(petReducer(awake, { type: "pet", now: 10100 }).pats).toBe(1);
+  });
+
   it("첫 클릭은 1초 놀란 뒤 깨우고 이후 클릭부터 쓰담으로 셈", () => {
     const sleeping = petReducer(createPetState(), { type: "start", now: 0 });
     const startled = petReducer(sleeping, { type: "pet", now: 100 });

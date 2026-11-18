@@ -32,6 +32,7 @@ const SAMPLE_VALUES = {
   title: "할 일",
   label: "집중 시간",
   mode: "집중",
+  time: "04:47",
   walk: "long",
   sound: "빗소리",
   date: "2026.11.07",

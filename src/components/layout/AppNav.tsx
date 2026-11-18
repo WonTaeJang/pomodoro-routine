@@ -5,13 +5,14 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "use-intl";
 import { CalendarIcon, PetDeviceIcon, TimerIcon } from "@/components/icons";
 import { cx } from "@/lib/cx";
+import { PATHS } from "@/lib/paths";
 import styles from "./AppNav.module.scss";
 
 /** 이름은 app.nav.<key> */
 const PAGES = [
-  { href: "/", key: "timer", icon: TimerIcon },
-  { href: "/calendar", key: "calendar", icon: CalendarIcon },
-  { href: "/pet", key: "pet", icon: PetDeviceIcon },
+  { href: PATHS.timer, key: "timer", icon: TimerIcon },
+  { href: PATHS.calendar, key: "calendar", icon: CalendarIcon },
+  { href: PATHS.pet, key: "pet", icon: PetDeviceIcon },
 ] as const;
 
 /**

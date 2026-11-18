@@ -7,6 +7,7 @@ import { useWakeLock } from "@/lib/useWakeLock";
 import { useCompleteWhenDue, useTimerTitle } from "../hooks";
 import { useTimerStore } from "../store";
 import { formatRemaining, getRemainingMs } from "../timer";
+import { BreakSnackbar } from "./BreakSnackbar";
 import { CompletionDialog } from "./CompletionDialog";
 
 type TimerRuntimeProps = {
@@ -16,7 +17,7 @@ type TimerRuntimeProps = {
 
 /**
  * 어느 페이지에 있든 타이머가 하는 일: 시간이 되면 다음으로 넘기기, 알림, 집중 소리, 탭 제목,
- * 화면 켜두기, 완료 팝업. 앱 틀(AppShell)에 한 번만 둡니다.
+ * 화면 켜두기, 완료 팝업, 휴식 시작 안내. 앱 틀(AppShell)에 한 번만 둡니다.
  */
 export function TimerRuntime({ ready }: TimerRuntimeProps) {
   const timer = useTimerStore((s) => s.timer);
@@ -33,5 +34,10 @@ export function TimerRuntime({ ready }: TimerRuntimeProps) {
   useFocusSound(ready);
   useWakeLock(ready && keepAwake);
 
-  return ready ? <CompletionDialog /> : null;
+  return ready ? (
+    <>
+      <CompletionDialog />
+      <BreakSnackbar />
+    </>
+  ) : null;
 }

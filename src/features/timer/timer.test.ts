@@ -8,10 +8,12 @@ import {
   DEFAULT_SETTINGS,
   formatRemaining,
   getRemainingMs,
+  isOnBreak,
   pause,
   reset,
   skip,
   start,
+  startedBreak,
   switchMode,
   sync,
 } from "./timer";
@@ -358,5 +360,31 @@ describe("시간 표시", () => {
     [120 * MIN, "120:00"],
   ])("%i ms → %s", (ms, text) => {
     expect(formatRemaining(ms)).toBe(text);
+  });
+});
+
+describe("휴식 시작 알아채기 (까미 안내)", () => {
+  const focusDone = finishSession(createInitialState(settings), settings, T0);
+  const breakIdle = focusDone.state;
+
+  it("집중을 마친 뒤 휴식을 시작하면 그 휴식", () => {
+    expect(breakIdle).toMatchObject({ mode: "short-break", status: "idle" });
+    const running = start(breakIdle, T0 + 1000);
+    expect(startedBreak(breakIdle, running)).toBe("short-break");
+    expect(isOnBreak(running)).toBe(true);
+  });
+
+  it("일시정지를 풀거나 집중을 시작하는 것은 아님", () => {
+    const running = start(breakIdle, T0 + 1000);
+    const paused = pause(running, T0 + 2000);
+    expect(isOnBreak(paused)).toBe(true);
+    expect(startedBreak(paused, start(paused, T0 + 3000))).toBeNull();
+    const focus = createInitialState(settings);
+    expect(startedBreak(focus, start(focus, T0))).toBeNull();
+  });
+
+  it("시작 전이거나 집중 중이면 휴식 중이 아님", () => {
+    expect(isOnBreak(breakIdle)).toBe(false);
+    expect(isOnBreak(start(createInitialState(settings), T0))).toBe(false);
   });
 });

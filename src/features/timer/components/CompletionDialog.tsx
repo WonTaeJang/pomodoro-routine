@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "use-intl";
 import { MedalIcon } from "@/components/icons";
 import { Button, Dialog } from "@/components/ui";
 import { CertificateLauncher } from "@/features/certificate";
+import { PATHS } from "@/lib/paths";
 import { TaskDoneCheck } from "@/features/tasks/components/TaskDoneCheck";
 import { useKkamiPhoto } from "../photos/useKkamiPhoto";
 import { startSession } from "../startSession";
@@ -34,6 +36,8 @@ export function CompletionDialog() {
   const open = completed !== null && shown;
   const { waiting: autoStart, secondsLeft } = useAutoStartCountdown(open);
   const t = useTranslations();
+  const router = useRouter();
+  const onPet = usePathname() === PATHS.pet;
 
   const focusDone = completed?.mode === "focus";
   // 집중을 마쳤으면 웃는 까미, 휴식을 마쳤으면 집중을 기다리는 까미. 팝업마다 한 장을 랜덤으로
@@ -46,6 +50,13 @@ export function CompletionDialog() {
   const cycleDone = focusDone && completed?.cycleCompleted === true;
   const nextLabel = t(`timer.modes.${next.mode}`);
   const walk = next.mode === "long-break" ? "long" : "short";
+
+  function startNext() {
+    startSession();
+    dismissCompleted();
+    // 다마고치에서 쉬다가 집중으로 돌아갈 때는 타이머 화면으로
+    if (!focusDone && onPet) router.push(PATHS.timer);
+  }
 
   function cancel() {
     cancelAutoStart();
@@ -71,12 +82,7 @@ export function CompletionDialog() {
             <Button variant="ghost" onClick={cancel}>
               {t("common.cancel")}
             </Button>
-            <Button
-              onClick={() => {
-                startSession();
-                dismissCompleted();
-              }}
-            >
+            <Button onClick={startNext}>
               {t("timer.completion.startNow")}
             </Button>
           </>
@@ -85,12 +91,7 @@ export function CompletionDialog() {
             <Button variant="ghost" onClick={dismissCompleted}>
               {t("timer.completion.later")}
             </Button>
-            <Button
-              onClick={() => {
-                startSession();
-                dismissCompleted();
-              }}
-            >
+            <Button onClick={startNext}>
               {t("timer.completion.startNext", { mode: nextLabel })}
             </Button>
           </>

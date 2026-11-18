@@ -1,0 +1,61 @@
+@use "../../../styles/mixins";
+
+// 화면 아래 가운데에 잠깐 뜨는 알림 띠. 글자·바탕 색을 뒤집어 화면과 구분
+.snackbar {
+  position: fixed;
+  z-index: var(--z-overlay);
+  left: 50%;
+  bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  width: max-content;
+  max-width: calc(100vw - var(--space-8));
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg);
+  background: var(--color-text);
+  color: var(--color-bg);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--font-size-sm);
+  transform: translateX(-50%);
+  animation: snack-in 200ms ease-out;
+
+  @include mixins.reduced-motion {
+    animation: none;
+  }
+}
+
+.text {
+  flex: 1;
+}
+
+// 바탕이 뒤집혀 있어서 강조색도 바탕 쪽으로 섞어 읽기 쉽게
+.action {
+  padding: var(--space-1-5) var(--space-2-5);
+  border-radius: var(--radius-full);
+  color: color-mix(in srgb, var(--color-accent) 55%, var(--color-bg));
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+  text-decoration: none;
+
+  @include mixins.focus-ring;
+}
+
+.close {
+  display: flex;
+  padding: var(--space-1-5);
+  border: none;
+  border-radius: var(--radius-full);
+  background: none;
+  color: inherit;
+  opacity: 0.7;
+
+  @include mixins.focus-ring;
+}
+
+@keyframes snack-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, var(--space-2));
+  }
+}

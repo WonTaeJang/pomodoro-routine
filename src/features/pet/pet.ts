@@ -20,9 +20,11 @@ export type PetState = {
 
 export type PetAction =
   | {
-      type: "start" | "advanceIntro" | "pet" | "feed" | "walk" | "cheer";
+      type: "advanceIntro" | "pet" | "feed" | "walk" | "cheer";
       now: number;
     }
+  /** awake: met during a break, so Kkami is already up (no sleeping intro). */
+  | { type: "start"; now: number; awake?: boolean }
   | { type: "settle"; now: number }
   | { type: "returnHome"; now: number };
 
@@ -93,6 +95,8 @@ export function petReducer(state: PetState, action: PetAction): PetState {
       return state;
     case "start":
       if (state.phase !== "sleeping" || state.introUntil !== null) return state;
+      if (action.awake)
+        return { ...state, phase: "awake", awakeAt: action.now };
       return { ...state, introUntil: action.now + PET_SLEEP_MS };
     case "advanceIntro":
       if (state.introUntil === null || action.now < state.introUntil)

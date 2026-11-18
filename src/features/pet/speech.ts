@@ -15,6 +15,8 @@ export type SpeechLines = {
   snack: ByLevel;
   wake: ByLevel;
   home: ByLevel;
+  /** Greeting when met during a break, instead of waking up. */
+  rest: ByLevel;
   decorated: ByLevel;
   /** Said once, as the new level is reached. */
   levelUp: Record<`lv${Exclude<SpeechLevel, 1>}`, string>;
@@ -30,6 +32,7 @@ export type Situation =
   | "decorated"
   | "pat"
   | "home"
+  | "rest"
   | "idle";
 
 /** Idle talk changes this often while nothing happens. */
@@ -37,6 +40,8 @@ export const IDLE_LINE_MS = 60_000;
 /** How long Kkami keeps greeting after waking, or talking after a walk. */
 export const WAKE_LINE_MS = 4000;
 export const HOME_LINE_MS = 8000;
+/** The break greeting stays a little longer: it is the reason to come. */
+export const REST_LINE_MS = 8000;
 /** Lines from earlier levels still come up now and then. */
 export const EARLIER_LEVEL_CHANCE = 0.2;
 const TIME_TALK_LEVEL = 4;
@@ -48,6 +53,7 @@ export function speechSituation({
   decorated,
   greeting,
   backHome,
+  resting = false,
 }: {
   pose: PetPose;
   /** A level was just reached. */
@@ -57,13 +63,15 @@ export function speechSituation({
   /** Just woke up (WAKE_LINE_MS) or got home (HOME_LINE_MS). */
   greeting: boolean;
   backHome: boolean;
+  /** On a break: the greeting is about resting together. */
+  resting?: boolean;
 }): Situation {
   if (pose === "sleeping") return "sleep";
   if (levelUp) return "levelUp";
   if (pose === "startled") return "wake";
   if (pose === "snacking") return "snack";
   if (pose === "happy") return decorated ? "decorated" : "pat";
-  if (greeting) return "wake";
+  if (greeting) return resting ? "rest" : "wake";
   return backHome ? "home" : "idle";
 }
 
