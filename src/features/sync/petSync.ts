@@ -66,7 +66,7 @@ export function hasUnsent(record: PetRecord, userId: string): boolean {
  * 남깁니다. 정리할 것이 없으면 null.
  * 들어온 시각은 서버 시계라, 기기 시계가 늦으면 받은 기록 중 가장 늦은 것을 지금으로 봄
  */
-export function settledHistory(rows: readonly PetHistoryRow[], now: number) {
+function settledHistory(rows: readonly PetHistoryRow[], now: number) {
   const latest = Math.max(...rows.map((row) => fromIso(row.created_at)));
   const cutoff = Math.max(latest, now) - SETTLE_MS;
   let end = 0;

@@ -13,7 +13,7 @@ import type { TimerMode } from "../types";
 import styles from "./BreakSnackbar.module.scss";
 
 /** 보여 주는 시간. 마우스를 올리거나 버튼에 포커스가 있는 동안은 멈추고, 떠나면 처음부터 다시 셈 */
-export const BREAK_SNACK_MS = 8000;
+const BREAK_SNACK_MS = 8000;
 
 /**
  * 휴식을 시작하면 화면 아래에 잠깐: 까미랑 쉬자고 제안합니다.

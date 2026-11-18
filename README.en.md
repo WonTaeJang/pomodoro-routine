@@ -4,6 +4,7 @@
 
 A pomodoro timer with **Kkami**, a black poodle.
 Focus for 25 minutes, rest for 5, and repeat. After 4 focus sessions, you earn a Kkami certificate.
+During breaks, look after a pixel Kkami like a Tamagotchi and take him for walks.
 
 > Use it right away at **https://kkamodoro.vercel.app**. To run it on your computer, see [Getting started](#getting-started).
 
@@ -23,16 +24,19 @@ Screenshots: put the images in docs/images/ and uncomment the lines below.
 - **Focus sounds**: 3 kinds of noise (white, pink, brown), 6 nature sounds (rain, rain on window, fireplace, forest, waves, stream) and 3 place sounds (airplane cabin, library, café). They play only while you focus, and "Random" picks a different one each session.
 - **Calendar and stats**: daily focus count, time and finished tasks, plus your streak, the last 7 days, this month and all-time totals.
 - **Kkami certificate**: finish a cycle and save or share that day's certificate as an image (1080×1920, Instagram story size).
+- **Kkami care (Tamagotchi)**: on a handheld-console screen, pat Kkami, give treats (5 a day) and take walks (5 a day, each bringing home one item). As affinity grows he reaches new levels (5 in all) and gives hearts, and you craft windows, pots, wall-and-floor sets, rugs and outfits from your items and hearts to decorate his room. The view outside follows your device's time (dawn, day, dusk, night), and Kkami says more as you grow closer.
+- **Meet Kkami on breaks**: when a break starts, a short "Play with Kkami?" note appears. During the break, the Tamagotchi page shows the time left and Kkami is awake to greet you. Nothing nudges you while you focus.
 - **Alerts**: a chime when a session ends, and a browser notification if you're in another tab.
-- **Sign-in (optional)**: sign in with Google or Kakao to save your tasks, history and settings to your account and pick up on other devices. You can change your nickname or delete your account on your profile. Everything works without signing in.
+- **Sign-in (optional)**: sign in with Google or Kakao to save your tasks, history, settings and Kkami's care to your account and pick up on other devices. You can change your nickname or delete your account on your profile. Everything works without signing in.
 - **Keyboard shortcuts**: `Space` start / pause, `R` reset, `N` next session, `S` settings.
 - **Also**: dark mode, Korean / English, a first-visit intro and a guide page (`/guide`), keep screen on while the timer runs, and one shared timer across tabs.
 
 ### Where is my data saved?
 
-- **Without signing in:** your tasks, history and settings are saved **only in this browser (localStorage)**. Nothing is sent to a server, and clearing your browser data also deletes your history.
+- **Without signing in:** your tasks, history, settings and Kkami's care are saved **only in this browser (localStorage)**. Nothing is sent to a server, and clearing your browser data also deletes your history.
 - **When you sign in:** your tasks, focus history and settings (durations, auto-start, focus sound, etc.) are also saved to your account (Supabase), so you can continue on other devices with the same account. Tasks and history saved in this browser before you sign in are merged into your account when you sign in. Sound volume, notifications, display settings, theme and language stay in this browser.
-- **Logging out** clears tasks, history and the timer in this browser (they stay in your account). **Deleting your account** removes it and all data saved to it.
+- **Kkami's care** is saved to your account too. If you look after him on two devices, pats, treats, walks and crafting all add up. On your first sign-in, this browser's Kkami goes up if your account has none yet; otherwise this browser switches to your account's Kkami.
+- **Logging out** clears tasks, history, the timer and Kkami in this browser (they stay in your account). **Deleting your account** removes it and all data saved to it.
 
 ## Getting started
 
@@ -57,19 +61,20 @@ Then open http://localhost:3000 in your browser.
 
 During development, add `?test=5` to the address to make every session 5 seconds long (`?test=off` turns it off). See the [setup guide](./docs/05-setup.md) (in Korean) for more.
 
-To try sign-in, create a Supabase project and put its URL and publishable key in `.env.local`. Without them, only the sign-in menu is hidden and everything else works. To save to accounts, also run the two SQL files in `supabase/`. ([Sign-in setup, in Korean](./docs/05-setup.md#로그인-supabase-설정))
+To try sign-in, create a Supabase project and put its URL and publishable key in `.env.local`. Without them, only the sign-in menu is hidden and everything else works. To save to accounts, also run `sync-tables.sql`, `delete-account.sql` and `pet-game.sql` in `supabase/` (`admin.sql` for the admin page). ([Sign-in setup, in Korean](./docs/05-setup.md#로그인-supabase-설정))
 
 ## Tech stack
 
-| Area      | What's used                                                                                 |
-| --------- | ------------------------------------------------------------------------------------------- |
-| Framework | Next.js 16 (App Router), React 19, TypeScript                                               |
-| Styling   | SCSS Modules + design tokens, [Pretendard](https://github.com/orioncactus/pretendard) font  |
-| State     | Zustand (saved to localStorage, synced across tabs)                                         |
-| Sign-in   | Supabase Auth (Google, Kakao)                                                               |
-| i18n      | use-intl (Korean, English)                                                                  |
-| Other     | dnd-kit (drag to reorder), Web Audio API (alerts, focus sounds), Canvas (certificate image) |
-| Tests     | Vitest                                                                                      |
+| Area       | What's used                                                                                 |
+| ---------- | ------------------------------------------------------------------------------------------- |
+| Framework  | Next.js 16 (App Router), React 19, TypeScript                                               |
+| Styling    | SCSS Modules + design tokens, [Pretendard](https://github.com/orioncactus/pretendard) font  |
+| State      | Zustand (saved to localStorage, synced across tabs)                                         |
+| Sign-in    | Supabase Auth (Google, Kakao); account data in Supabase Postgres (row-level security)       |
+| i18n       | use-intl (Korean, English)                                                                  |
+| Other      | dnd-kit (drag to reorder), Web Audio API (alerts, focus sounds), Canvas (certificate image) |
+| Kkami care | Rive (pixel Kkami animation), scripts that build the pixel art (`scripts/`)                 |
+| Tests      | Vitest                                                                                      |
 
 ## Docs
 
