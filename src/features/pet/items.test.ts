@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { isItemCounts, ITEMS, pickItem, totalItems } from "./items";
+import {
+  isItemCounts,
+  itemPercent,
+  itemRarity,
+  ITEMS,
+  pickItem,
+  totalItems,
+} from "./items";
 import {
   addSnacks,
   addWalks,
@@ -52,6 +59,21 @@ describe("산책 아이템", () => {
     expect(seeItems(pet, 99).itemsSeen).toBe(3);
     const seen = seeItems(pet, 2);
     expect(seeItems(seen, 1)).toBe(seen);
+  });
+});
+
+describe("산책 아이템 확률 (얻는 방법)", () => {
+  it("무게로 정한 확률이고, 모두 더하면 100%", () => {
+    expect(itemPercent("leaf")).toBe(25);
+    expect(itemPercent("ball")).toBe(6);
+    expect(ITEMS.reduce((sum, { id }) => sum + itemPercent(id), 0)).toBe(100);
+  });
+
+  it("20% 이상은 자주, 10% 이상은 가끔, 그 아래는 드물게", () => {
+    expect(itemRarity("leaf")).toBe("often");
+    expect(itemRarity("stone")).toBe("often");
+    expect(itemRarity("flower")).toBe("sometimes");
+    expect(itemRarity("ball")).toBe("rarely");
   });
 });
 

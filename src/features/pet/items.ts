@@ -13,6 +13,18 @@ export type ItemCounts = Partial<Record<ItemId, number>>;
 
 const TOTAL_WEIGHT = ITEMS.reduce((sum, item) => sum + item.weight, 0);
 
+/** Chance of finding an item on one walk, in whole percent. */
+export function itemPercent(id: ItemId): number {
+  const item = ITEMS.find((entry) => entry.id === id)!;
+  return Math.round((item.weight / TOTAL_WEIGHT) * 100);
+}
+
+/** How often an item comes up, in words: 20% or more often, 10% or more sometimes. */
+export function itemRarity(id: ItemId): "often" | "sometimes" | "rarely" {
+  const percent = itemPercent(id);
+  return percent >= 20 ? "often" : percent >= 10 ? "sometimes" : "rarely";
+}
+
 export function isItemId(value: unknown): value is ItemId {
   return ITEMS.some((item) => item.id === value);
 }

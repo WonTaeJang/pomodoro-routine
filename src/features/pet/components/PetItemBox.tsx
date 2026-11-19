@@ -2,9 +2,11 @@
 
 import { useState, type ReactNode } from "react";
 import { useTranslations } from "use-intl";
+import { HelpIcon } from "@/components/icons";
 import {
   Button,
   Dialog,
+  IconButton,
   SegmentedControl,
   VisuallyHidden,
 } from "@/components/ui";
@@ -29,6 +31,7 @@ import {
   SlotIcon,
 } from "./PetIcons";
 import { LookPicture } from "./PetRoomArt";
+import { PetItemGuide } from "./PetItemGuide";
 import styles from "./PetItemBox.module.scss";
 
 /** Items found on walks, and furniture to make from them. */
@@ -52,10 +55,31 @@ export function PetItemBox({
   const t = useTranslations("pet.items");
   const [tab, setTab] = useState<"list" | "craft">("list");
   const [slot, setSlot] = useState<Slot>(SLOTS[0]);
+  const [guideOpen, setGuideOpen] = useState(false);
   const left = materialsLeft(pet, stamps);
   const heartsEarned = levelHearts(pet.affinity.points) > 0;
   return (
-    <Dialog open={open} onClose={onClose} title={t("title")}>
+    <Dialog
+      open={open}
+      onClose={() => {
+        setGuideOpen(false);
+        onClose();
+      }}
+      title={t("title")}
+      titleAction={
+        <IconButton
+          label={t("guide.button")}
+          icon={<HelpIcon />}
+          size="sm"
+          onClick={() => setGuideOpen(true)}
+        />
+      }
+    >
+      {/* 상자가 닫히면 함께 닫힘 */}
+      <PetItemGuide
+        open={open && guideOpen}
+        onClose={() => setGuideOpen(false)}
+      />
       <SegmentedControl
         className={styles.tabs}
         label={t("tabs")}

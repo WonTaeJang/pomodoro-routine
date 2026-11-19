@@ -15,6 +15,8 @@ export type DialogProps = {
   children: ReactNode;
   /** 아래쪽 버튼 영역 */
   footer?: ReactNode;
+  /** 제목 바로 오른쪽에 두는 작은 버튼 (예: 도움말 ?) */
+  titleAction?: ReactNode;
   className?: string;
   /**
    * 등장 효과 없이 바로 보이기. 다른 창(메뉴 등)이 닫히자마자 열 때 켬:
@@ -34,6 +36,7 @@ export function Dialog({
   title,
   children,
   footer,
+  titleAction,
   className,
   instant = false,
 }: DialogProps) {
@@ -62,9 +65,12 @@ export function Dialog({
     >
       <div className={styles.panel}>
         <header className={styles.header}>
-          <h2 id={titleId} className={styles.title}>
-            {title}
-          </h2>
+          <div className={styles.titleRow}>
+            <h2 id={titleId} className={styles.title}>
+              {title}
+            </h2>
+            {titleAction}
+          </div>
           <IconButton
             label={t("close")}
             icon={<CloseIcon />}

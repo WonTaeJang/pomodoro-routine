@@ -29,6 +29,15 @@ const ko = {
       notFound: "아직 못 찾음",
       heartLocked: "아직 못 받음",
       stampLocked: "사이클 완료 시",
+      guide: {
+        button: "얻는 방법",
+        title: "얻는 방법",
+        intro:
+          "산책에서는 다녀올 때마다 아이템 하나를 주워요. 퍼센트는 그 아이템이 나올 확률이에요.",
+        walk: "산책할 때마다 하나 · {chance, select, often {자주} sometimes {가끔} other {드물게}} ({percent}%)",
+        heart: "친밀도 레벨이 오를 때마다 1개",
+        stamp: "집중 사이클을 마칠 때마다 1개",
+      },
       count: "× {count}",
       leaf: { name: "나뭇잎", object: "나뭇잎을" },
       twig: { name: "나뭇가지", object: "나뭇가지를" },

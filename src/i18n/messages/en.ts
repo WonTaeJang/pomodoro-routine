@@ -29,6 +29,15 @@ const en: Messages = {
       notFound: "Not found yet",
       heartLocked: "Not yet",
       stampLocked: "After a cycle",
+      guide: {
+        button: "How to get items",
+        title: "How to get items",
+        intro:
+          "Each walk brings home one item. The percentage is the chance of finding it.",
+        walk: "One per walk · {chance, select, often {often} sometimes {sometimes} other {rarely}} ({percent}%)",
+        heart: "One each time affinity reaches a new level",
+        stamp: "One each time you finish a focus cycle",
+      },
       count: "× {count}",
       leaf: { name: "Leaf", object: "a leaf" },
       twig: { name: "Twig", object: "a twig" },

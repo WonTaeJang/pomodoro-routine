@@ -115,3 +115,40 @@
   width: 100%;
   margin-top: var(--space-4);
 }
+
+// 얻는 방법 팝업: 아이템마다 한 줄 (아이콘 · 이름과 방법)
+.guideIntro {
+  margin-bottom: var(--space-3);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-base);
+}
+.guide {
+  display: grid;
+  gap: var(--space-1-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.guideRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  @include device.lcd-card;
+  strong {
+    display: block;
+    font-size: var(--font-size-sm);
+  }
+  // 액정 칸은 테마와 상관없이 밝은 색이라, 설명도 액정 글자색을 옅게 씀
+  span span {
+    color: color-mix(in srgb, device.$lcd-text 78%, device.$lcd-wall);
+    font-size: var(--font-size-xs);
+  }
+}
+.guideIcon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 30px;
+}
