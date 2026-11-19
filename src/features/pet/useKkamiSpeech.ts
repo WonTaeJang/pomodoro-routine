@@ -6,6 +6,7 @@ import type { Messages } from "@/i18n/messages/ko";
 import type { TimeOfDay } from "./roomArt";
 import {
   IDLE_LINE_MS,
+  palaceLine,
   pickLine,
   speechPool,
   type Situation,
@@ -23,11 +24,13 @@ type Said = {
 /**
  * What Kkami says now. Each new situation picks a line once; idle talk moves
  * on every minute. Picking waits for the browser, so server and client agree.
+ * With the palace set placed, idle talk takes turns with the palace line.
  */
 export function useKkamiSpeech(
   situation: Situation,
   level: SpeechLevel,
   time: TimeOfDay,
+  palace = false,
 ) {
   const locale = useLocale();
   // Whole lists, not single messages: read the dictionary directly.
@@ -41,19 +44,20 @@ export function useKkamiSpeech(
   }, [situation]);
 
   // A new turn picks a new line; idle turns also move on with the minute.
-  const turn = `${locale}:${situation}:${level}:${time}:${situation === "idle" ? tick : ""}`;
+  const idle = situation === "idle";
+  const turn = `${locale}:${situation}:${level}:${time}:${idle ? `${tick}:${palace}` : ""}`;
   const [said, setSaid] = useState<Said | null>(null);
   useEffect(() => {
     queueMicrotask(() =>
       setSaid((previous) => {
         if (previous?.turn === turn) return previous;
-        const line = pickLine(
-          speechPool(lines, situation, level, time),
-          previous?.last[situation] ?? null,
-        );
+        const last = previous?.last[situation] ?? null;
+        const line =
+          (idle && palace && palaceLine(lines, level, last)) ||
+          pickLine(speechPool(lines, situation, level, time), last);
         return { turn, line, last: { ...previous?.last, [situation]: line } };
       }),
     );
-  }, [turn, lines, situation, level, time]);
+  }, [turn, lines, situation, level, time, idle, palace]);
   return said?.line ?? "";
 }

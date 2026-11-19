@@ -81,6 +81,11 @@ const en: Messages = {
           object: "a round stone window",
           to: "the round stone window",
         },
+        palaceWindow: {
+          name: "Gold arch window",
+          object: "a gold arch window",
+          to: "the gold arch window",
+        },
         plainPot: {
           name: "Plain pot",
           object: "a plain pot",
@@ -100,6 +105,11 @@ const en: Messages = {
           name: "Stone pot succulent",
           object: "a stone pot succulent",
           to: "the stone pot succulent",
+        },
+        palacePot: {
+          name: "Golden rose pot",
+          object: "a golden rose pot",
+          to: "the golden rose pot",
         },
         plainRoom: {
           name: "Plain walls & floor",
@@ -121,6 +131,11 @@ const en: Messages = {
           object: "a classic stripe room",
           to: "the classic stripe room",
         },
+        palaceRoom: {
+          name: "Palace room",
+          object: "a palace room",
+          to: "the palace room",
+        },
         plainRug: {
           name: "Plain rug",
           object: "a plain rug",
@@ -140,6 +155,11 @@ const en: Messages = {
           name: "Blue tassel rug",
           object: "a blue tassel rug",
           to: "the blue tassel rug",
+        },
+        palaceRug: {
+          name: "Persian rug",
+          object: "a Persian rug",
+          to: "the Persian rug",
         },
         plainOutfit: {
           name: "Plain collar",
@@ -287,6 +307,13 @@ const en: Messages = {
         lv3: ["The room looks lovely!", "Ooh, new stuff!"],
         lv4: ["I love it here", "Our room is the best"],
         lv5: ["Decorating together!", "This is our room"],
+      },
+      palace: {
+        lv1: "Woof! Sparkly!",
+        lv2: "Woof! Sparkly!",
+        lv3: "Home's like a palace!",
+        lv4: "Home's like a palace!",
+        lv5: "Home's like a palace!",
       },
       levelUp: {
         lv2: "Woof… oh, h-hi?!",

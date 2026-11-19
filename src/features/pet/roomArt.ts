@@ -1,4 +1,4 @@
-import type { LookId } from "./furniture";
+import type { LookId, SlotLook } from "./furniture";
 import OUTFIT_PICTURES from "./outfitPictures.json";
 
 // 방의 창문·화분·벽과 바닥·러그 도트 그림. 집 까미와 같은 칸 크기로 그립니다(_room-art.scss의 --room-cell).
@@ -39,6 +39,11 @@ export type PixelArt = {
   width: number;
   height: number;
   paths: [string, string][];
+  /**
+   * In the room, how far the drawing hangs over the left and top of its
+   * place, in cells: the palace window's curtains.
+   */
+  overhang?: { x: number; y: number };
 };
 
 type Cells = Map<string, string>;
@@ -93,17 +98,24 @@ const SKY: Record<TimeOfDay, { sky: string[]; hill: [string, string] }> = {
 };
 const HILL_TOP = [13, 13, 12, 12, 12, 13, 13, 12, 12]; // per pane column
 const SHADOW = "#dfd5bf";
+/** See-through, so the gold window sits on dark walls as well as light ones. */
+const SHEER_SHADOW = "rgba(58, 20, 12, 0.28)";
 const CREAM = "#fdf9ed";
+const GOLD = "#e2b54c";
+const GOLD_LIGHT = "#f3d27a";
+const GOLD_SHADE = "#a8792a";
+const WINE = "#8e1a2d";
+const NAVY = "#23325e";
+const TASSEL = "#efe3c8";
 const TWIG = "#8a6239";
 
-type WindowLook = Extract<
-  LookId,
-  "plainWindow" | "twigWindow" | "flowerWindow" | "stoneWindow"
->;
+type WindowLook = SlotLook<"window">;
+/** Windows whose glass has a round top. */
+const ARCHED = new Set<WindowLook>(["stoneWindow", "palaceWindow"]);
 
 function inPane(look: WindowLook, x: number, y: number) {
   if (x < PANE.x0 || x > PANE.x1 || y < PANE.y0 || y > PANE.y1) return false;
-  if (look !== "stoneWindow") return true;
+  if (!ARCHED.has(look)) return true;
   // Arched top: a half circle as wide as the glass.
   const r = (PANE.x1 - PANE.x0 + 1) / 2;
   const cy = PANE.y0 + r;
@@ -121,12 +133,16 @@ const frameColor: Record<WindowLook, (x: number, y: number) => string> = {
     ["#b9b5ad", "#cfcbc3", "#a8a49c"][
       (Math.floor(x / 2) + Math.floor((y + (Math.floor(y / 2) % 2)) / 2)) % 3
     ],
+  // Gold, lit from the top left.
+  palaceWindow: (x, y) =>
+    x + y < 10 ? GOLD_LIGHT : x + y > 22 ? GOLD_SHADE : GOLD,
 };
 const barColor: Record<WindowLook, string> = {
   plainWindow: CREAM,
   flowerWindow: CREAM,
   twigWindow: TWIG,
   stoneWindow: TWIG,
+  palaceWindow: GOLD,
 };
 /** Extra cells drawn over everything: twig ends, leaves, flowers, a keystone. */
 const TRIM: Record<WindowLook, [number, number, string][]> = {
@@ -174,9 +190,16 @@ const TRIM: Record<WindowLook, [number, number, string][]> = {
     [7, 1, "#97938b"],
     [8, 1, "#97938b"],
   ],
+  palaceWindow: [],
 };
 
 export function windowArt(look: WindowLook, time: TimeOfDay): PixelArt {
+  const cells = windowCells(look, time);
+  if (look === "palaceWindow") return drapeCurtains(cells);
+  return toArt(cells, WINDOW_WIDTH, WINDOW_HEIGHT);
+}
+
+function windowCells(look: WindowLook, time: TimeOfDay): Cells {
   const cells: Cells = new Map();
   const set = (x: number, y: number, color: string) => {
     if (x >= 0 && y >= 0 && x < WINDOW_WIDTH && y < WINDOW_HEIGHT)
@@ -197,7 +220,8 @@ export function windowArt(look: WindowLook, time: TimeOfDay): PixelArt {
 
   for (let y = 0; y < WINDOW_HEIGHT; y++)
     for (let x = 0; x < WINDOW_WIDTH; x++)
-      if (solid(x - 1, y - 1) && !solid(x, y)) set(x, y, SHADOW);
+      if (solid(x - 1, y - 1) && !solid(x, y))
+        set(x, y, look === "palaceWindow" ? SHEER_SHADOW : SHADOW);
 
   const { sky, hill } = SKY[time];
   const rows = PANE.y1 - PANE.y0 + 1;
@@ -257,14 +281,45 @@ export function windowArt(look: WindowLook, time: TimeOfDay): PixelArt {
   for (let y = PANE.y0; y <= PANE.y1; y++) paint(BAR.x, y, barColor[look]);
   for (let x = PANE.x0; x <= PANE.x1; x++) paint(x, BAR.y, barColor[look]);
   for (const [x, y, color] of TRIM[look]) set(x, y, color);
-  return toArt(cells, WINDOW_WIDTH, WINDOW_HEIGHT);
+  return cells;
+}
+
+// 궁전 창은 커튼이 창 양옆으로 늘어져 그림이 더 큽니다. 유리는 다른 창과 같은 자리에
+// 오도록 방에서 커튼만큼(overhang) 왼쪽·위로 당겨 둡니다(PetRoomArt).
+const CURTAIN_SPACE = { x: 3, y: 1 };
+const VELVET = ["#b3243a", WINE];
+/** How wide each curtain hangs on a row: full, gathered at the tie, then flaring. */
+const CURTAIN_WIDTH = [
+  0, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 3, 2, 2, 3, 3, 4, 4, 4, 4,
+];
+const TIE_ROW = 12;
+
+/** The window moved into a bigger picture, under a gold rod and red curtains. */
+function drapeCurtains(window: Cells): PixelArt {
+  const width = WINDOW_WIDTH + CURTAIN_SPACE.x * 2;
+  const height = CURTAIN_WIDTH.length;
+  const cells: Cells = new Map();
+  for (const [key, color] of window) {
+    const [x, y] = key.split(",").map(Number);
+    cells.set(`${x + CURTAIN_SPACE.x},${y + CURTAIN_SPACE.y}`, color);
+  }
+  const set = (x: number, y: number, color: string) =>
+    cells.set(`${x},${y}`, color);
+  for (let x = 1; x < width - 1; x++) set(x, 0, GOLD);
+  set(0, 0, GOLD_SHADE);
+  set(width - 1, 0, GOLD_SHADE);
+  CURTAIN_WIDTH.forEach((hang, y) => {
+    for (let i = 0; i < hang; i++) {
+      const color = y === TIE_ROW ? GOLD : VELVET[i % 2];
+      set(1 + i, y, color);
+      set(width - 2 - i, y, color);
+    }
+  });
+  return { ...toArt(cells, width, height), overhang: CURTAIN_SPACE };
 }
 
 // --- Pot ----------------------------------------------------------------------
-type PotLook = Extract<
-  LookId,
-  "plainPot" | "flowerPot" | "pinePot" | "succulentPot"
->;
+type PotLook = SlotLook<"pot">;
 export const POTS: Record<
   PotLook,
   { rows: string[]; colors: Record<string, string> }
@@ -382,6 +437,38 @@ export const POTS: Record<
       d: "#8f8c86",
     },
   },
+  palacePot: {
+    rows: [
+      "..rpr.......",
+      "..pcr..rpr..",
+      "..rrpl.pcr..",
+      "....lL.rrp..",
+      "lrpr.rpr.lL.",
+      ".pcr.pcr.rpr",
+      ".rrp.rrp.pcr",
+      "..L.l.l.lrrp",
+      "...l.l.L....",
+      ".GGGGGGGGGG.",
+      "..ssssssss..",
+      "..hhhggggs..",
+      "..GbGbGbGb..",
+      "...hgggss...",
+      "....ssss....",
+      "...GGGGGG...",
+    ],
+    colors: {
+      r: "#c8283f",
+      p: "#ef6b7d",
+      c: "#7a1528",
+      l: "#4f8a4a",
+      L: "#3b6d38",
+      G: GOLD,
+      s: GOLD_SHADE,
+      h: "#f6dc8a",
+      g: "#d9a940",
+      b: WINE,
+    },
+  },
 };
 
 export function potArt(look: PotLook): PixelArt {
@@ -395,10 +482,7 @@ export function potArt(look: PotLook): PixelArt {
 
 // --- Walls and floor -------------------------------------------------------------
 // 벽과 바닥은 방 크기를 모르니 반복 무늬(tile)로 그리고, 벽 아래 띠·바닥 첫 줄(edge)을 덧댑니다.
-type RoomLook = Extract<
-  LookId,
-  "plainRoom" | "cabinRoom" | "floralRoom" | "stripeRoom"
->;
+type RoomLook = SlotLook<"room">;
 /** A pattern to repeat: its size in cells and a color for each cell. */
 export type Pattern = { width: number; height: number; paint: Paint };
 /** A repeating pattern, plus an optional strip along the floor line. */
@@ -413,6 +497,19 @@ const pattern = (width: number, height: number, paint: Paint): Pattern => ({
 const strip = (colors: string[]) =>
   pattern(1, colors.length, (_, y) => colors[y]);
 const mod = (n: number, m: number) => ((n % m) + m) % m;
+
+/** One damask flower, 9 x 9 in a 14 x 12 cell: gold (g) and dark (d) lines. */
+const DAMASK = [
+  "....g....",
+  "...ddd...",
+  "..dd.dd..",
+  ".dd.g.dd.",
+  "dd.ggg.dd",
+  ".dd.g.dd.",
+  "..dd.dd..",
+  "...ddd...",
+  "....d....",
+];
 
 export const ROOMS: Record<RoomLook, RoomSurfaces> = {
   // The starting room: the room's own CSS draws it; this is for small pictures.
@@ -484,6 +581,34 @@ export const ROOMS: Record<RoomLook, RoomSurfaces> = {
       }),
     },
   },
+  // Burgundy damask over a dark panelled wainscot; marble checks.
+  palaceRoom: {
+    wall: {
+      tile: pattern(14, 24, (x, y) => {
+        const row = Math.floor(y / 12);
+        const cell = DAMASK[y % 12]?.[mod(x - row * 7, 14)];
+        if (cell === "g") return GOLD;
+        return cell === "d" ? "#5e1828" : "#7d2436";
+      }),
+      edge: pattern(14, 11, (x, y) => {
+        if (y === 0) return GOLD;
+        if (y === 1 || y === 10) return GOLD_SHADE;
+        if (x === 0 || x === 13) return "#4a1220";
+        const panel = x >= 2 && x <= 11 && y >= 3 && y <= 8;
+        const rim = x === 2 || x === 11 || y === 3 || y === 8;
+        return panel && rim ? GOLD_SHADE : "#5c1828";
+      }),
+    },
+    floor: {
+      edge: strip([GOLD, GOLD_SHADE]),
+      tile: pattern(14, 10, (x, y) => {
+        const light = (Math.floor(x / 7) + Math.floor(y / 5)) % 2 === 0;
+        const [i, j] = [x % 7, y % 5];
+        if (light) return (i + j * 2) % 9 === 0 ? "#d9d2c8" : "#f1ece4";
+        return (i * 2 + j) % 8 === 0 ? "#9a948c" : "#b8b2aa";
+      }),
+    },
+  },
 };
 
 /** A pattern drawn once, as a CSS image for repeating backgrounds. */
@@ -521,10 +646,7 @@ export function roomPicture(look: RoomLook, size = 16): PixelArt {
 }
 
 // --- Rugs -------------------------------------------------------------------------
-type RugLook = Extract<
-  LookId,
-  "plainRug" | "braidRug" | "pinkRug" | "fringeRug"
->;
+type RugLook = SlotLook<"rug">;
 /** Rug sizes in cells: on the floor, and as a small picture. */
 const RUG_SIZE = { room: [45, 12], small: [23, 7] } as const;
 
@@ -540,6 +662,25 @@ const oval =
     const dy = (y + 0.5 - height / 2) / (height / 2);
     return paint(Math.hypot(dx, dy), Math.atan2(dy, dx), x, y);
   };
+
+/**
+ * A square rug with cream tassels at both ends. `paint` gets each cell inside
+ * the tassels, its ring counted from the edge, and the width inside.
+ */
+function tasselRug(
+  width: number,
+  height: number,
+  paint: (x: number, y: number, ring: number, inner: number) => string,
+): Paint {
+  const fringe = width > 30 ? 2 : 1;
+  const inner = width - fringe * 2;
+  return (x, y) => {
+    if (x < fringe || x >= width - fringe)
+      return y % 2 === 0 && y > 0 && y < height - 1 ? TASSEL : null;
+    const ix = x - fringe;
+    return paint(ix, y, Math.min(ix, inner - 1 - ix, y, height - 1 - y), inner);
+  };
+}
 
 const RUGS: Record<RugLook, (width: number, height: number) => Paint> = {
   // The starting rug: the room's own CSS draws it; this is for small pictures.
@@ -571,23 +712,36 @@ const RUGS: Record<RugLook, (width: number, height: number) => Paint> = {
       return "#f2c2c4";
     }),
   // Blue and square, with a diamond in the middle and tassels at both ends.
-  fringeRug: (w, h) => {
-    const fringe = w > 30 ? 2 : 1;
-    const inner = w - fringe * 2;
-    return (x, y) => {
-      if (x < fringe || x >= w - fringe)
-        return y % 2 === 0 && y > 0 && y < h - 1 ? "#efe3c8" : null;
-      const ix = x - fringe;
-      const ring = Math.min(ix, inner - 1 - ix, y, h - 1 - y);
-      if (ring === 0) return "#efe3c8";
+  fringeRug: (w, h) =>
+    tasselRug(w, h, (x, y, ring, inner) => {
+      if (ring === 0) return TASSEL;
       if (ring === 1) return "#c9785f";
       const diamond =
-        Math.abs(ix + 0.5 - inner / 2) / 2 + Math.abs(y + 0.5 - h / 2);
-      if (diamond < 1) return "#efe3c8";
+        Math.abs(x + 0.5 - inner / 2) / 2 + Math.abs(y + 0.5 - h / 2);
+      if (diamond < 1) return TASSEL;
       if (diamond < 2) return "#c9785f";
-      if (diamond < 3 && h > 8) return "#efe3c8";
+      if (diamond < 3 && h > 8) return TASSEL;
       return "#7d94b2";
-    };
+    }),
+  // Persian: navy and gold borders, a red field, a gold medallion, tassels.
+  palaceRug: (w, h) => {
+    const big = h > 8;
+    const middle = (h - 1) / 2;
+    return tasselRug(w, h, (x, y, ring, inner) => {
+      if (ring === 0) return NAVY;
+      if (ring === 1) return GOLD;
+      if (ring === 2 && big) return (x + y) % 2 ? "#3a4c86" : NAVY;
+      const m = Math.abs(x - (inner - 1) / 2) / 2.2 + Math.abs(y - middle);
+      if (m < 1) return GOLD;
+      if (m < 2) return NAVY;
+      if (big && m < 3) return GOLD;
+      if (big && m < 3.6) return TASSEL;
+      const side = (at: number) =>
+        Math.abs(x - at) + Math.abs(y - middle) * 1.5 < (big ? 2.2 : 1.2);
+      if (side(inner * 0.16) || side(inner * 0.84 - 1)) return GOLD;
+      if (big && (x + y) % 6 === 0) return WINE;
+      return "#a3263a";
+    });
   },
 };
 
@@ -618,7 +772,7 @@ function outfitArt(look: OutfitLook | "plainOutfit") {
 
 // --- Speech bubbles -----------------------------------------------------------
 // 만들기·꾸미기 목록에 보이는 작은 말풍선 그림. 방의 말풍선은 CSS로 그립니다(PetSpeechBubble).
-type BubbleLook = Extract<LookId, `${string}Bubble`>;
+type BubbleLook = SlotLook<"bubble">;
 const isBubbleLook = (look: LookId): look is BubbleLook =>
   look.endsWith("Bubble");
 type BubbleInk = { line: string; paper: string; text: string };

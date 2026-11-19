@@ -25,21 +25,26 @@ export type MaterialCounts = Partial<Record<Material, number>>;
 /**
  * Furniture made from walk finds: three each, two of one kind. Outfits take
  * a heart and two finds; the brown hat is everyone's from the start (free).
- * Speech bubbles take a paw stamp and two finds (I-066).
+ * Speech bubbles take a paw stamp and two finds (I-066), and so does the
+ * palace set: one more wall, window, pot and rug (I-067).
  */
 export const FURNITURE = [
   { id: "twigWindow", slot: "window", need: { twig: 2, leaf: 1 } },
   { id: "flowerWindow", slot: "window", need: { flower: 2, twig: 1 } },
   { id: "stoneWindow", slot: "window", need: { stone: 2, twig: 1 } },
+  { id: "palaceWindow", slot: "window", need: { stamp: 1, stone: 2 } },
   { id: "flowerPot", slot: "pot", need: { flower: 2, stone: 1 } },
   { id: "pinePot", slot: "pot", need: { pinecone: 2, leaf: 1 } },
   { id: "succulentPot", slot: "pot", need: { stone: 2, leaf: 1 } },
+  { id: "palacePot", slot: "pot", need: { stamp: 1, leaf: 2 } },
   { id: "cabinRoom", slot: "room", need: { twig: 2, pinecone: 1 } },
   { id: "floralRoom", slot: "room", need: { flower: 2, leaf: 1 } },
   { id: "stripeRoom", slot: "room", need: { stone: 2, pinecone: 1 } },
+  { id: "palaceRoom", slot: "room", need: { stamp: 1, pinecone: 2 } },
   { id: "braidRug", slot: "rug", need: { leaf: 2, flower: 1 } },
   { id: "pinkRug", slot: "rug", need: { flower: 2, ball: 1 } },
   { id: "fringeRug", slot: "rug", need: { pinecone: 2, ball: 1 } },
+  { id: "palaceRug", slot: "rug", need: { stamp: 1, ball: 2 } },
   { id: "brownHat", slot: "outfit", need: {}, free: true },
   { id: "ginghamBib", slot: "outfit", need: { heart: 1, flower: 2 } },
   { id: "creamScarf", slot: "outfit", need: { heart: 1, leaf: 2 } },
@@ -71,6 +76,10 @@ export const DEFAULT_LOOK = {
   bubble: "plainBubble",
 } as const satisfies Record<Slot, string>;
 export type LookId = FurnitureId | (typeof DEFAULT_LOOK)[Slot];
+/** The looks one slot can show: its starting look and what is made for it. */
+export type SlotLook<S extends Slot> =
+  | Extract<(typeof FURNITURE)[number], { slot: S }>["id"]
+  | (typeof DEFAULT_LOOK)[S];
 export type Placed = Partial<Record<Slot, FurnitureId>>;
 
 export const furnitureById = (id: FurnitureId) =>
@@ -118,6 +127,17 @@ export function looksFor(slot: Slot, owned: readonly FurnitureId[]): LookId[] {
 
 export const lookOf = (slot: Slot, placed: Placed): LookId =>
   placed[slot] ?? DEFAULT_LOOK[slot];
+
+/** The palace set: placed all together, Kkami notices (src/features/pet/speech.ts). */
+export const PALACE_SET = {
+  room: "palaceRoom",
+  window: "palaceWindow",
+  pot: "palacePot",
+  rug: "palaceRug",
+} as const satisfies Partial<Record<Slot, FurnitureId>>;
+
+export const isPalace = (placed: Placed) =>
+  Object.entries(PALACE_SET).every(([slot, id]) => placed[slot as Slot] === id);
 
 /** Items left to use: found minus spent. */
 export function availableItems(

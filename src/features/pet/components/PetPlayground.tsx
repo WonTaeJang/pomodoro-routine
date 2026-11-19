@@ -34,7 +34,7 @@ import {
   type SpeechLevel,
 } from "../speech";
 import { PET_HAPPY_MS } from "../pet";
-import { lookOf, type FurnitureId, type Slot } from "../furniture";
+import { isPalace, lookOf, type FurnitureId, type Slot } from "../furniture";
 import { PetFoundCard, PetWalkMap } from "./PetTrip";
 import { PetItemBox } from "./PetItemBox";
 import { PetLog } from "./PetLog";
@@ -235,6 +235,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     situation,
     (levelUp ?? affinity.progress.level) as SpeechLevel,
     time,
+    isPalace(record?.placed ?? {}),
   );
 
   // Picking a slot in the room (the bubble is one too) while decorating.

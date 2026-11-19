@@ -18,6 +18,8 @@ export type SpeechLines = {
   /** Greeting when met during a break, instead of waking up. */
   rest: ByLevel;
   decorated: ByLevel;
+  /** Idle talk with the whole palace set placed (I-067), one per level. */
+  palace: Record<`lv${SpeechLevel}`, string>;
   /** Said once, as the new level is reached. */
   levelUp: Record<`lv${Exclude<SpeechLevel, 1>}`, string>;
   sleep: string;
@@ -100,6 +102,19 @@ export function speechPool(
   for (let below = 1; below < level; below++)
     earlier.push(...byLevel[`lv${below as SpeechLevel}`]);
   return { main, earlier };
+}
+
+/**
+ * With the palace set placed, every other idle line is about it: the palace
+ * line, unless it was the one just said (then null, for a usual line).
+ */
+export function palaceLine(
+  lines: SpeechLines,
+  level: SpeechLevel,
+  previous: string | null,
+): string | null {
+  const line = lines.palace[`lv${level}`];
+  return line === previous ? null : line;
 }
 
 /**

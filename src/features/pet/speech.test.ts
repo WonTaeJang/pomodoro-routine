@@ -3,6 +3,7 @@ import ko from "@/i18n/messages/ko";
 import en from "@/i18n/messages/en";
 import {
   EARLIER_LEVEL_CHANCE,
+  palaceLine,
   pickLine,
   speechPool,
   speechSituation,
@@ -71,6 +72,19 @@ describe("까미 말풍선 고르기", () => {
   });
 });
 
+describe("궁전 세트 혼잣말", () => {
+  it("Lv.1–2는 짧은 소리, Lv.3부터 문장", () => {
+    expect(palaceLine(lines, 2, null)).toBe("멍! 반짝반짝!");
+    expect(palaceLine(lines, 3, null)).toBe("우리 집 궁전 같아!");
+  });
+
+  it("바로 전에 했으면 null: 평소 혼잣말과 번갈아", () => {
+    const line = palaceLine(lines, 4, null)!;
+    expect(palaceLine(lines, 4, line)).toBeNull();
+    expect(palaceLine(lines, 4, lines.idle.lv4[0])).toBe(line);
+  });
+});
+
 describe("말풍선 문장 사전", () => {
   it.each([
     ["ko", ko.pet.speech, 16],
@@ -83,6 +97,7 @@ describe("말풍선 문장 사전", () => {
           const list = speech[situation][`lv${level}`];
           expect(list.length).toBeGreaterThan(0);
           list.forEach((line) => expect(line.length).toBeLessThanOrEqual(max));
+          expect(speech.palace[`lv${level}`].length).toBeLessThanOrEqual(max);
         }
     },
   );

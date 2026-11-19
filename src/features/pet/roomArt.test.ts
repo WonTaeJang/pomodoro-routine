@@ -78,6 +78,16 @@ describe("창문·화분 도트", () => {
     expect([WINDOW_WIDTH, WINDOW_HEIGHT]).toEqual([15, 21]);
   });
 
+  it("궁전 창은 커튼만큼 크고, 유리 자리는 다른 창과 같음", () => {
+    const palace = windowArt("palaceWindow", "day");
+    const { x, y } = palace.overhang!;
+    expect(palace.width).toBe(WINDOW_WIDTH + x * 2);
+    const sky = cells(windowArt("stoneWindow", "day")).get("5,6");
+    const moved = cells(palace).get(`${5 + x},${6 + y}`);
+    expect(moved).toBe(sky); // the same arched glass, moved over
+    expect(cells(palace).get("1,1")).toBe("#b3243a"); // a curtain
+  });
+
   it("화분은 모두 같은 크기이고 정해진 색만 씀", () => {
     for (const { rows, colors } of Object.values(POTS)) {
       expect(rows).toHaveLength(16);
@@ -113,7 +123,12 @@ describe("벽·바닥·러그 도트", () => {
   });
 
   it("러그는 바닥에서 방 칸 크기로, 작은 그림은 더 작게", () => {
-    for (const look of ["braidRug", "pinkRug", "fringeRug"] as const) {
+    for (const look of [
+      "braidRug",
+      "pinkRug",
+      "fringeRug",
+      "palaceRug",
+    ] as const) {
       const floor = rugArt(look);
       const small = rugArt(look, "small");
       expect([floor.width, floor.height]).toEqual([45, 12]);

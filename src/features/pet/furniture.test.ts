@@ -3,7 +3,9 @@ import {
   RECIPES,
   SLOTS,
   availableItems,
+  PALACE_SET,
   canMake,
+  isPalace,
   looksFor,
   stampsSpent,
   type FurnitureId,
@@ -81,11 +83,9 @@ describe("가구 만들기", () => {
     expect(looksFor("rug", [])).toEqual(["plainRug"]);
   });
 
-  it("자리마다 만들 것이 3개씩(옷·말풍선은 4개), 재료 조합은 서로 다름", () => {
+  it("자리마다 만들 것이 4개씩, 재료 조합은 서로 다름", () => {
     for (const slot of SLOTS)
-      expect(RECIPES.filter((piece) => piece.slot === slot)).toHaveLength(
-        slot === "outfit" || slot === "bubble" ? 4 : 3,
-      );
+      expect(RECIPES.filter((piece) => piece.slot === slot)).toHaveLength(4);
     for (const { need } of RECIPES)
       expect(Object.values(need).reduce((a, b) => a + b, 0)).toBe(3);
     const recipes = RECIPES.map(({ need }) =>
@@ -228,8 +228,8 @@ describe("가구 저장 형식", () => {
     expect(decodePet(encode(7, pet))).toEqual(pet);
   });
 
-  it("v11 이상은 새 버전이라 건드리지 않음", () => {
-    expect(() => decodePet(encode(11, withItems({ leaf: 1 })))).toThrow(
+  it("v12 이상은 새 버전이라 건드리지 않음", () => {
+    expect(() => decodePet(encode(12, withItems({ leaf: 1 })))).toThrow(
       PetStorageError,
     );
   });
@@ -282,5 +282,37 @@ describe("말풍선 (발바닥 도장)", () => {
     expect(decodePet(encode(10, placed))).toEqual(placed);
     const v9 = withItems({ leaf: 1 });
     expect(decodePet(encode(9, v9))).toEqual(v9);
+  });
+});
+
+describe("궁전 세트 (발바닥 도장)", () => {
+  const SET = Object.values(PALACE_SET);
+
+  it("벽·창·화분·러그 하나씩, 도장 1개와 같은 아이템 2개", () => {
+    expect(Object.keys(PALACE_SET)).toEqual(["room", "window", "pot", "rug"]);
+    for (const id of SET) {
+      const need = RECIPES.find((p) => p.id === id)!.need as Record<
+        string,
+        number
+      >;
+      expect(need.stamp).toBe(1);
+      expect(Object.values(need).sort()).toEqual([1, 2]);
+    }
+  });
+
+  it("넷을 다 놓아야 궁전, 하나라도 바꾸면 아님", () => {
+    const made = SET.reduce(
+      (pet, id) => makeFurniture(pet, id, 3),
+      withItems({ pinecone: 2, stone: 2, leaf: 2, ball: 2 }),
+    );
+    expect(made.furniture).toEqual(SET);
+    const palace = Object.entries(PALACE_SET).reduce(
+      (pet, [slot, id]) => placeFurniture(pet, slot as never, id, 4),
+      made,
+    );
+    expect(isPalace(palace.placed)).toBe(true);
+    expect(isPalace({ ...palace.placed, pot: undefined })).toBe(false);
+    expect(isPalace({ ...palace.placed, rug: "pinkRug" })).toBe(false);
+    expect(decodePet(encode(11, palace))).toEqual(palace);
   });
 });

@@ -44,7 +44,7 @@ export interface LocalPetRepository extends PetRepository {
   updateRecord(change: (record: PetRecord) => PetRecord): Promise<PetRecord>;
 }
 
-const VERSION = 10;
+const VERSION = 11;
 /** 저장 형식 버전. 계정(pet_game.version)에도 같은 값을 씀 */
 export const PET_STORAGE_VERSION = VERSION;
 
@@ -52,9 +52,9 @@ export const PET_STORAGE_VERSION = VERSION;
  * What an older record lacks, as it would have been: v1 has no daily history
  * (past pats cannot earn affinity retroactively) and v1–2 no treats; v3 has
  * no walks or items; v4 no furniture; v5 no daily walk count; v8 and older
- * no daily treat count. v7 (walls, floors, rugs), v8 (outfits) and v10
- * (speech bubbles) have the shape of v6 but furniture that older builds
- * would not know.
+ * no daily treat count. v7 (walls, floors, rugs), v8 (outfits), v10
+ * (speech bubbles) and v11 (the palace set) have the shape of v6 but
+ * furniture that older builds would not know.
  */
 function missingFields(version: number, pet: LegacyPetProfile) {
   return {

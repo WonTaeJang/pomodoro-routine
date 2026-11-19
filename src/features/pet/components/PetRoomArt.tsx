@@ -79,6 +79,13 @@ function surfaceStyle({ tile, edge }: Surface, edgeAt: "top" | "bottom") {
     backgroundPosition: edge ? `left ${edgeAt}, left top` : "left top",
   } satisfies CSSProperties;
 }
+/** Pull a place back by as much as its drawing hangs over (the curtains). */
+function overhangStyle({ overhang }: PixelArt): CSSProperties | undefined {
+  if (!overhang) return undefined;
+  const cells = (n: number) => `calc(var(--room-cell) * ${-n})`;
+  return { margin: `${cells(overhang.y)} 0 0 ${cells(overhang.x)}` };
+}
+
 const surfaceStyles = new Map<LookId, [CSSProperties, CSSProperties]>();
 /** Wall and floor backgrounds; none for the starting room (the room's CSS). */
 function roomStyles(look: LookId) {
@@ -107,11 +114,17 @@ export function PetRoomArt({
   const placed = usePetStore((s) => s.pet?.placed);
   const time = useTimeOfDay();
   const look = (name: Slot) => preview?.[name] ?? lookOf(name, placed ?? {});
-  const slot = (name: Slot, className: string, art: ReactNode) => {
+  const slot = (
+    name: Slot,
+    className: string,
+    art: ReactNode,
+    style?: CSSProperties,
+  ) => {
     const selected = decorating?.selected === name;
     return (
       <div
         className={className}
+        style={style}
         data-selected={selected}
         data-look={look(name)}
       >
@@ -134,6 +147,7 @@ export function PetRoomArt({
     );
   };
   const room = roomStyles(look("room"));
+  const windowArt = lookArt(look("window"), time);
   const rug = look("rug");
   return (
     <>
@@ -150,7 +164,8 @@ export function PetRoomArt({
       {slot(
         "window",
         styles.window,
-        <Pixels art={lookArt(look("window"), time)} />,
+        <Pixels art={windowArt} />,
+        overhangStyle(windowArt),
       )}
       {slot("pot", styles.plant, <Pixels art={lookArt(look("pot"), time)} />)}
       {slot(
