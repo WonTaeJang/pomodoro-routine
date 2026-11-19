@@ -340,7 +340,8 @@ $slot-tag-color: #fffaf0;
     --bubble-ink: #8c3a4e;
     --bubble-line-width: 2px;
   }
-  // 우표: 톱니 가장자리(바탕 그림을 따로 깔아 구멍을 뚫음), 붉은 안쪽 테두리, 발바닥 소인
+  // 우표: 톱니 가장자리(바탕 그림을 따로 깔아 구멍을 뚫음), 붉은 안쪽 테두리, 발바닥 소인.
+  // 꼬리는 테두리선 없이 우표 종이가 이어짐(StampTail), 그림자는 위 drop-shadow가 함께 그림
   &[data-look="stampBubble"] {
     --bubble-paper: #fff6e2;
     --bubble-line: #c8664a;
@@ -457,6 +458,17 @@ $slot-tag-color: #fffaf0;
     stroke: var(--bubble-line);
     stroke-width: var(--bubble-line-width);
   }
+}
+
+// 우표 말풍선 꼬리: 위 5px은 톱니 가장자리 아래로 들어가 구멍을 덮음
+.stampTail {
+  position: absolute;
+  top: calc(100% - 5px);
+  left: calc(50% - 18px);
+  width: 20px;
+  height: 22px;
+  overflow: visible;
+  fill: var(--bubble-paper);
 }
 
 .loading {

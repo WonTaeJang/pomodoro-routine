@@ -103,7 +103,7 @@ function BubbleDecor({ look }: { look: LookId }) {
           <Decor place="postmark">
             <BubbleDecorIcon decor="postmark" size={24} />
           </Decor>
-          <BubbleTail />
+          <StampTail />
         </>
       );
     default:
@@ -126,3 +126,34 @@ function BubbleTail() {
     </svg>
   );
 }
+
+/**
+ * The stamp's paper running on into a tail: no outline, small perforations
+ * along the slanted side. 20 x 22; the top 5px tucks under the box's edge.
+ */
+function StampTail() {
+  return (
+    <svg className={styles.stampTail} viewBox="0 0 20 22" aria-hidden="true">
+      <path d={STAMP_TAIL} />
+    </svg>
+  );
+}
+
+/** The tail's outline: down the right side, then back up the slanted side, biting a hole every STEP. */
+const STAMP_TAIL = (() => {
+  const TIP = [20, 19];
+  const START = [5.3, 5]; // where the slanted side leaves the box
+  const STEP = 3.6;
+  const R = 1.3;
+  const length = Math.hypot(TIP[0] - START[0], TIP[1] - START[1]);
+  // One step up the slanted side, from the tip toward the box.
+  const [ux, uy] = [(START[0] - TIP[0]) / length, (START[1] - TIP[1]) / length];
+  const at = (x: number, y: number) => `${+x.toFixed(2)} ${+y.toFixed(2)}`;
+  let d = `M0 0H${TIP[0]}V${TIP[1]}`;
+  for (let i = Math.floor(length / STEP); i >= 1; i--) {
+    const [cx, cy] = [START[0] - ux * i * STEP, START[1] - uy * i * STEP];
+    d += `L${at(cx - ux * R, cy - uy * R)}`;
+    d += `A${R} ${R} 0 0 0 ${at(cx + ux * R, cy + uy * R)}`;
+  }
+  return `${d}L0 0Z`;
+})();
