@@ -1,6 +1,7 @@
 import { useHistoryStore } from "@/features/history/store";
 import { useTasksStore } from "@/features/tasks/store";
 import { useTimerStore } from "@/features/timer/store";
+import { clearStampsSeen } from "@/features/pet/stamps";
 import { petStore } from "@/features/pet/store";
 import { clearSyncMemory } from "./memory";
 
@@ -16,5 +17,6 @@ export function clearLocalAccountData() {
   useHistoryStore.getState().clear();
   useTimerStore.getState().resetTimer();
   void petStore.getState().clear();
+  clearStampsSeen();
   clearSyncMemory();
 }

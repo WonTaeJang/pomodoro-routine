@@ -8,6 +8,7 @@ import { Button, VisuallyHidden } from "@/components/ui";
 import { usePetCare } from "../usePetCare";
 import { petStore, usePetStore } from "../store";
 import { petScreenOpened } from "../visits";
+import { useStamps } from "../stamps";
 import { useTimerStore } from "@/features/timer/store";
 import { isOnBreak } from "@/features/timer/timer";
 import { PATHS } from "@/lib/paths";
@@ -15,7 +16,7 @@ import { useStoresReady } from "@/lib/useHydrateStores";
 import { PetBreakTimer } from "./PetBreakTimer";
 import styles from "./PetPlayground.module.scss";
 import { PetWalk } from "./PetWalk";
-import { PetRoomArt } from "./PetRoomArt";
+import { PetRoomArt, type RoomDecorating } from "./PetRoomArt";
 import { PetAffinityDetail, PetHearts, usePetAffinity } from "./PetAffinity";
 import { StatusIcon } from "./PetIcons";
 import { PetPad } from "./PetPad";
@@ -163,6 +164,8 @@ function PetRoom({ retry }: { retry: () => void }) {
   useEffect(() => {
     if (levelUp !== null) addLog({ kind: "level", level: levelUp });
   }, [levelUp, addLog]);
+  // A cycle finished while here (this tab or another): a paw stamp in the log.
+  const stamps = useStamps(() => addLog({ kind: "stamp" }));
 
   // Five treats a day: after that the key rests and only says so in the log.
   const outOfSnacks = useDailyLimitReached(
@@ -183,11 +186,13 @@ function PetRoom({ retry }: { retry: () => void }) {
   const [boxOpen, setBoxOpen] = useState(false);
   const newItems =
     affinity.newHeart ||
+    stamps.unseen ||
     (record ? record.itemsSeen < totalItems(record.items) : false);
   const boxButton = useRef<HTMLButtonElement>(null);
   function openBox() {
     setBoxOpen(true);
     affinity.seeHeart();
+    stamps.see();
     void petStore.getState().markItemsSeen();
   }
   function craft(furniture: FurnitureId) {
@@ -231,6 +236,17 @@ function PetRoom({ retry }: { retry: () => void }) {
     (levelUp ?? affinity.progress.level) as SpeechLevel,
     time,
   );
+
+  // Picking a slot in the room (the bubble is one too) while decorating.
+  const roomDecorating: RoomDecorating | undefined = decor.mode
+    ? {
+        selected: decor.mode.slot,
+        tag: decorateTag(t, decor.mode, decor.looks),
+        label: (slot: Slot) =>
+          t("decorate.pick", { name: t(`items.slots.${slot}.name`) }),
+        onSelect: decor.select,
+      }
+    : undefined;
 
   // One status at a time in the header: a level up, then the mode, then the pose.
   const hud =
@@ -280,23 +296,22 @@ function PetRoom({ retry }: { retry: () => void }) {
             )}
             {walking && <PetWalk onStep={outing.step} onHome={outing.leave} />}
             <div className={styles.room} hidden={walking}>
-              <PetRoomArt
-                preview={decor.preview}
-                decorating={
-                  decor.mode
-                    ? {
-                        selected: decor.mode.slot,
-                        tag: decorateTag(t, decor.mode, decor.looks),
-                        label: (slot: Slot) =>
-                          t("decorate.pick", {
-                            name: t(`items.slots.${slot}.name`),
-                          }),
-                        onSelect: decor.select,
-                      }
-                    : undefined
+              <PetRoomArt preview={decor.preview} decorating={roomDecorating} />
+              <PetSpeechBubble
+                text={speech}
+                look={
+                  decor.preview?.bubble ??
+                  lookOf("bubble", record?.placed ?? {})
+                }
+                pick={
+                  roomDecorating && {
+                    selected: roomDecorating.selected === "bubble",
+                    label: roomDecorating.label("bubble"),
+                    tag: roomDecorating.tag,
+                    onSelect: () => roomDecorating.onSelect("bubble"),
+                  }
                 }
               />
-              <PetSpeechBubble text={speech} />
               <div className={styles.dog} aria-hidden="true">
                 <RiveComponent />
               </div>
@@ -417,6 +432,7 @@ function PetRoom({ retry }: { retry: () => void }) {
           open={boxOpen}
           onClose={() => setBoxOpen(false)}
           pet={record}
+          stamps={stamps.earned}
           onCraft={craft}
           onDecorate={() => {
             setBoxOpen(false);

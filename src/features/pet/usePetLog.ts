@@ -7,7 +7,7 @@ import type { FurnitureId, LookId, Slot } from "./furniture";
 import { petStore } from "./store";
 
 export type PetLogEvent =
-  | { kind: "enter" | "wake" | "walkOut" | "home" }
+  | { kind: "enter" | "wake" | "walkOut" | "home" | "stamp" }
   | { kind: "pat"; points: number; total: number }
   | { kind: "snack"; points: number }
   | { kind: "found" | "skipped"; item: ItemId }

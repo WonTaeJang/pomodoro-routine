@@ -41,6 +41,7 @@ describe("로그아웃할 때 지우기", () => {
     localStorage.setItem(STORAGE_KEYS.accountSync, "{}");
     localStorage.setItem(STORAGE_KEYS.pet, "pet");
     localStorage.setItem(STORAGE_KEYS.theme, "dark");
+    localStorage.setItem(STORAGE_KEYS.stampsSeen, "3");
 
     clearLocalAccountData();
     // 까미 기록은 다른 탭과 잠금을 나눠 쓰므로 순서대로 지워짐: 뒤에 넣은 일을 기다림
@@ -54,6 +55,7 @@ describe("로그아웃할 때 지우기", () => {
     expect(settings.focusMinutes).toBe(50);
     expect(localStorage.getItem(STORAGE_KEYS.accountSync)).toBeNull();
     expect(localStorage.getItem(STORAGE_KEYS.pet)).toBeNull();
+    expect(localStorage.getItem(STORAGE_KEYS.stampsSeen)).toBeNull();
     expect(petStore.getState().pet).toBeNull();
     expect(localStorage.getItem(STORAGE_KEYS.theme)).toBe("dark");
   });

@@ -54,8 +54,6 @@ $bubble-top: 34px; // clear of the head as Kkami bobs
 $bubble-paper: #fffcf5;
 $bubble-line: #e3d9c4;
 $bubble-shade: #e5dcc7;
-$bubble-border: 1px solid $bubble-line;
-$bubble-box-shadow: 0 3px 0 $bubble-shade;
 // Icon-style tail: the right side drops straight down to Kkami's head.
 $bubble-tail-width: 16px;
 $bubble-tail-height: 14px;
@@ -278,35 +276,186 @@ $slot-tag-color: #fffaf0;
 }
 
 .bubble {
+  // 말풍선 모양(I-066)마다 이 색들만 바꿉니다. 꼬리도 같은 색을 씀
+  --bubble-paper: #{$bubble-paper};
+  --bubble-line: #{$bubble-line};
+  --bubble-shade: #{$bubble-shade};
+  --bubble-ink: inherit;
+  --bubble-line-width: 1px;
   position: absolute;
   z-index: var(--z-raised);
   top: $bubble-top;
   left: 50%;
   transform: translateX(-50%);
   padding: var(--space-2-5) var(--space-3-5);
-  background: $bubble-paper;
-  border: $bubble-border;
-  box-shadow: $bubble-box-shadow;
+  background: var(--bubble-paper);
+  border: var(--bubble-line-width) solid var(--bubble-line);
+  box-shadow: 0 3px 0 var(--bubble-shade);
+  color: var(--bubble-ink);
   white-space: nowrap;
   font-size: var(--font-size-2xs);
+
+  // 꾸미기 모드에서 고른 자리처럼 깜빡이는 점선
+  &[data-selected="true"] {
+    z-index: $interaction-layer;
+    outline: $slot-outline;
+    outline-offset: 6px;
+    animation: slot-blink 1s steps(2, jump-none) infinite;
+    @include mixins.reduced-motion {
+      animation: none;
+    }
+  }
+  .slotTag {
+    top: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  // 레트로 게임 대화창: 남색 바탕, 흰 이중 테두리, 꼬리 없이 ▼
+  &[data-look="gameBubble"] {
+    --bubble-paper: #22305a;
+    --bubble-line: #f7f3e6;
+    --bubble-ink: #f7f3e6;
+    --bubble-line-width: 2px;
+    padding-right: var(--space-5);
+    box-shadow:
+      0 0 0 2px #22305a,
+      0 4px 0 2px #121a36;
+  }
+  // 뭉게구름: 둥근 흰 말풍선에 도트 구름, 생각하는 동그라미 꼬리
+  &[data-look="cloudBubble"] {
+    --bubble-paper: #ffffff;
+    --bubble-line: #c9d4e2;
+    --bubble-shade: #dde5ef;
+    --bubble-ink: #4a5668;
+    --bubble-line-width: 2px;
+    border-radius: 999px;
+    padding-inline: var(--space-4);
+  }
+  // 분홍 하트: 모서리 두 곳에 하트
+  &[data-look="heartBubble"] {
+    --bubble-paper: #ffe4ea;
+    --bubble-line: #e58a9d;
+    --bubble-shade: #f1b3c0;
+    --bubble-ink: #8c3a4e;
+    --bubble-line-width: 2px;
+  }
+  // 우표: 톱니 가장자리(바탕 그림을 따로 깔아 구멍을 뚫음), 붉은 안쪽 테두리, 발바닥 소인
+  &[data-look="stampBubble"] {
+    --bubble-paper: #fff6e2;
+    --bubble-line: #c8664a;
+    --bubble-shade: #e2d2b0;
+    --bubble-ink: #6b4a2e;
+    padding: var(--space-3) var(--space-8) var(--space-3) var(--space-4);
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    filter: drop-shadow(0 3px 0 var(--bubble-shade));
+    &::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      inset: 0;
+      padding: 4px;
+      background: var(--bubble-paper);
+      box-shadow:
+        inset 0 0 0 7px var(--bubble-paper),
+        inset 0 0 0 8.5px var(--bubble-line);
+      mask:
+        linear-gradient(#000 0 0) content-box,
+        radial-gradient(
+            circle at 4px 4px,
+            transparent 2.4px,
+            #000 2.9px
+          ) -4px -4px /
+          8px 8px round;
+    }
+  }
+}
+
+.bubbleDecor {
+  position: absolute;
+  line-height: 0;
+  pointer-events: none;
+  &[data-place="more"] {
+    right: 6px;
+    bottom: 5px;
+    // 2초에 한 번 (켜짐 1초, 꺼짐 1초)
+    animation: bubble-more 2s steps(2, jump-none) infinite;
+    @include mixins.reduced-motion {
+      animation: none;
+    }
+  }
+  &[data-place="cloudTopLeft"] {
+    top: -9px;
+    left: -10px;
+  }
+  &[data-place="cloudTop"] {
+    top: -5px;
+    left: 16px;
+  }
+  &[data-place="cloudBottomRight"] {
+    right: -10px;
+    bottom: -8px;
+  }
+  &[data-place="heartTopLeft"] {
+    top: -8px;
+    left: -8px;
+    transform: rotate(-12deg);
+  }
+  &[data-place="heartBottomRight"] {
+    right: -8px;
+    bottom: -7px;
+    transform: rotate(12deg);
+  }
+  &[data-place="postmark"] {
+    top: -9px;
+    right: 2px;
+    transform: rotate(14deg);
+    opacity: 0.85;
+  }
+}
+
+@keyframes bubble-more {
+  50% {
+    opacity: 0;
+  }
+}
+
+// 뭉게구름의 꼬리: 작은 동그라미 두 개
+.bubbleThought {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: calc(50% - 22px);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--bubble-paper);
+  box-shadow:
+    0 0 0 2px var(--bubble-line),
+    -9px 9px 0 -2px var(--bubble-paper),
+    -9px 9px 0 0 var(--bubble-line);
 }
 
 .bubbleTail {
   position: absolute;
-  top: calc(100% - 1px); // over the bottom line, so the tail opens into the box
+  top: calc(
+    100% - var(--bubble-line-width)
+  ); // over the bottom line, so the tail opens into the box
   left: calc(50% - #{$bubble-tail-width});
   width: $bubble-tail-width + 1px;
   height: $bubble-tail-height + 4px;
   overflow: visible;
   .shade {
-    fill: $bubble-shade;
+    fill: var(--bubble-shade);
   }
   .paper {
-    fill: $bubble-paper;
+    fill: var(--bubble-paper);
   }
   .line {
     fill: none;
-    stroke: $bubble-line;
+    stroke: var(--bubble-line);
+    stroke-width: var(--bubble-line-width);
   }
 }
 

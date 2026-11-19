@@ -5,6 +5,7 @@ import {
   availableItems,
   canMake,
   looksFor,
+  stampsSpent,
   type FurnitureId,
 } from "./furniture";
 import {
@@ -80,10 +81,10 @@ describe("가구 만들기", () => {
     expect(looksFor("rug", [])).toEqual(["plainRug"]);
   });
 
-  it("자리마다 만들 것이 3개씩(옷은 4개), 재료 조합은 서로 다름", () => {
+  it("자리마다 만들 것이 3개씩(옷·말풍선은 4개), 재료 조합은 서로 다름", () => {
     for (const slot of SLOTS)
       expect(RECIPES.filter((piece) => piece.slot === slot)).toHaveLength(
-        slot === "outfit" ? 4 : 3,
+        slot === "outfit" || slot === "bubble" ? 4 : 3,
       );
     for (const { need } of RECIPES)
       expect(Object.values(need).reduce((a, b) => a + b, 0)).toBe(3);
@@ -227,8 +228,8 @@ describe("가구 저장 형식", () => {
     expect(decodePet(encode(7, pet))).toEqual(pet);
   });
 
-  it("v10 이상은 새 버전이라 건드리지 않음", () => {
-    expect(() => decodePet(encode(10, withItems({ leaf: 1 })))).toThrow(
+  it("v11 이상은 새 버전이라 건드리지 않음", () => {
+    expect(() => decodePet(encode(11, withItems({ leaf: 1 })))).toThrow(
       PetStorageError,
     );
   });
@@ -243,5 +244,43 @@ describe("가구 저장 형식", () => {
   ])("손상된 가구 기록을 거부: %j", (broken) => {
     const pet = { ...withItems({ leaf: 2 }), ...broken };
     expect(() => decodePet(encode(7, pet))).toThrow(PetStorageError);
+  });
+});
+
+describe("말풍선 (발바닥 도장)", () => {
+  it("발바닥 도장 1개와 아이템 2개, 도장은 받은 만큼만 남은 재료에 들어감", () => {
+    for (const piece of RECIPES.filter((p) => p.slot === "bubble"))
+      expect((piece.need as Record<string, number>).stamp).toBe(1);
+    const pet = withItems({ flower: 2, leaf: 1 });
+    expect(materialsLeft(pet).stamp).toBeUndefined();
+    expect(materialsLeft(pet, 2).stamp).toBe(2);
+    expect(canMake("heartBubble", materialsLeft(pet))).toBe(false);
+    expect(canMake("heartBubble", materialsLeft(pet, 1))).toBe(true);
+  });
+
+  it("만들면 아이템만 쓴 것으로 남고, 쓴 도장은 만든 말풍선에서 셈", () => {
+    const made = makeFurniture(withItems({ flower: 2 }), "heartBubble", 3);
+    expect(made.furniture).toEqual(["heartBubble"]);
+    expect(made.spent).toEqual({ flower: 2 }); // stamps are not items
+    expect(stampsSpent(made.furniture)).toBe(1);
+    expect(materialsLeft(made, 3).stamp).toBe(2);
+    expect(materialsLeft(made, 1).stamp).toBeUndefined();
+  });
+
+  it("말풍선 자리에 놓고 v10으로 저장·복원, 예전 기록(v9)도 그대로 읽음", () => {
+    const placed = placeFurniture(
+      makeFurniture(withItems({ stone: 1, ball: 1 }), "gameBubble", 3),
+      "bubble",
+      "gameBubble",
+      4,
+    );
+    expect(placed.placed).toEqual({ bubble: "gameBubble" });
+    expect(looksFor("bubble", placed.furniture)).toEqual([
+      "plainBubble",
+      "gameBubble",
+    ]);
+    expect(decodePet(encode(10, placed))).toEqual(placed);
+    const v9 = withItems({ leaf: 1 });
+    expect(decodePet(encode(9, v9))).toEqual(v9);
   });
 });

@@ -2,19 +2,30 @@ import { isItemId, type ItemCounts, type ItemId } from "./items";
 
 /**
  * Places in the room that hold one piece of furniture each, in decorating
- * order: the walls and floor as one set, then the window, pot and rug, and
- * what Kkami wears.
+ * order: the walls and floor as one set, then the window, pot and rug, what
+ * Kkami wears, and his speech bubble.
  */
-export const SLOTS = ["room", "window", "pot", "rug", "outfit"] as const;
+export const SLOTS = [
+  "room",
+  "window",
+  "pot",
+  "rug",
+  "outfit",
+  "bubble",
+] as const;
 export type Slot = (typeof SLOTS)[number];
 
-/** What things are made from: walk finds, and hearts from level ups. */
-export type Material = ItemId | "heart";
+/**
+ * What things are made from: walk finds, hearts from level ups, and paw
+ * stamps from finished cycles (counted from focus records, src/features/pet/stamps.ts).
+ */
+export type Material = ItemId | "heart" | "stamp";
 export type MaterialCounts = Partial<Record<Material, number>>;
 
 /**
  * Furniture made from walk finds: three each, two of one kind. Outfits take
  * a heart and two finds; the brown hat is everyone's from the start (free).
+ * Speech bubbles take a paw stamp and two finds (I-066).
  */
 export const FURNITURE = [
   { id: "twigWindow", slot: "window", need: { twig: 2, leaf: 1 } },
@@ -34,6 +45,14 @@ export const FURNITURE = [
   { id: "creamScarf", slot: "outfit", need: { heart: 1, leaf: 2 } },
   { id: "checkShirt", slot: "outfit", need: { heart: 1, stone: 2 } },
   { id: "coneCollar", slot: "outfit", need: { heart: 1, ball: 2 } },
+  { id: "gameBubble", slot: "bubble", need: { stamp: 1, stone: 1, ball: 1 } },
+  { id: "cloudBubble", slot: "bubble", need: { stamp: 1, leaf: 1, flower: 1 } },
+  { id: "heartBubble", slot: "bubble", need: { stamp: 1, flower: 2 } },
+  {
+    id: "stampBubble",
+    slot: "bubble",
+    need: { stamp: 1, twig: 1, pinecone: 1 },
+  },
 ] as const satisfies readonly {
   id: string;
   slot: Slot;
@@ -49,6 +68,7 @@ export const DEFAULT_LOOK = {
   pot: "plainPot",
   rug: "plainRug",
   outfit: "plainOutfit",
+  bubble: "plainBubble",
 } as const satisfies Record<Slot, string>;
 export type LookId = FurnitureId | (typeof DEFAULT_LOOK)[Slot];
 export type Placed = Partial<Record<Slot, FurnitureId>>;
@@ -64,12 +84,19 @@ export const owns = (made: readonly FurnitureId[], id: FurnitureId) =>
 /** What can be made, in catalog order. */
 export const RECIPES = FURNITURE.filter((piece) => !("free" in piece));
 
-/** Hearts used on what was made. */
-export const heartsSpent = (furniture: readonly FurnitureId[]) =>
+/** A material used on what was made. */
+const spentOn = (material: Material, furniture: readonly FurnitureId[]) =>
   furniture.reduce(
-    (sum, id) => sum + ((furnitureById(id).need as MaterialCounts).heart ?? 0),
+    (sum, id) =>
+      sum + ((furnitureById(id).need as MaterialCounts)[material] ?? 0),
     0,
   );
+/** Hearts used on what was made. */
+export const heartsSpent = (furniture: readonly FurnitureId[]) =>
+  spentOn("heart", furniture);
+/** Paw stamps used on what was made. */
+export const stampsSpent = (furniture: readonly FurnitureId[]) =>
+  spentOn("stamp", furniture);
 
 export function isFurnitureId(value: unknown): value is FurnitureId {
   return FURNITURE.some((piece) => piece.id === value);

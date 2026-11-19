@@ -28,6 +28,7 @@ const en: Messages = {
       unknown: "???",
       notFound: "Not found yet",
       heartLocked: "Not yet",
+      stampLocked: "After a cycle",
       count: "× {count}",
       leaf: { name: "Leaf", object: "a leaf" },
       twig: { name: "Twig", object: "a twig" },
@@ -36,6 +37,7 @@ const en: Messages = {
       flower: { name: "Flower", object: "a flower" },
       ball: { name: "Ball", object: "a ball" },
       heart: { name: "Heart" },
+      stamp: { name: "Paw stamp" },
       needLabel: "{name}: {have} of {need}",
       make: "Make",
       made: "Made",
@@ -47,6 +49,7 @@ const en: Messages = {
         pot: { name: "Plant", object: "plant" },
         rug: { name: "Rug", object: "rug" },
         outfit: { name: "Outfit", object: "outfit" },
+        bubble: { name: "Speech bubble", object: "speech bubble" },
       },
       furniture: {
         plainWindow: {
@@ -158,6 +161,31 @@ const en: Messages = {
           name: "Cone collar",
           object: "a cone collar",
           to: "the cone collar",
+        },
+        plainBubble: {
+          name: "Plain bubble",
+          object: "a plain bubble",
+          to: "the plain bubble",
+        },
+        gameBubble: {
+          name: "Game dialog box",
+          object: "a game dialog box",
+          to: "the game dialog box",
+        },
+        cloudBubble: {
+          name: "Cloud bubble",
+          object: "a cloud bubble",
+          to: "the cloud bubble",
+        },
+        heartBubble: {
+          name: "Pink heart bubble",
+          object: "a pink heart bubble",
+          to: "the pink heart bubble",
+        },
+        stampBubble: {
+          name: "Stamp bubble",
+          object: "a stamp bubble",
+          to: "the stamp bubble",
         },
       },
     },
@@ -274,6 +302,7 @@ const en: Messages = {
       home: "Back home",
       skipped: "Skipped the walk and brought back {object}",
       levelHeart: "Level {level}! Got a heart",
+      stamp: "Cycle done! Got a paw stamp",
       craft: "Made {object}",
       place: "Changed the {slot} to {to}",
       walkLimit: "That’s all {count} walks for today. More tomorrow!",
@@ -484,6 +513,7 @@ const en: Messages = {
       later: "Later",
       startNext: "Start {mode} →",
       autoStart: "{mode} starts in {seconds}s",
+      stamp: "Paw stamp +1",
     },
     breakSnack: {
       short: "Short break! Play with Kkami?",

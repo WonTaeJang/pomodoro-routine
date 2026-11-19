@@ -5,6 +5,7 @@ import { createPetStore } from "./store";
 import {
   createLocalPetRepository,
   decodePet,
+  PET_STORAGE_VERSION,
   PetStorageError,
 } from "./repository";
 
@@ -658,7 +659,9 @@ describe("친밀도 저장과 재시도", () => {
       rewardedPats: { "2026-11-11": 5, "2026-11-12": 2 },
     });
     expect((await f.repository.load())!.totalPats).toBe(7);
-    expect(JSON.parse(f.storage.getItem(STORAGE_KEYS.pet)!).version).toBe(9);
+    expect(JSON.parse(f.storage.getItem(STORAGE_KEYS.pet)!).version).toBe(
+      PET_STORAGE_VERSION,
+    );
   });
 
   it("최초 저장 실패 시 임시 친밀도를 중복 저장하지 않음", async () => {
@@ -707,7 +710,9 @@ describe("친밀도 저장과 재시도", () => {
     await b.getState().recordWalk("stone");
     await a.getState().hydrate();
     expect(a.getState().pet).toMatchObject({ walks: 4, itemsSeen: 3 });
-    expect(JSON.parse(f.storage.getItem(STORAGE_KEYS.pet)!).version).toBe(9);
+    expect(JSON.parse(f.storage.getItem(STORAGE_KEYS.pet)!).version).toBe(
+      PET_STORAGE_VERSION,
+    );
   });
 
   it("저장 실패 뒤 재시도해도 산책 아이템을 두 번 넣지 않음", async () => {

@@ -616,6 +616,65 @@ function outfitArt(look: OutfitLook | "plainOutfit") {
   return paintArt(width, height, (x, y) => colors.get(`${x},${y}`) ?? null);
 }
 
+// --- Speech bubbles -----------------------------------------------------------
+// 만들기·꾸미기 목록에 보이는 작은 말풍선 그림. 방의 말풍선은 CSS로 그립니다(PetSpeechBubble).
+type BubbleLook = Extract<LookId, `${string}Bubble`>;
+const isBubbleLook = (look: LookId): look is BubbleLook =>
+  look.endsWith("Bubble");
+type BubbleInk = { line: string; paper: string; text: string };
+const BUBBLE_INK: Record<BubbleLook, BubbleInk> = {
+  plainBubble: { line: "#c9b99a", paper: "#fffcf5", text: "#b6a68a" },
+  gameBubble: { line: "#22305a", paper: "#22305a", text: "#f7f3e6" },
+  cloudBubble: { line: "#b9c7d8", paper: "#ffffff", text: "#8a97ab" },
+  heartBubble: { line: "#e58a9d", paper: "#ffe4ea", text: "#c56f83" },
+  stampBubble: { line: "#c8664a", paper: "#fff6e2", text: "#9c6a4a" },
+};
+const HEART_MARK = ["#.#", "###", ".#."];
+/** 16 x 12: the box (rows 0–8) and its tail below. */
+function bubbleArt(look: BubbleLook): PixelArt {
+  const { line, paper, text } = BUBBLE_INK[look];
+  return paintArt(16, 12, (x, y) => {
+    const edge = x === 0 || x === 15 || y === 0 || y === 8;
+    const words =
+      (y === 3 && x >= 3 && x <= 12) || (y === 5 && x >= 3 && x <= 9);
+    if (y > 8) {
+      // Tail: thought dots for the cloud, none for the game box.
+      if (look === "gameBubble") return null;
+      if (look === "cloudBubble")
+        return (y === 10 && (x === 5 || x === 6)) || (y === 11 && x === 3)
+          ? line
+          : null;
+      if (y === 9) return x === 6 || x === 8 ? line : x === 7 ? paper : null;
+      return y === 10 && (x === 7 || x === 8) ? line : null;
+    }
+    if (look === "heartBubble") {
+      const mark = (ox: number, oy: number) =>
+        HEART_MARK[y - oy]?.[x - ox] === "#";
+      if (mark(0, 0) || mark(13, 6)) return "#e0607a";
+    }
+    if (look === "cloudBubble") {
+      const corner = (x < 2 || x > 13) && (y < 2 || y > 6);
+      if (corner)
+        return (x === 1 || x === 14) && (y === 1 || y === 7) ? line : null;
+    }
+    if (look === "stampBubble") {
+      if (edge) return (x + y) % 2 === 0 ? paper : null;
+      const frame =
+        ((x === 2 || x === 13) && y >= 2 && y <= 6) ||
+        ((y === 2 || y === 6) && x >= 2 && x <= 13);
+      if (frame) return line;
+    }
+    if (look === "gameBubble") {
+      const ring = (x === 1 || x === 14 || y === 1 || y === 7) && !edge;
+      if (ring) return "#f7f3e6";
+      if ((y === 5 && x >= 11 && x <= 13) || (y === 6 && x === 12))
+        return "#f2c45a";
+    }
+    if (edge) return line;
+    return words ? text : paper;
+  });
+}
+
 const isWindowLook = (look: LookId): look is WindowLook =>
   look.endsWith("Window");
 export const isRoomLook = (look: LookId): look is RoomLook =>
@@ -638,6 +697,7 @@ export function lookArt(look: LookId, time: TimeOfDay): PixelArt {
   if (isRoomLook(look)) return cached(look, () => roomPicture(look));
   if (isRugLook(look)) return cached(look, () => rugArt(look, "small"));
   if (isOutfitLook(look)) return cached(look, () => outfitArt(look));
+  if (isBubbleLook(look)) return cached(look, () => bubbleArt(look));
   return cached(look, () => potArt(look as PotLook));
 }
 

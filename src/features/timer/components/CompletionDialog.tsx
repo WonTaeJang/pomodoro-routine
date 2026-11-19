@@ -6,6 +6,7 @@ import { useTranslations } from "use-intl";
 import { MedalIcon } from "@/components/icons";
 import { Button, Dialog } from "@/components/ui";
 import { CertificateLauncher } from "@/features/certificate";
+import { PawItemIcon } from "@/features/pet/components/PetIcons";
 import { PATHS } from "@/lib/paths";
 import { TaskDoneCheck } from "@/features/tasks/components/TaskDoneCheck";
 import { useKkamiPhoto } from "../photos/useKkamiPhoto";
@@ -116,17 +117,24 @@ export function CompletionDialog() {
         </div>
         <p>{message}</p>
         {cycleDone ? (
-          <CertificateLauncher>
-            {(open) => (
-              <Button
-                variant="secondary"
-                icon={<MedalIcon size={18} />}
-                onClick={open}
-              >
-                {t("certificate.make")}
-              </Button>
-            )}
-          </CertificateLauncher>
+          <>
+            {/* 수료증과 같은 조건으로 받는 발바닥 도장 (I-066) */}
+            <p className={styles.stamp}>
+              <PawItemIcon size={18} />
+              {t("timer.completion.stamp")}
+            </p>
+            <CertificateLauncher>
+              {(open) => (
+                <Button
+                  variant="secondary"
+                  icon={<MedalIcon size={18} />}
+                  onClick={open}
+                >
+                  {t("certificate.make")}
+                </Button>
+              )}
+            </CertificateLauncher>
+          </>
         ) : null}
         {focusDone && completed?.taskId ? (
           <TaskDoneCheck taskId={completed.taskId} />

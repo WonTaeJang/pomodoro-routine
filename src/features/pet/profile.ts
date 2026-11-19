@@ -10,6 +10,7 @@ import {
 } from "./affinity";
 import {
   isItemCounts,
+  isItemId,
   totalItems,
   type ItemCounts,
   type ItemId,
@@ -19,6 +20,7 @@ import {
   canMake,
   furnitureById,
   heartsSpent,
+  stampsSpent,
   isFree,
   isFurnitureId,
   isSlot,
@@ -178,14 +180,26 @@ export function seeItems(pet: PetProfile, seen: number): PetProfile {
   return itemsSeen === pet.itemsSeen ? pet : { ...pet, itemsSeen };
 }
 
-/** Finds and hearts left to make things with. */
-export function materialsLeft(pet: PetProfile): MaterialCounts {
+/**
+ * Finds, hearts and paw stamps left to make things with. Stamps are earned
+ * outside this record (finished cycles), so the caller passes how many.
+ */
+export function materialsLeft(pet: PetProfile, stamps = 0): MaterialCounts {
   const hearts = levelHearts(pet.affinity.points) - heartsSpent(pet.furniture);
+  const stampsLeft = stamps - stampsSpent(pet.furniture);
   return {
     ...availableItems(pet.items, pet.spent),
     ...(hearts > 0 && { heart: hearts }),
+    ...(stampsLeft > 0 && { stamp: stampsLeft }),
   };
 }
+
+/**
+ * Making a piece checks finds and hearts. Paw stamps are checked before the
+ * craft is recorded (the item box knows the count): a saved craft replays on
+ * another device even before its focus records arrive.
+ */
+const NO_STAMP_LIMIT = { stamp: Number.MAX_SAFE_INTEGER };
 
 /** Make a piece from what is left. Does nothing if made, free or short. */
 export function makeFurniture(
@@ -196,14 +210,13 @@ export function makeFurniture(
   if (
     pet.furniture.includes(id) ||
     isFree(id) ||
-    !canMake(id, materialsLeft(pet))
+    !canMake(id, { ...materialsLeft(pet), ...NO_STAMP_LIMIT })
   )
     return pet;
-  // Hearts are counted from what was made; finds are counted as spent.
+  // Hearts and stamps are counted from what was made; finds are counted as spent.
   const spent = { ...pet.spent };
   for (const [material, count] of Object.entries(furnitureById(id).need))
-    if (material !== "heart")
-      spent[material as ItemId] = (spent[material as ItemId] ?? 0) + count;
+    if (isItemId(material)) spent[material] = (spent[material] ?? 0) + count;
   return {
     ...pet,
     spent,

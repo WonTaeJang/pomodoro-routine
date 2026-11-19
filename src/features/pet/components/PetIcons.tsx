@@ -1,4 +1,4 @@
-import type { Slot } from "../furniture";
+import type { Material, Slot } from "../furniture";
 import type { ItemId } from "../items";
 
 // 돌봄 기계의 도트 아이콘. 한 글자가 한 칸이고 '.'은 비워 둡니다.
@@ -245,6 +245,85 @@ export function ItemIcon({
 }
 
 /** A heart earned by reaching a level, or its silhouette before the first. */
+// 사이클 보상 발바닥 도장: 금색 동전에 찍힌 발바닥 (할 일의 🐾 개수와 헷갈리지 않게 동전 모양)
+const PAW_COIN = {
+  rows: [
+    "....###....",
+    "..##ooo##..",
+    ".#hxoxoxo#.",
+    ".#oxoxoxo#.",
+    "#oxoooooxo#",
+    "#oxoxxxoxo#",
+    "#oooxxxooo#",
+    ".#oxxxxxo#.",
+    ".#oxxoxxo#.",
+    "..##ooo##..",
+    "....###....",
+  ],
+  colors: { "#": "#b8862b", o: "#f2c45a", h: "#fbe3a0", x: "#8a5a2b" },
+};
+
+/** The paw stamp from finishing a cycle (I-066). */
+export function PawItemIcon({
+  size = 14,
+  unknown = false,
+}: {
+  size?: number;
+  unknown?: boolean;
+}) {
+  return (
+    <PixelIcon art={unknown ? silhouette(PAW_COIN) : PAW_COIN} size={size} />
+  );
+}
+
+// 말풍선 장식 (I-066): 뭉게구름, 우표 소인, 게임 대화창의 ▼
+const BUBBLE_DECOR = {
+  cloud: {
+    rows: [
+      "....####....",
+      "..##oooo#...",
+      ".#oooooooo#.",
+      "#ooooooooo#.",
+      "#oooooooooo#",
+      ".##########.",
+    ],
+    colors: { "#": "#b9c7d8", o: "#ffffff" },
+  },
+  postmark: {
+    rows: [
+      "....#####....",
+      "..##.....##..",
+      ".##.......##.",
+      ".#..#.#.#..#.",
+      "#...#.#.#...#",
+      "#..#.....#..#",
+      "#..#.###.#..#",
+      "#....###....#",
+      "#...#####...#",
+      ".#..##.##..#.",
+      ".##.......##.",
+      "..##.....##..",
+      "....#####....",
+    ],
+    colors: { "#": "#c8664a" },
+  },
+  more: {
+    rows: ["#####", ".###.", "..#.."],
+    colors: { "#": "#f2c45a" },
+  },
+} satisfies Record<string, Pixels>;
+
+/** A decoration drawn on a speech bubble. */
+export function BubbleDecorIcon({
+  decor,
+  size,
+}: {
+  decor: keyof typeof BUBBLE_DECOR;
+  size: number;
+}) {
+  return <PixelIcon art={BUBBLE_DECOR[decor]} size={size} />;
+}
+
 export function HeartItemIcon({
   size = 14,
   unknown = false,
@@ -253,6 +332,13 @@ export function HeartItemIcon({
   unknown?: boolean;
 }) {
   return <PixelIcon art={unknown ? silhouette(HEART) : HEART} size={size} />;
+}
+
+/** Anything a recipe needs: a walk find, a heart or a paw stamp, about the same size. */
+export function MaterialIcon({ material }: { material: Material }) {
+  if (material === "heart") return <HeartItemIcon size={10} />;
+  if (material === "stamp") return <PawItemIcon size={12} />;
+  return <ItemIcon item={material} size={12} />;
 }
 
 const MAP = {
@@ -441,6 +527,20 @@ const SLOT_ART = {
       "..######..",
     ],
     colors: { "#": "#3f4f75", c: "#c9d8ee" },
+  },
+  bubble: {
+    rows: [
+      ".########.",
+      "#pppppppp#",
+      "#pkkkkkkp#",
+      "#pppppppp#",
+      "#pkkkkppp#",
+      "#pppppppp#",
+      ".###.####.",
+      "...#.#....",
+      "....##....",
+    ],
+    colors: { "#": "#8a7a62", p: "#fffcf5", k: "#c9b99a" },
   },
 } satisfies Record<Slot, Pixels>;
 

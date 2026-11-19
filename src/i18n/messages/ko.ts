@@ -28,6 +28,7 @@ const ko = {
       unknown: "???",
       notFound: "아직 못 찾음",
       heartLocked: "아직 못 받음",
+      stampLocked: "사이클 완료 시",
       count: "× {count}",
       leaf: { name: "나뭇잎", object: "나뭇잎을" },
       twig: { name: "나뭇가지", object: "나뭇가지를" },
@@ -36,6 +37,7 @@ const ko = {
       flower: { name: "꽃", object: "꽃을" },
       ball: { name: "공", object: "공을" },
       heart: { name: "하트" },
+      stamp: { name: "발바닥 도장" },
       needLabel: "{name} {have}개 있음, {need}개 필요",
       make: "만들기",
       made: "만들었어요",
@@ -47,6 +49,7 @@ const ko = {
         pot: { name: "화분", object: "화분을" },
         rug: { name: "카펫", object: "카펫을" },
         outfit: { name: "옷", object: "옷을" },
+        bubble: { name: "말풍선", object: "말풍선을" },
       },
       furniture: {
         plainWindow: {
@@ -151,6 +154,31 @@ const ko = {
           to: "하늘색 체크 셔츠로",
         },
         coneCollar: { name: "넥카라", object: "넥카라를", to: "넥카라로" },
+        plainBubble: {
+          name: "기본 말풍선",
+          object: "기본 말풍선을",
+          to: "기본 말풍선으로",
+        },
+        gameBubble: {
+          name: "게임 대화창",
+          object: "게임 대화창을",
+          to: "게임 대화창으로",
+        },
+        cloudBubble: {
+          name: "뭉게구름 말풍선",
+          object: "뭉게구름 말풍선을",
+          to: "뭉게구름 말풍선으로",
+        },
+        heartBubble: {
+          name: "분홍 하트 말풍선",
+          object: "분홍 하트 말풍선을",
+          to: "분홍 하트 말풍선으로",
+        },
+        stampBubble: {
+          name: "우표 말풍선",
+          object: "우표 말풍선을",
+          to: "우표 말풍선으로",
+        },
       },
     },
     decorate: {
@@ -250,6 +278,7 @@ const ko = {
       home: "집에 돌아왔어요",
       skipped: "산책을 건너뛰고 {object} 주워 왔어요",
       levelHeart: "Lv.{level} 달성! 하트를 받았어요",
+      stamp: "사이클 완료! 발바닥 도장을 받았어요",
       craft: "{object} 만들었어요",
       place: "{slot} {to} 바꿨어요",
       walkLimit: "오늘 산책 {count}번을 다 했어요. 내일 또 가요!",
@@ -460,6 +489,7 @@ const ko = {
       later: "나중에",
       startNext: "{mode} 시작 →",
       autoStart: "{seconds}초 후 {mode} 시작",
+      stamp: "발바닥 도장 +1",
     },
     breakSnack: {
       short: "짧은 휴식! 까미랑 놀까요?",

@@ -3,7 +3,13 @@
 import { useId, useState } from "react";
 import { useTranslations } from "use-intl";
 import type { PetLogEntry } from "../usePetLog";
-import { HeartItemIcon, ItemIcon, MapIcon, StatusIcon } from "./PetIcons";
+import {
+  HeartItemIcon,
+  ItemIcon,
+  MapIcon,
+  PawItemIcon,
+  StatusIcon,
+} from "./PetIcons";
 import { LookPicture } from "./PetRoomArt";
 import { PetPanel } from "./PetPanel";
 import styles from "./PetLog.module.scss";
@@ -35,6 +41,8 @@ function EntryIcon({ entry }: { entry: PetLogEntry }) {
       return <ItemIcon item={entry.item} size={12} />;
     case "level":
       return <HeartItemIcon size={11} />;
+    case "stamp":
+      return <PawItemIcon size={12} />;
     case "craft":
       return <LookPicture look={entry.furniture} height={12} />;
     case "place":
