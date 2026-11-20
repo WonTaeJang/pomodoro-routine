@@ -40,6 +40,7 @@ export function PetItemBox({
   onClose,
   pet,
   onCraft,
+  onApply,
   onDecorate,
   stamps,
 }: {
@@ -49,6 +50,8 @@ export function PetItemBox({
   /** Paw stamps from finished cycles (I-066). */
   stamps: number;
   onCraft: (furniture: FurnitureId) => void;
+  /** Put something made in its place in the room; the box stays open. */
+  onApply: (furniture: FurnitureId) => void;
   /** Close the box and start decorating the room. */
   onDecorate: () => void;
 }) {
@@ -149,7 +152,9 @@ export function PetItemBox({
                 piece={piece}
                 left={left}
                 made={pet.furniture.includes(piece.id)}
+                applied={pet.placed[piece.slot] === piece.id}
                 onCraft={onCraft}
+                onApply={onApply}
               />
             ))}
           </ul>
@@ -167,20 +172,40 @@ export function PetItemBox({
   );
 }
 
-/** One thing to make: picture, name, items left / needed, and its button. */
+/**
+ * One thing to make: picture, name, items left / needed and a make button.
+ * Once made, only its name and a button to put it in the room.
+ */
 function Recipe({
   piece: { id, need },
   left,
   made,
+  applied,
   onCraft,
+  onApply,
 }: {
   piece: (typeof RECIPES)[number];
   left: MaterialCounts;
   made: boolean;
+  /** In its place in the room now. */
+  applied: boolean;
   onCraft: (furniture: FurnitureId) => void;
+  onApply: (furniture: FurnitureId) => void;
 }) {
   const t = useTranslations("pet.items");
   const ready = canMake(id, left);
+  // Made: put it in the room (unless it is there). Not yet: make it.
+  const action = made
+    ? {
+        label: applied ? t("applied") : t("apply"),
+        enabled: !applied,
+        run: () => onApply(id),
+      }
+    : {
+        label: ready ? t("make") : t("short"),
+        enabled: ready,
+        run: () => onCraft(id),
+      };
   return (
     <li className={styles.recipe}>
       <span className={styles.art}>
@@ -188,44 +213,41 @@ function Recipe({
       </span>
       <span className={styles.recipeText}>
         <strong>{t(`furniture.${id}.name`)}</strong>
-        <span className={styles.need}>
-          {Object.entries(need).map(([key, count]) => {
-            const item = key as Material;
-            const have = left[item] ?? 0;
-            return (
-              <span key={item} data-short={!made && have < count}>
-                <MaterialIcon material={item} />
-                <span aria-hidden="true">
-                  {have}/{count}
-                </span>
-                <VisuallyHidden>
-                  {t("needLabel", {
-                    name: t(`${item}.name`),
-                    have,
-                    need: count,
-                  })}
-                </VisuallyHidden>
-              </span>
-            );
-          })}
-        </span>
+        {!made && <Needs need={need} left={left} />}
       </span>
-      {made ? (
-        <span className={styles.made}>
-          <span aria-hidden="true">✓</span>
-          <VisuallyHidden>{t("made")}</VisuallyHidden>
-        </span>
-      ) : (
-        <Button
-          size="sm"
-          variant={ready ? "primary" : "secondary"}
-          disabled={!ready}
-          onClick={() => onCraft(id)}
-        >
-          {ready ? t("make") : t("short")}
-        </Button>
-      )}
+      <Button
+        size="sm"
+        variant={action.enabled ? "primary" : "secondary"}
+        disabled={!action.enabled}
+        onClick={action.run}
+      >
+        {action.label}
+      </Button>
     </li>
+  );
+}
+
+/** Each material: how many are left of how many are needed. */
+function Needs({ need, left }: { need: MaterialCounts; left: MaterialCounts }) {
+  const t = useTranslations("pet.items");
+  return (
+    <span className={styles.need}>
+      {Object.entries(need).map(([key, count]) => {
+        const item = key as Material;
+        const have = left[item] ?? 0;
+        return (
+          <span key={item} data-short={have < count!}>
+            <MaterialIcon material={item} />
+            <span aria-hidden="true">
+              {have}/{count}
+            </span>
+            <VisuallyHidden>
+              {t("needLabel", { name: t(`${item}.name`), have, need: count! })}
+            </VisuallyHidden>
+          </span>
+        );
+      })}
+    </span>
   );
 }
 

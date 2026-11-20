@@ -49,7 +49,8 @@ const en: Messages = {
       stamp: { name: "Paw stamp" },
       needLabel: "{name}: {have} of {need}",
       make: "Make",
-      made: "Made",
+      apply: "Use",
+      applied: "In use",
       short: "Not enough",
       decorate: "Decorate the room",
       slots: {

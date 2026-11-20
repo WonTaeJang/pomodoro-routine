@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   DEFAULT_LOOK,
   SLOTS,
+  furnitureById,
   lookOf,
   looksFor,
   type FurnitureId,
@@ -30,7 +31,8 @@ const wrap = (index: number, length: number) => (index + length) % length;
 
 /**
  * Tamagotchi-style decorating with four keys: ◀ ▶ move, ✓ chooses, ✕ steps
- * back. Looks preview in the room before they are placed.
+ * back. Looks preview in the room before they are placed; placing one goes
+ * back to choosing a slot, so the room can be done in one go.
  */
 export function usePetDecorate({
   furniture,
@@ -69,11 +71,12 @@ export function usePetDecorate({
     onPlaced();
   }
 
+  /** ✓: choose the slot, or place the look and go back to choosing a slot. */
   function confirm() {
     if (!mode) return;
     if (mode.step === "slot") return setMode(pickLook(mode.slot));
     place(mode.slot, looks[mode.index]);
-    setMode(null);
+    setMode({ step: "slot", slot: mode.slot });
   }
 
   function back() {
@@ -92,6 +95,8 @@ export function usePetDecorate({
         ? ({ [mode.slot]: looks[mode.index] } as Partial<Record<Slot, LookId>>)
         : undefined,
     start: () => setMode({ step: "slot", slot: SLOTS[0] }),
+    /** Put something made in its place right away (the item box's button). */
+    apply: (piece: FurnitureId) => place(furnitureById(piece).slot, piece),
     /** Tap a slot in the room to go straight to its looks. */
     select: (slot: Slot) => setMode(pickLook(slot)),
     prev: () => move(-1),

@@ -49,7 +49,8 @@ const ko = {
       stamp: { name: "발바닥 도장" },
       needLabel: "{name} {have}개 있음, {need}개 필요",
       make: "만들기",
-      made: "만들었어요",
+      apply: "적용",
+      applied: "적용 중",
       short: "재료 부족",
       decorate: "방 꾸미기",
       slots: {
