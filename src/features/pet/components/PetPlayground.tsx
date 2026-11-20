@@ -456,6 +456,7 @@ function PetRoom({ retry }: { retry: () => void }) {
           stamps={stamps.earned}
           onCraft={craft}
           onApply={decor.apply}
+          onApplySet={decor.applySet}
           onDecorate={() => {
             setBoxOpen(false);
             decor.start();

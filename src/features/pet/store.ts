@@ -2,7 +2,7 @@ import { createStore } from "zustand/vanilla";
 import { useStore } from "zustand";
 import { createPetProfile, type PetProfile } from "./profile";
 import { totalItems, type ItemId } from "./items";
-import type { FurnitureId, Slot } from "./furniture";
+import type { FurnitureId, Placed, Slot } from "./furniture";
 import {
   appendCare,
   applyPending,
@@ -35,6 +35,8 @@ type PetStore = {
   recordCraft(furniture: FurnitureId): Promise<void>;
   /** Put furniture in a slot, or its starting look back with null. */
   recordPlace(slot: Slot, furniture: FurnitureId | null): Promise<void>;
+  /** Put several pieces in their places in one save (a room set). */
+  recordPlaceAll(pieces: Placed): Promise<void>;
   /** The item box was opened: clear the new-item dot. */
   markItemsSeen(): Promise<void>;
   retry(): Promise<void>;
@@ -79,7 +81,7 @@ export function createPetStore(
     }
     const fail = (error: unknown) =>
       set({ issue: error instanceof PetStorageError ? error.issue : "save" });
-    async function flush(fresh?: PendingCare) {
+    async function flush(...fresh: PendingCare[]) {
       const { pet } = get();
       if (!pet) return;
       // A new save supersedes a previously failed deletion.
@@ -90,9 +92,10 @@ export function createPetStore(
             // Check under the write lock: the storage event may not have arrived.
             // Retry discards old work; an explicit new action can start a new record.
             if (remotelyReset(current)) {
-              pending = fresh ? [fresh] : [];
+              pending = fresh.reduce<PendingCare[]>(appendCare, []);
               basePet =
-                current ?? (fresh ? createPetProfile(id(), fresh.at) : null);
+                current ??
+                (fresh.length > 0 ? createPetProfile(id(), fresh[0].at) : null);
               persistedId = current?.id ?? null;
               showPending();
             }
@@ -142,14 +145,16 @@ export function createPetStore(
       }
       set({ hydrated: true });
     }
-    function recordCare(input: CareInput) {
-      const entry = careEntry(input, now());
+    /** Several inputs land together: one update on screen, one save. */
+    function recordCare(...inputs: CareInput[]) {
+      const at = now();
+      const entries = inputs.map((input) => careEntry(input, at));
       return enqueue(async () => {
-        if (!get().hydrated) return;
-        basePet ??= createPetProfile(id(), entry.at);
-        pending = appendCare(pending, entry);
+        if (!get().hydrated || entries.length === 0) return;
+        basePet ??= createPetProfile(id(), at);
+        pending = entries.reduce(appendCare, pending);
         showPending();
-        await flush(entry);
+        await flush(...entries);
       });
     }
     return {
@@ -173,6 +178,14 @@ export function createPetStore(
       recordCraft: (furniture) => recordCare({ kind: "craft", furniture }),
       recordPlace: (slot, furniture) =>
         recordCare({ kind: "place", slot, furniture }),
+      recordPlaceAll: (pieces) =>
+        recordCare(
+          ...Object.entries(pieces).map(([slot, furniture]): CareInput => ({
+            kind: "place",
+            slot: slot as Slot,
+            furniture,
+          })),
+        ),
       markItemsSeen: () => {
         const pet = get().pet;
         if (!pet || pet.itemsSeen >= totalItems(pet.items))

@@ -3,9 +3,14 @@ import {
   RECIPES,
   SLOTS,
   availableItems,
-  PALACE_SET,
+  SETS,
+  SET_SLOTS,
   canMake,
+  furnitureById,
   isPalace,
+  isSetPlaced,
+  setById,
+  setPieces,
   looksFor,
   stampsSpent,
   type FurnitureId,
@@ -285,7 +290,33 @@ describe("말풍선 (발바닥 도장)", () => {
   });
 });
 
+describe("방 세트", () => {
+  it("세트마다 벽·창·화분·러그 하나씩, 제 자리의 가구", () => {
+    for (const set of SETS)
+      for (const slot of SET_SLOTS)
+        expect(furnitureById(set.pieces[slot]).slot).toBe(slot);
+  });
+
+  it("방 네 자리의 만들기는 모두 꼭 한 세트에 들어감", () => {
+    const inSets = SETS.flatMap(setPieces);
+    expect(new Set(inSets).size).toBe(inSets.length);
+    const roomRecipes = RECIPES.filter((p) =>
+      (SET_SLOTS as readonly string[]).includes(p.slot),
+    ).map((p) => p.id);
+    expect([...inSets].sort()).toEqual([...roomRecipes].sort());
+  });
+
+  it("넷이 다 제자리일 때만 놓인 세트, 옷·말풍선은 상관없음", () => {
+    const [cabin] = SETS;
+    const placed = { ...cabin.pieces, outfit: "coneCollar" } as const;
+    expect(isSetPlaced(cabin, placed)).toBe(true);
+    expect(isSetPlaced(cabin, { ...placed, rug: "pinkRug" })).toBe(false);
+    expect(isSetPlaced(cabin, { ...placed, pot: undefined })).toBe(false);
+  });
+});
+
 describe("궁전 세트 (발바닥 도장)", () => {
+  const PALACE_SET = setById("palace").pieces;
   const SET = Object.values(PALACE_SET);
 
   it("벽·창·화분·러그 하나씩, 도장 1개와 같은 아이템 2개", () => {

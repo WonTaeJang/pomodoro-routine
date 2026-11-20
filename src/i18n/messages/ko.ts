@@ -25,6 +25,7 @@ const ko = {
       slotTabs: "만들 자리",
       list: "아이템",
       craft: "만들기",
+      set: "세트",
       unknown: "???",
       notFound: "아직 못 찾음",
       heartLocked: "아직 못 받음",
@@ -51,6 +52,17 @@ const ko = {
       make: "만들기",
       apply: "적용",
       applied: "적용 중",
+      // 세트 탭 (I-069)
+      setMade: "{total}개 중 {count}개 만듦",
+      setMissing: "{name}, 아직 안 만듦",
+      setLeft: "{count}개 더 만들면 적용할 수 있어요",
+      setEdition: "다 놓으면 게임기가 궁전 에디션으로 바뀌어요",
+      sets: {
+        cabin: { name: "숲속 오두막 세트", to: "숲속 오두막 세트로" },
+        floral: { name: "파스텔 꽃 세트", to: "파스텔 꽃 세트로" },
+        stripe: { name: "줄무늬 클래식 세트", to: "줄무늬 클래식 세트로" },
+        palace: { name: "궁전 세트", to: "궁전 세트로" },
+      },
       short: "재료 부족",
       decorate: "방 꾸미기",
       slots: {
@@ -322,6 +334,7 @@ const ko = {
       palace: "궁전 세트를 다 놓아 게임기가 궁전 에디션이 됐어요",
       craft: "{object} 만들었어요",
       place: "{slot} {to} 바꿨어요",
+      set: "방을 {to} 꾸몄어요",
       walkLimit: "오늘 산책 {count}번을 다 했어요. 내일 또 가요!",
       snackLimit: "오늘 간식 {count}번을 다 줬어요. 내일 또 줄게요!",
     },

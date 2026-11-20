@@ -6,6 +6,8 @@ $lcd-header: #e6dcc5;
 $lcd-header-shade: #c9b998;
 $lcd-header-light: #fbf8ee;
 $lcd-text: #5e5246;
+// 액정 칸은 테마와 상관없이 밝은 색이라, 보조 글자는 액정 글자색을 옅게 씀
+$lcd-text-muted: color-mix(in srgb, $lcd-text 78%, $lcd-wall);
 $lcd-max: #c4626f;
 $lcd-level-up: #fff1c9;
 $lcd-level-up-shade: #e5c875;

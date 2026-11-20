@@ -56,7 +56,8 @@
   place-items: center;
   height: 30px;
 }
-.recipes {
+// 만들기·세트 목록: 카드를 한 줄에 하나씩
+.cards {
   display: grid;
   gap: var(--space-2);
   margin: 0;
@@ -109,6 +110,86 @@
   margin-top: var(--space-4);
 }
 
+// 세트 카드: 이름과 만든 수 · 조각 넷 · (궁전) 게임기 안내 · 적용 버튼이나 남은 개수
+.set {
+  display: grid;
+  gap: var(--space-2-5);
+  padding: var(--space-3);
+  @include device.lcd-card;
+}
+.setHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  strong {
+    font-size: var(--font-size-sm);
+  }
+}
+.setCount {
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, device.$lcd-text 8%, transparent);
+  font-size: var(--font-size-2xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-bold);
+  &[data-full="true"] {
+    background: device.$lcd-header;
+  }
+}
+.setPieces {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  > .art {
+    position: relative;
+    width: auto;
+    height: auto;
+    aspect-ratio: 1;
+  }
+  // 아직 안 만든 조각: 흐린 그림 위에 물음표
+  > [data-missing="true"] {
+    > :first-child {
+      opacity: 0.25;
+      filter: grayscale(1);
+    }
+    &::after {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      content: "?";
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-bold);
+    }
+  }
+}
+.setEdition {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  margin: 0;
+  padding: var(--space-1-5) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: device.$lcd-level-up;
+  color: device.$lcd-level-up-text;
+  font-size: var(--font-size-2xs);
+}
+.setFoot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 32px;
+  > span {
+    margin-right: auto;
+    color: device.$lcd-text-muted;
+    font-size: var(--font-size-xs);
+  }
+}
+
 // 얻는 방법 팝업: 아이템마다 한 줄 (아이콘 · 이름과 방법)
 .guideIntro {
   margin-bottom: var(--space-3);
@@ -133,9 +214,8 @@
     display: block;
     font-size: var(--font-size-sm);
   }
-  // 액정 칸은 테마와 상관없이 밝은 색이라, 설명도 액정 글자색을 옅게 씀
   span span {
-    color: color-mix(in srgb, device.$lcd-text 78%, device.$lcd-wall);
+    color: device.$lcd-text-muted;
     font-size: var(--font-size-xs);
   }
 }

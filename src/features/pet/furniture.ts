@@ -128,16 +128,71 @@ export function looksFor(slot: Slot, owned: readonly FurnitureId[]): LookId[] {
 export const lookOf = (slot: Slot, placed: Placed): LookId =>
   placed[slot] ?? DEFAULT_LOOK[slot];
 
-/** The palace set: placed all together, Kkami notices (src/features/pet/speech.ts). */
-export const PALACE_SET = {
-  room: "palaceRoom",
-  window: "palaceWindow",
-  pot: "palacePot",
-  rug: "palaceRug",
-} as const satisfies Partial<Record<Slot, FurnitureId>>;
+/** The room slots a set fills; Kkami's outfit and bubble stay as they are. */
+export const SET_SLOTS = ["room", "window", "pot", "rug"] as const;
+type SetSlot = (typeof SET_SLOTS)[number];
+
+/**
+ * Room sets: a wall, window, pot and rug that belong together, put in the
+ * room in one go from the item box (I-069). Each piece is in one set at most.
+ */
+export const SETS = [
+  {
+    id: "cabin",
+    pieces: {
+      room: "cabinRoom",
+      window: "twigWindow",
+      pot: "pinePot",
+      rug: "braidRug",
+    },
+  },
+  {
+    id: "floral",
+    pieces: {
+      room: "floralRoom",
+      window: "flowerWindow",
+      pot: "flowerPot",
+      rug: "pinkRug",
+    },
+  },
+  {
+    id: "stripe",
+    pieces: {
+      room: "stripeRoom",
+      window: "stoneWindow",
+      pot: "succulentPot",
+      rug: "fringeRug",
+    },
+  },
+  // Placed all together, Kkami notices (src/features/pet/speech.ts) and the
+  // device turns into the palace edition (I-067).
+  {
+    id: "palace",
+    pieces: {
+      room: "palaceRoom",
+      window: "palaceWindow",
+      pot: "palacePot",
+      rug: "palaceRug",
+    },
+  },
+] as const satisfies readonly {
+  id: string;
+  pieces: Record<SetSlot, FurnitureId>;
+}[];
+export type RoomSet = (typeof SETS)[number];
+export type SetId = RoomSet["id"];
+
+export const setById = (id: SetId) => SETS.find((set) => set.id === id)!;
+
+/** A set's pieces, in slot order. */
+export const setPieces = (set: RoomSet): FurnitureId[] =>
+  SET_SLOTS.map((slot) => set.pieces[slot]);
+/** Every piece of the set is in its place. */
+export const isSetPlaced = (set: RoomSet, placed: Placed) =>
+  SET_SLOTS.every((slot) => placed[slot] === set.pieces[slot]);
 
 export const isPalace = (placed: Placed) =>
-  Object.entries(PALACE_SET).every(([slot, id]) => placed[slot as Slot] === id);
+  isSetPlaced(setById("palace"), placed);
 
 /** Items left to use: found minus spent. */
 export function availableItems(

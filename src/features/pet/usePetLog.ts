@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AFFINITY_PER_SNACK } from "./affinity";
 import type { ItemId } from "./items";
-import type { FurnitureId, LookId, Slot } from "./furniture";
+import type { FurnitureId, LookId, SetId, Slot } from "./furniture";
 import { petStore } from "./store";
 
 export type PetLogEvent =
@@ -14,7 +14,8 @@ export type PetLogEvent =
   | { kind: "level"; level: number }
   | { kind: "walkLimit" | "snackLimit"; count: number }
   | { kind: "craft"; furniture: FurnitureId }
-  | { kind: "place"; slot: Slot; look: LookId };
+  | { kind: "place"; slot: Slot; look: LookId }
+  | { kind: "set"; set: SetId };
 export type PetLogEntry = PetLogEvent & { id: number; at: number };
 
 /** Enough for a long visit; older lines drop off. */

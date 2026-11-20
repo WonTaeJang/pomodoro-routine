@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { useTranslations } from "use-intl";
+import { setById } from "../furniture";
 import type { PetLogEntry } from "../usePetLog";
 import {
   HeartItemIcon,
@@ -49,6 +50,9 @@ function EntryIcon({ entry }: { entry: PetLogEntry }) {
       return <LookPicture look={entry.furniture} height={12} />;
     case "place":
       return <LookPicture look={entry.look} height={12} />;
+    case "set":
+      // The set's wall and floor stand for the whole set.
+      return <LookPicture look={setById(entry.set).pieces.room} height={12} />;
   }
 }
 
@@ -90,6 +94,8 @@ function EntryText({ entry }: { entry: PetLogEntry }) {
         slot: t(`items.slots.${entry.slot}.object`),
         to: t(`items.furniture.${entry.look}.to`),
       });
+    case "set":
+      return t("log.set", { to: t(`items.sets.${entry.set}.to`) });
     default:
       return t(`log.${entry.kind}`);
   }

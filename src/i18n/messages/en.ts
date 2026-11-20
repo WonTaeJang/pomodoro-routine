@@ -25,6 +25,7 @@ const en: Messages = {
       slotTabs: "Place to make for",
       list: "Items",
       craft: "Craft",
+      set: "Sets",
       unknown: "???",
       notFound: "Not found yet",
       heartLocked: "Not yet",
@@ -51,6 +52,17 @@ const en: Messages = {
       make: "Make",
       apply: "Use",
       applied: "In use",
+      // Sets tab (I-069)
+      setMade: "{count} of {total} made",
+      setMissing: "{name}, not made yet",
+      setLeft: "Make {count} more to use it",
+      setEdition: "Place them all to turn the device into the palace edition",
+      sets: {
+        cabin: { name: "Forest cabin set", to: "the forest cabin set" },
+        floral: { name: "Pastel flower set", to: "the pastel flower set" },
+        stripe: { name: "Classic stripe set", to: "the classic stripe set" },
+        palace: { name: "Palace set", to: "the palace set" },
+      },
       short: "Not enough",
       decorate: "Decorate the room",
       slots: {
@@ -344,6 +356,7 @@ const en: Messages = {
       palace: "The whole palace set is in: palace edition!",
       craft: "Made {object}",
       place: "Changed the {slot} to {to}",
+      set: "Decorated the room with {to}",
       walkLimit: "That’s all {count} walks for today. More tomorrow!",
       snackLimit: "That’s all {count} treats for today. More tomorrow!",
     },

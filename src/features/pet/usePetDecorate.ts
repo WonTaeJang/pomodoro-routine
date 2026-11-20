@@ -3,11 +3,13 @@
 import { useState } from "react";
 import {
   DEFAULT_LOOK,
+  SET_SLOTS,
   SLOTS,
   furnitureById,
   lookOf,
   looksFor,
   type FurnitureId,
+  type RoomSet,
   type LookId,
   type Placed,
   type Slot,
@@ -71,6 +73,19 @@ export function usePetDecorate({
     onPlaced();
   }
 
+  /** A whole room set at once: one save, one line in the log. */
+  function placeSet(set: RoomSet) {
+    const changed = Object.fromEntries(
+      SET_SLOTS.filter((slot) => placed[slot] !== set.pieces[slot]).map(
+        (slot) => [slot, set.pieces[slot]],
+      ),
+    );
+    if (Object.keys(changed).length === 0) return;
+    void petStore.getState().recordPlaceAll(changed);
+    addLog({ kind: "set", set: set.id });
+    onPlaced();
+  }
+
   /** ✓: choose the slot, or place the look and go back to choosing a slot. */
   function confirm() {
     if (!mode) return;
@@ -97,6 +112,8 @@ export function usePetDecorate({
     start: () => setMode({ step: "slot", slot: SLOTS[0] }),
     /** Put something made in its place right away (the item box's button). */
     apply: (piece: FurnitureId) => place(furnitureById(piece).slot, piece),
+    /** Put a whole set in the room (the item box's set tab). */
+    applySet: placeSet,
     /** Tap a slot in the room to go straight to its looks. */
     select: (slot: Slot) => setMode(pickLook(slot)),
     prev: () => move(-1),

@@ -14,11 +14,15 @@ import { cx } from "@/lib/cx";
 import { ITEMS } from "../items";
 import {
   RECIPES,
+  SETS,
   SLOTS,
   canMake,
+  isSetPlaced,
+  setPieces,
   type FurnitureId,
   type Material,
   type MaterialCounts,
+  type RoomSet,
   type Slot,
 } from "../furniture";
 import { levelHearts } from "../affinity";
@@ -29,6 +33,7 @@ import {
   MaterialIcon,
   PawItemIcon,
   SlotIcon,
+  StatusIcon,
 } from "./PetIcons";
 import { LookPicture } from "./PetRoomArt";
 import { PetItemGuide } from "./PetItemGuide";
@@ -41,6 +46,7 @@ export function PetItemBox({
   pet,
   onCraft,
   onApply,
+  onApplySet,
   onDecorate,
   stamps,
 }: {
@@ -52,11 +58,13 @@ export function PetItemBox({
   onCraft: (furniture: FurnitureId) => void;
   /** Put something made in its place in the room; the box stays open. */
   onApply: (furniture: FurnitureId) => void;
+  /** Put a whole set in the room (I-069); the box stays open. */
+  onApplySet: (set: RoomSet) => void;
   /** Close the box and start decorating the room. */
   onDecorate: () => void;
 }) {
   const t = useTranslations("pet.items");
-  const [tab, setTab] = useState<"list" | "craft">("list");
+  const [tab, setTab] = useState<"list" | "craft" | "set">("list");
   const [slot, setSlot] = useState<Slot>(SLOTS[0]);
   const [guideOpen, setGuideOpen] = useState(false);
   const left = materialsLeft(pet, stamps);
@@ -91,9 +99,10 @@ export function PetItemBox({
         options={[
           { value: "list", label: t("list") },
           { value: "craft", label: t("craft") },
+          { value: "set", label: t("set") },
         ]}
       />
-      {tab === "list" ? (
+      {tab === "list" && (
         <ul className={styles.grid}>
           {ITEMS.map(({ id }) => {
             const found = (pet.items[id] ?? 0) > 0;
@@ -128,7 +137,8 @@ export function PetItemBox({
             found={stamps > 0}
           />
         </ul>
-      ) : (
+      )}
+      {tab === "craft" && (
         <>
           <SegmentedControl
             className={cx(styles.tabs, styles.slotTabs)}
@@ -145,7 +155,7 @@ export function PetItemBox({
               ),
             }))}
           />
-          <ul className={styles.recipes}>
+          <ul className={styles.cards}>
             {RECIPES.filter((piece) => piece.slot === slot).map((piece) => (
               <Recipe
                 key={piece.id}
@@ -167,6 +177,19 @@ export function PetItemBox({
             {t("decorate")}
           </Button>
         </>
+      )}
+      {tab === "set" && (
+        <ul className={styles.cards}>
+          {SETS.map((set) => (
+            <SetCard
+              key={set.id}
+              set={set}
+              made={pet.furniture}
+              applied={isSetPlaced(set, pet.placed)}
+              onApply={onApplySet}
+            />
+          ))}
+        </ul>
       )}
     </Dialog>
   );
@@ -223,6 +246,79 @@ function Recipe({
       >
         {action.label}
       </Button>
+    </li>
+  );
+}
+
+/**
+ * One room set: its four pieces, how many are made and, once all are, a
+ * button that puts the whole set in the room. Missing pieces show faded.
+ */
+function SetCard({
+  set,
+  made,
+  applied,
+  onApply,
+}: {
+  set: RoomSet;
+  made: readonly FurnitureId[];
+  /** The whole set is in the room now. */
+  applied: boolean;
+  onApply: (set: RoomSet) => void;
+}) {
+  const t = useTranslations("pet.items");
+  const pieces = setPieces(set);
+  const missing = pieces.filter((id) => !made.includes(id));
+  const have = pieces.length - missing.length;
+  return (
+    <li className={styles.set}>
+      <div className={styles.setHead}>
+        <strong>{t(`sets.${set.id}.name`)}</strong>
+        <span className={styles.setCount} data-full={missing.length === 0}>
+          <span aria-hidden="true">
+            {have}/{pieces.length}
+          </span>
+          <VisuallyHidden>
+            {t("setMade", { count: have, total: pieces.length })}
+          </VisuallyHidden>
+        </span>
+      </div>
+      <ul className={styles.setPieces}>
+        {pieces.map((id) => {
+          const absent = missing.includes(id);
+          const name = t(`furniture.${id}.name`);
+          return (
+            <li key={id} className={styles.art} data-missing={absent}>
+              <LookPicture look={id} cell={2} fit={44} />
+              <VisuallyHidden>
+                {absent ? t("setMissing", { name }) : name}
+              </VisuallyHidden>
+            </li>
+          );
+        })}
+      </ul>
+      {/* 궁전 세트만 게임기가 바뀜 (I-067) */}
+      {set.id === "palace" && (
+        <p className={styles.setEdition}>
+          <StatusIcon status="palace" />
+          {t("setEdition")}
+        </p>
+      )}
+      {/* 하나라도 없으면 버튼 없이 남은 개수만 */}
+      <div className={styles.setFoot}>
+        {missing.length > 0 ? (
+          <span>{t("setLeft", { count: missing.length })}</span>
+        ) : (
+          <Button
+            size="sm"
+            variant={applied ? "secondary" : "primary"}
+            disabled={applied}
+            onClick={() => onApply(set)}
+          >
+            {applied ? t("applied") : t("apply")}
+          </Button>
+        )}
+      </div>
     </li>
   );
 }

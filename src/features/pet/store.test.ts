@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { STORAGE_KEYS } from "@/lib/storage";
 import { createPetCareStore } from "./careStore";
 import { createPetStore } from "./store";
@@ -760,5 +760,54 @@ describe("방 꾸미기 기록", () => {
     // Not enough left for a second piece that needs flowers.
     await b.getState().recordCraft("flowerWindow");
     expect(b.getState().pet!.furniture).toEqual(["flowerPot"]);
+  });
+
+  it("세트는 네 자리를 한 번에 저장하고, 화면도 한 번만 바뀜", async () => {
+    const f = fixture(),
+      a = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    for (const item of [
+      ...Array<"flower">(8).fill("flower"),
+      "leaf",
+      "twig",
+      "stone",
+      "ball",
+    ] as const)
+      await a.getState().recordWalk(item);
+    for (const id of [
+      "floralRoom",
+      "flowerWindow",
+      "flowerPot",
+      "pinkRug",
+    ] as const)
+      await a.getState().recordCraft(id);
+    const updates: unknown[] = [];
+    const stop = a.subscribe(({ pet }, before) => {
+      if (pet !== before.pet) updates.push(pet!.placed);
+    });
+    const writes = vi.spyOn(f.storage, "setItem");
+    await a.getState().recordPlaceAll({
+      room: "floralRoom",
+      window: "flowerWindow",
+      pot: "flowerPot",
+      rug: "pinkRug",
+    });
+    stop();
+    const placed = {
+      room: "floralRoom",
+      window: "flowerWindow",
+      pot: "flowerPot",
+      rug: "pinkRug",
+    };
+    // Shown at once, then the same record comes back from the save.
+    expect(updates[0]).toEqual(placed);
+    expect(
+      updates.every((u) => JSON.stringify(u) === JSON.stringify(placed)),
+    ).toBe(true);
+    expect(writes).toHaveBeenCalledTimes(1);
+    const b = f.store();
+    await b.getState().hydrate();
+    expect(b.getState().pet!.placed).toEqual(placed);
   });
 });
