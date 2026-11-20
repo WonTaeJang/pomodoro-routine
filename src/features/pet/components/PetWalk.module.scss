@@ -1,9 +1,10 @@
 @use "../../../styles/breakpoints" as bp;
 @use "room-layers" as layer;
 
-// The walk starts in the home room (shared room styles) and the Rive outdoors
-// slides over it. The artboard (680x320) is shown at the home dog scale: 1x on
-// phones, 1.2x from sm. It is taller than the room so the outdoors covers it.
+// The walk starts in the home room (shared room styles) and the outdoors on
+// the canvas slides over it. The scene (680x320) is shown at the home dog
+// scale: 1x on phones, 1.2x from sm. It is taller than the room so the
+// outdoors covers it.
 $small-canvas-width: 680px;
 $small-canvas-height: 320px;
 $canvas-width: 816px;
@@ -17,6 +18,12 @@ $canvas-height: 384px;
   width: $small-canvas-width;
   height: $small-canvas-height;
   pointer-events: none;
+}
+.canvas canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
 }
 // A failed load keeps the message and retry above whatever the canvas drew.
 .cover[data-failed="true"] {

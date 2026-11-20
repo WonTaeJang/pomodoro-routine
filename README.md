@@ -65,16 +65,16 @@ npm run dev
 
 ## 기술 스택
 
-| 분야       | 사용한 것                                                                                   |
-| ---------- | ------------------------------------------------------------------------------------------- |
-| 프레임워크 | Next.js 16 (App Router), React 19, TypeScript                                               |
-| 스타일     | SCSS Modules + 디자인 토큰, [Pretendard](https://github.com/orioncactus/pretendard) 글꼴    |
-| 상태       | Zustand (localStorage에 저장, 탭끼리 맞추기)                                                |
-| 로그인     | Supabase Auth (구글 · 카카오), 계정 저장은 Supabase Postgres (행 단위 보안)                 |
-| 다국어     | use-intl (한국어 · 영어)                                                                    |
-| 그 밖에    | dnd-kit (끌어서 순서 바꾸기), Web Audio API (알림 소리 · 집중 소리), Canvas (수료증 이미지) |
-| 까미 돌봄  | Rive (도트 까미 애니메이션), 도트 그림을 만드는 스크립트(`scripts/`)                        |
-| 테스트     | Vitest                                                                                      |
+| 분야       | 사용한 것                                                                                            |
+| ---------- | ---------------------------------------------------------------------------------------------------- |
+| 프레임워크 | Next.js 16 (App Router), React 19, TypeScript                                                        |
+| 스타일     | SCSS Modules + 디자인 토큰, [Pretendard](https://github.com/orioncactus/pretendard) 글꼴             |
+| 상태       | Zustand (localStorage에 저장, 탭끼리 맞추기)                                                         |
+| 로그인     | Supabase Auth (구글 · 카카오), 계정 저장은 Supabase Postgres (행 단위 보안)                          |
+| 다국어     | use-intl (한국어 · 영어)                                                                             |
+| 그 밖에    | dnd-kit (끌어서 순서 바꾸기), Web Audio API (알림 소리 · 집중 소리), Canvas (수료증 이미지)          |
+| 까미 돌봄  | 직접 만든 캔버스 도트 재생기(`src/features/pet/pixel/`), 까미 그림·동작(`src/features/pet/sprites/`) |
+| 테스트     | Vitest                                                                                               |
 
 ## 문서
 
@@ -93,5 +93,5 @@ npm run dev
 
 코드는 [MIT 라이선스](./LICENSE)예요. 아래는 MIT 라이선스에 들어가지 않아요.
 
-- **까미 사진**(`src/assets/kkami/`, 링크 미리보기 이미지 `src/app/opengraph-image.png`), **마스코트 그림**(`src/assets/mascot/`)과 **도트 까미 그림**(`public/rive/*.riv`, `src/assets/kkami-pet/`, `src/assets/kkami-walk/`), 이것이 들어간 화면 캡처(`docs/images/`): 허락 없이 쓰거나 고치거나 배포할 수 없어요.
+- **까미 사진**(`src/assets/kkami/`, 링크 미리보기 이미지 `src/app/opengraph-image.png`), **마스코트 그림**(`src/assets/mascot/`)과 **도트 까미 그림**(`src/features/pet/sprites/`), 이것이 들어간 화면 캡처(`docs/images/`): 허락 없이 쓰거나 고치거나 배포할 수 없어요.
 - **집중 소리 녹음**(`public/sounds/`): Pixabay 녹음을 다듬은 것이라 [Pixabay Content License](https://pixabay.com/service/terms/)를 따라요. 파일만 따로 배포할 수 없어요.

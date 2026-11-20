@@ -65,16 +65,16 @@ To try sign-in, create a Supabase project and put its URL and publishable key in
 
 ## Tech stack
 
-| Area       | What's used                                                                                 |
-| ---------- | ------------------------------------------------------------------------------------------- |
-| Framework  | Next.js 16 (App Router), React 19, TypeScript                                               |
-| Styling    | SCSS Modules + design tokens, [Pretendard](https://github.com/orioncactus/pretendard) font  |
-| State      | Zustand (saved to localStorage, synced across tabs)                                         |
-| Sign-in    | Supabase Auth (Google, Kakao); account data in Supabase Postgres (row-level security)       |
-| i18n       | use-intl (Korean, English)                                                                  |
-| Other      | dnd-kit (drag to reorder), Web Audio API (alerts, focus sounds), Canvas (certificate image) |
-| Kkami care | Rive (pixel Kkami animation), scripts that build the pixel art (`scripts/`)                 |
-| Tests      | Vitest                                                                                      |
+| Area       | What's used                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Framework  | Next.js 16 (App Router), React 19, TypeScript                                                                            |
+| Styling    | SCSS Modules + design tokens, [Pretendard](https://github.com/orioncactus/pretendard) font                               |
+| State      | Zustand (saved to localStorage, synced across tabs)                                                                      |
+| Sign-in    | Supabase Auth (Google, Kakao); account data in Supabase Postgres (row-level security)                                    |
+| i18n       | use-intl (Korean, English)                                                                                               |
+| Other      | dnd-kit (drag to reorder), Web Audio API (alerts, focus sounds), Canvas (certificate image)                              |
+| Kkami care | A small canvas player for the pixel art (`src/features/pet/pixel/`), Kkami’s art and moves (`src/features/pet/sprites/`) |
+| Tests      | Vitest                                                                                                                   |
 
 ## Docs
 
@@ -93,5 +93,5 @@ The docs are written in Korean.
 
 The code is under the [MIT License](./LICENSE). The following are not covered by it:
 
-- **Photos of Kkami** (`src/assets/kkami/`, and the link preview image `src/app/opengraph-image.png`), **mascot illustrations** (`src/assets/mascot/`), **pixel Kkami art** (`public/rive/*.riv`, `src/assets/kkami-pet/`, `src/assets/kkami-walk/`) and screenshots that include them (`docs/images/`): may not be used, modified or distributed without permission.
+- **Photos of Kkami** (`src/assets/kkami/`, and the link preview image `src/app/opengraph-image.png`), **mascot illustrations** (`src/assets/mascot/`), **pixel Kkami art** (`src/features/pet/sprites/`) and screenshots that include them (`docs/images/`): may not be used, modified or distributed without permission.
 - **Focus sound recordings** (`public/sounds/`): edited from Pixabay recordings, so they stay under the [Pixabay Content License](https://pixabay.com/service/terms/) and may not be redistributed as standalone files.

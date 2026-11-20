@@ -3,7 +3,11 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 import { useTranslations } from "use-intl";
-import { usePetRive, usePetRiveOutfit, usePetRivePose } from "../usePetRive";
+import {
+  usePetSprite,
+  usePetSpriteOutfit,
+  usePetSpritePose,
+} from "../usePetSprite";
 import { Button, VisuallyHidden } from "@/components/ui";
 import { usePetCare } from "../usePetCare";
 import { petStore, usePetStore } from "../store";
@@ -44,7 +48,6 @@ import { useDailyLimitReached } from "../useDailyLimit";
 import { DAILY_SNACKS, snacksOn } from "../profile";
 import { totalItems } from "../items";
 import { stopCareKey } from "./stopCareKey";
-import { preloadWalk } from "../walkFile";
 import type { PetPose } from "../pet";
 
 const POSE_COPY = {
@@ -78,7 +81,7 @@ export function PetPlayground() {
   const [attempt, setAttempt] = useState(0);
   // The router keeps a page it leaves (hidden, with its state) for a quick
   // way back. Coming back is a new visit: Kkami starts asleep again, the
-  // log starts over and Rive loads afresh.
+  // log starts over and his scene starts afresh.
   const pathname = usePathname();
   const [shownAt, setShownAt] = useState(pathname);
   const [visit, setVisit] = useState(0);
@@ -103,10 +106,10 @@ function PetRoom({ retry }: { retry: () => void }) {
   useEffect(() => {
     if (storesReady) void petStore.getState().meet();
   }, [storesReady]);
-  const animation = usePetRive(storesReady && hydrated);
+  const kkami = usePetSprite(storesReady && hydrated);
   // 휴식 중에 오면 까미가 깨어서 쉬자고 반김
   const resting = useTimerStore((s) => isOnBreak(s.timer));
-  const { RiveComponent, loaded, ready, failed } = animation;
+  const { ready, failed, bindCanvas } = kkami;
   const {
     pose,
     walking,
@@ -134,12 +137,7 @@ function PetRoom({ retry }: { retry: () => void }) {
   const walkButton = useRef<HTMLButtonElement>(null);
   useFocusAfter(walking, walkButton);
 
-  // Once home is showing, fetch the walk scene so walks start without a download.
-  useEffect(() => {
-    if (ready) preloadWalk();
-  }, [ready]);
-
-  usePetRivePose(animation, {
+  usePetSpritePose(kkami, {
     active: !walking,
     pose,
     snackSequence,
@@ -214,8 +212,8 @@ function PetRoom({ retry }: { retry: () => void }) {
   const decorating = decor.mode !== null;
   useFocusAfter(decorating, boxButton);
   // What Kkami wears, or tries on while decorating.
-  usePetRiveOutfit(
-    animation,
+  usePetSpriteOutfit(
+    kkami,
     decor.preview?.outfit ?? lookOf("outfit", record?.placed ?? {}),
   );
 
@@ -314,7 +312,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                 }
               />
               <div className={styles.dog} aria-hidden="true">
-                <RiveComponent />
+                <canvas ref={bindCanvas} />
               </div>
               <button
                 className={styles.petTarget}
@@ -331,22 +329,20 @@ function PetRoom({ retry }: { retry: () => void }) {
                 onKeyDown={stopCareKey}
               />
               {/*
-              강아지가 준비될 때까지 방을 가려 두고, 준비되면 서서히 걷음 (B-003).
-              Rive 시작 화면은 이 덮개 위에 보이므로, 파일을 다 받은 뒤에는 안내 글을 지움
+              까미를 처음 그릴 때까지 방을 가려 두고, 그리면 서서히 걷음 (B-003).
+              캔버스를 쓸 수 없는 브라우저에서만 안내와 다시 불러오기를 보여 줌
             */}
               <div
                 className={styles.loading}
                 data-hidden={ready}
                 role={failed ? "alert" : "status"}
               >
-                {!loaded && (
+                {failed && (
                   <>
-                    <p>{failed ? t("error") : t("loading")}</p>
-                    {failed && (
-                      <Button variant="secondary" size="sm" onClick={retry}>
-                        {t("retry")}
-                      </Button>
-                    )}
+                    <p>{t("error")}</p>
+                    <Button variant="secondary" size="sm" onClick={retry}>
+                      {t("retry")}
+                    </Button>
                   </>
                 )}
               </div>

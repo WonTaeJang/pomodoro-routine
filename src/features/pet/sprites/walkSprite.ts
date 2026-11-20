@@ -1,6 +1,8 @@
-// Walking Kkami pixel art. One cell is 4 Rive units, the same grid as the home
-// scene, and only the home palette is used so both scenes read as one sprite.
-export const CELL = 4;
+// 산책 까미 도트. 집 장면과 같은 4단위 격자에 집 팔레트만 써서 같은 그림으로 보입니다.
+// One cell is CELL scene units; positions here are in cells.
+import { CELL } from "../pixel/scene";
+
+export { CELL };
 export const FPS = 12;
 /** One stride per second: a relaxed walk. */
 export const FRAMES = 12;
@@ -10,7 +12,7 @@ export const PATH_SPEED = CELL * FPS;
 export const FRONT_FRAMES = 6;
 export const TURN_FRAMES = 2;
 
-export const PALETTE = {
+export const PALETTE: Record<string, string> = {
   K: "292A30", // ink
   F: "414249", // fur
   L: "575962", // light fur
@@ -21,7 +23,7 @@ export const PALETTE = {
   Y: "E5B95B", // tag
 };
 
-// The home idle pose, cell for cell (Kkami node frame 0 in kkami-pet).
+// The home idle pose, cell for cell (the home Kkami node at rest).
 // Origin is the top-left cell at (-15, -19) in home Kkami node cells.
 const FRONT_ORIGIN = [-15, -19];
 const FRONT = [
@@ -95,32 +97,44 @@ const EAR = { columns: 4, top: 5 };
 const HEAD_X = 16;
 const HEAD_Y = -33;
 
-class Cells {
-  constructor() {
-    this.map = new Map();
-  }
-  put(x, y, color) {
+export type Cell = { x: number; y: number; color: string };
+
+export class Cells {
+  private map = new Map<string, Cell>();
+  put(x: number, y: number, color: string) {
     if (color !== ".") this.map.set(`${x},${y}`, { x, y, color });
   }
-  rect(x, y, width, height, color) {
+  rect(x: number, y: number, width: number, height: number, color: string) {
     for (let j = 0; j < height; j++)
       for (let i = 0; i < width; i++) this.put(x + i, y + j, color);
   }
   /** Rectangle with stepped pixel corners. */
-  blob(x, y, width, height, color, radius = 2) {
+  blob(
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    color: string,
+    radius = 2,
+  ) {
     for (let j = 0; j < height; j++) {
       const cut = Math.max(0, radius - j, radius - (height - 1 - j));
       for (let i = cut; i < width - cut; i++) this.put(x + i, y + j, color);
     }
   }
-  ascii(rows, x, y, keep = () => true) {
+  ascii(
+    rows: readonly string[],
+    x: number,
+    y: number,
+    keep: (i: number, j: number) => boolean = () => true,
+  ) {
     rows.forEach((row, j) =>
       [...row].forEach((color, i) => {
         if (keep(i, j)) this.put(x + i, y + j, color);
       }),
     );
   }
-  get cells() {
+  get cells(): Cell[] {
     return [...this.map.values()];
   }
 }
@@ -129,7 +143,8 @@ class Cells {
 const STANCE = [3, 2, 1, 0, -1, -2];
 const SWING = [-3, -2, -1, 0, 1, 2];
 const LIFT = [1, 2, 2, 2, 2, 1];
-export function pawAt(frame, phase) {
+export type Paw = { dx: number; lift: number };
+export function pawAt(frame: number, phase: number): Paw {
   const k = (((frame + phase) % FRAMES) + FRAMES) % FRAMES;
   return k < STANCE.length
     ? { dx: STANCE[k], lift: 0 }
@@ -137,7 +152,7 @@ export function pawAt(frame, phase) {
 }
 
 /** Body bob, tail wag and ear lag (cells) for a walking frame. */
-export function poseAt(frame) {
+export function poseAt(frame: number) {
   const beat = frame % (FRAMES / 2);
   return {
     bob: beat === 3 || beat === 4 ? -1 : 0,
@@ -153,7 +168,13 @@ const BODY_RIGHT = 36;
 const RISE = -1; // one extra row of leg for a poodle stance
 
 // Diagonal pairs swing together (near front with far hind).
-export const LEGS = [
+export type Leg = {
+  name: string;
+  hip: (left: number) => number;
+  far: boolean;
+  phase: number;
+};
+export const LEGS: readonly Leg[] = [
   { name: "Far hind", hip: (left) => left + 7, far: true, phase: 0 },
   { name: "Far front", hip: () => 24, far: true, phase: FRAMES / 2 },
   { name: "Near hind", hip: (left) => left + 3, far: false, phase: FRAMES / 2 },
@@ -162,8 +183,8 @@ export const LEGS = [
 
 /** A leg from under the body to the path; the hip stays, the paw moves. */
 export function legCells(
-  leg,
-  { dx, lift },
+  leg: Leg,
+  { dx, lift }: Paw,
   left = BODY_LEFT,
   cells = new Cells(),
 ) {
@@ -224,9 +245,9 @@ export function bodyCells(left = BODY_LEFT, cells = new Cells()) {
   return cells;
 }
 
-const isEar = (i, j) => i < EAR.columns && j >= EAR.top;
+const isEar = (i: number, j: number) => i < EAR.columns && j >= EAR.top;
 // The head keeps the ear's root row, so a lowered ear leaves no gap under it.
-const isEarRoot = (i, j) => i < EAR.columns && j === EAR.top;
+const isEarRoot = (i: number, j: number) => i < EAR.columns && j === EAR.top;
 export function headCells(cells = new Cells()) {
   cells.ascii(
     HEAD,
@@ -263,11 +284,11 @@ export function turnCells() {
 }
 
 /**
- * Merge cells into rectangles per color, in Rive units. Ink comes first as a
- * full silhouette so anti-aliased seams between colors never show through.
+ * Merge cells into rectangles per color, in scene units. Ink comes first as a
+ * full silhouette under the other colors.
  */
-export function colorRects(cells) {
-  const byColor = new Map([["K", cells]]);
+export function colorRects(cells: readonly Cell[]) {
+  const byColor = new Map<string, Cell[]>([["K", [...cells]]]);
   for (const cell of cells)
     if (cell.color !== "K")
       byColor.set(cell.color, [...(byColor.get(cell.color) ?? []), cell]);
@@ -283,19 +304,20 @@ export function colorRects(cells) {
 }
 
 /** Horizontal runs per row, stacked while consecutive rows repeat the run. */
-function mergeRuns(cells) {
-  const rows = new Map();
+type Run = { x: number; y: number; width: number; height: number };
+function mergeRuns(cells: readonly Cell[]): Run[] {
+  const rows = new Map<number, number[]>();
   for (const { x, y } of cells) rows.set(y, [...(rows.get(y) ?? []), x]);
-  const result = [];
-  let open = new Map();
+  const result: Run[] = [];
+  let open = new Map<string, Run>();
   for (const y of [...rows.keys()].sort((a, b) => a - b)) {
-    const runs = [];
-    for (const x of rows.get(y).sort((a, b) => a - b)) {
+    const runs: { x: number; width: number }[] = [];
+    for (const x of rows.get(y)!.sort((a, b) => a - b)) {
       const last = runs.at(-1);
       if (last && last.x + last.width === x) last.width++;
       else runs.push({ x, width: 1 });
     }
-    const next = new Map();
+    const next = new Map<string, Run>();
     for (const run of runs) {
       const key = `${run.x}:${run.width}`;
       let rect = open.get(key);

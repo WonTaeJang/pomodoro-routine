@@ -1,6 +1,6 @@
 /**
- * One walk, measured from Kkami's first step (the `walkStarted` trigger).
- * The Rive scene plays the same timeline; walkSprite.test.ts checks they match.
+ * One walk, measured from Kkami's first step (WALK_STEP_MS into the scene).
+ * The walk scene plays the same timeline; walkSprite.test.ts checks they match.
  */
 export const TRIP = {
   /** A → B: out along the path to the find. */

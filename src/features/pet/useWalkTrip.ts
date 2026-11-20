@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { pickItem, type ItemId } from "./items";
 import { TRIP, tripAt, type TripStage } from "./walkTrip";
+// Long gaps (a background tab) do not jump ahead, the same as the walk scene.
+import { MAX_STEP_MS } from "./pixel/usePixelCanvas";
 
-// Long gaps (a background tab) do not jump ahead: the Rive scene pauses too.
-const MAX_FRAME_MS = 100;
 // The map moves in small steps; finer updates would only re-render more.
 const TICK_MS = 50;
 
@@ -27,7 +27,7 @@ type Events = {
 
 /**
  * One walk out to a find and back, timed from Kkami's first step so the page
- * and the Rive scene stay together. The clock only runs while frames render.
+ * and the walk scene stay together. The clock only runs while frames render.
  */
 export function useWalkTrip(events: Events) {
   const [trip, setTrip] = useState<WalkTrip | null>(null);
@@ -77,7 +77,7 @@ export function useWalkTrip(events: Events) {
       last: number | null = null,
       frame = 0;
     const tick = (now: number) => {
-      elapsed += last === null ? 0 : Math.min(now - last, MAX_FRAME_MS);
+      elapsed += last === null ? 0 : Math.min(now - last, MAX_STEP_MS);
       last = now;
       const { stage, progress } = tripAt(elapsed);
       if (elapsed >= TRIP.toSpot) find(false);

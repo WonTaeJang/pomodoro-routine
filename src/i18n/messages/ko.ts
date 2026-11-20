@@ -367,7 +367,6 @@ const ko = {
     snackHappy: "맛있어요",
     petLabel: "까미 쓰다듬기",
     keyboard: "키보드로는 버튼에 초점을 맞추고 Enter 또는 Space를 눌러요.",
-    loading: "불러오는 중…",
     error: "까미를 불러오지 못했어요.",
     retry: "다시 불러오기",
     breakTimer: "{mode} {time} 남음",

@@ -11,7 +11,7 @@ $small-target-height: 170px;
 $small-target-bottom: 42px;
 $small-rug-width: 180px;
 $room-height: 356px;
-// One pixel-art cell: the same size as a cell of the home Kkami (Rive artboard 360 → 432px).
+// One pixel-art cell: the same size as a cell of the home Kkami (scene 360 → 432px).
 $room-cell: 4.8px;
 $small-room-cell: 4px;
 $window-top: 38px;
@@ -222,8 +222,8 @@ $slot-tag-color: #fffaf0;
 
 .dog {
   position: absolute;
-  // Keep the Rive startup screen above the loading cover and the speech bubble.
-  // Once it ends, the transparent canvas reveals the room without changing the layout.
+  // Above the loading cover: Kkami shows with his first frame as the cover
+  // fades. The canvas is see-through around him.
   z-index: $dog-layer;
   width: $dog-width;
   height: $dog-height;
@@ -232,8 +232,12 @@ $slot-tag-color: #fffaf0;
   pointer-events: none;
 }
 
+// The scene fills the box; the canvas holds one pixel per screen pixel.
 .dog canvas {
   display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
 }
 
 .petTarget,

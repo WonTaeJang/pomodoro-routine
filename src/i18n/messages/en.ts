@@ -390,7 +390,6 @@ const en: Messages = {
     snackHappy: "Yummy",
     petLabel: "Pet Kkami",
     keyboard: "With a keyboard, focus the button and press Enter or Space.",
-    loading: "Loading…",
     error: "Couldn’t load Kkami.",
     retry: "Try again",
     breakTimer: "{mode} · {time} left",

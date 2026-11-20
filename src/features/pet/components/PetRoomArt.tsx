@@ -175,7 +175,7 @@ export function PetRoomArt({
           <Pixels art={floorRugArt(rug)} />
         ),
       )}
-      {/* What Kkami wears is drawn by Rive; this only marks where to pick it. */}
+      {/* What Kkami wears is drawn on his canvas; this only marks where to pick it. */}
       {decorating && slot("outfit", styles.outfitSlot, null)}
     </>
   );

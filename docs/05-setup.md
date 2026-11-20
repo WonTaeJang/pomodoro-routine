@@ -150,9 +150,8 @@ import kkamiFocus from "@/assets/kkami/kkami-focus.webp";
 
 ### 돌봄 프로토타입 개발
 
-- `/pet` 실행과 Rive 에셋 제작은 [07-pet-prototype.md](./07-pet-prototype.md)를 참고합니다.
-- `npm run dev`와 `npm run build`는 설치된 Rive 런타임의 WASM을 `public/rive/rive.wasm`에 먼저 복사합니다. 이 파일은 생성물이라 Git에서 제외합니다.
-- 편집 가능한 RML·제작 설정은 `src/assets/kkami-pet/`, 실행용 `.riv`는 `public/rive/`에서 관리합니다. `design/`의 원본 사진·녹음 제외 규칙은 유지합니다.
+- `/pet` 실행과 까미 그림 고치기는 [07-pet-prototype.md](./07-pet-prototype.md)를 참고합니다.
+- 까미 그림·동작은 `src/features/pet/sprites/`의 코드라 따로 만들거나 복사할 파일이 없습니다(2026-11-20, Rive를 뺌). `design/`의 원본 사진·녹음 제외 규칙은 유지합니다.
 
 ### 기능 구성
 
