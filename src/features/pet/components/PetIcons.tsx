@@ -6,6 +6,11 @@ import type { ItemId } from "../items";
 
 type Pixels = { rows: string[]; colors: Record<string, string> };
 
+// 금빛 아이콘(레벨업·궁전)과 궁전 왕관이 함께 쓰는 색
+const GOLD = "#d79a2b";
+const GOLD_SHADE = "#a8792a";
+const RUBY = "#c8283f";
+
 function pixelPaths({ rows, colors }: Pixels) {
   return Object.entries(colors).map(([key, color]) => {
     let d = "";
@@ -108,6 +113,18 @@ const STATUS = {
     ],
     colors: { "#": "#a6735a", o: "#d0703f" },
   },
+  // 궁전 에디션 안내 (I-067)
+  palace: {
+    rows: [
+      "#..##..#",
+      "##.##.##",
+      "########",
+      "##o##o##",
+      "########",
+      "ssssssss",
+    ],
+    colors: { "#": GOLD, o: RUBY, s: GOLD_SHADE },
+  },
   levelUp: {
     rows: [
       "...##...",
@@ -119,7 +136,7 @@ const STATUS = {
       "...##...",
       "...##...",
     ],
-    colors: { "#": "#d79a2b" },
+    colors: { "#": GOLD },
   },
 } satisfies Record<string, Pixels>;
 
@@ -363,6 +380,22 @@ export function WalkerIcon() {
 
 export function StatusIcon({ status }: { status: PetStatusIcon }) {
   return <PixelIcon art={STATUS[status]} />;
+}
+
+// 궁전 에디션 본체 윗변에 앉는 왕관: 본체 금테(_device.scss의 $palace-gold)와
+// 같은 밝은 금, 더 밝은 금 장식, 루비 두 알
+const PALACE_CROWN = {
+  rows: [
+    "g....g....g",
+    "gg..ggg..gg",
+    "ggg.glg.ggg",
+    "ggggrgrgggg",
+    "sssssssssss",
+  ],
+  colors: { g: "#e2b54c", l: "#f6dc8a", r: RUBY, s: GOLD_SHADE },
+};
+export function PalaceCrown() {
+  return <PixelIcon art={PALACE_CROWN} size={20} />;
 }
 
 // 꾸미기 모드 버튼: 이전·다음·고르기·취소

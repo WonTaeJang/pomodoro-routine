@@ -43,6 +43,8 @@ function EntryIcon({ entry }: { entry: PetLogEntry }) {
       return <HeartItemIcon size={11} />;
     case "stamp":
       return <PawItemIcon size={12} />;
+    case "palace":
+      return <StatusIcon status="palace" />;
     case "craft":
       return <LookPicture look={entry.furniture} height={12} />;
     case "place":

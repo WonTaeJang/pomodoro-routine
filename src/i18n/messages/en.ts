@@ -325,6 +325,7 @@ const en: Messages = {
       sleep: "Zzz…",
     },
     panel: { collapse: "Collapse", expand: "Expand" },
+    palace: { notice: "Palace edition!" },
     log: {
       title: "Log",
       more: "Show {count} more",
@@ -340,6 +341,7 @@ const en: Messages = {
       skipped: "Skipped the walk and brought back {object}",
       levelHeart: "Level {level}! Got a heart",
       stamp: "Cycle done! Got a paw stamp",
+      palace: "The whole palace set is in: palace edition!",
       craft: "Made {object}",
       place: "Changed the {slot} to {to}",
       walkLimit: "That’s all {count} walks for today. More tomorrow!",

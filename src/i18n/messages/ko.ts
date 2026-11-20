@@ -302,6 +302,8 @@ const ko = {
       sleep: "쿨쿨…",
     },
     panel: { collapse: "접기", expand: "펼치기" },
+    // 궁전 세트 넷을 모두 놓았을 때 헤더 안내 (I-067)
+    palace: { notice: "궁전 에디션이 됐어요!" },
     log: {
       title: "기록",
       more: "더 보기 ({count})",
@@ -317,6 +319,7 @@ const ko = {
       skipped: "산책을 건너뛰고 {object} 주워 왔어요",
       levelHeart: "Lv.{level} 달성! 하트를 받았어요",
       stamp: "사이클 완료! 발바닥 도장을 받았어요",
+      palace: "궁전 세트를 다 놓아 게임기가 궁전 에디션이 됐어요",
       craft: "{object} 만들었어요",
       place: "{slot} {to} 바꿨어요",
       walkLimit: "오늘 산책 {count}번을 다 했어요. 내일 또 가요!",

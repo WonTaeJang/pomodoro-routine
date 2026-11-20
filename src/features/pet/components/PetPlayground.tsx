@@ -22,7 +22,7 @@ import styles from "./PetPlayground.module.scss";
 import { PetWalk } from "./PetWalk";
 import { PetRoomArt, type RoomDecorating } from "./PetRoomArt";
 import { PetAffinityDetail, PetHearts, usePetAffinity } from "./PetAffinity";
-import { StatusIcon } from "./PetIcons";
+import { PalaceCrown, StatusIcon, type PetStatusIcon } from "./PetIcons";
 import { PetPad } from "./PetPad";
 import { PetSpeechBubble } from "./PetSpeechBubble";
 import { DecoratePads, DecoratePick, decorateTag } from "./PetDecorate";
@@ -38,7 +38,8 @@ import {
   type SpeechLevel,
 } from "../speech";
 import { PET_HAPPY_MS } from "../pet";
-import { isPalace, lookOf, type FurnitureId, type Slot } from "../furniture";
+import { lookOf, type FurnitureId, type Slot } from "../furniture";
+import { usePalaceEdition } from "../usePalaceEdition";
 import { PetFoundCard, PetWalkMap } from "./PetTrip";
 import { PetItemBox } from "./PetItemBox";
 import { PetLog } from "./PetLog";
@@ -162,6 +163,12 @@ function PetRoom({ retry }: { retry: () => void }) {
   useEffect(() => {
     if (levelUp !== null) addLog({ kind: "level", level: levelUp });
   }, [levelUp, addLog]);
+
+  // All four palace pieces placed: the device becomes the palace edition.
+  const edition = usePalaceEdition();
+  useEffect(() => {
+    if (edition.notice) addLog({ kind: "palace" });
+  }, [edition.notice, addLog]);
   // A cycle finished while here (this tab or another): a paw stamp in the log.
   const stamps = useStamps(() => addLog({ kind: "stamp" }));
 
@@ -233,7 +240,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     situation,
     (levelUp ?? affinity.progress.level) as SpeechLevel,
     time,
-    isPalace(record?.placed ?? {}),
+    edition.palace,
   );
 
   // Picking a slot in the room (the bubble is one too) while decorating.
@@ -247,18 +254,26 @@ function PetRoom({ retry }: { retry: () => void }) {
       }
     : undefined;
 
-  // One status at a time in the header: a level up, then the mode, then the pose.
-  const hud =
-    levelUp !== null
-      ? {
-          icon: "levelUp" as const,
-          label: t("affinity.levelUpHeart", { level: levelUp }),
-        }
-      : walking
-        ? { icon: "walk" as const, label: t("walk.status") }
-        : decorating
-          ? { icon: "decorate" as const, label: t("decorate.status") }
-          : { icon: pose, label: t(copy.status) };
+  // One status at a time in the header: a passing notice in gold (a level
+  // up, then the palace edition), then the mode, then the pose.
+  function headerStatus(): {
+    icon: PetStatusIcon;
+    label: string;
+    notice?: true;
+  } {
+    if (levelUp !== null)
+      return {
+        icon: "levelUp",
+        label: t("affinity.levelUpHeart", { level: levelUp }),
+        notice: true,
+      };
+    if (edition.notice)
+      return { icon: "palace", label: t("palace.notice"), notice: true };
+    if (walking) return { icon: "walk", label: t("walk.status") };
+    if (decorating) return { icon: "decorate", label: t("decorate.status") };
+    return { icon: pose, label: t(copy.status) };
+  }
+  const hud = headerStatus();
 
   // The first walk is walked to the end, so skip stays off.
   const skipLocked = walking && !trip?.canSkip;
@@ -268,11 +283,20 @@ function PetRoom({ retry }: { retry: () => void }) {
       <VisuallyHidden id="pet-keyboard-help">{t("keyboard")}</VisuallyHidden>
 
       <PetBreakTimer />
-      <section className={styles.device} aria-label={t("label")}>
+      <section
+        className={styles.device}
+        aria-label={t("label")}
+        data-edition={edition.palace ? "palace" : undefined}
+      >
+        {edition.palace && (
+          <span className={styles.crown} aria-hidden="true">
+            <PalaceCrown />
+          </span>
+        )}
         <h1 className={styles.name}>{t("name")}</h1>
         <div className={styles.bezel}>
           <div className={styles.lcd}>
-            <div className={styles.hud} data-level-up={levelUp !== null}>
+            <div className={styles.hud} data-notice={hud.notice === true}>
               <span className={styles.state} role="status">
                 <StatusIcon status={hud.icon} />
                 {hud.label}

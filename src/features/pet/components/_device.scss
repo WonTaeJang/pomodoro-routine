@@ -10,6 +10,14 @@ $lcd-max: #c4626f;
 $lcd-level-up: #fff1c9;
 $lcd-level-up-shade: #e5c875;
 $lcd-level-up-text: #8a5a12;
+// 궁전 에디션(I-067): 궁전 벽 버건디 본체와 금테. 모드와 관계없이 같은 색
+$palace-shell: #7d2436;
+$palace-shell-shade: #4a1220;
+$palace-shell-light: #a8394d;
+$palace-gold: #e2b54c;
+$palace-gold-shade: #a8792a;
+$palace-hud: #f3e2c8;
+$palace-ink: #fbeedd;
 // 액정 색 카드(기록·친밀도·아이템 칸). 믹스인이라 쓰는 곳에서만 CSS가 나옵니다.
 @mixin lcd-card {
   border-radius: var(--radius-md);

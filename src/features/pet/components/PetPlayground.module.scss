@@ -18,6 +18,8 @@ $pad-width: 88px;
 $key-size: 60px;
 $key-depth: 6px;
 $dot-size: 12px;
+$edition-change: 0.6s;
+$palace-border: 3px;
 
 .page {
   max-width: $page-max;
@@ -55,6 +57,82 @@ $dot-size: 12px;
   box-shadow:
     inset 0 -6px 0 var(--shell-shade),
     inset 0 2px 0 var(--shell-light);
+  position: relative;
+  transition:
+    background-color $edition-change,
+    border-color $edition-change,
+    box-shadow $edition-change;
+  @include mixins.reduced-motion {
+    transition: none;
+  }
+}
+// 궁전 에디션 (I-067): 궁전 세트 넷을 모두 놓으면 버건디 본체 · 금테 · 금 테두리 버튼 · 크림빛 헤더,
+// 본체 윗변에 왕관. 바뀔 때는 0.6초 동안 서서히 (반짝임 없음)
+.device[data-edition="palace"] {
+  --shell: #{device.$palace-shell};
+  --shell-shade: #{device.$palace-shell-shade};
+  --shell-light: #{device.$palace-shell-light};
+  // Room for the crown above the shell.
+  margin-top: var(--space-4);
+  border: $palace-border solid device.$palace-gold;
+  box-shadow:
+    inset 0 -6px 0 var(--shell-shade),
+    inset 0 2px 0 var(--shell-light),
+    0 0 0 2px device.$palace-gold-shade;
+  .name {
+    color: device.$palace-gold;
+    text-shadow: 0 1px 0 var(--shell-shade);
+  }
+  .bezel {
+    box-shadow: inset 0 0 0 2px device.$palace-gold-shade;
+  }
+  .hud:not([data-notice="true"]) {
+    background: device.$palace-hud;
+    box-shadow:
+      inset 0 -2px 0 device.$palace-gold-shade,
+      0 2px 0 device.$lcd-header-light;
+  }
+  .pad {
+    color: device.$palace-ink;
+    &:not(:disabled, [data-resting]) {
+      --key-edge: #{device.$palace-gold-shade};
+    }
+    &[data-resting],
+    &:disabled {
+      color: color-mix(in srgb, device.$palace-ink 55%, var(--shell));
+    }
+  }
+  // 버튼 금 테두리: 버튼 그림자(눌림)와 따로 겹침
+  .key::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 0 3px device.$palace-gold;
+    pointer-events: none;
+  }
+  .padHint {
+    color: color-mix(in srgb, device.$palace-ink 75%, var(--shell));
+  }
+}
+// 왕관은 본체 윗변에 걸쳐 앉음
+.crown {
+  position: absolute;
+  top: -19px;
+  left: 50%;
+  transform: translateX(-50%);
+  line-height: 0;
+  filter: drop-shadow(0 2px 0 device.$palace-shell-shade);
+  animation: crown-in $edition-change ease-out;
+  @include mixins.reduced-motion {
+    animation: none;
+  }
+}
+@keyframes crown-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -6px);
+  }
 }
 .name {
   margin-bottom: var(--space-2-5);
@@ -94,7 +172,8 @@ $dot-size: 12px;
   z-index: 1;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
-  &[data-level-up="true"] {
+  // 잠깐 알림(레벨업·궁전 에디션): 금빛 헤더
+  &[data-notice="true"] {
     background: device.$lcd-level-up;
     box-shadow:
       inset 0 -2px 0 device.$lcd-level-up-shade,
