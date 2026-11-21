@@ -165,6 +165,19 @@ $edition-border: 3px;
     var(--space-6)
   );
 }
+// 색만 바뀌는 세트: 넷을 다 놓으면 본체 색만 (테두리·장식·헤더·안내 없음).
+// 그림자와 밝은 선은 .device가 본체 색에서 만들고, 바뀔 때는 같은 0.6초
+@each $set, $shell in device.$tint-shells {
+  .device[data-tint="#{$set}"] {
+    --shell: #{$shell};
+    --color-text: #{device.$tint-ink};
+    --color-text-muted: color-mix(
+      in srgb,
+      #{device.$tint-ink} 72%,
+      var(--shell)
+    );
+  }
+}
 // 장식(왕관·리본)은 본체 윗변에 걸쳐 앉음
 .editionMark {
   position: absolute;

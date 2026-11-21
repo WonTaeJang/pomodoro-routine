@@ -323,6 +323,7 @@ function PetRoom({ retry }: { retry: () => void }) {
         className={styles.device}
         aria-label={t("label")}
         data-edition={edition.current ?? undefined}
+        data-tint={edition.tint ?? undefined}
       >
         {edition.current && (
           <span

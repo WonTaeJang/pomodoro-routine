@@ -30,6 +30,14 @@ $stage-name-line: #c9387e;
 $stage-hud: #fff0f7;
 $stage-hud-shade: #f7a8cb;
 $stage-ink: #3f2a78;
+// 색만 바뀌는 세트(숲속 오두막 원목 브라운 · 파스텔 꽃 벚꽃 분홍 · 줄무늬 클래식 블루그레이).
+// 밝은 본체라 본체 위 글자(이름·버튼 이름)는 모드와 관계없이 진하게
+$tint-shells: (
+  cabin: #d2b48c,
+  floral: #f1cbd0,
+  stripe: #b9c7d6,
+);
+$tint-ink: #3f352c;
 // 액정 색 카드(기록·친밀도·아이템 칸). 믹스인이라 쓰는 곳에서만 CSS가 나옵니다.
 @mixin lcd-card {
   border-radius: var(--radius-md);

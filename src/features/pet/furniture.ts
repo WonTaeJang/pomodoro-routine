@@ -188,10 +188,13 @@ type SetSlot = (typeof SET_SLOTS)[number];
 /**
  * Room sets: a wall, window, pot and rug that belong together, put in the
  * room in one go from the item box (I-069). Each piece is in one set at most.
+ * Placed all together, a set changes the device: only its colour (tint), or
+ * its whole look with a notice (edition).
  */
 export const SETS = [
   {
     id: "cabin",
+    tint: true,
     pieces: {
       room: "cabinRoom",
       window: "twigWindow",
@@ -201,6 +204,7 @@ export const SETS = [
   },
   {
     id: "floral",
+    tint: true,
     pieces: {
       room: "floralRoom",
       window: "flowerWindow",
@@ -210,6 +214,7 @@ export const SETS = [
   },
   {
     id: "stripe",
+    tint: true,
     pieces: {
       room: "stripeRoom",
       window: "stoneWindow",
@@ -246,12 +251,16 @@ export const SETS = [
   vip?: true;
   /** Placed all together, the device takes this set's look (useDeviceEdition). */
   edition?: true;
+  /** Placed all together, only the device's colour changes, without a word. */
+  tint?: true;
   pieces: Record<SetSlot, FurnitureId>;
 }[];
 export type RoomSet = (typeof SETS)[number];
 export type SetId = RoomSet["id"];
 /** Sets that change the device: the palace edition (I-067) and the VIP edition. */
 export type EditionId = Extract<RoomSet, { edition: true }>["id"];
+/** Sets that only colour the device: cabin, floral and stripe. */
+export type TintId = Extract<RoomSet, { tint: true }>["id"];
 
 /** The sets an account sees: the VIP set only on a VIP account. */
 export const setsFor = (vip: boolean) =>
@@ -269,10 +278,18 @@ export const isSetPlaced = (set: RoomSet, placed: Placed) =>
 export const isPalace = (placed: Placed) =>
   isSetPlaced(setById("palace"), placed);
 
+/** The whole set of this kind in the room, if there is one. */
+const placedSet = (placed: Placed, kind: "edition" | "tint") =>
+  SETS.find((set) => kind in set && isSetPlaced(set, placed));
+
 /** The device edition the room makes, if a whole edition set is placed. */
 export function editionOf(placed: Placed): EditionId | null {
-  const set = SETS.find((set) => "edition" in set && isSetPlaced(set, placed));
-  return set ? (set.id as EditionId) : null;
+  return (placedSet(placed, "edition")?.id as EditionId | undefined) ?? null;
+}
+
+/** The device colour the room makes, if a whole tint set is placed. */
+export function tintOf(placed: Placed): TintId | null {
+  return (placedSet(placed, "tint")?.id as TintId | undefined) ?? null;
 }
 
 /** Items left to use: found minus spent. */

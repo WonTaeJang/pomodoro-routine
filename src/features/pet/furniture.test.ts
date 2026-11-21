@@ -5,6 +5,7 @@ import {
   SLOTS,
   canUse,
   editionOf,
+  tintOf,
   hasVip,
   isFree,
   isVip,
@@ -189,6 +190,16 @@ describe("VIP 조각 (아이돌 무대)", () => {
     // Not VIP: the stage pieces are not shown, so no VIP edition.
     expect(editionOf(withoutVip(stage))).toBeNull();
     expect(editionOf(setById("cabin").pieces)).toBeNull();
+  });
+
+  it("색만 바뀌는 세트: 오두막·꽃·줄무늬를 다 놓았을 때만 본체 색, 에디션 세트와 겹치지 않음", () => {
+    expect(tintOf(setById("cabin").pieces)).toBe("cabin");
+    expect(tintOf({ ...setById("floral").pieces, outfit: "brownHat" })).toBe(
+      "floral",
+    );
+    expect(tintOf({ ...setById("stripe").pieces, rug: "pinkRug" })).toBeNull();
+    expect(tintOf(setById("palace").pieces)).toBeNull();
+    expect(SETS.filter((set) => "tint" in set && "edition" in set)).toEqual([]);
   });
 
   it("VIP가 아니면 VIP 조각만 빼고 보임", () => {
