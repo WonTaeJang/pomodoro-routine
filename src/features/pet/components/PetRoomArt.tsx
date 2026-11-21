@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import { DEFAULT_LOOK, lookOf, type LookId, type Slot } from "../furniture";
-import { shownPlaced, usePetVip } from "../usePetVip";
+import { useShownPlaced } from "../usePetVip";
 import {
   ROOMS,
   floorRugArt,
@@ -14,7 +14,6 @@ import {
   type PixelArt,
   type Surface,
 } from "../roomArt";
-import { usePetStore } from "../store";
 import { useTimeOfDay } from "../useTimeOfDay";
 import styles from "./PetPlayground.module.scss";
 
@@ -112,8 +111,7 @@ export function PetRoomArt({
   preview?: Partial<Record<Slot, LookId>>;
   decorating?: RoomDecorating;
 }) {
-  const stored = usePetStore((s) => s.pet?.placed);
-  const placed = shownPlaced(stored ?? {}, usePetVip());
+  const placed = useShownPlaced();
   const time = useTimeOfDay();
   const look = (name: Slot) => preview?.[name] ?? lookOf(name, placed);
   const slot = (

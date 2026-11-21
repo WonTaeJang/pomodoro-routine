@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { editionOf, type EditionId } from "./furniture";
+import { editionOf, type EditionId, type Placed } from "./furniture";
 import { petStore, usePetStore } from "./store";
 import { shownPlaced } from "./usePetVip";
 
@@ -10,14 +10,16 @@ import { shownPlaced } from "./usePetVip";
 
 const NOTICE_MS = 3500;
 
+/** The edition the room makes as this account sees it (VIP pieces only on VIP). */
+const shownEdition = (placed: Placed, vip: boolean | null) =>
+  editionOf(shownPlaced(placed, vip));
+
 /**
  * The device's edition, and which edition was just completed (for a few
  * seconds). VIP pieces count only on a VIP account, like everywhere else.
  */
 export function useDeviceEdition(vip: boolean | null) {
-  const edition = usePetStore((s) =>
-    editionOf(shownPlaced(s.pet?.placed ?? {}, vip)),
-  );
+  const current = usePetStore((s) => shownEdition(s.pet?.placed ?? {}, vip));
   const [notice, setNotice] = useState<EditionId | null>(null);
 
   useEffect(() => {
@@ -29,9 +31,8 @@ export function useDeviceEdition(vip: boolean | null) {
         setNotice(null);
         return;
       }
-      const now = editionOf(shownPlaced(next.pet.placed, vip));
-      if (!now || now === editionOf(shownPlaced(previous.pet.placed, vip)))
-        return;
+      const now = shownEdition(next.pet.placed, vip);
+      if (!now || now === shownEdition(previous.pet.placed, vip)) return;
       clearTimeout(timer);
       setNotice(now);
       timer = setTimeout(() => setNotice(null), NOTICE_MS);
@@ -42,5 +43,5 @@ export function useDeviceEdition(vip: boolean | null) {
     };
   }, [vip]);
 
-  return { edition, notice };
+  return { current, notice };
 }

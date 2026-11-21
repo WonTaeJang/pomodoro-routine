@@ -1,5 +1,13 @@
 @use "device";
 
+// 카드 안의 작은 알약 표시(VIP · 기본 제공 · 만든 수)
+@mixin pill {
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+}
+
 .tabs {
   display: flex;
   width: 100%;
@@ -91,14 +99,11 @@
 }
 // VIP 조각·세트 표시: 프로필 VIP 배지처럼 금빛
 .vip {
+  @include pill;
   justify-self: start;
   margin-left: var(--space-1-5);
-  padding: 1px var(--space-2);
-  border-radius: var(--radius-full);
   background: device.$palace-gold;
   color: #6b430c;
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-bold);
   letter-spacing: 0.04em;
   vertical-align: 1px;
   .lookText > & {
@@ -107,13 +112,10 @@
 }
 // 처음부터 있는 것 표시
 .starter {
+  @include pill;
   justify-self: start;
-  padding: 1px var(--space-2);
-  border-radius: var(--radius-full);
   background: device.$lcd-header;
   color: device.$lcd-text-muted;
-  font-size: var(--font-size-2xs);
-  font-weight: var(--font-weight-bold);
 }
 .need {
   display: flex;
@@ -153,12 +155,9 @@
   }
 }
 .setCount {
-  padding: 1px var(--space-2);
-  border-radius: var(--radius-full);
+  @include pill;
   background: color-mix(in srgb, device.$lcd-text 8%, transparent);
-  font-size: var(--font-size-2xs);
   font-variant-numeric: tabular-nums;
-  font-weight: var(--font-weight-bold);
   &[data-full="true"] {
     background: device.$lcd-header;
   }

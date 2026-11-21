@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useAccountFlags } from "@/features/admin";
 import { useAuth } from "@/features/auth";
-import { hasVip, isVip, withoutVip, type Placed } from "./furniture";
+import { hasVip, vipSlots, withoutVip, type Placed } from "./furniture";
 import { petStore, usePetStore } from "./store";
 
 // 아이돌 무대 세트와 응원 피켓 말풍선은 VIP 계정에만 있습니다. VIP가 아니면 어디에도
@@ -24,6 +24,13 @@ export function usePetVip(): boolean | null {
 export const shownPlaced = (placed: Placed, vip: boolean | null) =>
   vip === false ? withoutVip(placed) : placed;
 
+/** The placed room from the store, as this account may see it. */
+export function useShownPlaced(): Placed {
+  const vip = usePetVip();
+  const placed = usePetStore((s) => s.pet?.placed);
+  return shownPlaced(placed ?? {}, vip);
+}
+
 /** Not VIP (any more): put the starting looks back where VIP pieces were. */
 export function useVipRoomCleanup(vip: boolean | null) {
   const holdsVip = usePetStore((s) => hasVip(s.pet?.placed ?? {}));
@@ -31,9 +38,7 @@ export function useVipRoomCleanup(vip: boolean | null) {
     if (vip !== false || !holdsVip) return;
     const placed = petStore.getState().pet?.placed ?? {};
     const back = Object.fromEntries(
-      Object.entries(placed)
-        .filter(([, id]) => isVip(id))
-        .map(([slot]) => [slot, null]),
+      vipSlots(placed).map((slot) => [slot, null]),
     );
     void petStore.getState().recordPlaceAll(back);
   }, [vip, holdsVip]);

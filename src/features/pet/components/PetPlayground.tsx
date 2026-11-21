@@ -243,7 +243,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     situation,
     (levelUp ?? affinity.progress.level) as SpeechLevel,
     time,
-    edition.edition === "palace",
+    edition.current === "palace",
   );
 
   // Picking a slot in the room (the bubble is one too) while decorating.
@@ -293,16 +293,16 @@ function PetRoom({ retry }: { retry: () => void }) {
       <section
         className={styles.device}
         aria-label={t("label")}
-        data-edition={edition.edition ?? undefined}
+        data-edition={edition.current ?? undefined}
       >
-        {edition.edition && (
+        {edition.current && (
           <span
-            key={edition.edition}
+            key={edition.current}
             className={styles.editionMark}
-            data-edition={edition.edition}
+            data-edition={edition.current}
             aria-hidden="true"
           >
-            <EditionMark edition={edition.edition} />
+            <EditionMark edition={edition.current} />
           </span>
         )}
         <h1 className={styles.name}>{t("name")}</h1>

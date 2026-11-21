@@ -164,12 +164,17 @@ export const lookOf = (slot: Slot, placed: Placed): LookId =>
 export const startersFor = (slot: Slot, vip = false): LookId[] =>
   looksFor(slot, [], vip);
 
+/** The slots holding a VIP piece. */
+export const vipSlots = (placed: Placed) =>
+  SLOTS.filter((slot) => placed[slot] !== undefined && isVip(placed[slot]));
 /** Some slot holds a VIP piece. */
-export const hasVip = (placed: Placed) =>
-  Object.values(placed).some((id) => isVip(id));
+export const hasVip = (placed: Placed) => vipSlots(placed).length > 0;
 /** The room as anyone but a VIP account sees it: VIP pieces back to the start. */
-export const withoutVip = (placed: Placed): Placed =>
-  Object.fromEntries(Object.entries(placed).filter(([, id]) => !isVip(id)));
+export function withoutVip(placed: Placed): Placed {
+  const shown = { ...placed };
+  for (const slot of vipSlots(placed)) delete shown[slot];
+  return shown;
+}
 
 /** The slot a look belongs to. */
 export const slotOfLook = (look: LookId): Slot =>
