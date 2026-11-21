@@ -33,6 +33,7 @@ import {
 import { levelHearts } from "../affinity";
 import { materialsLeft, type PetProfile } from "../profile";
 import {
+  CheckIcon,
   HeartItemIcon,
   ItemIcon,
   MaterialIcon,
@@ -336,7 +337,7 @@ function LookCard({
 }) {
   const t = useTranslations("pet.items");
   return (
-    <li className={styles.lookCard}>
+    <li className={styles.lookCard} data-applied={action.label === "applied"}>
       <span className={styles.art}>
         <LookPicture look={look} cell={2} fit={44} />
       </span>
@@ -349,9 +350,19 @@ function LookCard({
   );
 }
 
-/** A card's one button: filled when it can be pressed. */
+/**
+ * A card's one button: filled when it can be pressed. What is in the room
+ * now gets a check mark in the accent colour instead of a button.
+ */
 function ActionButton({ action }: { action: CardAction }) {
   const t = useTranslations("pet.items");
+  if (action.label === "applied")
+    return (
+      <span className={styles.applied}>
+        <CheckIcon />
+        {t("applied")}
+      </span>
+    );
   return (
     <Button
       size="sm"
@@ -388,7 +399,7 @@ function SetCard({
   const missing = pieces.filter((id) => !canUse(made, id, vip));
   const have = pieces.length - missing.length;
   return (
-    <li className={styles.set}>
+    <li className={styles.set} data-applied={applied}>
       <div className={styles.setHead}>
         <strong>
           {t(`sets.${set.id}.name`)}
@@ -426,7 +437,7 @@ function SetCard({
       )}
       {/* 한 줄 소개, 다 모았을 때만 적용 버튼 (몇 개 모았는지는 위의 3/4) */}
       <div className={styles.setFoot}>
-        <span>{t(`sets.${set.id}.intro`)}</span>
+        <span className={styles.setIntro}>{t(`sets.${set.id}.intro`)}</span>
         {missing.length === 0 && (
           <ActionButton action={applyAction(applied, () => onApply(set))} />
         )}
@@ -435,7 +446,6 @@ function SetCard({
   );
 }
 
-/** Gold "VIP" mark, like the profile's VIP badge. */
 /** The gold VIP mark on VIP pieces, sets and the first gift box. */
 export function VipBadge() {
   const t = useTranslations("pet.items");

@@ -593,6 +593,16 @@ const METER = {
   1: meterHeart(() => true),
 };
 
+// 체크 표시: 글자색(currentColor)을 따라 칠함
+const CHECK = {
+  rows: ["......#", ".....##", "#...##.", "##.##..", ".###...", "..#...."],
+  colors: { "#": "currentColor" },
+};
+/** A pixel check mark in the text colour (what is in the room now). */
+export function CheckIcon({ size = 10 }: { size?: number }) {
+  return <PixelIcon art={CHECK} size={size} />;
+}
+
 /** 친밀도 설명의 간식 줄 앞 작은 뼈 */
 export function SnackRuleIcon() {
   return <PixelIcon art={BONE} size={9} />;
