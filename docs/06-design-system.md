@@ -221,3 +221,4 @@ import { PawIcon } from "@/components/icons";
 - 2026-11-16: 방 벽·바닥을 도트 반복 무늬(SVG 데이터 주소 CSS 배경, 칸 크기 `--room-cell`)로, 카펫을 도트 그림으로 만들어 꾸미기 자리로 고름. 아이템 상자 만들기 탭은 두 번째 `SegmentedControl`(자리 탭)로 3개씩. 꺼진 까미 누르기 영역(`petTarget:disabled`)은 눌림을 통과
 - 2026-11-16: 아이템 상자 만들기 탭의 자리 탭을 도트 아이콘(`SlotIcon`, 2px 칸)으로, 이름은 `VisuallyHidden`
 - 2026-11-18: 헤더 메뉴에 다마고치(돌봄 페이지, `PetDeviceIcon`) 추가. 돌봄 페이지 위의 "< 타이머" 돌아가기 링크는 헤더 메뉴로 대신해 뺌
+- 2026-11-21: 팝업(`Dialog`) 안쪽 높이에서 테두리를 빼 팝업 자체가 스크롤되지 않게 하고, 내용 스크롤에 `overscroll-behavior: contain`(끝까지 내린 뒤 제목까지 밀리던 문제)

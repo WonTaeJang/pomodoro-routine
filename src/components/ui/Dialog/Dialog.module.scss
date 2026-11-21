@@ -1,10 +1,13 @@
 @use "../../../styles/mixins";
 
+// 화면에서 위아래로 남기는 여백만큼 낮게. 테두리는 이 높이 안에 들어감
+$max-height: calc(100dvh - var(--space-8));
+
 .dialog {
   // 전역 margin 초기화를 덮어써서 화면 가운데에 두기
   margin: auto;
   width: min(100% - var(--space-8), var(--dialog-width));
-  max-height: calc(100dvh - var(--space-8));
+  max-height: $max-height;
   padding: 0;
   border: var(--border-width) solid var(--color-dialog-border);
   border-radius: var(--radius-lg);
@@ -34,9 +37,11 @@
   animation: none;
 }
 
+// 테두리를 뺀 높이: 같으면 팝업 자체가 2px 스크롤돼, 내용을 끝까지 내린 뒤
+// 한 번 더 스크롤하면 제목까지 함께 밀림
 .panel {
   display: flex;
-  max-height: inherit;
+  max-height: calc(#{$max-height} - var(--border-width) * 2);
   flex-direction: column;
 }
 
@@ -62,6 +67,8 @@
 
 .body {
   overflow-y: auto;
+  // 끝까지 내린 뒤의 스크롤이 뒤 화면으로 넘어가지 않게
+  overscroll-behavior: contain;
   padding: var(--space-2) var(--space-5) var(--space-5);
 }
 
