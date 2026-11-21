@@ -44,7 +44,7 @@ export interface LocalPetRepository extends PetRepository {
   updateRecord(change: (record: PetRecord) => PetRecord): Promise<PetRecord>;
 }
 
-const VERSION = 11;
+const VERSION = 12;
 /** 저장 형식 버전. 계정(pet_game.version)에도 같은 값을 씀 */
 export const PET_STORAGE_VERSION = VERSION;
 

@@ -109,10 +109,37 @@ const WINE = "#8e1a2d";
 const NAVY = "#23325e";
 const TASSEL = "#efe3c8";
 const TWIG = "#8a6239";
+// 아이돌 무대(VIP): 보라 조명, 핫핑크, 검정 무대, 별빛 금
+const STAGE = {
+  wall: "#dccff6",
+  led: "#c2b0f0",
+  sparkle: "#f0a92a",
+  lightsBase: "#6f55c4",
+  floor: "#a999da",
+  floorLine: "#c4b8ec",
+  floorSeam: "#9c8bd0",
+  rugRim: "#5a42ad",
+  rugOuter: "#8a6fdc",
+  rugField: "#9b82e6",
+  violet: "#8b6fe0",
+  violetLight: "#c9b6ff",
+  violetDark: "#5a3fa8",
+  pink: "#ff6fb1",
+  pinkDark: "#d94f8e",
+  glow: "#ffb3dc",
+  gold: "#ffd66b",
+  goldDark: "#c9973a",
+  bulb: "#fff3c4",
+};
 
 type WindowLook = SlotLook<"window">;
 /** Windows whose glass has a round top. */
 const ARCHED = new Set<WindowLook>(["stoneWindow", "palaceWindow"]);
+/** Windows made for dark walls: a see-through shadow. */
+const DARK_WALL_WINDOWS = new Set<WindowLook>([
+  "palaceWindow",
+  "lightstickWindow",
+]);
 
 function inPane(look: WindowLook, x: number, y: number) {
   if (x < PANE.x0 || x > PANE.x1 || y < PANE.y0 || y > PANE.y1) return false;
@@ -137,6 +164,13 @@ const frameColor: Record<WindowLook, (x: number, y: number) => string> = {
   // Gold, lit from the top left.
   palaceWindow: (x, y) =>
     x + y < 10 ? GOLD_LIGHT : x + y > 22 ? GOLD_SHADE : GOLD,
+  // Glossy violet, lit from the top left.
+  lightstickWindow: (x, y) =>
+    x + y < 10
+      ? STAGE.violetLight
+      : x + y > 22
+        ? STAGE.violetDark
+        : STAGE.violet,
 };
 const barColor: Record<WindowLook, string> = {
   plainWindow: CREAM,
@@ -144,6 +178,7 @@ const barColor: Record<WindowLook, string> = {
   twigWindow: TWIG,
   stoneWindow: TWIG,
   palaceWindow: GOLD,
+  lightstickWindow: STAGE.violet,
 };
 /** Extra cells drawn over everything: twig ends, leaves, flowers, a keystone. */
 const TRIM: Record<WindowLook, [number, number, string][]> = {
@@ -192,6 +227,12 @@ const TRIM: Record<WindowLook, [number, number, string][]> = {
     [8, 1, "#97938b"],
   ],
   palaceWindow: [],
+  // Marquee bulbs along the top.
+  lightstickWindow: [2, 5, 9, 12].map((x): [number, number, string] => [
+    x,
+    1,
+    STAGE.bulb,
+  ]),
 };
 
 export function windowArt(look: WindowLook, time: TimeOfDay): PixelArt {
@@ -222,7 +263,7 @@ function windowCells(look: WindowLook, time: TimeOfDay): Cells {
   for (let y = 0; y < WINDOW_HEIGHT; y++)
     for (let x = 0; x < WINDOW_WIDTH; x++)
       if (solid(x - 1, y - 1) && !solid(x, y))
-        set(x, y, look === "palaceWindow" ? SHEER_SHADOW : SHADOW);
+        set(x, y, DARK_WALL_WINDOWS.has(look) ? SHEER_SHADOW : SHADOW);
 
   const { sky, hill } = SKY[time];
   const rows = PANE.y1 - PANE.y0 + 1;
@@ -270,11 +311,13 @@ function windowCells(look: WindowLook, time: TimeOfDay): Cells {
     ])
       paint(x, y, "#fdf6d8");
   }
-  HILL_TOP.forEach((top, i) => {
-    const x = PANE.x0 + i;
-    for (let y = top; y <= PANE.y1; y++)
-      paint(x, y, hill[y === PANE.y1 ? 1 : 0]);
-  });
+  if (look === "lightstickWindow") paintCrowd(paint, time);
+  else
+    HILL_TOP.forEach((top, i) => {
+      const x = PANE.x0 + i;
+      for (let y = top; y <= PANE.y1; y++)
+        paint(x, y, hill[y === PANE.y1 ? 1 : 0]);
+    });
 
   for (let y = 0; y < WINDOW_HEIGHT; y++)
     for (let x = 0; x < WINDOW_WIDTH; x++)
@@ -283,6 +326,27 @@ function windowCells(look: WindowLook, time: TimeOfDay): Cells {
   for (let x = PANE.x0; x <= PANE.x1; x++) paint(x, BAR.y, barColor[look]);
   for (const [x, y, color] of TRIM[look]) set(x, y, color);
   return cells;
+}
+
+/** The crowd seen from the stage: heads, and lightsticks held up, brighter at night. */
+function paintCrowd(
+  paint: (x: number, y: number, color: string) => void,
+  time: TimeOfDay,
+) {
+  const dark = time === "night" || time === "dusk";
+  const head = dark ? "#2a2440" : "#6a6284";
+  for (let x = PANE.x0; x <= PANE.x1; x++) {
+    for (let y = 14; y <= PANE.y1; y++) paint(x, y, head);
+    if (x % 2 === 0) paint(x, 13, head);
+  }
+  [3, 5, 9, 11, 4, 10].forEach((x, i) => {
+    const top = i < 4 ? (i % 2 ? 10 : 11) : 9;
+    const tip = i % 2 ? STAGE.pink : STAGE.violetLight;
+    paint(x, top + 1, "#e8e0ff");
+    paint(x, top + 2, "#e8e0ff");
+    paint(x, top, tip);
+    if (dark) paint(x, top - 1, STAGE.glow);
+  });
 }
 
 // 궁전 창은 커튼이 창 양옆으로 늘어져 그림이 더 큽니다. 유리는 다른 창과 같은 자리에
@@ -470,6 +534,41 @@ export const POTS: Record<
       b: WINE,
     },
   },
+  // Outlined so it stands out on the pastel stage: a silver head, a gold
+  // band, a thick stand tied with a pink bow, a gold base.
+  standMicPot: {
+    rows: [
+      "...oooooo...",
+      "..ohmhmhmo..",
+      "..omMmMmMo..",
+      "..oMmMmMmo..",
+      "..omMmMmMo..",
+      "...oGGGGo...",
+      "....oSso....",
+      "..pp.Ss.pp..",
+      ".pPpPHHPpPp.",
+      "..pp.Ss.pp..",
+      ".....Ss.....",
+      ".....Ss.....",
+      ".....Ss.....",
+      "....oGGo....",
+      "..oGGGGGGo..",
+      ".oggggggggo.",
+    ],
+    colors: {
+      o: "#3b2a6e",
+      h: "#ffffff",
+      m: "#d8d4ea",
+      M: "#7f7a9e",
+      G: "#f0b429",
+      g: "#c98a1e",
+      S: "#2e2650",
+      s: "#6a5f96",
+      p: "#ff5fa8",
+      P: "#d93f86",
+      H: "#b82a6c",
+    },
+  },
 };
 
 export function potArt(look: PotLook): PixelArt {
@@ -511,6 +610,18 @@ const DAMASK = [
   "...ddd...",
   "....d....",
 ];
+
+/** A four-point sparkle: gold rays (#) and a bright middle (o). */
+const SPARKLE = [
+  "...#...",
+  "...#...",
+  "..#o#..",
+  "##ooo##",
+  "..#o#..",
+  "...#...",
+  "...#...",
+];
+const HEART = [".#.#.", "#####", ".###.", "..#.."];
 
 export const ROOMS: Record<RoomLook, RoomSurfaces> = {
   // The starting room: the room's own CSS draws it; this is for small pictures.
@@ -607,6 +718,36 @@ export const ROOMS: Record<RoomLook, RoomSurfaces> = {
         const [i, j] = [x % 7, y % 5];
         if (light) return (i + j * 2) % 9 === 0 ? "#d9d2c8" : "#f1ece4";
         return (i * 2 + j) % 8 === 0 ? "#9a948c" : "#b8b2aa";
+      }),
+    },
+  },
+  // Violet LED wall with gold sparkles and pink hearts over a row of stage
+  // lights; a glossy black stage with a pink neon edge.
+  stageRoom: {
+    wall: {
+      tile: pattern(24, 24, (x, y) => {
+        const sparkle = SPARKLE[y - 3]?.[x - 3];
+        if (sparkle === "#") return STAGE.sparkle;
+        if (sparkle === "o") return STAGE.bulb;
+        if (HEART[y - 15]?.[x - 15] === "#") return STAGE.pink;
+        if (x % 3 === 1 && y % 3 === 1)
+          return mod(x * 2 + y, 21) === 6 ? STAGE.pink : STAGE.led;
+        return STAGE.wall;
+      }),
+      edge: pattern(6, 6, (x, y) => {
+        if (y === 0) return STAGE.violetDark;
+        const bulb = (x === 2 || x === 3) && (y === 2 || y === 3);
+        if (bulb) return STAGE.bulb;
+        const glow = x >= 1 && x <= 4 && y >= 1 && y <= 4;
+        return glow ? STAGE.pinkDark : STAGE.lightsBase;
+      }),
+    },
+    floor: {
+      edge: strip([STAGE.pink, STAGE.pinkDark]),
+      tile: pattern(16, 8, (x, y) => {
+        if (mod(x - y * 2, 16) === 0) return STAGE.floorLine;
+        if (x === 11 && y === 5) return STAGE.glow;
+        return y % 8 === 7 ? STAGE.floorSeam : STAGE.floor;
       }),
     },
   },
@@ -744,6 +885,19 @@ const RUGS: Record<RugLook, (width: number, height: number) => Paint> = {
       return "#a3263a";
     });
   },
+  // A dark stage circle ringed with lights, a gold star in the middle.
+  centerStageRug: (w, h) =>
+    oval(w, h, (r, angle, x) => {
+      if (r > 1) return null;
+      if (r > 0.86)
+        return x % 3 === 0 ? (x % 6 ? STAGE.gold : STAGE.pink) : STAGE.rugRim;
+      const phase = mod(((angle + Math.PI / 2) / (2 * Math.PI)) * 5, 1);
+      const star = 0.26 + 0.38 * Math.abs(phase * 2 - 1);
+      if (r < star - 0.14) return STAGE.bulb;
+      if (r < star) return STAGE.gold;
+      if (r < star + 0.07) return STAGE.goldDark;
+      return r > 0.72 ? STAGE.rugOuter : STAGE.rugField;
+    }),
 };
 
 export function rugArt(look: RugLook, size: keyof typeof RUG_SIZE = "room") {
@@ -783,6 +937,7 @@ const BUBBLE_INK: Record<BubbleLook, BubbleInk> = {
   cloudBubble: { line: "#b9c7d8", paper: "#ffffff", text: "#8a97ab" },
   heartBubble: { line: "#e58a9d", paper: "#ffe4ea", text: "#c56f83" },
   stampBubble: { line: "#c8664a", paper: "#fff6e2", text: "#9c6a4a" },
+  cheerBubble: { line: "#ff4f9a", paper: "#fff0f7", text: "#d0508e" },
 };
 const HEART_MARK = ["#.#", "###", ".#."];
 /** 16 x 12: the box (rows 0–8) and its tail below. */
@@ -795,6 +950,9 @@ function bubbleArt(look: BubbleLook): PixelArt {
     if (y > 8) {
       // Tail: thought dots for the cloud, none for the game box.
       if (look === "gameBubble") return null;
+      // The cheer sign's handle.
+      if (look === "cheerBubble")
+        return x === 7 ? "#c98a5a" : x === 8 ? "#a06a40" : null;
       if (look === "cloudBubble")
         return (y === 10 && (x === 5 || x === 6)) || (y === 11 && x === 3)
           ? line
@@ -818,6 +976,12 @@ function bubbleArt(look: BubbleLook): PixelArt {
         ((x === 2 || x === 13) && y >= 2 && y <= 6) ||
         ((y === 2 || y === 6) && x >= 2 && x <= 13);
       if (frame) return line;
+    }
+    if (look === "cheerBubble") {
+      if ((x === 0 || x === 15) && (y === 0 || y === 8)) return STAGE.gold;
+      const star =
+        (x === 13 && y >= 1 && y <= 3) || (y === 2 && x >= 12 && x <= 14);
+      if (star) return STAGE.gold;
     }
     if (look === "gameBubble") {
       const ring = (x === 1 || x === 14 || y === 1 || y === 7) && !edge;

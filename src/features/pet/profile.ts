@@ -24,7 +24,8 @@ import {
   isFree,
   isFurnitureId,
   isSlot,
-  owns,
+  isVip,
+  mayPlace,
   type FurnitureId,
   type MaterialCounts,
   type Placed,
@@ -210,6 +211,7 @@ export function makeFurniture(
   if (
     pet.furniture.includes(id) ||
     isFree(id) ||
+    isVip(id) ||
     !canMake(id, { ...materialsLeft(pet), ...NO_STAMP_LIMIT })
   )
     return pet;
@@ -225,7 +227,7 @@ export function makeFurniture(
   };
 }
 
-/** Put a made piece in its slot, or the starting look back with null. */
+/** Put a made (or free, or VIP) piece in its slot, or the starting look back with null. */
 export function placeFurniture(
   pet: PetProfile,
   slot: Slot,
@@ -233,7 +235,7 @@ export function placeFurniture(
   now: number,
 ): PetProfile {
   if ((pet.placed[slot] ?? null) === id) return pet;
-  if (id && (!owns(pet.furniture, id) || furnitureById(id).slot !== slot))
+  if (id && (!mayPlace(pet.furniture, id) || furnitureById(id).slot !== slot))
     return pet;
   const placed = { ...pet.placed };
   if (id) placed[slot] = id;
@@ -257,7 +259,7 @@ function isFurnitureState(p: Partial<PetProfile>): boolean {
     Object.entries(spent).every(
       ([item, count]) => count! <= (items?.[item as ItemId] ?? 0),
     ) &&
-    furniture.every((id) => isFurnitureId(id) && !isFree(id)) &&
+    furniture.every((id) => isFurnitureId(id) && !isFree(id) && !isVip(id)) &&
     new Set(furniture).size === furniture.length &&
     // Hearts come from level ups only.
     heartsSpent(furniture) <= levelHearts(affinity?.points ?? 0) &&
@@ -265,7 +267,7 @@ function isFurnitureState(p: Partial<PetProfile>): boolean {
       ([slot, id]) =>
         isSlot(slot) &&
         isFurnitureId(id) &&
-        owns(furniture, id) &&
+        mayPlace(furniture, id) &&
         furnitureById(id).slot === slot,
     )
   );

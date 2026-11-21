@@ -344,6 +344,16 @@ $slot-tag-color: #fffaf0;
     --bubble-ink: #8c3a4e;
     --bubble-line-width: 2px;
   }
+  // 응원 피켓 (VIP): 굵은 핫핑크 테두리, 둥근 모서리, 금 반짝이, 아래로 손잡이
+  &[data-look="cheerBubble"] {
+    --bubble-paper: #fff0f7;
+    --bubble-line: #ff4f9a;
+    --bubble-shade: #f7a8cb;
+    --bubble-ink: #8a2457;
+    --bubble-line-width: 3px;
+    border-radius: 10px;
+    padding-inline: var(--space-4);
+  }
   // 우표: 톱니 가장자리(바탕 그림을 따로 깔아 구멍을 뚫음), 붉은 안쪽 테두리, 발바닥 소인.
   // 꼬리는 테두리선 없이 우표 종이가 이어짐(StampTail), 그림자는 위 drop-shadow가 함께 그림
   &[data-look="stampBubble"] {
@@ -413,6 +423,14 @@ $slot-tag-color: #fffaf0;
     bottom: -7px;
     transform: rotate(12deg);
   }
+  &[data-place="sparkleTopLeft"] {
+    top: -10px;
+    left: -9px;
+  }
+  &[data-place="sparkleTopRight"] {
+    top: -7px;
+    right: 8px;
+  }
   &[data-place="postmark"] {
     top: -9px;
     right: 2px;
@@ -425,6 +443,18 @@ $slot-tag-color: #fffaf0;
   50% {
     opacity: 0;
   }
+}
+
+// 응원 피켓 손잡이: 말풍선 아래 가운데로 나무 막대
+.bubbleHandle {
+  position: absolute;
+  z-index: -1;
+  top: 100%;
+  left: calc(50% - 3px);
+  width: 6px;
+  height: 18px;
+  background: linear-gradient(90deg, #c98a5a 0 50%, #a06a40 50%);
+  box-shadow: 0 3px 0 var(--bubble-shade);
 }
 
 // 뭉게구름의 꼬리: 작은 동그라미 두 개

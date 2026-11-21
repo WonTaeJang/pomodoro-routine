@@ -810,4 +810,24 @@ describe("방 꾸미기 기록", () => {
     await b.getState().hydrate();
     expect(b.getState().pet!.placed).toEqual(placed);
   });
+
+  it("VIP 조각은 만들지 않고 놓고, null로 한 번에 기본 모양으로", async () => {
+    const f = fixture(),
+      a = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    await a.getState().recordPlaceAll({
+      room: "stageRoom",
+      bubble: "cheerBubble",
+    });
+    expect(a.getState().pet!.placed).toEqual({
+      room: "stageRoom",
+      bubble: "cheerBubble",
+    });
+    await a.getState().recordPlaceAll({ room: null, bubble: null });
+    expect(a.getState().pet!.placed).toEqual({});
+    const b = f.store();
+    await b.getState().hydrate();
+    expect(b.getState().pet!.placed).toEqual({});
+  });
 });

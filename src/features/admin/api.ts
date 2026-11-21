@@ -98,9 +98,11 @@ export async function setVip(userId: string, on: boolean): Promise<boolean> {
 
 // --- 지금 로그인한 계정이 관리자·VIP인지 ---
 
-export type AccountFlags = { admin: boolean; vip: boolean };
+/** vip가 null이면 확인하지 못함 (네트워크 등). 아님(false)과 구분해 까미 방의 VIP 조각을 함부로 치우지 않음 */
+export type AccountFlags = { admin: boolean; vip: boolean | null };
 
 const NO_FLAGS: AccountFlags = { admin: false, vip: false };
+const UNKNOWN_FLAGS: AccountFlags = { admin: false, vip: null };
 /** 계정마다 한 번만 물어봄 (메뉴·프로필이 함께 씀) */
 const flagsCache = new Map<string, Promise<AccountFlags>>();
 
@@ -115,18 +117,22 @@ async function loadAccountFlags(userId: string): Promise<AccountFlags> {
       .eq("user_id", userId)
       .maybeSingle(),
   ]);
-  // admin.sql을 아직 실행하지 않았거나 실패하면 둘 다 아님으로 (화면은 그대로)
+  // admin.sql을 아직 실행하지 않았거나 실패하면 관리자 아님, VIP는 모름으로 (화면은 그대로)
   return {
     admin: !admin.error && admin.data === true,
-    vip: !vip.error && vip.data !== null,
+    vip: vip.error ? null : vip.data !== null,
   };
 }
 
 export function getAccountFlags(userId: string): Promise<AccountFlags> {
   let flags = flagsCache.get(userId);
   if (!flags) {
-    flags = loadAccountFlags(userId).catch(() => NO_FLAGS);
+    flags = loadAccountFlags(userId).catch(() => UNKNOWN_FLAGS);
     flagsCache.set(userId, flags);
+    // 확인하지 못했으면 다음에 다시 물어봄
+    void flags.then(({ vip }) => {
+      if (vip === null) forgetAccountFlags(userId);
+    });
   }
   return flags;
 }

@@ -40,6 +40,7 @@ import {
 import { PET_HAPPY_MS } from "../pet";
 import { lookOf, type FurnitureId, type Slot } from "../furniture";
 import { usePalaceEdition } from "../usePalaceEdition";
+import { shownPlaced, usePetVip, useVipRoomCleanup } from "../usePetVip";
 import { PetFoundCard, PetWalkMap } from "./PetTrip";
 import { PetItemBox } from "./PetItemBox";
 import { PetLog } from "./PetLog";
@@ -150,6 +151,10 @@ function PetRoom({ retry }: { retry: () => void }) {
   const infoId = useId();
   const levelUp = affinity.leveledUp;
   const record = usePetStore((s) => s.pet);
+  // VIP pieces show only on VIP accounts; others get the starting looks back.
+  const vip = usePetVip();
+  useVipRoomCleanup(vip);
+  const placed = shownPlaced(record?.placed ?? {}, vip);
   const log = usePetLog();
   const addLog = log.add;
 
@@ -209,7 +214,8 @@ function PetRoom({ retry }: { retry: () => void }) {
   const decorated = useMoment<true>(PET_HAPPY_MS);
   const decor = usePetDecorate({
     furniture: record?.furniture ?? [],
-    placed: record?.placed ?? {},
+    placed,
+    vip: vip === true,
     addLog,
     onPlaced: () => {
       cheer();
@@ -219,10 +225,7 @@ function PetRoom({ retry }: { retry: () => void }) {
   const decorating = decor.mode !== null;
   useFocusAfter(decorating, boxButton);
   // What Kkami wears, or tries on while decorating.
-  usePetSpriteOutfit(
-    kkami,
-    decor.preview?.outfit ?? lookOf("outfit", record?.placed ?? {}),
-  );
+  usePetSpriteOutfit(kkami, decor.preview?.outfit ?? lookOf("outfit", placed));
 
   // What Kkami says (I-058).
   const time = useTimeOfDay();
@@ -322,10 +325,7 @@ function PetRoom({ retry }: { retry: () => void }) {
               <PetRoomArt preview={decor.preview} decorating={roomDecorating} />
               <PetSpeechBubble
                 text={speech}
-                look={
-                  decor.preview?.bubble ??
-                  lookOf("bubble", record?.placed ?? {})
-                }
+                look={decor.preview?.bubble ?? lookOf("bubble", placed)}
                 pick={
                   roomDecorating && {
                     selected: roomDecorating.selected === "bubble",
@@ -453,6 +453,7 @@ function PetRoom({ retry }: { retry: () => void }) {
           open={boxOpen}
           onClose={() => setBoxOpen(false)}
           pet={record}
+          vip={vip === true}
           stamps={stamps.earned}
           onCraft={craft}
           onApply={decor.apply}

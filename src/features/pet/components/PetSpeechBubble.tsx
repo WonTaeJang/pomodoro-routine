@@ -106,6 +106,22 @@ function BubbleDecor({ look }: { look: LookId }) {
           <StampTail />
         </>
       );
+    case "cheerBubble":
+      // A fan's cheer sign: sparkles on two corners, held up on a stick.
+      return (
+        <>
+          <Decor place="sparkleTopLeft">
+            <BubbleDecorIcon decor="sparkle" size={14} />
+          </Decor>
+          <Decor place="sparkleTopRight">
+            <BubbleDecorIcon decor="sparkle" size={10} />
+          </Decor>
+          <Decor place="heartBottomRight">
+            <HeartItemIcon size={12} />
+          </Decor>
+          <span className={styles.bubbleHandle} aria-hidden="true" />
+        </>
+      );
     default:
       return <BubbleTail />;
   }

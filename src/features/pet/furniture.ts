@@ -26,7 +26,8 @@ export type MaterialCounts = Partial<Record<Material, number>>;
  * Furniture made from walk finds: three each, two of one kind. Outfits take
  * a heart and two finds; the brown hat is everyone's from the start (free).
  * Speech bubbles take a paw stamp and two finds (I-066), and so does the
- * palace set: one more wall, window, pot and rug (I-067).
+ * palace set: one more wall, window, pot and rug (I-067). The idol stage and
+ * its cheer sign bubble are never made: VIP accounts have them (vip).
  */
 export const FURNITURE = [
   { id: "twigWindow", slot: "window", need: { twig: 2, leaf: 1 } },
@@ -58,11 +59,17 @@ export const FURNITURE = [
     slot: "bubble",
     need: { stamp: 1, twig: 1, pinecone: 1 },
   },
+  { id: "stageRoom", slot: "room", need: {}, vip: true },
+  { id: "lightstickWindow", slot: "window", need: {}, vip: true },
+  { id: "standMicPot", slot: "pot", need: {}, vip: true },
+  { id: "centerStageRug", slot: "rug", need: {}, vip: true },
+  { id: "cheerBubble", slot: "bubble", need: {}, vip: true },
 ] as const satisfies readonly {
   id: string;
   slot: Slot;
   need: MaterialCounts;
   free?: true;
+  vip?: true;
 }[];
 
 export type FurnitureId = (typeof FURNITURE)[number]["id"];
@@ -87,11 +94,29 @@ export const furnitureById = (id: FurnitureId) =>
 
 /** Owned without being made (the brown hat). */
 export const isFree = (id: FurnitureId) => "free" in furnitureById(id);
+/** For VIP accounts only, never made: the idol stage set and its bubble. */
+export const isVip = (look: LookId) =>
+  isFurnitureId(look) && "vip" in furnitureById(look);
 /** Made, or free to everyone. */
 export const owns = (made: readonly FurnitureId[], id: FurnitureId) =>
   made.includes(id) || isFree(id);
+/** Can be used now: owned, or a VIP piece on a VIP account. */
+export const canUse = (
+  made: readonly FurnitureId[],
+  id: FurnitureId,
+  vip: boolean,
+) => owns(made, id) || (vip && isVip(id));
+/**
+ * May be kept in the room record: what is owned, and VIP pieces. Whether
+ * the account is VIP is known only on screen (usePetVip), which hides VIP
+ * pieces from everyone else and puts the starting looks back.
+ */
+export const mayPlace = (made: readonly FurnitureId[], id: FurnitureId) =>
+  owns(made, id) || isVip(id);
 /** What can be made, in catalog order. */
-export const RECIPES = FURNITURE.filter((piece) => !("free" in piece));
+export const RECIPES = FURNITURE.filter(
+  (piece) => !("free" in piece) && !("vip" in piece),
+);
 
 /** A material used on what was made. */
 const spentOn = (material: Material, furniture: readonly FurnitureId[]) =>
@@ -116,11 +141,15 @@ export function isSlot(value: unknown): value is Slot {
 }
 
 /** The looks a slot can show, starting look first, in catalog order. */
-export function looksFor(slot: Slot, owned: readonly FurnitureId[]): LookId[] {
+export function looksFor(
+  slot: Slot,
+  owned: readonly FurnitureId[],
+  vip = false,
+): LookId[] {
   return [
     DEFAULT_LOOK[slot],
     ...FURNITURE.filter(
-      (piece) => piece.slot === slot && owns(owned, piece.id),
+      (piece) => piece.slot === slot && canUse(owned, piece.id, vip),
     ).map((piece) => piece.id),
   ];
 }
@@ -128,8 +157,19 @@ export function looksFor(slot: Slot, owned: readonly FurnitureId[]): LookId[] {
 export const lookOf = (slot: Slot, placed: Placed): LookId =>
   placed[slot] ?? DEFAULT_LOOK[slot];
 
-/** What everyone has from the start: the slot's starting look, then free pieces. */
-export const startersFor = (slot: Slot): LookId[] => looksFor(slot, []);
+/**
+ * What is there without making it: the slot's starting look, free pieces,
+ * and VIP pieces on a VIP account.
+ */
+export const startersFor = (slot: Slot, vip = false): LookId[] =>
+  looksFor(slot, [], vip);
+
+/** Some slot holds a VIP piece. */
+export const hasVip = (placed: Placed) =>
+  Object.values(placed).some((id) => isVip(id));
+/** The room as anyone but a VIP account sees it: VIP pieces back to the start. */
+export const withoutVip = (placed: Placed): Placed =>
+  Object.fromEntries(Object.entries(placed).filter(([, id]) => !isVip(id)));
 
 /** The slot a look belongs to. */
 export const slotOfLook = (look: LookId): Slot =>
@@ -183,12 +223,28 @@ export const SETS = [
       rug: "palaceRug",
     },
   },
+  // VIP 계정에만 보임 (조각을 만들지 않고 처음부터 가짐)
+  {
+    id: "stage",
+    vip: true,
+    pieces: {
+      room: "stageRoom",
+      window: "lightstickWindow",
+      pot: "standMicPot",
+      rug: "centerStageRug",
+    },
+  },
 ] as const satisfies readonly {
   id: string;
+  vip?: true;
   pieces: Record<SetSlot, FurnitureId>;
 }[];
 export type RoomSet = (typeof SETS)[number];
 export type SetId = RoomSet["id"];
+
+/** The sets an account sees: the VIP set only on a VIP account. */
+export const setsFor = (vip: boolean) =>
+  SETS.filter((set) => vip || !("vip" in set));
 
 export const setById = (id: SetId) => SETS.find((set) => set.id === id)!;
 

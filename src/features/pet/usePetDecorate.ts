@@ -24,6 +24,8 @@ export type DecorateStep =
 type Options = {
   furniture: readonly FurnitureId[];
   placed: Placed;
+  /** VIP accounts also go through the VIP looks. */
+  vip: boolean;
   addLog: (event: PetLogEvent) => void;
   /** Kkami's happy reaction once something new is placed. */
   onPlaced: () => void;
@@ -39,17 +41,21 @@ const wrap = (index: number, length: number) => (index + length) % length;
 export function usePetDecorate({
   furniture,
   placed,
+  vip,
   addLog,
   onPlaced,
 }: Options) {
   const [mode, setMode] = useState<DecorateStep | null>(null);
-  const looks = mode ? looksFor(mode.slot, furniture) : [];
+  const looks = mode ? looksFor(mode.slot, furniture, vip) : [];
 
   /** Choose a look for a slot, starting from what it shows now. */
   const pickLook = (slot: Slot): DecorateStep => ({
     step: "look",
     slot,
-    index: Math.max(0, looksFor(slot, furniture).indexOf(lookOf(slot, placed))),
+    index: Math.max(
+      0,
+      looksFor(slot, furniture, vip).indexOf(lookOf(slot, placed)),
+    ),
   });
 
   function move(by: 1 | -1) {
@@ -60,7 +66,7 @@ export function usePetDecorate({
           step: "slot",
           slot: SLOTS[wrap(SLOTS.indexOf(current.slot) + by, SLOTS.length)],
         };
-      const total = looksFor(current.slot, furniture).length;
+      const total = looksFor(current.slot, furniture, vip).length;
       return { ...current, index: wrap(current.index + by, total) };
     });
   }

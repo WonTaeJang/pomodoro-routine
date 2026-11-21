@@ -2,7 +2,7 @@ import { createStore } from "zustand/vanilla";
 import { useStore } from "zustand";
 import { createPetProfile, type PetProfile } from "./profile";
 import { totalItems, type ItemId } from "./items";
-import type { FurnitureId, Placed, Slot } from "./furniture";
+import type { FurnitureId, Slot } from "./furniture";
 import {
   appendCare,
   applyPending,
@@ -35,8 +35,10 @@ type PetStore = {
   recordCraft(furniture: FurnitureId): Promise<void>;
   /** Put furniture in a slot, or its starting look back with null. */
   recordPlace(slot: Slot, furniture: FurnitureId | null): Promise<void>;
-  /** Put several pieces in their places in one save (a room set). */
-  recordPlaceAll(pieces: Placed): Promise<void>;
+  /** Put several pieces (or starting looks, null) in their places in one save. */
+  recordPlaceAll(
+    pieces: Partial<Record<Slot, FurnitureId | null>>,
+  ): Promise<void>;
   /** The item box was opened: clear the new-item dot. */
   markItemsSeen(): Promise<void>;
   retry(): Promise<void>;

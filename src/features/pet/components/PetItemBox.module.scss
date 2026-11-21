@@ -89,6 +89,22 @@
     font-size: var(--font-size-xs);
   }
 }
+// VIP 조각·세트 표시: 프로필 VIP 배지처럼 금빛
+.vip {
+  justify-self: start;
+  margin-left: var(--space-1-5);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: device.$palace-gold;
+  color: #6b430c;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  vertical-align: 1px;
+  .lookText > & {
+    margin-left: 0;
+  }
+}
 // 처음부터 있는 것 표시
 .starter {
   justify-self: start;

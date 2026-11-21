@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  FURNITURE,
   RECIPES,
   SLOTS,
+  canUse,
+  hasVip,
+  isFree,
+  isVip,
+  setsFor,
+  withoutVip,
   availableItems,
   SETS,
   SET_SLOTS,
@@ -123,6 +130,63 @@ describe("기본 제공", () => {
     expect(slotOfLook("plainRug")).toBe("rug");
     expect(slotOfLook("brownHat")).toBe("outfit");
     expect(slotOfLook("palacePot")).toBe("pot");
+  });
+});
+
+describe("VIP 조각 (아이돌 무대)", () => {
+  const VIP_PIECES = [
+    "stageRoom",
+    "lightstickWindow",
+    "standMicPot",
+    "centerStageRug",
+    "cheerBubble",
+  ] as const;
+
+  it("만들 수 없고, VIP 계정에서만 기본 제공처럼 보임", () => {
+    for (const id of VIP_PIECES) {
+      expect(isVip(id)).toBe(true);
+      expect(RECIPES.some((p) => p.id === id)).toBe(false);
+      const slot = furnitureById(id).slot;
+      expect(startersFor(slot)).not.toContain(id);
+      expect(startersFor(slot, true)).toContain(id);
+      expect(looksFor(slot, [])).not.toContain(id);
+      expect(looksFor(slot, [], true)).toContain(id);
+    }
+    expect(isVip("plainRoom")).toBe(false);
+    expect(isVip("palaceRoom")).toBe(false);
+  });
+
+  it("VIP 세트는 VIP 계정에만, 처음부터 넷 다 있음", () => {
+    expect(setsFor(false).map((s) => s.id)).not.toContain("stage");
+    const stage = setsFor(true).find((s) => s.id === "stage")!;
+    expect(setPieces(stage).every((id) => canUse([], id, true))).toBe(true);
+    expect(setPieces(stage).some((id) => canUse([], id, false))).toBe(false);
+  });
+
+  it("방 기록에는 만들지 않고 놓을 수 있지만, 만들기는 안 됨", () => {
+    const pet = withItems({});
+    const placed = placeFurniture(pet, "room", "stageRoom", 2);
+    expect(placed.placed).toEqual({ room: "stageRoom" });
+    expect(makeFurniture(pet, "stageRoom", 2)).toBe(pet);
+    // Saved and read back with the VIP piece in place.
+    expect(decodePet(encode(12, placed))!.placed).toEqual({
+      room: "stageRoom",
+    });
+    // Never in the made list.
+    expect(() =>
+      decodePet(encode(12, { ...pet, furniture: ["stageRoom"] })),
+    ).toThrow(PetStorageError);
+  });
+
+  it("VIP가 아니면 VIP 조각만 빼고 보임", () => {
+    const placed = {
+      room: "stageRoom",
+      window: "twigWindow",
+      bubble: "cheerBubble",
+    } as const;
+    expect(hasVip(placed)).toBe(true);
+    expect(withoutVip(placed)).toEqual({ window: "twigWindow" });
+    expect(hasVip({ window: "twigWindow" })).toBe(false);
   });
 });
 
@@ -249,8 +313,8 @@ describe("가구 저장 형식", () => {
     expect(decodePet(encode(7, pet))).toEqual(pet);
   });
 
-  it("v12 이상은 새 버전이라 건드리지 않음", () => {
-    expect(() => decodePet(encode(12, withItems({ leaf: 1 })))).toThrow(
+  it("v13 이상은 새 버전이라 건드리지 않음", () => {
+    expect(() => decodePet(encode(13, withItems({ leaf: 1 })))).toThrow(
       PetStorageError,
     );
   });
@@ -313,13 +377,13 @@ describe("방 세트", () => {
         expect(furnitureById(set.pieces[slot]).slot).toBe(slot);
   });
 
-  it("방 네 자리의 만들기는 모두 꼭 한 세트에 들어감", () => {
+  it("방 네 자리의 만들기와 VIP 조각은 모두 꼭 한 세트에 들어감", () => {
     const inSets = SETS.flatMap(setPieces);
     expect(new Set(inSets).size).toBe(inSets.length);
-    const roomRecipes = RECIPES.filter((p) =>
-      (SET_SLOTS as readonly string[]).includes(p.slot),
+    const roomPieces = FURNITURE.filter(
+      (p) => (SET_SLOTS as readonly string[]).includes(p.slot) && !isFree(p.id),
     ).map((p) => p.id);
-    expect([...inSets].sort()).toEqual([...roomRecipes].sort());
+    expect([...inSets].sort()).toEqual([...roomPieces].sort());
   });
 
   it("넷이 다 제자리일 때만 놓인 세트, 옷·말풍선은 상관없음", () => {

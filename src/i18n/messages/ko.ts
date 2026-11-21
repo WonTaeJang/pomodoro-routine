@@ -51,6 +51,7 @@ const ko = {
       apply: "적용",
       applied: "적용 중",
       starter: "기본 제공",
+      vip: "VIP",
       // 세트 탭 (I-069)
       setMade: "{total}개 중 {count}개 만듦",
       setMissing: "{name}, 아직 안 만듦",
@@ -61,6 +62,7 @@ const ko = {
         floral: { name: "파스텔 꽃 세트", to: "파스텔 꽃 세트로" },
         stripe: { name: "줄무늬 클래식 세트", to: "줄무늬 클래식 세트로" },
         palace: { name: "궁전 세트", to: "궁전 세트로" },
+        stage: { name: "아이돌 무대 세트", to: "아이돌 무대 세트로" },
       },
       short: "재료 부족",
       decorate: "방 꾸미기",
@@ -195,6 +197,31 @@ const ko = {
           to: "하늘색 체크 셔츠로",
         },
         coneCollar: { name: "넥카라", object: "넥카라를", to: "넥카라로" },
+        stageRoom: {
+          name: "아이돌 무대",
+          object: "아이돌 무대를",
+          to: "아이돌 무대로",
+        },
+        lightstickWindow: {
+          name: "응원봉 객석",
+          object: "응원봉 객석을",
+          to: "응원봉 객석으로",
+        },
+        standMicPot: {
+          name: "스탠드 마이크",
+          object: "스탠드 마이크를",
+          to: "스탠드 마이크로",
+        },
+        centerStageRug: {
+          name: "센터 스테이지",
+          object: "센터 스테이지를",
+          to: "센터 스테이지로",
+        },
+        cheerBubble: {
+          name: "응원 피켓 말풍선",
+          object: "응원 피켓 말풍선을",
+          to: "응원 피켓 말풍선으로",
+        },
         plainBubble: {
           name: "기본 말풍선",
           object: "기본 말풍선을",

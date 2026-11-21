@@ -51,6 +51,7 @@ const en: Messages = {
       apply: "Use",
       applied: "In use",
       starter: "Included",
+      vip: "VIP",
       // Sets tab (I-069)
       setMade: "{count} of {total} made",
       setMissing: "{name}, not made yet",
@@ -61,6 +62,7 @@ const en: Messages = {
         floral: { name: "Pastel flower set", to: "the pastel flower set" },
         stripe: { name: "Classic stripe set", to: "the classic stripe set" },
         palace: { name: "Palace set", to: "the palace set" },
+        stage: { name: "Idol stage set", to: "the idol stage set" },
       },
       short: "Not enough",
       decorate: "Decorate the room",
@@ -202,6 +204,31 @@ const en: Messages = {
           name: "Cone collar",
           object: "a cone collar",
           to: "the cone collar",
+        },
+        stageRoom: {
+          name: "Idol stage",
+          object: "the idol stage",
+          to: "the idol stage",
+        },
+        lightstickWindow: {
+          name: "Lightstick crowd",
+          object: "the lightstick crowd",
+          to: "the lightstick crowd",
+        },
+        standMicPot: {
+          name: "Stand mic",
+          object: "a stand mic",
+          to: "the stand mic",
+        },
+        centerStageRug: {
+          name: "Center stage",
+          object: "the center stage",
+          to: "the center stage",
+        },
+        cheerBubble: {
+          name: "Cheer sign bubble",
+          object: "a cheer sign bubble",
+          to: "the cheer sign bubble",
         },
         plainBubble: {
           name: "Plain bubble",

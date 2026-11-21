@@ -328,6 +328,18 @@ const BUBBLE_DECOR = {
     rows: ["#####", ".###.", "..#.."],
     colors: { "#": "#f2c45a" },
   },
+  sparkle: {
+    rows: [
+      "...#...",
+      "...#...",
+      "..#o#..",
+      "##ooo##",
+      "..#o#..",
+      "...#...",
+      "...#...",
+    ],
+    colors: { "#": "#ffc94a", o: "#fff6c8" },
+  },
 } satisfies Record<string, Pixels>;
 
 /** A decoration drawn on a speech bubble. */

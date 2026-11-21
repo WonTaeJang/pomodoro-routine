@@ -14,12 +14,14 @@ import { cx } from "@/lib/cx";
 import { ITEMS } from "../items";
 import {
   RECIPES,
-  SETS,
   SLOTS,
   canMake,
+  canUse,
   isSetPlaced,
+  isVip,
   lookOf,
   setPieces,
+  setsFor,
   startersFor,
   type FurnitureId,
   type LookId,
@@ -58,10 +60,13 @@ export function PetItemBox({
   onApplySet,
   onDecorate,
   stamps,
+  vip,
 }: {
   open: boolean;
   onClose: () => void;
   pet: PetProfile;
+  /** A VIP account: the idol stage set and bubble show, marked VIP. */
+  vip: boolean;
   /** Paw stamps from finished cycles (I-066). */
   stamps: number;
   onCraft: (furniture: FurnitureId) => void;
@@ -114,6 +119,7 @@ export function PetItemBox({
         <>
           <DecorTab
             pet={pet}
+            vip={vip}
             left={left}
             slot={slot}
             onSlot={setSlot}
@@ -132,11 +138,12 @@ export function PetItemBox({
       )}
       {tab === "sets" && (
         <ul className={styles.cards}>
-          {SETS.map((set) => (
+          {setsFor(vip).map((set) => (
             <SetCard
               key={set.id}
               set={set}
               made={pet.furniture}
+              vip={vip}
               applied={isSetPlaced(set, pet.placed)}
               onApply={onApplySet}
             />
@@ -200,6 +207,7 @@ function MaterialsTab({
  */
 function DecorTab({
   pet,
+  vip,
   left,
   slot,
   onSlot,
@@ -207,6 +215,7 @@ function DecorTab({
   onApply,
 }: {
   pet: PetProfile;
+  vip: boolean;
   left: MaterialCounts;
   slot: Slot;
   onSlot: (slot: Slot) => void;
@@ -233,14 +242,18 @@ function DecorTab({
         }))}
       />
       <ul className={styles.cards}>
-        {/* 처음부터 있는 것(기본 모양·갈색 모자)은 만들 필요 없이 적용만 */}
-        {startersFor(slot).map((look) => (
+        {/* 만들 필요 없이 적용만: 처음부터 있는 것(기본 모양·갈색 모자), VIP 계정의 VIP 조각 */}
+        {startersFor(slot, vip).map((look) => (
           <LookCard
             key={look}
             look={look}
             action={applyAction(shown === look, () => onApply(look))}
           >
-            <span className={styles.starter}>{t("starter")}</span>
+            {isVip(look) ? (
+              <VipBadge />
+            ) : (
+              <span className={styles.starter}>{t("starter")}</span>
+            )}
           </LookCard>
         ))}
         {RECIPES.filter((piece) => piece.slot === slot).map((piece) => (
@@ -354,23 +367,28 @@ function ActionButton({ action }: { action: CardAction }) {
 function SetCard({
   set,
   made,
+  vip,
   applied,
   onApply,
 }: {
   set: RoomSet;
   made: readonly FurnitureId[];
+  vip: boolean;
   /** The whole set is in the room now. */
   applied: boolean;
   onApply: (set: RoomSet) => void;
 }) {
   const t = useTranslations("pet.items");
   const pieces = setPieces(set);
-  const missing = pieces.filter((id) => !made.includes(id));
+  const missing = pieces.filter((id) => !canUse(made, id, vip));
   const have = pieces.length - missing.length;
   return (
     <li className={styles.set}>
       <div className={styles.setHead}>
-        <strong>{t(`sets.${set.id}.name`)}</strong>
+        <strong>
+          {t(`sets.${set.id}.name`)}
+          {"vip" in set && <VipBadge />}
+        </strong>
         <span className={styles.setCount} data-full={missing.length === 0}>
           <span aria-hidden="true">
             {have}/{pieces.length}
@@ -411,6 +429,12 @@ function SetCard({
       </div>
     </li>
   );
+}
+
+/** Gold "VIP" mark, like the profile's VIP badge. */
+function VipBadge() {
+  const t = useTranslations("pet.items");
+  return <span className={styles.vip}>{t("vip")}</span>;
 }
 
 /** Each material: how many are left of how many are needed. */
