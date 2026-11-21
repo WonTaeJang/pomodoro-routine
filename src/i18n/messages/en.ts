@@ -7,7 +7,7 @@ import type { Messages } from "./ko";
 const en: Messages = {
   pet: {
     walk: {
-      start: "Go for a walk",
+      start: "Walk",
       status: "On a walk",
       scene: "Kkami walking along a park path",
       error: "Could not load the walk.",
@@ -449,11 +449,12 @@ const en: Messages = {
     name: "Kkami",
     idle: "Relaxed",
     sleeping: "Sleeping",
-    wake: "Gently wake Kkami",
+    // Device buttons: short words, one line each
+    wake: "Wake up",
     wakeLabel: "Wake Kkami",
     happy: "Happy",
-    pet: "Give a little pat",
-    feed: "Give a treat",
+    pet: "Pat",
+    feed: "Feed",
     snackHappy: "Yummy",
     petLabel: "Pet Kkami",
     keyboard: "With a keyboard, focus the button and press Enter or Space.",
