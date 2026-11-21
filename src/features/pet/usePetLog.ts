@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AFFINITY_PER_SNACK } from "./affinity";
 import type { ItemId } from "./items";
-import type { FurnitureId, LookId, SetId, Slot } from "./furniture";
+import type { EditionId, FurnitureId, LookId, SetId, Slot } from "./furniture";
 import { petStore } from "./store";
 
 export type PetLogEvent =
-  | { kind: "enter" | "wake" | "walkOut" | "home" | "stamp" | "palace" }
+  | { kind: "enter" | "wake" | "walkOut" | "home" | "stamp" }
+  | { kind: "edition"; edition: EditionId }
   | { kind: "pat"; points: number; total: number }
   | { kind: "snack"; points: number }
   | { kind: "found" | "skipped"; item: ItemId }

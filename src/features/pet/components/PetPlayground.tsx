@@ -22,7 +22,7 @@ import styles from "./PetPlayground.module.scss";
 import { PetWalk } from "./PetWalk";
 import { PetRoomArt, type RoomDecorating } from "./PetRoomArt";
 import { PetAffinityDetail, PetHearts, usePetAffinity } from "./PetAffinity";
-import { PalaceCrown, StatusIcon, type PetStatusIcon } from "./PetIcons";
+import { EditionMark, StatusIcon, type PetStatusIcon } from "./PetIcons";
 import { PetPad } from "./PetPad";
 import { PetSpeechBubble } from "./PetSpeechBubble";
 import { DecoratePads, DecoratePick, decorateTag } from "./PetDecorate";
@@ -39,7 +39,7 @@ import {
 } from "../speech";
 import { PET_HAPPY_MS } from "../pet";
 import { lookOf, type FurnitureId, type Slot } from "../furniture";
-import { usePalaceEdition } from "../usePalaceEdition";
+import { useDeviceEdition } from "../useDeviceEdition";
 import { shownPlaced, usePetVip, useVipRoomCleanup } from "../usePetVip";
 import { PetFoundCard, PetWalkMap } from "./PetTrip";
 import { PetItemBox } from "./PetItemBox";
@@ -169,10 +169,10 @@ function PetRoom({ retry }: { retry: () => void }) {
     if (levelUp !== null) addLog({ kind: "level", level: levelUp });
   }, [levelUp, addLog]);
 
-  // All four palace pieces placed: the device becomes the palace edition.
-  const edition = usePalaceEdition();
+  // A whole edition set placed (palace, idol stage): the device changes.
+  const edition = useDeviceEdition(vip);
   useEffect(() => {
-    if (edition.notice) addLog({ kind: "palace" });
+    if (edition.notice) addLog({ kind: "edition", edition: edition.notice });
   }, [edition.notice, addLog]);
   // A cycle finished while here (this tab or another): a paw stamp in the log.
   const stamps = useStamps(() => addLog({ kind: "stamp" }));
@@ -243,7 +243,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     situation,
     (levelUp ?? affinity.progress.level) as SpeechLevel,
     time,
-    edition.palace,
+    edition.edition === "palace",
   );
 
   // Picking a slot in the room (the bubble is one too) while decorating.
@@ -258,7 +258,7 @@ function PetRoom({ retry }: { retry: () => void }) {
     : undefined;
 
   // One status at a time in the header: a passing notice in gold (a level
-  // up, then the palace edition), then the mode, then the pose.
+  // up, then a new device edition), then the mode, then the pose.
   function headerStatus(): {
     icon: PetStatusIcon;
     label: string;
@@ -271,7 +271,11 @@ function PetRoom({ retry }: { retry: () => void }) {
         notice: true,
       };
     if (edition.notice)
-      return { icon: "palace", label: t("palace.notice"), notice: true };
+      return {
+        icon: edition.notice,
+        label: t(`edition.${edition.notice}`),
+        notice: true,
+      };
     if (walking) return { icon: "walk", label: t("walk.status") };
     if (decorating) return { icon: "decorate", label: t("decorate.status") };
     return { icon: pose, label: t(copy.status) };
@@ -289,11 +293,16 @@ function PetRoom({ retry }: { retry: () => void }) {
       <section
         className={styles.device}
         aria-label={t("label")}
-        data-edition={edition.palace ? "palace" : undefined}
+        data-edition={edition.edition ?? undefined}
       >
-        {edition.palace && (
-          <span className={styles.crown} aria-hidden="true">
-            <PalaceCrown />
+        {edition.edition && (
+          <span
+            key={edition.edition}
+            className={styles.editionMark}
+            data-edition={edition.edition}
+            aria-hidden="true"
+          >
+            <EditionMark edition={edition.edition} />
           </span>
         )}
         <h1 className={styles.name}>{t("name")}</h1>

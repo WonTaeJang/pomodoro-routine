@@ -4,6 +4,7 @@ import {
   RECIPES,
   SLOTS,
   canUse,
+  editionOf,
   hasVip,
   isFree,
   isVip,
@@ -176,6 +177,16 @@ describe("VIP 조각 (아이돌 무대)", () => {
     expect(() =>
       decodePet(encode(12, { ...pet, furniture: ["stageRoom"] })),
     ).toThrow(PetStorageError);
+  });
+
+  it("에디션: 궁전·아이돌 무대 세트를 다 놓았을 때만, 하나라도 빠지면 없음", () => {
+    const stage = setById("stage").pieces;
+    expect(editionOf(setById("palace").pieces)).toBe("palace");
+    expect(editionOf({ ...stage, outfit: "brownHat" })).toBe("stage");
+    expect(editionOf({ ...stage, pot: "pinePot" })).toBeNull();
+    // Not VIP: the stage pieces are not shown, so no VIP edition.
+    expect(editionOf(withoutVip(stage))).toBeNull();
+    expect(editionOf(setById("cabin").pieces)).toBeNull();
   });
 
   it("VIP가 아니면 VIP 조각만 빼고 보임", () => {

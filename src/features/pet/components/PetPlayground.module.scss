@@ -19,7 +19,7 @@ $key-size: 60px;
 $key-depth: 6px;
 $dot-size: 12px;
 $edition-change: 0.6s;
-$palace-border: 3px;
+$edition-border: 3px;
 
 .page {
   max-width: $page-max;
@@ -66,69 +66,123 @@ $palace-border: 3px;
     transition: none;
   }
 }
-// 궁전 에디션 (I-067): 궁전 세트 넷을 모두 놓으면 버건디 본체 · 금테 · 금 테두리 버튼 · 크림빛 헤더,
-// 본체 윗변에 왕관. 바뀔 때는 0.6초 동안 서서히 (반짝임 없음)
-.device[data-edition="palace"] {
-  --shell: #{device.$palace-shell};
-  --shell-shade: #{device.$palace-shell-shade};
-  --shell-light: #{device.$palace-shell-light};
-  // Room for the crown above the shell.
-  margin-top: var(--space-4);
-  border: $palace-border solid device.$palace-gold;
+// 에디션(세트 넷을 모두 놓으면): 본체 색 · 테두리 · 이름 · 헤더 · 버튼 테두리가 바뀌고,
+// 본체 윗변에 장식이 앉음. 바뀔 때는 0.6초 동안 서서히 (반짝임 없음)
+@mixin edition(
+  $shell,
+  $shell-shade,
+  $shell-light,
+  $ring,
+  $ring-shade,
+  $name,
+  $name-shadow,
+  $hud,
+  $hud-shade,
+  $ink,
+  $mark-room
+) {
+  --shell: #{$shell};
+  --shell-shade: #{$shell-shade};
+  --shell-light: #{$shell-light};
+  // Room for the mark above the shell.
+  margin-top: $mark-room;
+  border: $edition-border solid $ring;
   box-shadow:
     inset 0 -6px 0 var(--shell-shade),
     inset 0 2px 0 var(--shell-light),
-    0 0 0 2px device.$palace-gold-shade;
+    0 0 0 2px $ring-shade;
   .name {
-    color: device.$palace-gold;
-    text-shadow: 0 1px 0 var(--shell-shade);
+    color: $name;
+    text-shadow: $name-shadow;
   }
   .bezel {
-    box-shadow: inset 0 0 0 2px device.$palace-gold-shade;
+    box-shadow: inset 0 0 0 2px $ring-shade;
   }
   .hud:not([data-notice="true"]) {
-    background: device.$palace-hud;
+    background: $hud;
     box-shadow:
-      inset 0 -2px 0 device.$palace-gold-shade,
+      inset 0 -2px 0 $hud-shade,
       0 2px 0 device.$lcd-header-light;
   }
   .pad {
-    color: device.$palace-ink;
+    color: $ink;
     &:not(:disabled, [data-resting]) {
-      --key-edge: #{device.$palace-gold-shade};
+      --key-edge: #{$ring-shade};
     }
     &[data-resting],
     &:disabled {
-      color: color-mix(in srgb, device.$palace-ink 55%, var(--shell));
+      color: color-mix(in srgb, $ink 55%, var(--shell));
     }
   }
-  // 버튼 금 테두리: 버튼 그림자(눌림)와 따로 겹침
+  // 버튼 테두리: 버튼 그림자(눌림)와 따로 겹침
   .key::after {
     content: "";
     position: absolute;
     inset: 0;
     border-radius: inherit;
-    box-shadow: inset 0 0 0 3px device.$palace-gold;
+    box-shadow: inset 0 0 0 3px $ring;
     pointer-events: none;
   }
   .padHint {
-    color: color-mix(in srgb, device.$palace-ink 75%, var(--shell));
+    color: color-mix(in srgb, $ink 75%, var(--shell));
   }
 }
-// 왕관은 본체 윗변에 걸쳐 앉음
-.crown {
+// 궁전 에디션 (I-067): 버건디 본체 · 금테 · 금 이름 · 크림빛 헤더, 위에 왕관
+.device[data-edition="palace"] {
+  @include edition(
+    device.$palace-shell,
+    device.$palace-shell-shade,
+    device.$palace-shell-light,
+    device.$palace-gold,
+    device.$palace-gold-shade,
+    device.$palace-gold,
+    0 1px 0 device.$palace-shell-shade,
+    device.$palace-hud,
+    device.$palace-gold-shade,
+    device.$palace-ink,
+    var(--space-4)
+  );
+}
+// VIP 에디션 (아이돌 무대 세트): 연보라 본체 · 핫핑크 테두리 · 흰 이름에 핑크 외곽 ·
+// 연분홍 헤더, 위에 핑크 리본
+.device[data-edition="stage"] {
+  @include edition(
+    device.$stage-shell,
+    device.$stage-shell-shade,
+    device.$stage-shell-light,
+    device.$stage-pink,
+    device.$stage-pink-shade,
+    #fff,
+    (
+      0 1px 0 device.$stage-name-line,
+      1px 0 0 device.$stage-name-line,
+      -1px 0 0 device.$stage-name-line,
+      0 -1px 0 device.$stage-name-line
+    ),
+    device.$stage-hud,
+    device.$stage-hud-shade,
+    device.$stage-ink,
+    var(--space-6)
+  );
+}
+// 장식(왕관·리본)은 본체 윗변에 걸쳐 앉음
+.editionMark {
   position: absolute;
   top: -19px;
   left: 50%;
   transform: translateX(-50%);
   line-height: 0;
   filter: drop-shadow(0 2px 0 device.$palace-shell-shade);
-  animation: crown-in $edition-change ease-out;
+  animation: mark-in $edition-change ease-out;
   @include mixins.reduced-motion {
     animation: none;
   }
+  &[data-edition="stage"] {
+    top: -26px;
+    filter: drop-shadow(0 2px 0 device.$stage-shell-shade);
+  }
 }
-@keyframes crown-in {
+@keyframes mark-in {
   from {
     opacity: 0;
     transform: translate(-50%, -6px);

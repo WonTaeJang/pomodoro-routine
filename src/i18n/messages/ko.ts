@@ -56,7 +56,10 @@ const ko = {
       setMade: "{total}개 중 {count}개 만듦",
       setMissing: "{name}, 아직 안 만듦",
       setLeft: "{count}개 더 만들면 적용할 수 있어요",
-      setEdition: "다 놓으면 게임기가 궁전 에디션으로 바뀌어요",
+      setEdition: {
+        palace: "다 놓으면 게임기가 궁전 에디션으로 바뀌어요",
+        stage: "다 놓으면 게임기가 VIP 에디션으로 바뀌어요",
+      },
       sets: {
         cabin: { name: "숲속 오두막 세트", to: "숲속 오두막 세트로" },
         floral: { name: "파스텔 꽃 세트", to: "파스텔 꽃 세트로" },
@@ -340,8 +343,8 @@ const ko = {
       sleep: "쿨쿨…",
     },
     panel: { collapse: "접기", expand: "펼치기" },
-    // 궁전 세트 넷을 모두 놓았을 때 헤더 안내 (I-067)
-    palace: { notice: "궁전 에디션이 됐어요!" },
+    // 에디션 세트 넷을 모두 놓았을 때 헤더 안내 (궁전 I-067, 아이돌 무대)
+    edition: { palace: "궁전 에디션이 됐어요!", stage: "VIP 에디션이 됐어요!" },
     log: {
       title: "기록",
       more: "더 보기 ({count})",
@@ -357,7 +360,10 @@ const ko = {
       skipped: "산책을 건너뛰고 {object} 주워 왔어요",
       levelHeart: "Lv.{level} 달성! 하트를 받았어요",
       stamp: "사이클 완료! 발바닥 도장을 받았어요",
-      palace: "궁전 세트를 다 놓아 게임기가 궁전 에디션이 됐어요",
+      edition: {
+        palace: "궁전 세트를 다 놓아 게임기가 궁전 에디션이 됐어요",
+        stage: "아이돌 무대 세트를 다 놓아 게임기가 VIP 에디션이 됐어요",
+      },
       craft: "{object} 만들었어요",
       place: "{slot} {to} 바꿨어요",
       set: "방을 {to} 꾸몄어요",

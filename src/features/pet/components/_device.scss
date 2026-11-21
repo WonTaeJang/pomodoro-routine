@@ -20,6 +20,16 @@ $palace-gold: #e2b54c;
 $palace-gold-shade: #a8792a;
 $palace-hud: #f3e2c8;
 $palace-ink: #fbeedd;
+// VIP 에디션: 아이돌 무대 방과 같은 파스텔 무대. 연보라 본체에 핫핑크 테두리
+$stage-shell: #c9b8f4;
+$stage-shell-shade: #9c84de;
+$stage-shell-light: #e6ddfb;
+$stage-pink: #ff6fb1;
+$stage-pink-shade: #d94f8e;
+$stage-name-line: #c9387e;
+$stage-hud: #fff0f7;
+$stage-hud-shade: #f7a8cb;
+$stage-ink: #3f2a78;
 // 액정 색 카드(기록·친밀도·아이템 칸). 믹스인이라 쓰는 곳에서만 CSS가 나옵니다.
 @mixin lcd-card {
   border-radius: var(--radius-md);

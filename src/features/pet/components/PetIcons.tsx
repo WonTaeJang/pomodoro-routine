@@ -1,4 +1,4 @@
-import type { Material, Slot } from "../furniture";
+import type { EditionId, Material, Slot } from "../furniture";
 import type { ItemId } from "../items";
 
 // 돌봄 기계의 도트 아이콘. 한 글자가 한 칸이고 '.'은 비워 둡니다.
@@ -10,6 +10,8 @@ type Pixels = { rows: string[]; colors: Record<string, string> };
 const GOLD = "#d79a2b";
 const GOLD_SHADE = "#a8792a";
 const RUBY = "#c8283f";
+// VIP 에디션 리본 (_device.scss의 $stage-pink와 같은 핫핑크)
+const RIBBON = { P: "#d93f86", p: "#ff6fb1", h: "#ffc2df", K: "#b82a6c" };
 
 function pixelPaths({ rows, colors }: Pixels) {
   return Object.entries(colors).map(([key, color]) => {
@@ -124,6 +126,18 @@ const STATUS = {
       "ssssssss",
     ],
     colors: { "#": GOLD, o: RUBY, s: GOLD_SHADE },
+  },
+  // VIP 에디션 안내: 핑크 리본
+  stage: {
+    rows: [
+      "PP....PP",
+      "PpPKKPpP",
+      "PppKKppP",
+      "PPPKKPPP",
+      "..P..P..",
+      ".P....P.",
+    ],
+    colors: RIBBON,
   },
   levelUp: {
     rows: [
@@ -406,8 +420,27 @@ const PALACE_CROWN = {
   ],
   colors: { g: "#e2b54c", l: "#f6dc8a", r: RUBY, s: GOLD_SHADE },
 };
-export function PalaceCrown() {
-  return <PixelIcon art={PALACE_CROWN} size={20} />;
+// VIP 에디션 본체 윗변에 묶은 큰 리본: 고리 둘, 매듭, 아래로 꼬리 둘
+const STAGE_RIBBON = {
+  rows: [
+    ".PPP.....PPP.",
+    "PpppP...PpppP",
+    "PphppPKPpphpP",
+    "PpppppKpppppP",
+    "PpppPPKPPpppP",
+    ".PPP.PpP.PPP.",
+    ".....P.P.....",
+    "....PP.PP....",
+  ],
+  colors: RIBBON,
+};
+/** What sits on the device's top edge in each edition. */
+export function EditionMark({ edition }: { edition: EditionId }) {
+  return edition === "palace" ? (
+    <PixelIcon art={PALACE_CROWN} size={20} />
+  ) : (
+    <PixelIcon art={STAGE_RIBBON} size={32} />
+  );
 }
 
 // 꾸미기 모드 버튼: 이전·다음·고르기·취소

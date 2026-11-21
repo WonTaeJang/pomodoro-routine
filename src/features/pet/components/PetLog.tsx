@@ -44,8 +44,8 @@ function EntryIcon({ entry }: { entry: PetLogEntry }) {
       return <HeartItemIcon size={11} />;
     case "stamp":
       return <PawItemIcon size={12} />;
-    case "palace":
-      return <StatusIcon status="palace" />;
+    case "edition":
+      return <StatusIcon status={entry.edition} />;
     case "craft":
       return <LookPicture look={entry.furniture} height={12} />;
     case "place":
@@ -96,6 +96,8 @@ function EntryText({ entry }: { entry: PetLogEntry }) {
       });
     case "set":
       return t("log.set", { to: t(`items.sets.${entry.set}.to`) });
+    case "edition":
+      return t(`log.edition.${entry.edition}`);
     default:
       return t(`log.${entry.kind}`);
   }

@@ -56,7 +56,10 @@ const en: Messages = {
       setMade: "{count} of {total} made",
       setMissing: "{name}, not made yet",
       setLeft: "Make {count} more to use it",
-      setEdition: "Place them all to turn the device into the palace edition",
+      setEdition: {
+        palace: "Place them all to turn the device into the palace edition",
+        stage: "Place them all to turn the device into the VIP edition",
+      },
       sets: {
         cabin: { name: "Forest cabin set", to: "the forest cabin set" },
         floral: { name: "Pastel flower set", to: "the pastel flower set" },
@@ -363,7 +366,7 @@ const en: Messages = {
       sleep: "Zzz…",
     },
     panel: { collapse: "Collapse", expand: "Expand" },
-    palace: { notice: "Palace edition!" },
+    edition: { palace: "Palace edition!", stage: "VIP edition!" },
     log: {
       title: "Log",
       more: "Show {count} more",
@@ -379,7 +382,10 @@ const en: Messages = {
       skipped: "Skipped the walk and brought back {object}",
       levelHeart: "Level {level}! Got a heart",
       stamp: "Cycle done! Got a paw stamp",
-      palace: "The whole palace set is in: palace edition!",
+      edition: {
+        palace: "The whole palace set is in: palace edition!",
+        stage: "The whole idol stage set is in: VIP edition!",
+      },
       craft: "Made {object}",
       place: "Changed the {slot} to {to}",
       set: "Decorated the room with {to}",

@@ -412,11 +412,11 @@ function SetCard({
           );
         })}
       </ul>
-      {/* 궁전 세트만 게임기가 바뀜 (I-067) */}
-      {set.id === "palace" && (
+      {/* 에디션 세트(궁전 I-067, 아이돌 무대)는 다 놓으면 게임기가 바뀜 */}
+      {"edition" in set && (
         <p className={styles.setEdition}>
-          <StatusIcon status="palace" />
-          {t("setEdition")}
+          <StatusIcon status={set.id} />
+          {t(`setEdition.${set.id}`)}
         </p>
       )}
       {/* 하나라도 없으면 버튼 없이 남은 개수만 */}

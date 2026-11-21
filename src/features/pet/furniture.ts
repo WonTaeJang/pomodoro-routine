@@ -216,6 +216,7 @@ export const SETS = [
   // device turns into the palace edition (I-067).
   {
     id: "palace",
+    edition: true,
     pieces: {
       room: "palaceRoom",
       window: "palaceWindow",
@@ -223,10 +224,11 @@ export const SETS = [
       rug: "palaceRug",
     },
   },
-  // VIP 계정에만 보임 (조각을 만들지 않고 처음부터 가짐)
+  // VIP 계정에만 보임 (조각을 만들지 않고 처음부터 가짐). 다 놓으면 VIP 에디션
   {
     id: "stage",
     vip: true,
+    edition: true,
     pieces: {
       room: "stageRoom",
       window: "lightstickWindow",
@@ -237,10 +239,14 @@ export const SETS = [
 ] as const satisfies readonly {
   id: string;
   vip?: true;
+  /** Placed all together, the device takes this set's look (useDeviceEdition). */
+  edition?: true;
   pieces: Record<SetSlot, FurnitureId>;
 }[];
 export type RoomSet = (typeof SETS)[number];
 export type SetId = RoomSet["id"];
+/** Sets that change the device: the palace edition (I-067) and the VIP edition. */
+export type EditionId = Extract<RoomSet, { edition: true }>["id"];
 
 /** The sets an account sees: the VIP set only on a VIP account. */
 export const setsFor = (vip: boolean) =>
@@ -257,6 +263,12 @@ export const isSetPlaced = (set: RoomSet, placed: Placed) =>
 
 export const isPalace = (placed: Placed) =>
   isSetPlaced(setById("palace"), placed);
+
+/** The device edition the room makes, if a whole edition set is placed. */
+export function editionOf(placed: Placed): EditionId | null {
+  const set = SETS.find((set) => "edition" in set && isSetPlaced(set, placed));
+  return set ? (set.id as EditionId) : null;
+}
 
 /** Items left to use: found minus spent. */
 export function availableItems(
