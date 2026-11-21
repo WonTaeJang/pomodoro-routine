@@ -72,7 +72,7 @@ export function PetItemBox({
   onCraft: (furniture: FurnitureId) => void;
   /** Put something made or given in its place in the room; the box stays open. */
   onApply: (look: LookId) => void;
-  /** Put a whole set in the room (I-069); the box stays open. */
+  /** Put a whole set in the room (I-069); the page closes the box to show it. */
   onApplySet: (set: RoomSet) => void;
   /** Close the box and start decorating the room. */
   onDecorate: () => void;
