@@ -12,6 +12,19 @@ const GOLD_SHADE = "#a8792a";
 const RUBY = "#c8283f";
 // VIP 에디션 리본 (_device.scss의 $stage-pink와 같은 핫핑크)
 const RIBBON = { P: "#d93f86", p: "#ff6fb1", h: "#ffc2df", K: "#b82a6c" };
+// VIP 선물 상자 (I-070): VIP 에디션과 같은 연보라 상자에 핫핑크 리본, 금 반짝이
+const GIFT_COLORS = {
+  P: RIBBON.P,
+  p: "#ff8fc6",
+  K: RIBBON.p,
+  L: "#5a3fa8",
+  l: "#c2adf2",
+  B: "#6d52c4",
+  b: "#a58be6",
+  h: "#e6ddfb",
+  s: "#ffd66b",
+  w: "#fff6c8",
+};
 
 function pixelPaths({ rows, colors }: Pixels) {
   return Object.entries(colors).map(([key, color]) => {
@@ -138,6 +151,18 @@ const STATUS = {
       ".P....P.",
     ],
     colors: RIBBON,
+  },
+  // VIP 선물 상자 안내: 작은 선물 상자
+  gift: {
+    rows: [
+      "..P..P..",
+      "...PP...",
+      "LLLKKLLL",
+      ".bbKKbb.",
+      ".bbKKbb.",
+      ".BBKKBB.",
+    ],
+    colors: GIFT_COLORS,
   },
   levelUp: {
     rows: [
@@ -434,6 +459,55 @@ const STAGE_RIBBON = {
   ],
   colors: RIBBON,
 };
+// VIP 선물 상자: 닫힌 상자(방 바닥)와 뚜껑이 열린 상자(여는 팝업)
+const GIFT_BOX = {
+  rows: [
+    "...PPP..PPP...",
+    "..PpppPPpppP..",
+    "...PPPKKPPP...",
+    "LLLLLLKKLLLLLL",
+    "LhllllKKllllhL",
+    "LLLLLLKKLLLLLL",
+    ".BBBBBKKBBBBB.",
+    ".BhbbbKKbbbbB.",
+    ".BbbbbKKbbbbB.",
+    ".BbbbbKKbbbbB.",
+    ".BbbbbKKbbbbB.",
+    ".BBBBBKKBBBBB.",
+  ],
+  colors: GIFT_COLORS,
+};
+const GIFT_OPEN = {
+  rows: [
+    "..s........s....",
+    ".sws......sws...",
+    "..s..PPP.PPP.s..",
+    "....PpppPpppP...",
+    "..LLLLLLKKLLLLLL",
+    "..LhllllKKllllhL",
+    "..LLLLLLKKLLLLLL",
+    "......s.........",
+    ".....sws...s....",
+    ".s....s...sws...",
+    "sws........s....",
+    ".s.BBBBBKKBBBBB.",
+    "...BbbbbKKbbbbB.",
+    "...BbbbbKKbbbbB.",
+    "...BbbbbKKbbbbB.",
+    "...BBBBBKKBBBBB.",
+  ],
+  colors: GIFT_COLORS,
+};
+export function GiftBoxIcon({
+  open = false,
+  size,
+}: {
+  open?: boolean;
+  size: number;
+}) {
+  return <PixelIcon art={open ? GIFT_OPEN : GIFT_BOX} size={size} />;
+}
+
 /** What sits on the device's top edge in each edition. */
 export function EditionMark({ edition }: { edition: EditionId }) {
   return edition === "palace" ? (

@@ -28,6 +28,8 @@ import {
 import {
   addWalks,
   createPetProfile,
+  giftWaiting,
+  receiveGift,
   makeFurniture,
   materialsLeft,
   placeFurniture,
@@ -201,6 +203,64 @@ describe("VIP 조각 (아이돌 무대)", () => {
   });
 });
 
+describe("VIP 선물 상자", () => {
+  const DAY = "2026-11-21";
+  const NEXT = "2026-11-22";
+
+  it("하루 한 번 산책 재료 6가지를 하나씩, 새 아이템 점은 그대로", () => {
+    const pet = withItems({ leaf: 2 });
+    const got = receiveGift(pet, 10, DAY);
+    expect(got.items).toEqual({
+      leaf: 3,
+      twig: 1,
+      stone: 1,
+      pinecone: 1,
+      flower: 1,
+      ball: 1,
+    });
+    expect(got.gifts).toBe(1);
+    expect(got.giftDay).toBe(DAY);
+    expect(got.itemsSeen - pet.itemsSeen).toBe(6);
+    expect(giftWaiting(got, DAY)).toBe(false);
+    expect(giftWaiting(got, NEXT)).toBe(true);
+    // Same day again, or a late save for an older day: nothing.
+    expect(receiveGift(got, 11, DAY)).toBe(got);
+    expect(receiveGift(got, 11, "2026-11-20")).toBe(got);
+    expect(receiveGift(got, 12, NEXT).gifts).toBe(2);
+  });
+
+  it("두 기기에서 같은 날 열어도 합치면 한 번", () => {
+    const base = withItems({});
+    const a = careEntry({ kind: "gift" }, Date.parse("2026-11-21T09:00"));
+    const b = careEntry({ kind: "gift" }, Date.parse("2026-11-21T10:00"));
+    const merged = applyPending(base, [a, b]);
+    expect(merged.gifts).toBe(1);
+    expect(merged.items.ball).toBe(1);
+  });
+
+  it("저장하고 다시 읽음, 예전 기록은 선물 0으로", () => {
+    const got = receiveGift(withItems({ leaf: 1 }), 10, DAY);
+    expect(decodePet(encode(13, got))).toMatchObject({
+      gifts: 1,
+      giftDay: DAY,
+    });
+    const old = { ...withItems({ leaf: 1 }) } as Partial<typeof got>;
+    delete old.gifts;
+    delete old.giftDay;
+    expect(decodePet(encode(12, old))).toMatchObject({
+      gifts: 0,
+      giftDay: null,
+    });
+    // Items that came from nowhere, or a gift without a day, are rejected.
+    expect(() => decodePet(encode(13, { ...got, gifts: 2 }))).toThrow(
+      PetStorageError,
+    );
+    expect(() => decodePet(encode(13, { ...got, giftDay: null }))).toThrow(
+      PetStorageError,
+    );
+  });
+});
+
 describe("가구 놓기", () => {
   const owner = makeFurniture(
     withItems({ flower: 2, twig: 1 }),
@@ -324,8 +384,8 @@ describe("가구 저장 형식", () => {
     expect(decodePet(encode(7, pet))).toEqual(pet);
   });
 
-  it("v13 이상은 새 버전이라 건드리지 않음", () => {
-    expect(() => decodePet(encode(13, withItems({ leaf: 1 })))).toThrow(
+  it("v14 이상은 새 버전이라 건드리지 않음", () => {
+    expect(() => decodePet(encode(14, withItems({ leaf: 1 })))).toThrow(
       PetStorageError,
     );
   });

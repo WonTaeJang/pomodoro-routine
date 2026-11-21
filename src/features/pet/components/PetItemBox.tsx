@@ -61,12 +61,15 @@ export function PetItemBox({
   onDecorate,
   stamps,
   vip,
+  startTab = "materials",
 }: {
   open: boolean;
   onClose: () => void;
   pet: PetProfile;
   /** A VIP account: the idol stage set and bubble show, marked VIP. */
   vip: boolean;
+  /** The tab it opens on first (the first VIP gift box opens the sets). */
+  startTab?: Tab;
   /** Paw stamps from finished cycles (I-066). */
   stamps: number;
   onCraft: (furniture: FurnitureId) => void;
@@ -78,7 +81,7 @@ export function PetItemBox({
   onDecorate: () => void;
 }) {
   const t = useTranslations("pet.items");
-  const [tab, setTab] = useState<Tab>("materials");
+  const [tab, setTab] = useState<Tab>(startTab);
   // Kept here so the chosen place stays while looking at another tab.
   const [slot, setSlot] = useState<Slot>(SLOTS[0]);
   const [guideOpen, setGuideOpen] = useState(false);
@@ -102,6 +105,7 @@ export function PetItemBox({
     >
       {/* 상자가 닫히면 함께 닫힘 */}
       <PetItemGuide
+        vip={vip}
         open={open && guideOpen}
         onClose={() => setGuideOpen(false)}
       />
@@ -432,7 +436,8 @@ function SetCard({
 }
 
 /** Gold "VIP" mark, like the profile's VIP badge. */
-function VipBadge() {
+/** The gold VIP mark on VIP pieces, sets and the first gift box. */
+export function VipBadge() {
   const t = useTranslations("pet.items");
   return <span className={styles.vip}>{t("vip")}</span>;
 }

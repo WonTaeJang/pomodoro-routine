@@ -258,6 +258,31 @@ $slot-tag-color: #fffaf0;
   -webkit-tap-highlight-color: transparent;
 }
 
+// 오늘의 VIP 선물 상자 (I-070): 까미 왼쪽 바닥. 로딩 덮개 아래, 까미 그림과는 겹치지 않음
+.giftBox {
+  position: absolute;
+  z-index: $interaction-layer;
+  left: calc(50% - 150px);
+  bottom: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
+  filter: drop-shadow(0 3px 0 rgb(60 40 110 / 35%));
+  transition: transform var(--duration-fast);
+  &:hover {
+    transform: translateY(-2px);
+  }
+  &:focus-visible {
+    outline: $petTarget-focus-visible-outline;
+    outline-offset: 4px;
+  }
+  @include mixins.reduced-motion {
+    transition: none;
+  }
+}
+
 .petTarget:active:not(:disabled) {
   cursor: grabbing;
 }

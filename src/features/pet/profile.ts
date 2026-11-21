@@ -9,6 +9,7 @@ import {
   type Affinity,
 } from "./affinity";
 import {
+  ITEMS,
   isItemCounts,
   isItemId,
   totalItems,
@@ -61,6 +62,10 @@ export type PetProfile = LegacyPetProfile & {
   /** Treats on the latest treat day (local date), for the daily limit. */
   snackDay: string | null;
   snacksOnDay: number;
+  /** VIP gift boxes opened (I-070): each brings one of every walk item. */
+  gifts: number;
+  /** The local date of the latest gift box: one a day. */
+  giftDay: string | null;
 };
 
 /** Walks a day; the walk key rests after that until the next day. */
@@ -87,6 +92,13 @@ function countForDay(
   return day === latest ? [day, count + amount] : null;
 }
 
+/** What a record from before VIP gift boxes starts with. */
+export const NO_GIFTS = { gifts: 0, giftDay: null } as const;
+/** One of every walk item in each VIP gift box. */
+export const GIFT_EACH = 1;
+/** Walk items in each VIP gift box. */
+export const GIFT_TOTAL = ITEMS.length * GIFT_EACH;
+
 /** What a record from before furniture starts with. */
 export const NO_FURNITURE = { spent: {}, furniture: [], placed: {} } as const;
 
@@ -107,6 +119,7 @@ export function createPetProfile(id: string, now: number): PetProfile {
     placed: {},
     ...NO_DAILY_WALKS,
     ...NO_DAILY_SNACKS,
+    ...NO_GIFTS,
   };
 }
 
@@ -161,6 +174,33 @@ export function addWalks(
     updatedAt: Math.max(now, pet.updatedAt),
   };
 }
+
+/**
+ * Open the day's VIP gift box: one of every walk item. Once a day; a late
+ * save for the same or an older day changes nothing (two devices, one box).
+ * The items count as seen, so the box shows no new-item dot for them.
+ */
+export function receiveGift(
+  pet: PetProfile,
+  now: number,
+  day = affinityDay(now),
+): PetProfile {
+  if (!giftWaiting(pet, day)) return pet;
+  const items = { ...pet.items };
+  for (const { id } of ITEMS) items[id] = (items[id] ?? 0) + GIFT_EACH;
+  return {
+    ...pet,
+    items,
+    itemsSeen: pet.itemsSeen + GIFT_TOTAL,
+    gifts: pet.gifts + 1,
+    giftDay: day,
+    updatedAt: Math.max(now, pet.updatedAt),
+  };
+}
+
+/** A gift box waits on `day` (local date) if none was opened on it or later. */
+export const giftWaiting = (pet: PetProfile, day: string) =>
+  pet.giftDay === null || day > pet.giftDay;
 
 /** Walks taken on `day` (a local YYYY-MM-DD date). */
 export function walksOn(pet: PetProfile, day: string): number {
@@ -243,6 +283,12 @@ export function placeFurniture(
   return { ...pet, placed, updatedAt: Math.max(now, pet.updatedAt) };
 }
 
+/** Gift boxes opened and the latest one's date: a date once there is one. */
+function isGifts(gifts: unknown, day: unknown) {
+  if (!Number.isSafeInteger(gifts) || (gifts as number) < 0) return false;
+  return gifts === 0 ? day === null : isDayKey(day);
+}
+
 /** A latest day and its count: none before the first, never above the total. */
 function isDailyCount(day: unknown, count: unknown, total: number) {
   if (!Number.isSafeInteger(count) || (count as number) < 0) return false;
@@ -303,10 +349,12 @@ export function isPetProfile(value: unknown): value is PetProfile {
     isAffinity(p.affinity, p.totalSnacks) &&
     Number.isSafeInteger(p.walks) &&
     isItemCounts(p.items) &&
-    totalItems(p.items) === p.walks &&
+    isGifts(p.gifts, p.giftDay) &&
+    // Every item came from a walk or a gift box.
+    totalItems(p.items) === p.walks! + p.gifts! * GIFT_TOTAL &&
     Number.isSafeInteger(p.itemsSeen) &&
     p.itemsSeen! >= 0 &&
-    p.itemsSeen! <= p.walks! &&
+    p.itemsSeen! <= totalItems(p.items!) &&
     isFurnitureState(p) &&
     isDailyCount(p.walkDay, p.walksOnDay, p.walks!) &&
     isDailyCount(p.snackDay, p.snacksOnDay, p.totalSnacks)

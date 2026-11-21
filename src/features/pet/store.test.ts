@@ -264,6 +264,8 @@ describe("돌봄 로컬 저장", () => {
       "affinity",
       "createdAt",
       "furniture",
+      "giftDay",
+      "gifts",
       "id",
       "items",
       "itemsSeen",
@@ -809,6 +811,20 @@ describe("방 꾸미기 기록", () => {
     const b = f.store();
     await b.getState().hydrate();
     expect(b.getState().pet!.placed).toEqual(placed);
+  });
+
+  it("VIP 선물 상자는 하루 한 번만 받고, 다시 열어도 그대로", async () => {
+    const f = fixture(),
+      a = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    await a.getState().recordGift();
+    await a.getState().recordGift();
+    expect(a.getState().pet).toMatchObject({ gifts: 1, walks: 0 });
+    expect(a.getState().pet!.items).toMatchObject({ leaf: 1, ball: 1 });
+    const b = f.store();
+    await b.getState().hydrate();
+    expect(b.getState().pet).toMatchObject({ gifts: 1 });
   });
 
   it("VIP 조각은 만들지 않고 놓고, null로 한 번에 기본 모양으로", async () => {

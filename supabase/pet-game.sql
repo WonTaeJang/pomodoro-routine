@@ -72,6 +72,7 @@ create table public.pet_game_history (
     or (kind = 'craft' and furniture is not null and item is null and slot is null)
     or (kind = 'place' and slot is not null and item is null)
     or (kind in ('pats', 'snacks', 'seen') and item is null and furniture is null and slot is null)
+    -- 'gift'(VIP 선물 상자)는 pet-gift.sql이 더합니다 (admin.sql의 vip_users가 필요해서 따로)
   )
 );
 

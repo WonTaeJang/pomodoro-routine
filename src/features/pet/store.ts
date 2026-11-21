@@ -39,6 +39,8 @@ type PetStore = {
   recordPlaceAll(
     pieces: Partial<Record<Slot, FurnitureId | null>>,
   ): Promise<void>;
+  /** Open the day's VIP gift box (the page checks VIP; the server too). */
+  recordGift(): Promise<void>;
   /** The item box was opened: clear the new-item dot. */
   markItemsSeen(): Promise<void>;
   retry(): Promise<void>;
@@ -188,6 +190,7 @@ export function createPetStore(
             furniture,
           })),
         ),
+      recordGift: () => recordCare({ kind: "gift" }),
       markItemsSeen: () => {
         const pet = get().pet;
         if (!pet || pet.itemsSeen >= totalItems(pet.items))

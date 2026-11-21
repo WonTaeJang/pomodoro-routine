@@ -1,0 +1,127 @@
+@use "../../../styles/mixins";
+@use "device";
+
+// VIP 선물 상자를 연 팝업: (처음이면 VIP 세트 안내) · 열린 상자 · 재료 6가지 · 버튼
+$open-at: 0.7s;
+
+.gift {
+  display: grid;
+  gap: var(--space-3-5);
+}
+// 처음 한 번: 아이돌 무대 세트를 받았다는 안내 (VIP 에디션의 연분홍)
+.welcome {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: device.$stage-hud;
+  box-shadow: inset 0 0 0 2px device.$stage-hud-shade;
+  color: #6b2a55;
+  strong {
+    display: flex;
+    align-items: center;
+    color: #8a2457;
+    font-size: var(--font-size-sm);
+  }
+  p {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+  }
+}
+.pieces {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-1-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  li {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    background: #fff;
+  }
+}
+// 닫힌 상자가 흔들리다 열린 상자로 바뀜
+.box {
+  display: grid;
+  place-items: center;
+  height: 84px;
+  > span {
+    grid-area: 1 / 1;
+    line-height: 0;
+  }
+}
+.closed {
+  animation:
+    gift-shake $open-at ease-in-out,
+    gift-hide 0s linear $open-at forwards;
+}
+.opened {
+  opacity: 0;
+  animation: gift-show 0.25s ease-out $open-at forwards;
+}
+@include mixins.reduced-motion {
+  .closed {
+    display: none;
+  }
+  .opened {
+    opacity: 1;
+    animation: none;
+  }
+}
+@keyframes gift-shake {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20%,
+  60% {
+    transform: rotate(-8deg);
+  }
+  40%,
+  80% {
+    transform: rotate(8deg);
+  }
+}
+@keyframes gift-hide {
+  to {
+    visibility: hidden;
+  }
+}
+@keyframes gift-show {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.lead {
+  margin: 0;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+// 재료 칸은 아이템 상자 칸(PetItemBox의 grid·slot)에 받는 수만 오른쪽 위에
+.got {
+  position: relative;
+  b {
+    position: absolute;
+    top: var(--space-1);
+    right: var(--space-1-5);
+    color: #d0508e;
+    font-size: var(--font-size-2xs);
+  }
+}
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  > * {
+    flex: 1;
+  }
+}

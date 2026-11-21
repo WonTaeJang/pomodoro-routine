@@ -28,6 +28,7 @@ const ko = {
       notFound: "아직 못 찾음",
       heartLocked: "아직 못 받음",
       stampLocked: "사이클 완료 시",
+      giftName: "VIP 선물 상자",
       guide: {
         button: "얻는 방법",
         title: "얻는 방법",
@@ -36,6 +37,7 @@ const ko = {
         walk: "산책할 때마다 하나 · {chance, select, often {자주} sometimes {가끔} other {드물게}} ({percent}%)",
         heart: "친밀도 레벨이 오를 때마다 1개",
         stamp: "집중 사이클을 마칠 때마다 1개",
+        gift: "하루 한 번 · 산책 재료 {kinds}가지를 {count}개씩",
       },
       count: "× {count}",
       leaf: { name: "나뭇잎", object: "나뭇잎을" },
@@ -365,6 +367,19 @@ const ko = {
     panel: { collapse: "접기", expand: "펼치기" },
     // 에디션 세트 넷을 모두 놓았을 때 헤더 안내 (궁전 I-067, 아이돌 무대)
     edition: { palace: "궁전 에디션이 됐어요!", stage: "VIP 에디션이 됐어요!" },
+    // VIP 선물 상자 (I-070)
+    gift: {
+      title: "VIP 선물 상자",
+      arrived: "VIP 선물 상자가 왔어요!",
+      open: "VIP 선물 상자 열기",
+      lead: "오늘의 선물: 산책 재료 {count}가지를 하나씩",
+      take: "받기",
+      toSets: "세트 보러 가기",
+      welcome: {
+        title: "VIP 혜택",
+        text: "아이돌 무대 세트를 받았어요. 아이템 상자 › 세트에서 바로 적용할 수 있어요.",
+      },
+    },
     log: {
       title: "기록",
       more: "더 보기 ({count})",
@@ -387,6 +402,7 @@ const ko = {
       craft: "{object} 만들었어요",
       place: "{slot} {to} 바꿨어요",
       set: "방을 {to} 꾸몄어요",
+      gift: "VIP 선물 상자에서 산책 재료 {count}개를 받았어요",
       walkLimit: "오늘 산책 {count}번을 다 했어요. 내일 또 가요!",
       snackLimit: "오늘 간식 {count}번을 다 줬어요. 내일 또 줄게요!",
     },

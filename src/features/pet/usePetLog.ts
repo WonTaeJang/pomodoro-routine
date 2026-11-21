@@ -9,6 +9,7 @@ import { petStore } from "./store";
 export type PetLogEvent =
   | { kind: "enter" | "wake" | "walkOut" | "home" | "stamp" }
   | { kind: "edition"; edition: EditionId }
+  | { kind: "gift"; count: number }
   | { kind: "pat"; points: number; total: number }
   | { kind: "snack"; points: number }
   | { kind: "found" | "skipped"; item: ItemId }

@@ -22,7 +22,13 @@ import styles from "./PetPlayground.module.scss";
 import { PetWalk } from "./PetWalk";
 import { PetRoomArt, type RoomDecorating } from "./PetRoomArt";
 import { PetAffinityDetail, PetHearts, usePetAffinity } from "./PetAffinity";
-import { EditionMark, StatusIcon, type PetStatusIcon } from "./PetIcons";
+import {
+  EditionMark,
+  GiftBoxIcon,
+  StatusIcon,
+  type PetStatusIcon,
+} from "./PetIcons";
+import { PetGiftBox } from "./PetGiftBox";
 import { PetPad } from "./PetPad";
 import { PetSpeechBubble } from "./PetSpeechBubble";
 import { DecoratePads, DecoratePick, decorateTag } from "./PetDecorate";
@@ -40,6 +46,8 @@ import {
 import { PET_HAPPY_MS } from "../pet";
 import { lookOf, type FurnitureId, type Slot } from "../furniture";
 import { useDeviceEdition } from "../useDeviceEdition";
+import { useVipGift } from "../useVipGift";
+import { GIFT_TOTAL } from "../profile";
 import { shownPlaced, usePetVip, useVipRoomCleanup } from "../usePetVip";
 import { PetFoundCard, PetWalkMap } from "./PetTrip";
 import { PetItemBox } from "./PetItemBox";
@@ -169,6 +177,17 @@ function PetRoom({ retry }: { retry: () => void }) {
     if (levelUp !== null) addLog({ kind: "level", level: levelUp });
   }, [levelUp, addLog]);
 
+  // VIP: one gift box a day in the room (I-070).
+  const gift = useVipGift(vip, record ?? null);
+  const [giftOpen, setGiftOpen] = useState(false);
+  function takeGift(toSets: boolean) {
+    void petStore.getState().recordGift();
+    addLog({ kind: "gift", count: GIFT_TOTAL });
+    cheer();
+    setGiftOpen(false);
+    if (toSets) openBox(true);
+  }
+
   // A whole edition set placed (palace, idol stage): the device changes.
   const edition = useDeviceEdition(vip);
   useEffect(() => {
@@ -198,12 +217,15 @@ function PetRoom({ retry }: { retry: () => void }) {
   const [shownWalk, setShownWalk] = useState<number | null>();
 
   const [boxOpen, setBoxOpen] = useState(false);
+  // Opening at the sets tab (from the first gift box) starts a fresh box.
+  const [boxStart, setBoxStart] = useState({ sets: false, n: 0 });
   const newItems =
     affinity.newHeart ||
     stamps.unseen ||
     (record ? record.itemsSeen < totalItems(record.items) : false);
   const boxButton = useRef<HTMLButtonElement>(null);
-  function openBox() {
+  function openBox(atSets = false) {
+    if (atSets) setBoxStart(({ n }) => ({ sets: true, n: n + 1 }));
     setBoxOpen(true);
     affinity.seeHeart();
     stamps.see();
@@ -262,7 +284,8 @@ function PetRoom({ retry }: { retry: () => void }) {
     : undefined;
 
   // One status at a time in the header: a passing notice in gold (a level
-  // up, then a new device edition), then the mode, then the pose.
+  // up, then a new device edition), then the mode, then a waiting VIP gift
+  // box (gold too), then the pose.
   function headerStatus(): {
     icon: PetStatusIcon;
     label: string;
@@ -282,6 +305,8 @@ function PetRoom({ retry }: { retry: () => void }) {
       };
     if (walking) return { icon: "walk", label: t("walk.status") };
     if (decorating) return { icon: "decorate", label: t("decorate.status") };
+    if (gift.waiting)
+      return { icon: "gift", label: t("gift.arrived"), notice: true };
     return { icon: pose, label: t(copy.status) };
   }
   const hud = headerStatus();
@@ -374,6 +399,18 @@ function PetRoom({ retry }: { retry: () => void }) {
                 onClick={clickPet}
                 onKeyDown={stopCareKey}
               />
+              {/* 오늘의 VIP 선물 상자: 까미 옆 바닥에 놓여 있다가 누르면 열림 */}
+              {gift.waiting && !decorating && (
+                <button
+                  type="button"
+                  className={styles.giftBox}
+                  aria-label={t("gift.open")}
+                  onClick={() => setGiftOpen(true)}
+                  onKeyDown={stopCareKey}
+                >
+                  <GiftBoxIcon size={48} />
+                </button>
+              )}
               {/*
               까미를 처음 그릴 때까지 방을 가려 두고, 그리면 서서히 걷음 (B-003).
               캔버스를 쓸 수 없는 브라우저에서만 안내와 다시 불러오기를 보여 줌
@@ -433,7 +470,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                 ref={boxButton}
                 kind="box"
                 label={t("items.button")}
-                onClick={openBox}
+                onClick={() => openBox()}
                 disabled={!record || walking}
                 dot={newItems ? t("items.newItems") : undefined}
               />
@@ -470,8 +507,17 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
         )}
       </div>
+      {giftOpen && gift.waiting && (
+        <PetGiftBox
+          first={gift.first}
+          onClose={() => setGiftOpen(false)}
+          onReceive={takeGift}
+        />
+      )}
       {record && (
         <PetItemBox
+          key={boxStart.n}
+          startTab={boxStart.sets ? "sets" : "materials"}
           open={boxOpen}
           onClose={() => setBoxOpen(false)}
           pet={record}

@@ -28,6 +28,7 @@ const en: Messages = {
       notFound: "Not found yet",
       heartLocked: "Not yet",
       stampLocked: "After a cycle",
+      giftName: "VIP gift box",
       guide: {
         button: "How to get items",
         title: "How to get items",
@@ -36,6 +37,7 @@ const en: Messages = {
         walk: "One per walk · {chance, select, often {often} sometimes {sometimes} other {rarely}} ({percent}%)",
         heart: "One each time affinity reaches a new level",
         stamp: "One each time you finish a focus cycle",
+        gift: "Once a day · {count} of each of the {kinds} walk items",
       },
       count: "× {count}",
       leaf: { name: "Leaf", object: "a leaf" },
@@ -386,6 +388,18 @@ const en: Messages = {
     },
     panel: { collapse: "Collapse", expand: "Expand" },
     edition: { palace: "Palace edition!", stage: "VIP edition!" },
+    gift: {
+      title: "VIP gift box",
+      arrived: "A VIP gift box is here!",
+      open: "Open the VIP gift box",
+      lead: "Today's gift: one of each of the {count} walk items",
+      take: "Take",
+      toSets: "See the set",
+      welcome: {
+        title: "VIP perk",
+        text: "You got the idol stage set. Use it from Item box › Sets.",
+      },
+    },
     log: {
       title: "Log",
       more: "Show {count} more",
@@ -408,6 +422,7 @@ const en: Messages = {
       craft: "Made {object}",
       place: "Changed the {slot} to {to}",
       set: "Decorated the room with {to}",
+      gift: "Got {count} walk items from the VIP gift box",
       walkLimit: "That’s all {count} walks for today. More tomorrow!",
       snackLimit: "That’s all {count} treats for today. More tomorrow!",
     },

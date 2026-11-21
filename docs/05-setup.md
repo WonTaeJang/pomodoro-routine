@@ -40,6 +40,7 @@ npm run dev
 4. `.env.local`을 바꾸면 `npm run dev`를 다시 시작합니다 (값이 빌드할 때 들어감).
 5. 계정에 기록을 저장하려면 Supabase **SQL Editor**에서 `supabase/sync-tables.sql`(표 3개)과 `supabase/delete-account.sql`(회원 탈퇴 함수)을 차례로 한 번씩 실행합니다. 까미 돌봄 기록까지 저장하려면 `supabase/pet-game.sql`(표 `pet_game`·`pet_game_history`)도 한 번 실행합니다.
 6. 관리자 페이지(`/admin`)와 VIP 표시를 쓰려면 `supabase/admin.sql`을 한 번 실행한 뒤, 파일 맨 아래 "관리자 지정"의 주석을 풀고 이메일을 본인 것으로 바꿔 한 번 더 실행합니다. 관리자가 되면 ☰ 메뉴에 "관리자"가 보입니다. 관리자는 SQL Editor에서만 넣고 뺍니다 (`public.admins` 표).
+7. VIP 선물 상자(다마고치)를 쓰려면 `pet-game.sql`·`admin.sql` 다음에 `supabase/pet-gift.sql`을 한 번 실행합니다. 돌봄 기록에 선물(`gift`) 종류를 더하고 VIP 계정만 올릴 수 있게 합니다. 이 파일을 실행하기 전의 서버에 선물 기록을 올리면 거부되어 돌봄 기록 동기화가 멈추므로, 배포보다 먼저 실행합니다.
 
 ### 테스트 계정 로그인 (개발 서버 전용)
 

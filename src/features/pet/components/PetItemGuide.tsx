@@ -4,7 +4,8 @@ import type { ReactNode } from "react";
 import { useTranslations } from "use-intl";
 import { Dialog } from "@/components/ui";
 import { ITEMS, itemPercent, itemRarity } from "../items";
-import { HeartItemIcon, ItemIcon, PawItemIcon } from "./PetIcons";
+import { GIFT_EACH } from "../profile";
+import { GiftBoxIcon, HeartItemIcon, ItemIcon, PawItemIcon } from "./PetIcons";
 import styles from "./PetItemBox.module.scss";
 
 /**
@@ -14,9 +15,12 @@ import styles from "./PetItemBox.module.scss";
 export function PetItemGuide({
   open,
   onClose,
+  vip,
 }: {
   open: boolean;
   onClose: () => void;
+  /** VIP accounts also see the daily gift box (I-070). */
+  vip: boolean;
 }) {
   const t = useTranslations("pet.items");
   return (
@@ -44,6 +48,13 @@ export function PetItemGuide({
           name={t("stamp.name")}
           how={t("guide.stamp")}
         />
+        {vip && (
+          <GuideRow
+            icon={<GiftBoxIcon size={22} />}
+            name={t("giftName")}
+            how={t("guide.gift", { count: GIFT_EACH, kinds: ITEMS.length })}
+          />
+        )}
       </ul>
     </Dialog>
   );
