@@ -475,8 +475,7 @@ const en: Messages = {
     keyboard: "With a keyboard, focus the button and press Enter or Space.",
     error: "Couldn’t load Kkami.",
     retry: "Try again",
-    breakTimer: "{mode} · {time} left",
-    breakPaused: "{mode} paused · {time} left",
+    break: { left: "left", paused: "paused" },
   },
   common: {
     cancel: "Cancel",

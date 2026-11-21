@@ -454,8 +454,8 @@ const ko = {
     keyboard: "키보드로는 버튼에 초점을 맞추고 Enter 또는 Space를 눌러요.",
     error: "까미를 불러오지 못했어요.",
     retry: "다시 불러오기",
-    breakTimer: "{mode} {time} 남음",
-    breakPaused: "{mode} 멈춤 · {time} 남음",
+    // 휴식 남은 시간 옆 (멈췄으면 "멈춤")
+    break: { left: "남음", paused: "멈춤" },
   },
   common: {
     cancel: "취소",

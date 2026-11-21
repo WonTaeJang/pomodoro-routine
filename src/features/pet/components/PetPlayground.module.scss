@@ -18,6 +18,8 @@ $pad-width: 88px;
 $key-size: 60px;
 $key-depth: 6px;
 $dot-size: 12px;
+// 휴식 알약: 페이지 위 여백(20px, sm부터 28px)만큼 올라가고 남는 12px은 헤더 아래 여백에 걸침
+$break-pill-height: 32px;
 $edition-change: 0.6s;
 $edition-border: 3px;
 
@@ -26,21 +28,58 @@ $edition-border: 3px;
   margin: 0 auto;
   padding: var(--space-5) var(--space-3-5) var(--space-8);
 }
-// 휴식 중 남은 시간 (게임기 위 가운데)
+// 휴식 중 남은 시간. 휴대폰·태블릿: 헤더와 본체 사이에 떠 있는 알약. 높이만큼 위로 당겨
+// 본체를 밀지 않고, 스크롤하면 화면 위에 붙어 따라옴. 에디션 장식(왕관·리본)은 살짝 가려도 됨
 .breakTimer {
+  position: sticky;
+  top: var(--space-2);
+  z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--space-1-5);
   width: fit-content;
-  margin: 0 auto var(--space-3);
-  padding: var(--space-1) var(--space-3);
+  height: $break-pill-height;
+  margin: calc(-1 * $break-pill-height) auto 0;
+  padding: 0 var(--space-3);
   border: var(--border-width) solid var(--color-border);
   border-radius: var(--radius-full);
   background: var(--color-surface);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.breakMode {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+}
+.breakLeft {
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+// 지나간 휴식 (넓은 화면 카드에만)
+.breakBar {
+  display: none;
+  overflow: hidden;
+  width: 100%;
+  height: 5px;
+  margin-top: var(--space-1);
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--break-color) 18%, var(--color-surface));
+  i {
+    display: block;
+    height: 100%;
+    background: var(--break-color);
+    transform-origin: left;
+  }
+  [data-mode="short-break"] > & {
+    --break-color: var(--color-short-break);
+  }
+  [data-mode="long-break"] > & {
+    --break-color: var(--color-long-break);
+  }
 }
 // 휴대용 게임기 모양 본체. 본체 색은 모드를 따르고 액정·버튼은 고정 팔레트(_device.scss)입니다.
 .device {
@@ -58,6 +97,8 @@ $edition-border: 3px;
     inset 0 -6px 0 var(--shell-shade),
     inset 0 2px 0 var(--shell-light);
   position: relative;
+  // 방 그림의 겹 순서를 본체 안에 가둬, 떠 있는 휴식 알약이 늘 위에 보이게
+  isolation: isolate;
   transition:
     background-color $edition-change,
     border-color $edition-change,
@@ -404,18 +445,37 @@ $edition-border: 3px;
     align-items: start;
     max-width: $page-wide-max;
   }
-  // 휴식 시간은 본체 바로 위 (없으면 그 줄은 높이 0)
+  // 휴식 시간은 비어 있는 왼쪽 칸에, 본체 옆 카드로 (떠 있지 않음)
   .breakTimer {
+    position: static;
+    display: grid;
     grid-row: 1;
-    grid-column: 2;
+    grid-column: 1;
+    justify-self: end;
+    justify-items: center;
+    gap: var(--space-1);
+    width: 124px;
+    height: auto;
+    margin: var(--space-2-5) 0 0;
+    padding: var(--space-3) var(--space-2-5);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 14px rgb(0 0 0 / 8%);
+    font-size: var(--font-size-xs);
+  }
+  .breakLeft {
+    font-size: var(--font-size-2xl);
+    line-height: 1.1;
+  }
+  .breakBar {
+    display: block;
   }
   .device {
-    grid-row: 2;
+    grid-row: 1;
     grid-column: 2;
     width: 100%;
   }
   .below {
-    grid-row: 1 / span 2;
+    grid-row: 1;
     grid-column: 3;
     width: 100%;
     max-width: $log-max;
