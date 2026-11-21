@@ -193,6 +193,10 @@ function PetRoom({ retry }: { retry: () => void }) {
   });
   const trip = outing.trip;
 
+  // Home stays on screen until the walk has drawn its first frame. A walk is
+  // told apart by when Kkami last came home (homeAt changes after each one).
+  const [shownWalk, setShownWalk] = useState<number | null>();
+
   const [boxOpen, setBoxOpen] = useState(false);
   const newItems =
     affinity.newHeart ||
@@ -329,8 +333,17 @@ function PetRoom({ retry }: { retry: () => void }) {
             {outing.card.value && (
               <PetFoundCard key={outing.card.key} item={outing.card.value} />
             )}
-            {walking && <PetWalk onStep={outing.step} onHome={outing.leave} />}
-            <div className={styles.room} hidden={walking}>
+            {walking && (
+              <PetWalk
+                onStep={outing.step}
+                onHome={outing.leave}
+                onShown={() => setShownWalk(homeAt)}
+              />
+            )}
+            <div
+              className={styles.room}
+              hidden={walking && shownWalk === homeAt}
+            >
               <PetRoomArt preview={decor.preview} decorating={roomDecorating} />
               <PetSpeechBubble
                 text={speech}

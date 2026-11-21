@@ -10,6 +10,13 @@ $small-canvas-height: 320px;
 $canvas-width: 816px;
 $canvas-height: 384px;
 
+// 첫 프레임을 그리기 전: 집 방 위에 겹쳐 보이지 않게 기다림 (그동안 집 방이 그대로 보임)
+.scene:not([data-ready="true"]) {
+  position: absolute;
+  inset: auto 0 0;
+  opacity: 0;
+  pointer-events: none;
+}
 .canvas {
   position: absolute;
   z-index: layer.$dog-layer;
