@@ -55,17 +55,37 @@ const ko = {
       // 세트 탭 (I-069)
       setMade: "{total}개 중 {count}개 만듦",
       setMissing: "{name}, 아직 안 만듦",
-      setLeft: "{count}개 더 만들면 적용할 수 있어요",
       setEdition: {
         palace: "다 놓으면 게임기가 궁전 에디션으로 바뀌어요",
         stage: "다 놓으면 게임기가 VIP 에디션으로 바뀌어요",
       },
       sets: {
-        cabin: { name: "숲속 오두막 세트", to: "숲속 오두막 세트로" },
-        floral: { name: "파스텔 꽃 세트", to: "파스텔 꽃 세트로" },
-        stripe: { name: "줄무늬 클래식 세트", to: "줄무늬 클래식 세트로" },
-        palace: { name: "궁전 세트", to: "궁전 세트로" },
-        stage: { name: "아이돌 무대 세트", to: "아이돌 무대 세트로" },
+        // intro: 카드 아래 한 줄 소개
+        cabin: {
+          name: "숲속 오두막 세트",
+          to: "숲속 오두막 세트로",
+          intro: "나무 냄새 나는 아늑한 오두막",
+        },
+        floral: {
+          name: "파스텔 꽃 세트",
+          to: "파스텔 꽃 세트로",
+          intro: "꽃이 가득한 봄날의 방",
+        },
+        stripe: {
+          name: "줄무늬 클래식 세트",
+          to: "줄무늬 클래식 세트로",
+          intro: "단정하고 차분한 클래식 방",
+        },
+        palace: {
+          name: "궁전 세트",
+          to: "궁전 세트로",
+          intro: "금빛으로 빛나는 궁전의 방",
+        },
+        stage: {
+          name: "아이돌 무대 세트",
+          to: "아이돌 무대 세트로",
+          intro: "조명이 켜진 반짝이는 무대",
+        },
       },
       short: "재료 부족",
       decorate: "방 꾸미기",

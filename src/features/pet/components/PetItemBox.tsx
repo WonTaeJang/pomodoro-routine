@@ -361,8 +361,9 @@ function ActionButton({ action }: { action: CardAction }) {
 }
 
 /**
- * One room set: its four pieces, how many are made and, once all are, a
- * button that puts the whole set in the room. Missing pieces show faded.
+ * One room set: its four pieces, how many are made, a line about it and,
+ * once all are there, a button that puts the whole set in the room.
+ * Missing pieces show faded.
  */
 function SetCard({
   set,
@@ -419,11 +420,10 @@ function SetCard({
           {t(`setEdition.${set.id}`)}
         </p>
       )}
-      {/* 하나라도 없으면 버튼 없이 남은 개수만 */}
+      {/* 한 줄 소개, 다 모았을 때만 적용 버튼 (몇 개 모았는지는 위의 3/4) */}
       <div className={styles.setFoot}>
-        {missing.length > 0 ? (
-          <span>{t("setLeft", { count: missing.length })}</span>
-        ) : (
+        <span>{t(`sets.${set.id}.intro`)}</span>
+        {missing.length === 0 && (
           <ActionButton action={applyAction(applied, () => onApply(set))} />
         )}
       </div>

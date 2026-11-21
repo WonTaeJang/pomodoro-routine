@@ -55,17 +55,36 @@ const en: Messages = {
       // Sets tab (I-069)
       setMade: "{count} of {total} made",
       setMissing: "{name}, not made yet",
-      setLeft: "Make {count} more to use it",
       setEdition: {
         palace: "Place them all to turn the device into the palace edition",
         stage: "Place them all to turn the device into the VIP edition",
       },
       sets: {
-        cabin: { name: "Forest cabin set", to: "the forest cabin set" },
-        floral: { name: "Pastel flower set", to: "the pastel flower set" },
-        stripe: { name: "Classic stripe set", to: "the classic stripe set" },
-        palace: { name: "Palace set", to: "the palace set" },
-        stage: { name: "Idol stage set", to: "the idol stage set" },
+        cabin: {
+          name: "Forest cabin set",
+          to: "the forest cabin set",
+          intro: "A cozy cabin that smells of wood",
+        },
+        floral: {
+          name: "Pastel flower set",
+          to: "the pastel flower set",
+          intro: "A spring room full of flowers",
+        },
+        stripe: {
+          name: "Classic stripe set",
+          to: "the classic stripe set",
+          intro: "A neat, calm classic room",
+        },
+        palace: {
+          name: "Palace set",
+          to: "the palace set",
+          intro: "A palace room in shining gold",
+        },
+        stage: {
+          name: "Idol stage set",
+          to: "the idol stage set",
+          intro: "A sparkling stage, lights on",
+        },
       },
       short: "Not enough",
       decorate: "Decorate the room",

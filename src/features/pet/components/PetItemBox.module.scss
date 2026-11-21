@@ -136,7 +136,7 @@
   margin-top: var(--space-4);
 }
 
-// 세트 카드: 이름과 만든 수 · 조각 넷 · (궁전) 게임기 안내 · 적용 버튼이나 남은 개수
+// 세트 카드: 이름과 만든 수 · 조각 넷 · (에디션 세트) 게임기 안내 · 한 줄 소개와 적용 버튼
 .set {
   display: grid;
   gap: var(--space-2-5);
@@ -207,10 +207,11 @@
 .setFoot {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  gap: var(--space-2);
   min-height: 32px;
   > span {
-    margin-right: auto;
+    flex: 1;
+    min-width: 0;
     color: device.$lcd-text-muted;
     font-size: var(--font-size-xs);
   }
