@@ -128,6 +128,14 @@ export function looksFor(slot: Slot, owned: readonly FurnitureId[]): LookId[] {
 export const lookOf = (slot: Slot, placed: Placed): LookId =>
   placed[slot] ?? DEFAULT_LOOK[slot];
 
+/** What everyone has from the start: the slot's starting look, then free pieces. */
+export const startersFor = (slot: Slot): LookId[] => looksFor(slot, []);
+
+/** The slot a look belongs to. */
+export const slotOfLook = (look: LookId): Slot =>
+  SLOTS.find((slot) => DEFAULT_LOOK[slot] === look) ??
+  furnitureById(look as FurnitureId).slot;
+
 /** The room slots a set fills; Kkami's outfit and bubble stay as they are. */
 export const SET_SLOTS = ["room", "window", "pot", "rug"] as const;
 type SetSlot = (typeof SET_SLOTS)[number];

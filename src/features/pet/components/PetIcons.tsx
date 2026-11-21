@@ -484,7 +484,7 @@ export function MeterHeart({ fill }: { fill: keyof typeof METER }) {
   return <PixelIcon art={METER[fill]} size={11} />;
 }
 
-// 만들기 탭의 자리 아이콘: 벽·바닥, 창문, 화분, 카펫, 옷
+// 꾸미기 탭의 자리 아이콘: 벽·바닥, 창문, 화분, 카펫, 옷
 const SLOT_ART = {
   room: {
     rows: [

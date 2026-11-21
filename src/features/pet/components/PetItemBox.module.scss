@@ -10,7 +10,7 @@
     transition: none;
   }
 }
-// 만들기 안의 자리 탭: 위의 아이템·만들기 탭보다 한 단계 작게
+// 꾸미기 안의 자리 탭: 위의 재료·꾸미기·세트 탭보다 한 단계 작게
 .tabs.slotTabs {
   margin-bottom: var(--space-3);
   padding: 2px;
@@ -56,7 +56,7 @@
   place-items: center;
   height: 30px;
 }
-// 만들기·세트 목록: 카드를 한 줄에 하나씩
+// 꾸미기·세트 목록: 카드를 한 줄에 하나씩
 .cards {
   display: grid;
   gap: var(--space-2);
@@ -64,8 +64,8 @@
   padding: 0;
   list-style: none;
 }
-// 만들기 한 줄: 그림 · 이름과 재료(가진 수/필요 수, 만든 것은 이름만) · 버튼
-.recipe {
+// 꾸미기 한 줄: 그림 · 이름과 그 아래 한 줄(재료 가진 수/필요 수, 기본 제공 표시, 만든 것은 이름만) · 버튼
+.lookCard {
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: var(--space-2-5);
@@ -81,13 +81,23 @@
   border-radius: var(--radius-sm);
   background: device.$lcd-header;
 }
-.recipeText {
+.lookText {
   display: grid;
   gap: var(--space-1);
   min-width: 0;
   strong {
     font-size: var(--font-size-xs);
   }
+}
+// 처음부터 있는 것 표시
+.starter {
+  justify-self: start;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: device.$lcd-header;
+  color: device.$lcd-text-muted;
+  font-size: var(--font-size-2xs);
+  font-weight: var(--font-weight-bold);
 }
 .need {
   display: flex;

@@ -5,9 +5,9 @@ import {
   DEFAULT_LOOK,
   SET_SLOTS,
   SLOTS,
-  furnitureById,
   lookOf,
   looksFor,
+  slotOfLook,
   type FurnitureId,
   type RoomSet,
   type LookId,
@@ -110,8 +110,8 @@ export function usePetDecorate({
         ? ({ [mode.slot]: looks[mode.index] } as Partial<Record<Slot, LookId>>)
         : undefined,
     start: () => setMode({ step: "slot", slot: SLOTS[0] }),
-    /** Put something made in its place right away (the item box's button). */
-    apply: (piece: FurnitureId) => place(furnitureById(piece).slot, piece),
+    /** Put a look in its place right away (the item box's button). */
+    apply: (look: LookId) => place(slotOfLook(look), look),
     /** Put a whole set in the room (the item box's set tab). */
     applySet: placeSet,
     /** Tap a slot in the room to go straight to its looks. */

@@ -12,6 +12,8 @@ import {
   setById,
   setPieces,
   looksFor,
+  slotOfLook,
+  startersFor,
   stampsSpent,
   type FurnitureId,
 } from "./furniture";
@@ -107,6 +109,20 @@ describe("가구 만들기", () => {
     expect(
       looksFor("window", ["stoneWindow", "pinePot", "twigWindow"]),
     ).toEqual(["plainWindow", "twigWindow", "stoneWindow"]);
+  });
+});
+
+describe("기본 제공", () => {
+  it("칸마다 기본 모양이 먼저, 옷 칸엔 갈색 모자도", () => {
+    expect(startersFor("room")).toEqual(["plainRoom"]);
+    expect(startersFor("outfit")).toEqual(["plainOutfit", "brownHat"]);
+    expect(startersFor("bubble")).toEqual(["plainBubble"]);
+  });
+
+  it("모양으로 칸 찾기: 기본 모양도, 만든 것도", () => {
+    expect(slotOfLook("plainRug")).toBe("rug");
+    expect(slotOfLook("brownHat")).toBe("outfit");
+    expect(slotOfLook("palacePot")).toBe("pot");
   });
 });
 

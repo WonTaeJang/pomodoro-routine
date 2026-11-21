@@ -18,8 +18,11 @@ import {
   SLOTS,
   canMake,
   isSetPlaced,
+  lookOf,
   setPieces,
+  startersFor,
   type FurnitureId,
+  type LookId,
   type Material,
   type MaterialCounts,
   type RoomSet,
@@ -39,7 +42,13 @@ import { LookPicture } from "./PetRoomArt";
 import { PetItemGuide } from "./PetItemGuide";
 import styles from "./PetItemBox.module.scss";
 
-/** Items found on walks, and furniture to make from them. */
+const TABS = ["materials", "decor", "sets"] as const;
+type Tab = (typeof TABS)[number];
+
+/**
+ * The item box: materials found and earned, things to decorate with (given
+ * from the start or made from materials), and whole room sets.
+ */
 export function PetItemBox({
   open,
   onClose,
@@ -56,19 +65,19 @@ export function PetItemBox({
   /** Paw stamps from finished cycles (I-066). */
   stamps: number;
   onCraft: (furniture: FurnitureId) => void;
-  /** Put something made in its place in the room; the box stays open. */
-  onApply: (furniture: FurnitureId) => void;
+  /** Put something made or given in its place in the room; the box stays open. */
+  onApply: (look: LookId) => void;
   /** Put a whole set in the room (I-069); the box stays open. */
   onApplySet: (set: RoomSet) => void;
   /** Close the box and start decorating the room. */
   onDecorate: () => void;
 }) {
   const t = useTranslations("pet.items");
-  const [tab, setTab] = useState<"list" | "craft" | "set">("list");
+  const [tab, setTab] = useState<Tab>("materials");
+  // Kept here so the chosen place stays while looking at another tab.
   const [slot, setSlot] = useState<Slot>(SLOTS[0]);
   const [guideOpen, setGuideOpen] = useState(false);
   const left = materialsLeft(pet, stamps);
-  const heartsEarned = levelHearts(pet.affinity.points) > 0;
   return (
     <Dialog
       open={open}
@@ -96,78 +105,21 @@ export function PetItemBox({
         label={t("tabs")}
         value={tab}
         onChange={setTab}
-        options={[
-          { value: "list", label: t("list") },
-          { value: "craft", label: t("craft") },
-          { value: "set", label: t("set") },
-        ]}
+        options={TABS.map((value) => ({ value, label: t(`tab.${value}`) }))}
       />
-      {tab === "list" && (
-        <ul className={styles.grid}>
-          {ITEMS.map(({ id }) => {
-            const found = (pet.items[id] ?? 0) > 0;
-            const count = left[id] ?? 0;
-            return (
-              <BoxSlot
-                key={id}
-                icon={<ItemIcon item={id} size={30} unknown={!found} />}
-                name={found ? t(`${id}.name`) : null}
-                count={found ? t("count", { count }) : t("notFound")}
-              />
-            );
-          })}
-          <BoxSlot
-            icon={<HeartItemIcon size={23} unknown={!heartsEarned} />}
-            name={heartsEarned ? t("heart.name") : null}
-            count={
-              heartsEarned
-                ? t("count", { count: left.heart ?? 0 })
-                : t("heartLocked")
-            }
-          />
-          {/* 한 사이클을 마치면 받음 (I-066). 받는 방법을 알 수 있게 이름은 처음부터 보임 */}
-          <BoxSlot
-            icon={<PawItemIcon size={24} unknown={stamps === 0} />}
-            name={t("stamp.name")}
-            count={
-              stamps > 0
-                ? t("count", { count: left.stamp ?? 0 })
-                : t("stampLocked")
-            }
-            found={stamps > 0}
-          />
-        </ul>
+      {tab === "materials" && (
+        <MaterialsTab pet={pet} left={left} stamps={stamps} />
       )}
-      {tab === "craft" && (
+      {tab === "decor" && (
         <>
-          <SegmentedControl
-            className={cx(styles.tabs, styles.slotTabs)}
-            label={t("slotTabs")}
-            value={slot}
-            onChange={setSlot}
-            options={SLOTS.map((value) => ({
-              value,
-              label: (
-                <>
-                  <SlotIcon slot={value} />
-                  <VisuallyHidden>{t(`slots.${value}.name`)}</VisuallyHidden>
-                </>
-              ),
-            }))}
+          <DecorTab
+            pet={pet}
+            left={left}
+            slot={slot}
+            onSlot={setSlot}
+            onCraft={onCraft}
+            onApply={onApply}
           />
-          <ul className={styles.cards}>
-            {RECIPES.filter((piece) => piece.slot === slot).map((piece) => (
-              <Recipe
-                key={piece.id}
-                piece={piece}
-                left={left}
-                made={pet.furniture.includes(piece.id)}
-                applied={pet.placed[piece.slot] === piece.id}
-                onCraft={onCraft}
-                onApply={onApply}
-              />
-            ))}
-          </ul>
           {/* Always open: everyone has the brown hat to try on. */}
           <Button
             className={styles.decorate}
@@ -178,7 +130,7 @@ export function PetItemBox({
           </Button>
         </>
       )}
-      {tab === "set" && (
+      {tab === "sets" && (
         <ul className={styles.cards}>
           {SETS.map((set) => (
             <SetCard
@@ -192,6 +144,118 @@ export function PetItemBox({
         </ul>
       )}
     </Dialog>
+  );
+}
+
+/** What is left of each material: walk items, level hearts and paw stamps. */
+function MaterialsTab({
+  pet,
+  left,
+  stamps,
+}: {
+  pet: PetProfile;
+  left: MaterialCounts;
+  stamps: number;
+}) {
+  const t = useTranslations("pet.items");
+  const heartsEarned = levelHearts(pet.affinity.points) > 0;
+  return (
+    <ul className={styles.grid}>
+      {ITEMS.map(({ id }) => {
+        const found = (pet.items[id] ?? 0) > 0;
+        return (
+          <BoxSlot
+            key={id}
+            icon={<ItemIcon item={id} size={30} unknown={!found} />}
+            name={found ? t(`${id}.name`) : null}
+            count={found ? t("count", { count: left[id] ?? 0 }) : t("notFound")}
+          />
+        );
+      })}
+      <BoxSlot
+        icon={<HeartItemIcon size={23} unknown={!heartsEarned} />}
+        name={heartsEarned ? t("heart.name") : null}
+        count={
+          heartsEarned
+            ? t("count", { count: left.heart ?? 0 })
+            : t("heartLocked")
+        }
+      />
+      {/* 한 사이클을 마치면 받음 (I-066). 받는 방법을 알 수 있게 이름은 처음부터 보임 */}
+      <BoxSlot
+        icon={<PawItemIcon size={24} unknown={stamps === 0} />}
+        name={t("stamp.name")}
+        count={
+          stamps > 0 ? t("count", { count: left.stamp ?? 0 }) : t("stampLocked")
+        }
+        found={stamps > 0}
+      />
+    </ul>
+  );
+}
+
+/**
+ * One place's looks: what everyone has from the start, then what can be
+ * made, each with a button to make it or put it in the room.
+ */
+function DecorTab({
+  pet,
+  left,
+  slot,
+  onSlot,
+  onCraft,
+  onApply,
+}: {
+  pet: PetProfile;
+  left: MaterialCounts;
+  slot: Slot;
+  onSlot: (slot: Slot) => void;
+  onCraft: (furniture: FurnitureId) => void;
+  onApply: (look: LookId) => void;
+}) {
+  const t = useTranslations("pet.items");
+  const shown = lookOf(slot, pet.placed);
+  return (
+    <>
+      <SegmentedControl
+        className={cx(styles.tabs, styles.slotTabs)}
+        label={t("slotTabs")}
+        value={slot}
+        onChange={onSlot}
+        options={SLOTS.map((value) => ({
+          value,
+          label: (
+            <>
+              <SlotIcon slot={value} />
+              <VisuallyHidden>{t(`slots.${value}.name`)}</VisuallyHidden>
+            </>
+          ),
+        }))}
+      />
+      <ul className={styles.cards}>
+        {/* 처음부터 있는 것(기본 모양·갈색 모자)은 만들 필요 없이 적용만 */}
+        {startersFor(slot).map((look) => (
+          <LookCard
+            key={look}
+            look={look}
+            action={applyAction(shown === look, () => onApply(look))}
+          >
+            <span className={styles.starter}>{t("starter")}</span>
+          </LookCard>
+        ))}
+        {RECIPES.filter((piece) => piece.slot === slot).map((piece) => (
+          <Recipe
+            key={piece.id}
+            piece={piece}
+            left={left}
+            made={pet.furniture.includes(piece.id)}
+            applied={shown === piece.id}
+            onCraft={onCraft}
+            onApply={onApply}
+          />
+        ))}
+      </ul>
+    </>
   );
 }
 
@@ -213,40 +277,73 @@ function Recipe({
   /** In its place in the room now. */
   applied: boolean;
   onCraft: (furniture: FurnitureId) => void;
-  onApply: (furniture: FurnitureId) => void;
+  onApply: (look: LookId) => void;
 }) {
-  const t = useTranslations("pet.items");
   const ready = canMake(id, left);
   // Made: put it in the room (unless it is there). Not yet: make it.
-  const action = made
-    ? {
-        label: applied ? t("applied") : t("apply"),
-        enabled: !applied,
-        run: () => onApply(id),
-      }
+  const action: CardAction = made
+    ? applyAction(applied, () => onApply(id))
     : {
-        label: ready ? t("make") : t("short"),
+        label: ready ? "make" : "short",
         enabled: ready,
         run: () => onCraft(id),
       };
   return (
-    <li className={styles.recipe}>
+    <LookCard look={id} action={action}>
+      {!made && <Needs need={need} left={left} />}
+    </LookCard>
+  );
+}
+
+type CardAction = {
+  label: "apply" | "applied" | "make" | "short";
+  enabled: boolean;
+  run: () => void;
+};
+/** Put it in the room, or say it is there already. */
+const applyAction = (applied: boolean, run: () => void): CardAction => ({
+  label: applied ? "applied" : "apply",
+  enabled: !applied,
+  run,
+});
+
+/** A card in the decor list: picture, name with a line under it, one button. */
+function LookCard({
+  look,
+  action,
+  children,
+}: {
+  look: LookId;
+  action: CardAction;
+  children?: ReactNode;
+}) {
+  const t = useTranslations("pet.items");
+  return (
+    <li className={styles.lookCard}>
       <span className={styles.art}>
-        <LookPicture look={id} cell={2} fit={44} />
+        <LookPicture look={look} cell={2} fit={44} />
       </span>
-      <span className={styles.recipeText}>
-        <strong>{t(`furniture.${id}.name`)}</strong>
-        {!made && <Needs need={need} left={left} />}
+      <span className={styles.lookText}>
+        <strong>{t(`furniture.${look}.name`)}</strong>
+        {children}
       </span>
-      <Button
-        size="sm"
-        variant={action.enabled ? "primary" : "secondary"}
-        disabled={!action.enabled}
-        onClick={action.run}
-      >
-        {action.label}
-      </Button>
+      <ActionButton action={action} />
     </li>
+  );
+}
+
+/** A card's one button: filled when it can be pressed. */
+function ActionButton({ action }: { action: CardAction }) {
+  const t = useTranslations("pet.items");
+  return (
+    <Button
+      size="sm"
+      variant={action.enabled ? "primary" : "secondary"}
+      disabled={!action.enabled}
+      onClick={action.run}
+    >
+      {t(action.label)}
+    </Button>
   );
 }
 
@@ -309,14 +406,7 @@ function SetCard({
         {missing.length > 0 ? (
           <span>{t("setLeft", { count: missing.length })}</span>
         ) : (
-          <Button
-            size="sm"
-            variant={applied ? "secondary" : "primary"}
-            disabled={applied}
-            onClick={() => onApply(set)}
-          >
-            {applied ? t("applied") : t("apply")}
-          </Button>
+          <ActionButton action={applyAction(applied, () => onApply(set))} />
         )}
       </div>
     </li>
