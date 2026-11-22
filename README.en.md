@@ -8,14 +8,11 @@ During breaks, look after a pixel Kkami like a Tamagotchi and take him for walks
 
 > Use it right away at **https://kkamodoro.vercel.app**. To run it on your computer, see [Getting started](#getting-started).
 
-<!--
-Screenshots: put the images in docs/images/ and uncomment the lines below.
 <p>
   <img src="./docs/images/timer.en.png" alt="Timer" width="640" />
   <img src="./docs/images/calendar.en.png" alt="Calendar and stats" width="640" />
   <img src="./docs/images/certificate.en.png" alt="Kkami certificate" width="240" />
 </p>
--->
 
 ## Features
 
@@ -24,8 +21,7 @@ Screenshots: put the images in docs/images/ and uncomment the lines below.
 - **Focus sounds**: 3 kinds of noise (white, pink, brown), 6 nature sounds (rain, rain on window, fireplace, forest, waves, stream) and 3 place sounds (airplane cabin, library, café). They play only while you focus, and "Random" picks a different one each session.
 - **Calendar and stats**: daily focus count, time and finished tasks, plus your streak, the last 7 days, this month and all-time totals.
 - **Kkami certificate**: finish a cycle and save or share that day's certificate as an image (1080×1920, Instagram story size).
-- **Kkami care (Tamagotchi)**: on a handheld-console screen, pat Kkami, give treats (5 a day) and take walks (5 a day, each bringing home one item). As affinity grows he reaches new levels (5 in all) and gives hearts, and you craft windows, pots, wall-and-floor sets, rugs and outfits from your items and hearts, and speech bubbles and a fancy palace set from the paw stamps you get for each finished cycle, to decorate his room. The view outside follows your device's time (dawn, day, dusk, night), and Kkami says more as you grow closer.
-- **Meet Kkami on breaks**: when a break starts, a short "Play with Kkami?" note appears. During the break, the Tamagotchi page shows the time left and Kkami is awake to greet you. Nothing nudges you while you focus.
+- **Kkami care (Tamagotchi)**: on breaks, pat pixel Kkami, give him treats and take him for walks, and decorate his room with what you find on the way. Nothing nudges you while you focus.
 - **Alerts**: a chime when a session ends, and a browser notification if you're in another tab.
 - **Sign-in (optional)**: sign in with Google or Kakao to save your tasks, history, settings and Kkami's care to your account and pick up on other devices. You can change your nickname or delete your account on your profile. Everything works without signing in.
 - **Keyboard shortcuts**: `Space` start / pause, `R` reset, `N` next session, `S` settings.
