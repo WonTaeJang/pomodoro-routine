@@ -190,9 +190,13 @@ describe("VIP 조각 (아이돌 무대)", () => {
     ).toThrow(PetStorageError);
   });
 
-  it("에디션: 궁전·아이돌 무대 세트를 다 놓았을 때만, 하나라도 빠지면 없음", () => {
+  it("에디션: 궁전·크리스마스·아이돌 무대 세트를 다 놓았을 때만, 하나라도 빠지면 없음", () => {
     const stage = setById("stage").pieces;
+    const christmas = setById("christmas").pieces;
     expect(editionOf(setById("palace").pieces)).toBe("palace");
+    expect(editionOf({ ...christmas, outfit: "santaSuit" })).toBe("christmas");
+    expect(editionOf({ ...christmas, rug: "pinkRug" })).toBeNull();
+    expect(tintOf(christmas)).toBeNull();
     expect(editionOf({ ...stage, outfit: "brownHat" })).toBe("stage");
     expect(editionOf({ ...stage, pot: "pinePot" })).toBeNull();
     // Not VIP: the stage pieces are not shown, so no VIP edition.

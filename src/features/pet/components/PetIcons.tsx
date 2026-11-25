@@ -27,7 +27,11 @@ const GIFT_COLORS = {
   w: "#fff6c8",
 };
 
-function pixelPaths({ rows, colors }: Pixels) {
+/** One path per colour; `cellClass` names the cells of a colour (a blinking nose). */
+function pixelPaths(
+  { rows, colors }: Pixels,
+  cellClass?: Record<string, string | undefined>,
+) {
   return Object.entries(colors).map(([key, color]) => {
     let d = "";
     rows.forEach((row, y) =>
@@ -35,11 +39,19 @@ function pixelPaths({ rows, colors }: Pixels) {
         if (cell === key) d += `M${x} ${y}h1v1h-1z`;
       }),
     );
-    return <path key={key} d={d} fill={color} />;
+    return <path key={key} d={d} fill={color} className={cellClass?.[key]} />;
   });
 }
 
-function PixelIcon({ art, size = 14 }: { art: Pixels; size?: number }) {
+function PixelIcon({
+  art,
+  size = 14,
+  cellClass,
+}: {
+  art: Pixels;
+  size?: number;
+  cellClass?: Record<string, string | undefined>;
+}) {
   const width = art.rows[0].length;
   const height = art.rows.length;
   return (
@@ -51,7 +63,7 @@ function PixelIcon({ art, size = 14 }: { art: Pixels; size?: number }) {
       aria-hidden="true"
       focusable="false"
     >
-      {pixelPaths(art)}
+      {pixelPaths(art, cellClass)}
     </svg>
   );
 }
@@ -152,6 +164,18 @@ const STATUS = {
       ".P....P.",
     ],
     colors: RIBBON,
+  },
+  // 크리스마스 에디션 안내 (I-075): 빨간 코 루돌프
+  christmas: {
+    rows: [
+      "T.T..T.T",
+      ".TT..TT.",
+      "..DDDD..",
+      ".DeDDeD.",
+      "..DDDD..",
+      "...NN...",
+    ],
+    colors: { T: "#c9a06a", D: "#8a5a35", e: "#2b2320", N: "#e0353b" },
   },
   // 눈송이 상자 안내: 작은 눈송이
   snow: {
@@ -587,11 +611,140 @@ export function BoxIcon({
 }
 
 /** What sits on the device's top edge in each edition. */
-export function EditionMark({ edition }: { edition: EditionId }) {
+export function EditionMark({
+  edition,
+}: {
+  edition: Exclude<EditionId, "christmas">;
+}) {
   return edition === "palace" ? (
     <PixelIcon art={PALACE_CROWN} size={20} />
   ) : (
     <PixelIcon art={STAGE_RIBBON} size={32} />
+  );
+}
+
+// 크리스마스 에디션 (I-075): 게임기가 썰매. 위에 선물 짐과 고삐 맨 루돌프, 아래에 금빛 썰매 날.
+// 방에서는 1분에 한 번쯤 산타 썰매가 날아감. 루돌프 코(N)는 깜빡임
+const SLEIGH_COLORS = {
+  R: "#c8343a",
+  r: "#8e1f28",
+  S: "#e04848",
+  Y: "#e2b54c",
+  y: GOLD_SHADE,
+  W: "#fbf7ee",
+  s: "#f2c7a0",
+  m: "#f29b9b",
+  e: "#2b2320",
+  B: "#a3713f",
+  b: "#71492a",
+  T: "#d8b47a",
+  G: "#4f8a5b",
+  g: "#2f6b45",
+  P: "#4a7fd0",
+  p: "#2f5aa0",
+  L: "#f2c94c",
+  D: "#8a5a35",
+  d: "#5e3b22",
+  c: "#e3c79b",
+  h: "#3a2a1c",
+  N: "#ff3b3b",
+};
+// 선물 짐: 초록 상자를 얹은 빨간 상자, 선물 자루, 파란 상자
+const SLEIGH_CARGO = [
+  "..R.R..............",
+  ".GGRGG.............",
+  ".RRRRR...b..b......",
+  ".GGRGG....bb.......",
+  ".ggRgg..bBBBBb.....",
+  "RRRLRRRbBBBBBBb....",
+  "LLLLLLLbBBBBBBb....",
+  "RRRLRRRbBBBTBBPPWPP",
+  "RRRLRRRbBBBBBBWWWWW",
+  "RRRLRRRbBBBBBBPPWPP",
+  "rrrLrrrbbbbbbbppWpp",
+];
+// 오른쪽을 보는 루돌프: 뿔, 빨간 코, 크림빛 배
+const REINDEER = [
+  ".........T..T.....",
+  ".........TT.T.T...",
+  "..........TTTT....",
+  "..........DDDd....",
+  ".........DDDDDDD..",
+  ".........DDeDDDDDN",
+  ".........DDDDDD...",
+  "d.......DDDD......",
+  "DDDDDDDDDDDD......",
+  "DDDDDDDDDDDD......",
+  ".DcccccccDDD......",
+  ".D.D.....D.D......",
+  ".d.d.....d.d......",
+];
+// 썰매 날의 앞머리: 바닥에서 말려 올라감
+const SLEIGH_CURL = [
+  "...YYY..",
+  "..Y...Y.",
+  "..Y....Y",
+  "...YY..Y",
+  ".......Y",
+  ".......Y",
+  "......Yy",
+  "YYYYYYy.",
+  "yyyyyy..",
+];
+// 방을 날아가는 썰매: 선물 자루를 싣고 산타가 탐
+const SLEIGH = [
+  "....bBBb.........SSSW......",
+  "...bBBBBb.......SSSS.......",
+  "...bBBBBBb.....WWWWWW......",
+  "..GGgbBBBb.....sesses......",
+  "..GLGPPLPb.....WmssmW......",
+  "..GLGPLPPb.....WWWWWW......",
+  "YRRRRRRRRRRRRRSSWWSSRR.....",
+  "yRRRRRRRRRRRRRSSSeSSSRRR...",
+  ".rRRRRRRRRRRRRRRRRRRRRRRR..",
+  "..rRRRRRRRRRRRRRRRRRRRRRrRR",
+  "...YYYYYYYYYYYYYYYYYYY..rR.",
+  "....y....y.......y....y....",
+  "..YYYYYYYYYYYYYYYYYYYYYYY..",
+];
+// 날아가는 썰매 행렬: 썰매, 고삐(가운데 빈칸), 한 칸 높이 선 루돌프
+const REIN = { row: 8, from: 24, to: 32 };
+const SLEIGH_TEAM = Array.from({ length: REINDEER.length + 1 }, (_, y) => {
+  const sleigh = (SLEIGH[y - 1] ?? "").padEnd(REIN.to, ".");
+  const rein = sleigh.slice(REIN.from);
+  return (
+    sleigh.slice(0, REIN.from) +
+    (y === REIN.row ? rein.replaceAll(".", "h") : rein) +
+    (REINDEER[y] ?? "")
+  );
+});
+const SLEIGH_PARTS = {
+  cargo: SLEIGH_CARGO,
+  deer: REINDEER,
+  curl: SLEIGH_CURL,
+  team: SLEIGH_TEAM,
+};
+
+/**
+ * A piece of the Christmas sleigh, `cell` pixels per cell (3 on the device).
+ * Rudolph's nose takes `noseClass`.
+ */
+export function SleighArt({
+  part,
+  cell = 3,
+  noseClass,
+}: {
+  part: keyof typeof SLEIGH_PARTS;
+  cell?: number;
+  noseClass?: string;
+}) {
+  const rows = SLEIGH_PARTS[part];
+  return (
+    <PixelIcon
+      art={{ rows, colors: SLEIGH_COLORS }}
+      size={rows.length * cell}
+      cellClass={{ N: noseClass }}
+    />
   );
 }
 

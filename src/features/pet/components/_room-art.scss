@@ -118,6 +118,130 @@ $loading-background: #f4efdf;
   display: block;
 }
 
+// 크리스마스 에디션 (I-075): 방에 눈이 내리고, 1분에 한 번쯤 산타 썰매가 위쪽을 날아감.
+// 까미와 말풍선 아래 겹. 움직임 줄이기면 썰매와 눈은 숨기고 전구는 켜진 채로
+$flake: #fff;
+$flake-edge: rgb(150 180 210 / 45%);
+$sleigh-flight: 60s;
+$sleigh-cross: 12%; // 60초 중 지나가는 7초쯤
+$sleigh-first: 4s;
+// 썰매 행렬 그림 너비: 50칸 × 2px (PetSleigh의 cell={2})
+$sleigh-width: 100px;
+$sparkle: #f2c94c;
+$light-off: rgb(40 10 10 / 55%);
+.christmasSky {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  @include mixins.reduced-motion {
+    display: none;
+  }
+}
+// 방 높이만큼의 기둥이 통째로 내려가고, 눈송이는 그 꼭대기에 붙어 있음
+.flake {
+  position: absolute;
+  top: -3px;
+  height: 100%;
+  animation: snow-fall linear infinite;
+  &::before {
+    content: "";
+    display: block;
+    width: 3px;
+    height: 3px;
+    background: $flake;
+    box-shadow: 0 0 0 1px $flake-edge;
+  }
+  &[data-small="true"]::before {
+    width: 2px;
+    height: 2px;
+  }
+}
+@keyframes snow-fall {
+  to {
+    transform: translate(var(--drift), 100%);
+  }
+}
+// 방 너비만큼의 길이 통째로 지나가고, 썰매는 그 왼쪽 바깥에서 출발
+.sleighFlight {
+  position: absolute;
+  top: 3%;
+  left: 0;
+  width: 100%;
+  animation: sleigh-fly $sleigh-flight linear $sleigh-first infinite both;
+}
+@keyframes sleigh-fly {
+  from {
+    transform: translateX(0);
+  }
+  #{$sleigh-cross},
+  to {
+    transform: translateX(calc(100% + #{$sleigh-width} + 20px));
+  }
+}
+.sleighTeam {
+  position: absolute;
+  right: 100%;
+  // 바깥(너비 0)에 걸려도 그림이 줄지 않게
+  width: $sleigh-width;
+  line-height: 0;
+  filter: drop-shadow(0 2px 0 rgb(0 0 0 / 18%));
+  animation: sleigh-bob 0.5s ease-in-out infinite alternate;
+}
+@keyframes sleigh-bob {
+  to {
+    transform: translateY(-3px);
+  }
+}
+// 썰매 뒤로 금빛 반짝이 셋
+.sparkle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: $sparkle;
+  animation: sparkle-blink 0.6s steps(1) infinite;
+  &:nth-of-type(1) {
+    left: -8px;
+    top: 18px;
+  }
+  &:nth-of-type(2) {
+    left: -17px;
+    top: 24px;
+    animation-delay: 0.2s;
+  }
+  &:nth-of-type(3) {
+    left: -26px;
+    top: 18px;
+    animation-delay: 0.4s;
+  }
+}
+@keyframes sparkle-blink {
+  50% {
+    opacity: 0;
+  }
+}
+// 창문 전구: 짝수 · 홀수 번째가 번갈아 꺼짐 (켜진 전구 위에 어두운 칸을 덮음)
+.windowLight {
+  position: absolute;
+  top: var(--room-cell);
+  width: var(--room-cell);
+  height: var(--room-cell);
+  background: $light-off;
+  opacity: 0;
+  animation: light-blink 1.6s steps(1) infinite;
+  &[data-turn="1"] {
+    animation-delay: -0.8s;
+  }
+  @include mixins.reduced-motion {
+    display: none;
+  }
+}
+@keyframes light-blink {
+  50% {
+    opacity: 1;
+  }
+}
+
 // 꾸미기 모드: 고른 자리를 점선으로 깜빡이고 이름표를 붙입니다.
 $slot-outline: 3px dashed #d0703f;
 $slot-tag-background: #5e5246;

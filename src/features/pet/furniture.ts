@@ -279,10 +279,12 @@ export const SETS = [
       rug: "palaceRug",
     },
   },
-  // 눈송이로 만드는 크리스마스 세트 (I-074). 눈송이를 받은 뒤에 보임
+  // 눈송이로 만드는 크리스마스 세트 (I-074). 눈송이를 받은 뒤에 보임.
+  // 다 놓으면 크리스마스 에디션: 게임기가 루돌프가 끄는 선물 썰매가 됨 (I-075)
   {
     id: "christmas",
     season: "winter",
+    edition: true,
     pieces: {
       room: "christmasRoom",
       window: "christmasWindow",
@@ -315,7 +317,10 @@ export const SETS = [
 }[];
 export type RoomSet = (typeof SETS)[number];
 export type SetId = RoomSet["id"];
-/** Sets that change the device: the palace edition (I-067) and the VIP edition. */
+/**
+ * Sets that change the device: the palace edition (I-067), the Christmas
+ * sleigh (I-075) and the VIP edition.
+ */
 export type EditionId = Extract<RoomSet, { edition: true }>["id"];
 /** Sets that only colour the device: cabin, floral and stripe. */
 export type TintId = Extract<RoomSet, { tint: true }>["id"];

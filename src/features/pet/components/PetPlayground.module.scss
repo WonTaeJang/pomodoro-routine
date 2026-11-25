@@ -184,6 +184,24 @@ $edition-border: 3px;
     var(--space-4)
   );
 }
+// 크리스마스 에디션 (I-075): 게임기가 썰매. 빨간 본체 · 금테 · 흰 이름 · 크림빛 헤더.
+// 위에 선물 짐과 루돌프(.sleigh), 아래에 썰매 날이 붙어 아래 여백을 조금 더 둠
+.device[data-edition="christmas"] {
+  @include edition(
+    device.$xmas-shell,
+    device.$xmas-shell-shade,
+    device.$xmas-shell-light,
+    device.$xmas-gold,
+    device.$xmas-gold-shade,
+    #fff,
+    0 1px 0 device.$xmas-shell-shade,
+    device.$xmas-hud,
+    device.$xmas-hud-shade,
+    device.$xmas-ink,
+    var(--space-9)
+  );
+  margin-bottom: var(--space-4);
+}
 // VIP 에디션 (아이돌 무대 세트): 연보라 본체 · 핫핑크 테두리 · 흰 이름에 핑크 외곽 ·
 // 연분홍 헤더, 위에 핑크 리본
 .device[data-edition="stage"] {
@@ -240,6 +258,103 @@ $edition-border: 3px;
   from {
     opacity: 0;
     transform: translate(-50%, -6px);
+  }
+}
+// 썰매(크리스마스 에디션): 본체에 붙는 그림들. 위 왼쪽에 선물 짐, 오른쪽에 고삐 맨 루돌프,
+// 아래에 금빛 썰매 날과 오른쪽에서 말려 올라가는 앞머리. 선물 짐과 루돌프는 본체 윗변에 앉음
+$sleigh-cell: 3px;
+$runner-height: 16px;
+.sleigh {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  animation: sleigh-in $edition-change ease-out;
+  @include mixins.reduced-motion {
+    animation: none;
+  }
+  span {
+    position: absolute;
+    line-height: 0;
+  }
+}
+@keyframes sleigh-in {
+  from {
+    opacity: 0;
+  }
+}
+// 선물 짐(11칸)과 루돌프(13칸)는 아래 1~2px이 본체 윗변에 걸침
+.sleighCargo,
+.sleighDeer {
+  filter: drop-shadow(0 2px 0 device.$xmas-shell-shade);
+}
+.sleighCargo {
+  top: calc(#{$sleigh-cell} * -11 + 2px);
+  left: var(--space-5);
+}
+.sleighDeer {
+  top: calc(#{$sleigh-cell} * -13 + 1px);
+  right: var(--space-5);
+}
+// 고삐: 루돌프 가슴에서 본체 윗변으로
+.sleighRein {
+  top: -14px;
+  right: 56px;
+  width: 34px;
+  height: 2px;
+  background: device.$xmas-rein;
+  transform: rotate(-24deg);
+  transform-origin: right;
+}
+// 썰매 날: 본체 바닥 아래 금빛 막대, 기둥 셋, 오른쪽 끝 앞머리
+.sleighRunner {
+  left: var(--space-5);
+  right: 2px;
+  bottom: -$runner-height;
+  height: $runner-height;
+  // 막대
+  &::before {
+    content: "";
+    position: absolute;
+    bottom: 3px;
+    left: 0;
+    right: 22px;
+    height: 3px;
+    background: device.$xmas-gold;
+    box-shadow: 0 3px 0 device.$xmas-gold-shade;
+  }
+}
+// 썰매 날을 본체에 잇는 기둥: 왼쪽 · 가운데 · 앞머리 앞
+.runnerPost {
+  position: absolute;
+  bottom: 6px;
+  width: 4px;
+  height: $runner-height - 6px;
+  background: device.$xmas-gold;
+  box-shadow: 2px 0 0 device.$xmas-gold-shade;
+  &:nth-child(1) {
+    left: 12px;
+  }
+  &:nth-child(2) {
+    left: 48%;
+  }
+  &:nth-child(3) {
+    right: 52px;
+  }
+}
+.sleighCurl {
+  right: 0;
+  bottom: 0;
+}
+// 루돌프 코: 빨갛게 깜빡임
+.nose {
+  animation: nose-blink 1.2s steps(1) infinite;
+  @include mixins.reduced-motion {
+    animation: none;
+  }
+}
+@keyframes nose-blink {
+  50% {
+    fill: #b8262c;
   }
 }
 .name {

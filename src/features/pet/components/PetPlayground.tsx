@@ -30,6 +30,7 @@ import {
 } from "./PetIcons";
 import { PetGiftBox } from "./PetGiftBox";
 import { PetSnowBox } from "./PetSnowBox";
+import { DeviceSleigh } from "./PetSleigh";
 import { PetPad } from "./PetPad";
 import { PetSpeechBubble } from "./PetSpeechBubble";
 import { DecoratePads, DecoratePick, decorateTag } from "./PetDecorate";
@@ -45,7 +46,12 @@ import {
   type SpeechLevel,
 } from "../speech";
 import { PET_HAPPY_MS } from "../pet";
-import { lookOf, type FurnitureId, type Slot } from "../furniture";
+import {
+  lookOf,
+  type EditionId,
+  type FurnitureId,
+  type Slot,
+} from "../furniture";
 import { useDeviceEdition } from "../useDeviceEdition";
 import { useDailyBoxes } from "../useDailyBoxes";
 import { GIFT_TOTAL, SNOW_EACH, type DailyBox } from "../profile";
@@ -354,14 +360,7 @@ function PetRoom({ retry }: { retry: () => void }) {
         data-tint={edition.tint ?? undefined}
       >
         {edition.current && (
-          <span
-            key={edition.current}
-            className={styles.editionMark}
-            data-edition={edition.current}
-            aria-hidden="true"
-          >
-            <EditionMark edition={edition.current} />
-          </span>
+          <EditionDecor key={edition.current} edition={edition.current} />
         )}
         <h1 className={styles.name}>{t("name")}</h1>
         <div className={styles.bezel}>
@@ -592,5 +591,22 @@ function PetRoom({ retry }: { retry: () => void }) {
         />
       )}
     </main>
+  );
+}
+
+/**
+ * What an edition adds to the device: a mark on its top edge (crown,
+ * ribbon), or the whole sleigh around it (Christmas).
+ */
+function EditionDecor({ edition }: { edition: EditionId }) {
+  if (edition === "christmas") return <DeviceSleigh />;
+  return (
+    <span
+      className={styles.editionMark}
+      data-edition={edition}
+      aria-hidden="true"
+    >
+      <EditionMark edition={edition} />
+    </span>
   );
 }

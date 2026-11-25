@@ -62,6 +62,7 @@ const en: Messages = {
       setMissing: "{name}, not made yet",
       setEdition: {
         palace: "Place them all to turn the device into the palace edition",
+        christmas: "Place them all to turn the device into Rudolph's sleigh",
         stage: "Place them all to turn the device into the VIP edition",
       },
       sets: {
@@ -425,7 +426,11 @@ const en: Messages = {
       sleep: "Zzz…",
     },
     panel: { collapse: "Collapse", expand: "Expand" },
-    edition: { palace: "Palace edition!", stage: "VIP edition!" },
+    edition: {
+      palace: "Palace edition!",
+      christmas: "Christmas edition!",
+      stage: "VIP edition!",
+    },
     snow: {
       title: "Snow box",
       arrived: "A snow box is here!",
@@ -471,6 +476,7 @@ const en: Messages = {
       stamp: "Cycle done! Got a paw stamp",
       edition: {
         palace: "The whole palace set is in: palace edition!",
+        christmas: "The whole Christmas set is in: Christmas edition!",
         stage: "The whole idol stage set is in: VIP edition!",
       },
       craft: "Made {object}",

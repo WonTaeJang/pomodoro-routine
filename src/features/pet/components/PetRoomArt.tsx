@@ -1,7 +1,13 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { DEFAULT_LOOK, lookOf, type LookId, type Slot } from "../furniture";
+import {
+  DEFAULT_LOOK,
+  editionOf,
+  lookOf,
+  type LookId,
+  type Slot,
+} from "../furniture";
 import { useShownPlaced } from "../usePetVip";
 import {
   ROOMS,
@@ -16,6 +22,7 @@ import {
 } from "../roomArt";
 import { useTimeOfDay } from "../useTimeOfDay";
 import styles from "./PetPlayground.module.scss";
+import { ChristmasSky, WindowLights } from "./PetSleigh";
 
 /** A room drawing at the room's cell size, or at `cell` pixels per cell. */
 export function Pixels({ art, cell }: { art: PixelArt; cell?: number }) {
@@ -148,6 +155,9 @@ export function PetRoomArt({
       </div>
     );
   };
+  // The whole Christmas set (I-075): snow, blinking lights, a sleigh flying by.
+  // Not while decorating, when the room may be only a preview.
+  const christmas = !decorating && editionOf(placed) === "christmas";
   const room = roomStyles(look("room"));
   const windowArt = lookArt(look("window"), time);
   const rug = look("rug");
@@ -166,7 +176,10 @@ export function PetRoomArt({
       {slot(
         "window",
         styles.window,
-        <Pixels art={windowArt} />,
+        <>
+          <Pixels art={windowArt} />
+          {christmas && <WindowLights />}
+        </>,
         overhangStyle(windowArt),
       )}
       {slot("pot", styles.plant, <Pixels art={lookArt(look("pot"), time)} />)}
@@ -177,6 +190,7 @@ export function PetRoomArt({
           <Pixels art={floorRugArt(rug)} />
         ),
       )}
+      {christmas && <ChristmasSky />}
       {/* What Kkami wears is drawn on his canvas; this only marks where to pick it. */}
       {decorating && slot("outfit", styles.outfitSlot, null)}
     </>

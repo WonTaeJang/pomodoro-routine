@@ -63,6 +63,7 @@ const ko = {
       setMissing: "{name}, 아직 안 만듦",
       setEdition: {
         palace: "다 놓으면 게임기가 궁전 에디션으로 바뀌어요",
+        christmas: "다 놓으면 게임기가 루돌프가 끄는 썰매가 돼요",
         stage: "다 놓으면 게임기가 VIP 에디션으로 바뀌어요",
       },
       sets: {
@@ -404,8 +405,12 @@ const ko = {
       sleep: "쿨쿨…",
     },
     panel: { collapse: "접기", expand: "펼치기" },
-    // 에디션 세트 넷을 모두 놓았을 때 헤더 안내 (궁전 I-067, 아이돌 무대)
-    edition: { palace: "궁전 에디션이 됐어요!", stage: "VIP 에디션이 됐어요!" },
+    // 에디션 세트 넷을 모두 놓았을 때 헤더 안내 (궁전 I-067, 크리스마스 I-075, 아이돌 무대)
+    edition: {
+      palace: "궁전 에디션이 됐어요!",
+      christmas: "크리스마스 에디션이 됐어요!",
+      stage: "VIP 에디션이 됐어요!",
+    },
     // VIP 선물 상자 (I-070)
     snow: {
       title: "눈송이 상자",
@@ -453,6 +458,8 @@ const ko = {
       stamp: "사이클 완료! 발바닥 도장을 받았어요",
       edition: {
         palace: "궁전 세트를 다 놓아 게임기가 궁전 에디션이 됐어요",
+        christmas:
+          "크리스마스 세트를 다 놓아 게임기가 크리스마스 에디션이 됐어요",
         stage: "아이돌 무대 세트를 다 놓아 게임기가 VIP 에디션이 됐어요",
       },
       craft: "{object} 만들었어요",

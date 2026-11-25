@@ -20,6 +20,17 @@ $palace-gold: #e2b54c;
 $palace-gold-shade: #a8792a;
 $palace-hud: #f3e2c8;
 $palace-ink: #fbeedd;
+// 크리스마스 에디션(I-075): 산타 썰매. 빨간 본체에 금테, 크림빛 헤더. 모드와 관계없이 같은 색
+$xmas-shell: #c8343a;
+$xmas-shell-shade: #8e1f28;
+$xmas-shell-light: #e2626a;
+// 금테는 궁전과 같은 금
+$xmas-gold: $palace-gold;
+$xmas-gold-shade: $palace-gold-shade;
+$xmas-hud: #fbefe4;
+$xmas-hud-shade: #e3a3a3;
+$xmas-ink: #fff3ea;
+$xmas-rein: #3a2a1c;
 // VIP 에디션: 아이돌 무대 방과 같은 파스텔 무대. 연보라 본체에 핫핑크 테두리
 $stage-shell: #c9b8f4;
 $stage-shell-shade: #9c84de;

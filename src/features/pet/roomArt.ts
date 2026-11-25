@@ -199,6 +199,8 @@ const XMAS_LIGHTS = [
   "#f2c94c",
   "#4a9a5c",
 ];
+/** Columns of the Christmas window's bulbs (row 1), which blink with the whole set. */
+export const XMAS_LIGHT_CELLS = XMAS_LIGHTS.map((_, i) => 1 + i * 2);
 /** Extra cells drawn over everything: twig ends, leaves, flowers, a keystone. */
 const TRIM: Record<WindowLook, Trim[]> = {
   plainWindow: [],
@@ -255,7 +257,7 @@ const TRIM: Record<WindowLook, Trim[]> = {
   // String lights on a green wire along the top, a wreath on the bars, snow on the sill.
   christmasWindow: [
     ...Array.from({ length: 15 }, (_, x): Trim => [x, 0, "#2f5a3e"]),
-    ...XMAS_LIGHTS.map((color, i): Trim => [1 + i * 2, 1, color]),
+    ...XMAS_LIGHTS.map((color, i): Trim => [XMAS_LIGHT_CELLS[i], 1, color]),
     // The wreath: green ring, darker leaves, red berries and bow, a gold bell.
     [5, 8, "#3f7a4f"],
     [5, 9, "#3f7a4f"],
