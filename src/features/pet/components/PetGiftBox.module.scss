@@ -1,14 +1,26 @@
 @use "../../../styles/mixins";
 @use "device";
 
-// VIP 선물 상자를 연 팝업: (처음이면 VIP 세트 안내) · 열린 상자 · 재료 6가지 · 버튼
+// 그날의 상자를 연 팝업 (VIP 선물 상자, 눈송이 상자):
+// (여러 개면 1/2) · (처음이면 안내) · 열린 상자 · 받는 것 · 버튼
 $open-at: 0.7s;
 
 .gift {
   display: grid;
   gap: var(--space-3-5);
 }
-// 처음 한 번: 아이돌 무대 세트를 받았다는 안내 (VIP 에디션의 연분홍)
+// 상자를 차례로 열 때 몇 번째인지
+.step {
+  justify-self: center;
+  padding: 2px var(--space-2-5);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+// 처음 한 번만: VIP는 아이돌 무대 세트 (VIP 에디션의 연분홍),
+// 눈송이는 크리스마스 꾸미기 6가지 (크림 바탕에 빨강)
 .welcome {
   display: grid;
   gap: var(--space-2);
@@ -23,6 +35,14 @@ $open-at: 0.7s;
     color: #8a2457;
     font-size: var(--font-size-sm);
   }
+  &[data-theme="christmas"] {
+    background: #fbf3ea;
+    box-shadow: inset 0 0 0 2px #e2b3a8;
+    color: #6e3a2e;
+    strong {
+      color: #a42a2f;
+    }
+  }
   p {
     margin: 0;
     font-size: var(--font-size-xs);
@@ -31,7 +51,7 @@ $open-at: 0.7s;
 }
 .pieces {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--space-1-5);
   margin: 0;
   padding: 0;
@@ -40,8 +60,13 @@ $open-at: 0.7s;
     display: grid;
     place-items: center;
     aspect-ratio: 1;
+    overflow: hidden;
     border-radius: var(--radius-sm);
     background: #fff;
+  }
+  &[data-count="6"] {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--space-1);
   }
 }
 // 닫힌 상자가 흔들리다 열린 상자로 바뀜
@@ -107,7 +132,11 @@ $open-at: 0.7s;
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
-// 재료 칸은 아이템 상자 칸(PetItemBox의 grid·slot)에 받는 수만 오른쪽 위에
+// 재료 칸은 아이템 상자 칸(PetItemBox의 grid·slot)에 받는 수만 오른쪽 위에. 하나면 가운데
+.gift [data-count="1"] {
+  grid-template-columns: minmax(0, 112px);
+  justify-content: center;
+}
 .got {
   position: relative;
   b {

@@ -38,6 +38,7 @@ const ko = {
         heart: "친밀도 레벨이 오를 때마다 1개",
         stamp: "집중 사이클을 마칠 때마다 1개",
         gift: "하루 한 번 · 산책 재료 {kinds}가지를 {count}개씩",
+        snow: "11~2월 · 하루 한 번 눈송이 {count}개",
       },
       count: "× {count}",
       leaf: { name: "나뭇잎", object: "나뭇잎을" },
@@ -48,6 +49,9 @@ const ko = {
       ball: { name: "공", object: "공을" },
       heart: { name: "하트" },
       stamp: { name: "발바닥 도장" },
+      snow: { name: "눈송이" },
+      // 눈송이와 크리스마스 꾸미기에 붙는 시즌 표시 (I-074)
+      season: "11~2월 한정",
       needLabel: "{name} {have}개 있음, {need}개 필요",
       make: "만들기",
       apply: "적용",
@@ -82,6 +86,11 @@ const ko = {
           name: "궁전 세트",
           to: "궁전 세트로",
           intro: "금빛으로 빛나는 궁전의 방",
+        },
+        christmas: {
+          name: "크리스마스 세트",
+          to: "크리스마스 세트로",
+          intro: "트리 불빛이 반짝이는 크리스마스 방",
         },
         stage: {
           name: "아이돌 무대 세트",
@@ -242,6 +251,36 @@ const ko = {
           object: "센터 스테이지를",
           to: "센터 스테이지로",
         },
+        christmasRoom: {
+          name: "크리스마스 벽지",
+          object: "크리스마스 벽지를",
+          to: "크리스마스 벽지로",
+        },
+        christmasWindow: {
+          name: "반짝이 전구 창문",
+          object: "반짝이 전구 창문을",
+          to: "반짝이 전구 창문으로",
+        },
+        christmasTree: {
+          name: "크리스마스트리",
+          object: "크리스마스트리를",
+          to: "크리스마스트리로",
+        },
+        santaRug: {
+          name: "산타 러그",
+          object: "산타 러그를",
+          to: "산타 러그로",
+        },
+        santaSuit: {
+          name: "산타 옷",
+          object: "산타 옷을",
+          to: "산타 옷으로",
+        },
+        christmasBubble: {
+          name: "크리스마스 말풍선",
+          object: "크리스마스 말풍선을",
+          to: "크리스마스 말풍선으로",
+        },
         cheerBubble: {
           name: "응원 피켓 말풍선",
           object: "응원 피켓 말풍선을",
@@ -368,6 +407,23 @@ const ko = {
     // 에디션 세트 넷을 모두 놓았을 때 헤더 안내 (궁전 I-067, 아이돌 무대)
     edition: { palace: "궁전 에디션이 됐어요!", stage: "VIP 에디션이 됐어요!" },
     // VIP 선물 상자 (I-070)
+    snow: {
+      title: "눈송이 상자",
+      arrived: "눈송이 상자가 왔어요!",
+      open: "눈송이 상자 열기",
+      lead: "오늘의 선물: 눈송이 {count}개",
+      take: "받기",
+      welcome: {
+        title: "크리스마스가 다가와요",
+        text: "11월부터 2월까지 하루 한 번 눈송이를 받아요. 눈송이로 크리스마스 꾸미기 6가지를 만들 수 있어요.",
+      },
+    },
+    // 상자가 여러 개면 쌓아 두고 차례로 엶 (I-074)
+    boxes: {
+      arrived: "상자가 {count}개 왔어요!",
+      open: "상자 {count}개 열기",
+      step: "{index}/{total}",
+    },
     gift: {
       title: "VIP 선물 상자",
       arrived: "VIP 선물 상자가 왔어요!",
@@ -403,6 +459,7 @@ const ko = {
       place: "{slot} {to} 바꿨어요",
       set: "방을 {to} 꾸몄어요",
       gift: "VIP 선물 상자에서 산책 재료 {count}개를 받았어요",
+      snow: "눈송이 상자에서 눈송이 {count}개를 받았어요",
       walkLimit: "오늘 산책 {count}번을 다 했어요. 내일 또 가요!",
       snackLimit: "오늘 간식 {count}번을 다 줬어요. 내일 또 줄게요!",
     },

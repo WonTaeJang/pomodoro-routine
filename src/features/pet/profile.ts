@@ -21,6 +21,7 @@ import {
   canMake,
   furnitureById,
   heartsSpent,
+  snowSpent,
   stampsSpent,
   isFree,
   isFurnitureId,
@@ -66,6 +67,10 @@ export type PetProfile = LegacyPetProfile & {
   gifts: number;
   /** The local date of the latest gift box: one a day. */
   giftDay: string | null;
+  /** Snow boxes opened (I-074, November to February): a snowflake each. */
+  snows: number;
+  /** The local date of the latest snow box: one a day. */
+  snowDay: string | null;
 };
 
 /** Walks a day; the walk key rests after that until the next day. */
@@ -98,6 +103,17 @@ export const NO_GIFTS = { gifts: 0, giftDay: null } as const;
 export const GIFT_EACH = 1;
 /** Walk items in each VIP gift box. */
 export const GIFT_TOTAL = ITEMS.length * GIFT_EACH;
+/** What a record from before snow boxes starts with. */
+export const NO_SNOW = { snows: 0, snowDay: null } as const;
+/** The boxes that come to the room once a day: snow (I-074), VIP gift (I-070). */
+export type DailyBox = "snow" | "gift";
+/** Snowflakes in each snow box. */
+export const SNOW_EACH = 1;
+/** The months a snow box comes, by the device's local date (11월~2월). */
+const SNOW_MONTHS = [11, 12, 1, 2];
+/** Snow boxes come on `day` (local YYYY-MM-DD). */
+export const isSnowSeason = (day: string) =>
+  SNOW_MONTHS.includes(Number(day.slice(5, 7)));
 
 /** What a record from before furniture starts with. */
 export const NO_FURNITURE = { spent: {}, furniture: [], placed: {} } as const;
@@ -120,6 +136,7 @@ export function createPetProfile(id: string, now: number): PetProfile {
     ...NO_DAILY_WALKS,
     ...NO_DAILY_SNACKS,
     ...NO_GIFTS,
+    ...NO_SNOW,
   };
 }
 
@@ -198,9 +215,38 @@ export function receiveGift(
   };
 }
 
-/** A gift box waits on `day` (local date) if none was opened on it or later. */
+/** A daily box waits on `day` (local date) if none was opened on it or later. */
+const isNewDay = (latest: string | null, day: string) =>
+  latest === null || day > latest;
+
+/** A gift box waits on `day` if none was opened on it or later. */
 export const giftWaiting = (pet: PetProfile, day: string) =>
-  pet.giftDay === null || day > pet.giftDay;
+  isNewDay(pet.giftDay, day);
+
+/**
+ * Open the day's snow box: one snowflake for the Christmas pieces. Only from
+ * November to February, once a day; like gift boxes, two devices get one box.
+ */
+export function receiveSnow(
+  pet: PetProfile,
+  now: number,
+  day = affinityDay(now),
+): PetProfile {
+  if (!snowWaiting(pet, day)) return pet;
+  return {
+    ...pet,
+    snows: pet.snows + 1,
+    snowDay: day,
+    updatedAt: Math.max(now, pet.updatedAt),
+  };
+}
+
+/** A snow box waits on `day` in the snow months, if none was opened on it or later. */
+export const snowWaiting = (pet: PetProfile, day: string) =>
+  isSnowSeason(day) && isNewDay(pet.snowDay, day);
+
+/** The Christmas pieces and set show once a snowflake has come (I-074). */
+export const hasSnow = (pet: PetProfile) => pet.snows > 0;
 
 /** Walks taken on `day` (a local YYYY-MM-DD date). */
 export function walksOn(pet: PetProfile, day: string): number {
@@ -222,16 +268,18 @@ export function seeItems(pet: PetProfile, seen: number): PetProfile {
 }
 
 /**
- * Finds, hearts and paw stamps left to make things with. Stamps are earned
- * outside this record (finished cycles), so the caller passes how many.
+ * Finds, hearts, paw stamps and snowflakes left to make things with. Stamps
+ * are earned outside this record (finished cycles), so the caller passes how many.
  */
 export function materialsLeft(pet: PetProfile, stamps = 0): MaterialCounts {
   const hearts = levelHearts(pet.affinity.points) - heartsSpent(pet.furniture);
   const stampsLeft = stamps - stampsSpent(pet.furniture);
+  const snow = pet.snows * SNOW_EACH - snowSpent(pet.furniture);
   return {
     ...availableItems(pet.items, pet.spent),
     ...(hearts > 0 && { heart: hearts }),
     ...(stampsLeft > 0 && { stamp: stampsLeft }),
+    ...(snow > 0 && { snow }),
   };
 }
 
@@ -283,10 +331,10 @@ export function placeFurniture(
   return { ...pet, placed, updatedAt: Math.max(now, pet.updatedAt) };
 }
 
-/** Gift boxes opened and the latest one's date: a date once there is one. */
-function isGifts(gifts: unknown, day: unknown) {
-  if (!Number.isSafeInteger(gifts) || (gifts as number) < 0) return false;
-  return gifts === 0 ? day === null : isDayKey(day);
+/** Boxes opened and the latest one's date: a date once there is one. */
+function isBoxes(boxes: unknown, day: unknown) {
+  if (!Number.isSafeInteger(boxes) || (boxes as number) < 0) return false;
+  return boxes === 0 ? day === null : isDayKey(day);
 }
 
 /** A latest day and its count: none before the first, never above the total. */
@@ -349,13 +397,16 @@ export function isPetProfile(value: unknown): value is PetProfile {
     isAffinity(p.affinity, p.totalSnacks) &&
     Number.isSafeInteger(p.walks) &&
     isItemCounts(p.items) &&
-    isGifts(p.gifts, p.giftDay) &&
+    isBoxes(p.gifts, p.giftDay) &&
+    isBoxes(p.snows, p.snowDay) &&
     // Every item came from a walk or a gift box.
     totalItems(p.items) === p.walks! + p.gifts! * GIFT_TOTAL &&
     Number.isSafeInteger(p.itemsSeen) &&
     p.itemsSeen! >= 0 &&
     p.itemsSeen! <= totalItems(p.items!) &&
     isFurnitureState(p) &&
+    // Christmas pieces take no more snowflakes than came.
+    snowSpent(p.furniture!) <= p.snows! * SNOW_EACH &&
     isDailyCount(p.walkDay, p.walksOnDay, p.walks!) &&
     isDailyCount(p.snackDay, p.snacksOnDay, p.totalSnacks)
   );

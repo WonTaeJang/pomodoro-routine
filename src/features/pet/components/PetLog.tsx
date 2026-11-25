@@ -47,7 +47,8 @@ function EntryIcon({ entry }: { entry: PetLogEntry }) {
     case "edition":
       return <StatusIcon status={entry.edition} />;
     case "gift":
-      return <StatusIcon status="gift" />;
+    case "snow":
+      return <StatusIcon status={entry.kind} />;
     case "craft":
       return <LookPicture look={entry.furniture} height={12} />;
     case "place":
@@ -101,7 +102,8 @@ function EntryText({ entry }: { entry: PetLogEntry }) {
     case "edition":
       return t(`log.edition.${entry.edition}`);
     case "gift":
-      return t("log.gift", { count: entry.count });
+    case "snow":
+      return t(`log.${entry.kind}`, { count: entry.count });
     default:
       return t(`log.${entry.kind}`);
   }

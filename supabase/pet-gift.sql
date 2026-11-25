@@ -28,7 +28,8 @@ add constraint pet_game_history_kind_check check (
   (kind = 'walks' and item is not null and furniture is null and slot is null)
   or (kind = 'craft' and furniture is not null and item is null and slot is null)
   or (kind = 'place' and slot is not null and item is null)
-  or (kind in ('pats', 'snacks', 'seen', 'gift') and item is null and furniture is null and slot is null)
+  -- 'snow'는 pet-snow.sql의 눈송이 상자. 이 파일을 다시 실행해도 빠지지 않게 함께 둡니다
+  or (kind in ('pats', 'snacks', 'seen', 'gift', 'snow') and item is null and furniture is null and slot is null)
 );
 
 -- 2. 'gift' 기록은 VIP만 올림 ----------------------------------------------

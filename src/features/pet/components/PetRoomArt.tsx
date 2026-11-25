@@ -50,12 +50,14 @@ export function LookPicture({
   fit = Infinity,
 }: {
   look: LookId;
-  /** Widest it may be, in pixels: wide pictures (the cone) shrink to fit. */
+  /** Widest or tallest it may be, in pixels: wide pictures (the cone) and
+   * tall ones (the Christmas tree) shrink to fit. */
   fit?: number;
 } & ({ cell: number; height?: never } | { height: number; cell?: never })) {
   const art = lookArt(look, "day");
   const size = cell ?? height! / art.height;
-  return <Pixels art={art} cell={Math.min(size, fit / art.width)} />;
+  const longest = Math.max(art.width, art.height);
+  return <Pixels art={art} cell={Math.min(size, fit / longest)} />;
 }
 
 export type RoomDecorating = {

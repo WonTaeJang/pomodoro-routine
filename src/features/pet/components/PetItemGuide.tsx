@@ -4,8 +4,14 @@ import type { ReactNode } from "react";
 import { useTranslations } from "use-intl";
 import { Dialog } from "@/components/ui";
 import { ITEMS, itemPercent, itemRarity } from "../items";
-import { GIFT_EACH } from "../profile";
-import { GiftBoxIcon, HeartItemIcon, ItemIcon, PawItemIcon } from "./PetIcons";
+import { GIFT_EACH, SNOW_EACH } from "../profile";
+import {
+  BoxIcon,
+  HeartItemIcon,
+  ItemIcon,
+  PawItemIcon,
+  SnowflakeIcon,
+} from "./PetIcons";
 import styles from "./PetItemBox.module.scss";
 
 /**
@@ -48,9 +54,15 @@ export function PetItemGuide({
           name={t("stamp.name")}
           how={t("guide.stamp")}
         />
+        {/* 11~2월에만 오는 눈송이 상자 (I-074) */}
+        <GuideRow
+          icon={<SnowflakeIcon size={22} />}
+          name={t("snow.name")}
+          how={t("guide.snow", { count: SNOW_EACH })}
+        />
         {vip && (
           <GuideRow
-            icon={<GiftBoxIcon size={22} />}
+            icon={<BoxIcon box="gift" size={22} />}
             name={t("giftName")}
             how={t("guide.gift", { count: GIFT_EACH, kinds: ITEMS.length })}
           />

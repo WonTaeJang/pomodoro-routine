@@ -41,6 +41,8 @@ type PetStore = {
   ): Promise<void>;
   /** Open the day's VIP gift box (the page checks VIP; the server too). */
   recordGift(): Promise<void>;
+  /** Open the day's snow box (November to February, I-074). */
+  recordSnow(): Promise<void>;
   /** The item box was opened: clear the new-item dot. */
   markItemsSeen(): Promise<void>;
   retry(): Promise<void>;
@@ -191,6 +193,7 @@ export function createPetStore(
           })),
         ),
       recordGift: () => recordCare({ kind: "gift" }),
+      recordSnow: () => recordCare({ kind: "snow" }),
       markItemsSeen: () => {
         const pet = get().pet;
         if (!pet || pet.itemsSeen >= totalItems(pet.items))

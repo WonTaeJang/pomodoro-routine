@@ -251,12 +251,33 @@ const absolute = (
   [ox, oy]: readonly [number, number],
 ) => rects.map(([x, y, w, h, c]): RectSpec => [x + ox, y + oy, w, h, c]);
 
+// --- Santa suit: red with white fur trim, a black belt and a gold buckle ------
+const SANTA_RED = "#c8373a";
+const SANTA_FUR = "#fbf8f2";
+const santaStanding = (rects: readonly RectSpec[]) =>
+  shirt(rects, { top: 180, bottom: 208 }, (x, y) => {
+    if (y === 180 || y === 208) return SANTA_FUR; // collar and hem
+    if (y === 196) {
+      if (x >= 172 && x <= 188) return x === 180 ? "#2b2523" : "#e8b730"; // buckle
+      return "#2b2523"; // belt
+    }
+    if (x === 180) return SANTA_FUR; // fur down the front
+    return SANTA_RED;
+  });
+const santaResting = (rects: readonly RectSpec[]) =>
+  shirt(rects, { top: 192, bottom: 224, left: 200 }, (x, y) => {
+    if (x === 200) return SANTA_FUR;
+    if (x === 216) return "#2b2523";
+    return y % 16 === 0 && x === 208 ? "#b23034" : SANTA_RED;
+  });
+
 export const WORN_LOOKS = [
   "brownHat",
   "ginghamBib",
   "creamScarf",
   "checkShirt",
   "coneCollar",
+  "santaSuit",
 ] as const;
 export type WornLook = (typeof WORN_LOOKS)[number];
 
@@ -296,6 +317,7 @@ export function outfits(body: {
       upright: shift(grid(132, 60, HAT, HAT_COLORS), ORIGIN.head),
       resting: shift(grid(104, 136, HAT, HAT_COLORS), ORIGIN.restingHead),
     },
+    onBody("santaSuit", santaStanding(standing), santaResting(lying)),
     onBody("ginghamBib", bib.upright, bib.resting),
     onBody("creamScarf", scarf.upright, scarf.resting),
     onBody("checkShirt", shirtStanding(standing), shirtResting(lying)),

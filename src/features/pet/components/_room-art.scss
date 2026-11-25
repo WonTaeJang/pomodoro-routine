@@ -258,12 +258,15 @@ $slot-tag-color: #fffaf0;
   -webkit-tap-highlight-color: transparent;
 }
 
-// 오늘의 VIP 선물 상자 (I-070): 까미 왼쪽 바닥. 로딩 덮개 아래, 까미 그림과는 겹치지 않음
+// 오늘의 상자 더미 (눈송이 I-074, VIP 선물 I-070): 까미 왼쪽 바닥. 로딩 덮개 아래, 까미
+// 그림과는 겹치지 않음. 상자 하나(44px)에 비껴 쌓인 만큼 여유
 .giftBox {
   position: absolute;
   z-index: $interaction-layer;
   left: calc(50% - 150px);
   bottom: 30px;
+  width: 56px;
+  height: 60px;
   padding: 0;
   border: 0;
   background: none;
@@ -280,6 +283,20 @@ $slot-tag-color: #fffaf0;
   }
   @include mixins.reduced-motion {
     transition: none;
+  }
+}
+// 쌓인 상자: 맨 위(0)가 앞, 아래 상자는 뒤에서 조금씩 위·옆으로 비껴 보임 (3개까지)
+.pileBox {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  &[data-depth="1"] {
+    transform: translate(12px, -16px) rotate(6deg);
+    filter: brightness(0.96);
+  }
+  &[data-depth="2"] {
+    transform: translate(-6px, -30px) rotate(-5deg);
+    filter: brightness(0.92);
   }
 }
 
@@ -369,6 +386,14 @@ $slot-tag-color: #fffaf0;
     --bubble-ink: #8c3a4e;
     --bubble-line-width: 2px;
   }
+  // 크리스마스 말풍선 (눈송이, I-074): 빨간 테두리, 위에 호랑가시와 눈
+  &[data-look="christmasBubble"] {
+    --bubble-paper: #fffaf3;
+    --bubble-line: #c8373a;
+    --bubble-shade: #ecc9c0;
+    --bubble-ink: #7a2a2a;
+    --bubble-line-width: 2px;
+  }
   // 응원 피켓 (VIP): 굵은 핫핑크 테두리, 둥근 모서리, 금 반짝이, 아래로 손잡이
   &[data-look="cheerBubble"] {
     --bubble-paper: #fff0f7;
@@ -447,6 +472,15 @@ $slot-tag-color: #fffaf0;
     right: -8px;
     bottom: -7px;
     transform: rotate(12deg);
+  }
+  &[data-place="snowCapRight"] {
+    top: -5px;
+    right: 4px;
+  }
+  &[data-place="hollyTopLeft"] {
+    top: -8px;
+    left: -10px;
+    transform: rotate(-10deg);
   }
   &[data-place="sparkleTopLeft"] {
     top: -10px;

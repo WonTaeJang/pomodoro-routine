@@ -88,10 +88,11 @@ describe("창문·화분 도트", () => {
     expect(cells(palace).get("1,1")).toBe("#b3243a"); // a curtain
   });
 
-  it("화분은 모두 같은 크기이고 정해진 색만 씀", () => {
-    for (const { rows, colors } of Object.values(POTS)) {
-      expect(rows).toHaveLength(16);
-      rows.forEach((row) => expect(row).toHaveLength(12));
+  it("화분은 모두 같은 크기(크리스마스트리만 크게)이고 정해진 색만 씀", () => {
+    for (const [look, { rows, colors }] of Object.entries(POTS)) {
+      const [height, width] = look === "christmasTree" ? [31, 19] : [16, 12];
+      expect(rows).toHaveLength(height);
+      rows.forEach((row) => expect(row).toHaveLength(width));
       for (const cell of rows.join(""))
         if (cell !== ".") expect(colors).toHaveProperty(cell);
     }

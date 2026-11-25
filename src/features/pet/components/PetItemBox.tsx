@@ -13,7 +13,8 @@ import {
 import { cx } from "@/lib/cx";
 import { ITEMS } from "../items";
 import {
-  RECIPES,
+  recipesFor,
+  isSeasonal,
   SLOTS,
   canMake,
   canUse,
@@ -31,9 +32,10 @@ import {
   type Slot,
 } from "../furniture";
 import { levelHearts } from "../affinity";
-import { materialsLeft, type PetProfile } from "../profile";
+import { hasSnow, materialsLeft, type PetProfile } from "../profile";
 import {
   CheckIcon,
+  SnowflakeIcon,
   HeartItemIcon,
   ItemIcon,
   MaterialIcon,
@@ -87,6 +89,8 @@ export function PetItemBox({
   const [slot, setSlot] = useState<Slot>(SLOTS[0]);
   const [guideOpen, setGuideOpen] = useState(false);
   const left = materialsLeft(pet, stamps);
+  // 눈송이를 받은 뒤부터 눈송이 칸과 크리스마스 꾸미기·세트가 보임 (I-074)
+  const winter = hasSnow(pet);
   return (
     <Dialog
       open={open}
@@ -118,13 +122,14 @@ export function PetItemBox({
         options={TABS.map((value) => ({ value, label: t(`tab.${value}`) }))}
       />
       {tab === "materials" && (
-        <MaterialsTab pet={pet} left={left} stamps={stamps} />
+        <MaterialsTab pet={pet} left={left} stamps={stamps} winter={winter} />
       )}
       {tab === "decor" && (
         <>
           <DecorTab
             pet={pet}
             vip={vip}
+            winter={winter}
             left={left}
             slot={slot}
             onSlot={setSlot}
@@ -143,7 +148,7 @@ export function PetItemBox({
       )}
       {tab === "sets" && (
         <ul className={styles.cards}>
-          {setsFor(vip).map((set) => (
+          {setsFor(vip, winter).map((set) => (
             <SetCard
               key={set.id}
               set={set}
@@ -159,15 +164,20 @@ export function PetItemBox({
   );
 }
 
-/** What is left of each material: walk items, level hearts and paw stamps. */
+/**
+ * What is left of each material: walk items, level hearts, paw stamps and,
+ * once one has come, snowflakes (marked as a season's).
+ */
 function MaterialsTab({
   pet,
   left,
   stamps,
+  winter,
 }: {
   pet: PetProfile;
   left: MaterialCounts;
   stamps: number;
+  winter: boolean;
 }) {
   const t = useTranslations("pet.items");
   const heartsEarned = levelHearts(pet.affinity.points) > 0;
@@ -202,6 +212,14 @@ function MaterialsTab({
         }
         found={stamps > 0}
       />
+      {winter && (
+        <BoxSlot
+          icon={<SnowflakeIcon size={26} />}
+          name={t("snow.name")}
+          count={t("count", { count: left.snow ?? 0 })}
+          season
+        />
+      )}
     </ul>
   );
 }
@@ -213,6 +231,7 @@ function MaterialsTab({
 function DecorTab({
   pet,
   vip,
+  winter,
   left,
   slot,
   onSlot,
@@ -221,6 +240,8 @@ function DecorTab({
 }: {
   pet: PetProfile;
   vip: boolean;
+  /** A snowflake has come: the Christmas pieces show. */
+  winter: boolean;
   left: MaterialCounts;
   slot: Slot;
   onSlot: (slot: Slot) => void;
@@ -261,7 +282,7 @@ function DecorTab({
             )}
           </LookCard>
         ))}
-        {RECIPES.filter((piece) => piece.slot === slot).map((piece) => (
+        {recipesFor(slot, winter).map((piece) => (
           <Recipe
             key={piece.id}
             piece={piece}
@@ -289,7 +310,7 @@ function Recipe({
   onCraft,
   onApply,
 }: {
-  piece: (typeof RECIPES)[number];
+  piece: ReturnType<typeof recipesFor>[number];
   left: MaterialCounts;
   made: boolean;
   /** In its place in the room now. */
@@ -307,7 +328,7 @@ function Recipe({
         run: () => onCraft(id),
       };
   return (
-    <LookCard look={id} action={action}>
+    <LookCard look={id} action={action} season={isSeasonal(id)}>
       {!made && <Needs need={need} left={left} />}
     </LookCard>
   );
@@ -329,15 +350,23 @@ const applyAction = (applied: boolean, run: () => void): CardAction => ({
 function LookCard({
   look,
   action,
+  season = false,
   children,
 }: {
   look: LookId;
   action: CardAction;
+  /** Made from a season's material: the season border. */
+  season?: boolean;
   children?: ReactNode;
 }) {
   const t = useTranslations("pet.items");
   return (
-    <li className={styles.lookCard} data-applied={action.label === "applied"}>
+    <li
+      className={styles.lookCard}
+      data-applied={action.label === "applied"}
+      data-season={season}
+    >
+      {season && <SeasonMark />}
       <span className={styles.art}>
         <LookPicture look={look} cell={2} fit={44} />
       </span>
@@ -398,8 +427,10 @@ function SetCard({
   const pieces = setPieces(set);
   const missing = pieces.filter((id) => !canUse(made, id, vip));
   const have = pieces.length - missing.length;
+  const season = "season" in set;
   return (
-    <li className={styles.set} data-applied={applied}>
+    <li className={styles.set} data-applied={applied} data-season={season}>
+      {season && <SeasonMark />}
       <div className={styles.setHead}>
         <strong>
           {t(`sets.${set.id}.name`)}
@@ -452,6 +483,30 @@ export function VipBadge() {
   return <span className={styles.vip}>{t("vip")}</span>;
 }
 
+/**
+ * A season's limited material and what is made from it (I-074): snowflakes
+ * on two corners of the card's blue border (data-season), said in words for
+ * screen readers.
+ */
+function SeasonMark() {
+  const t = useTranslations("pet.items");
+  return (
+    <>
+      {(["top", "bottom"] as const).map((corner) => (
+        <span
+          key={corner}
+          className={styles.seasonFlake}
+          data-corner={corner}
+          aria-hidden="true"
+        >
+          <SnowflakeIcon size={20} />
+        </span>
+      ))}
+      <VisuallyHidden>{t("season")}</VisuallyHidden>
+    </>
+  );
+}
+
 /** Each material: how many are left of how many are needed. */
 function Needs({ need, left }: { need: MaterialCounts; left: MaterialCounts }) {
   const t = useTranslations("pet.items");
@@ -482,6 +537,7 @@ function BoxSlot({
   name,
   count,
   found = name !== null,
+  season = false,
 }: {
   icon: ReactNode;
   /** null until found. */
@@ -489,10 +545,13 @@ function BoxSlot({
   count: string;
   /** Not got yet, even though its name shows. */
   found?: boolean;
+  /** A season's limited material: the season border. */
+  season?: boolean;
 }) {
   const t = useTranslations("pet.items");
   return (
-    <li className={styles.slot} data-found={found}>
+    <li className={styles.slot} data-found={found} data-season={season}>
+      {season && <SeasonMark />}
       <span className={styles.icon}>{icon}</span>
       <strong>{name ?? t("unknown")}</strong>
       <span>{count}</span>

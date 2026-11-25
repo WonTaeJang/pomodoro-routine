@@ -3,6 +3,7 @@ import {
   NO_DAILY_SNACKS,
   NO_DAILY_WALKS,
   NO_GIFTS,
+  NO_SNOW,
   NO_FURNITURE,
   isLegacyPetProfile,
   isPetProfile,
@@ -45,7 +46,7 @@ export interface LocalPetRepository extends PetRepository {
   updateRecord(change: (record: PetRecord) => PetRecord): Promise<PetRecord>;
 }
 
-const VERSION = 13;
+const VERSION = 14;
 /** 저장 형식 버전. 계정(pet_game.version)에도 같은 값을 씀 */
 export const PET_STORAGE_VERSION = VERSION;
 
@@ -68,6 +69,7 @@ function missingFields(version: number, pet: LegacyPetProfile) {
     ...(version < 6 && NO_DAILY_WALKS),
     ...(version < 9 && NO_DAILY_SNACKS),
     ...(version < 13 && NO_GIFTS),
+    ...(version < 14 && NO_SNOW),
   };
 }
 
@@ -151,6 +153,8 @@ function copyPet(full: PetProfile): PetProfile {
     snacksOnDay: full.snacksOnDay,
     gifts: full.gifts,
     giftDay: full.giftDay,
+    snows: full.snows,
+    snowDay: full.snowDay,
   };
 }
 

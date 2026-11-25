@@ -24,6 +24,9 @@ import {
   slotOfLook,
   startersFor,
   stampsSpent,
+  snowSpent,
+  isSeasonal,
+  recipesFor,
   type FurnitureId,
 } from "./furniture";
 import {
@@ -31,6 +34,9 @@ import {
   createPetProfile,
   giftWaiting,
   receiveGift,
+  hasSnow,
+  receiveSnow,
+  snowWaiting,
   makeFurniture,
   materialsLeft,
   placeFurniture,
@@ -101,9 +107,11 @@ describe("가구 만들기", () => {
     expect(looksFor("rug", [])).toEqual(["plainRug"]);
   });
 
-  it("자리마다 만들 것이 4개씩, 재료 조합은 서로 다름", () => {
-    for (const slot of SLOTS)
-      expect(RECIPES.filter((piece) => piece.slot === slot)).toHaveLength(4);
+  it("자리마다 만들 것이 4개씩(크리스마스 1개 더), 재료 조합은 서로 다름", () => {
+    for (const slot of SLOTS) {
+      expect(recipesFor(slot, false)).toHaveLength(4);
+      expect(recipesFor(slot, true)).toHaveLength(5);
+    }
     for (const { need } of RECIPES)
       expect(Object.values(need).reduce((a, b) => a + b, 0)).toBe(3);
     const recipes = RECIPES.map(({ need }) =>
@@ -272,6 +280,69 @@ describe("VIP 선물 상자", () => {
   });
 });
 
+describe("눈송이 상자와 크리스마스 꾸미기 (I-074)", () => {
+  const DAY = "2026-11-23";
+
+  it("11~2월에만 하루 한 번 눈송이 1개", () => {
+    const pet = withItems({});
+    expect(snowWaiting(pet, "2026-10-31")).toBe(false);
+    expect(snowWaiting(pet, "2026-11-01")).toBe(true);
+    expect(snowWaiting(pet, "2027-02-28")).toBe(true);
+    expect(snowWaiting(pet, "2027-03-01")).toBe(false);
+    expect(receiveSnow(pet, 10, "2027-03-01")).toBe(pet);
+    const got = receiveSnow(pet, 10, DAY);
+    expect(got).toMatchObject({ snows: 1, snowDay: DAY });
+    expect(materialsLeft(got).snow).toBe(1);
+    expect(receiveSnow(got, 11, DAY)).toBe(got);
+    expect(receiveSnow(got, 12, "2026-11-24").snows).toBe(2);
+  });
+
+  it("두 기기에서 같은 날 열어도 합치면 한 번", () => {
+    const a = careEntry({ kind: "snow" }, Date.parse("2026-11-23T09:00"));
+    const b = careEntry({ kind: "snow" }, Date.parse("2026-11-23T10:00"));
+    expect(applyPending(withItems({}), [a, b]).snows).toBe(1);
+  });
+
+  it("눈송이를 받은 뒤에만 보이고, 눈송이 2개와 아이템 1개로 만듦", () => {
+    expect(hasSnow(withItems({}))).toBe(false);
+    expect(setsFor(false).map((set) => set.id)).not.toContain("christmas");
+    expect(setsFor(false, true).map((set) => set.id)).toContain("christmas");
+    for (const slot of SLOTS) {
+      const [piece] = recipesFor(slot, true).filter((p) => isSeasonal(p.id));
+      expect((piece.need as Record<string, number>).snow).toBe(2);
+    }
+    let pet = receiveSnow(withItems({ leaf: 1 }), 1, DAY);
+    expect(makeFurniture(pet, "christmasTree", 2)).toBe(pet); // one snowflake
+    pet = receiveSnow(pet, 3, "2026-11-24");
+    const made = makeFurniture(pet, "christmasTree", 4);
+    expect(made.furniture).toEqual(["christmasTree"]);
+    expect(made.spent).toEqual({ leaf: 1 }); // snowflakes are not items
+    expect(snowSpent(made.furniture)).toBe(2);
+    expect(materialsLeft(made).snow).toBeUndefined();
+  });
+
+  it("v14로 저장하고 다시 읽음, 예전 기록은 눈송이 0으로, 받은 것보다 많이 쓰면 거부", () => {
+    const got = receiveSnow(withItems({ leaf: 1 }), 10, DAY);
+    expect(decodePet(encode(14, got))).toMatchObject({
+      snows: 1,
+      snowDay: DAY,
+    });
+    const old = { ...withItems({ leaf: 1 }) } as Partial<typeof got>;
+    delete old.snows;
+    delete old.snowDay;
+    expect(decodePet(encode(13, old))).toMatchObject({
+      snows: 0,
+      snowDay: null,
+    });
+    expect(() => decodePet(encode(14, { ...got, snowDay: null }))).toThrow(
+      PetStorageError,
+    );
+    expect(() =>
+      decodePet(encode(14, { ...got, furniture: ["christmasTree"] })),
+    ).toThrow(PetStorageError);
+  });
+});
+
 describe("가구 놓기", () => {
   const owner = makeFurniture(
     withItems({ flower: 2, twig: 1 }),
@@ -395,8 +466,8 @@ describe("가구 저장 형식", () => {
     expect(decodePet(encode(7, pet))).toEqual(pet);
   });
 
-  it("v14 이상은 새 버전이라 건드리지 않음", () => {
-    expect(() => decodePet(encode(14, withItems({ leaf: 1 })))).toThrow(
+  it("v15 이상은 새 버전이라 건드리지 않음", () => {
+    expect(() => decodePet(encode(15, withItems({ leaf: 1 })))).toThrow(
       PetStorageError,
     );
   });
@@ -416,7 +487,7 @@ describe("가구 저장 형식", () => {
 
 describe("말풍선 (발바닥 도장)", () => {
   it("발바닥 도장 1개와 아이템 2개, 도장은 받은 만큼만 남은 재료에 들어감", () => {
-    for (const piece of RECIPES.filter((p) => p.slot === "bubble"))
+    for (const piece of recipesFor("bubble", false))
       expect((piece.need as Record<string, number>).stamp).toBe(1);
     const pet = withItems({ flower: 2, leaf: 1 });
     expect(materialsLeft(pet).stamp).toBeUndefined();

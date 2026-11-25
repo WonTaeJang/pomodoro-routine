@@ -12,6 +12,7 @@ import {
   addWalks,
   makeFurniture,
   receiveGift,
+  receiveSnow,
   placeFurniture,
   seeItems,
   type PetProfile,
@@ -27,14 +28,16 @@ export type CareInput =
   /** Null puts the starting look back. */
   | { kind: "place"; slot: Slot; furniture: FurnitureId | null }
   /** The day's VIP gift box opened (I-070). */
-  | { kind: "gift" };
+  | { kind: "gift" }
+  /** The day's snow box opened (I-074). */
+  | { kind: "snow" };
 export type PendingCare = {
   day: string;
   /** Pats/snacks/walks: how many. Seen: items found when the box was opened. */
   count: number;
   at: number;
 } & (
-  | { kind: "pats" | "snacks" | "seen" | "gift" }
+  | { kind: "pats" | "snacks" | "seen" | "gift" | "snow" }
   | { kind: "walks"; item: ItemId }
   | { kind: "craft"; furniture: FurnitureId }
   | { kind: "place"; slot: Slot; furniture: FurnitureId | null }
@@ -54,6 +57,7 @@ export function readCare(value: unknown): PendingCare | null {
     case "snacks":
     case "seen":
     case "gift":
+    case "snow":
       return { ...base, kind: c.kind };
     case "walks":
       return isItemId(c.item) ? { ...base, kind: c.kind, item: c.item } : null;
@@ -137,6 +141,8 @@ export function applyPending(
         return placeFurniture(pet, entry.slot, entry.furniture, entry.at);
       case "gift":
         return receiveGift(pet, entry.at, entry.day);
+      case "snow":
+        return receiveSnow(pet, entry.at, entry.day);
     }
   }, base);
 }

@@ -1,5 +1,6 @@
 import type { EditionId, Material, Slot } from "../furniture";
 import type { ItemId } from "../items";
+import type { DailyBox } from "../profile";
 
 // 돌봄 기계의 도트 아이콘. 한 글자가 한 칸이고 '.'은 비워 둡니다.
 // 색은 방 그림과 같은 고정 팔레트라 라이트/다크 모드에서 바뀌지 않습니다.
@@ -151,6 +152,11 @@ const STATUS = {
       ".P....P.",
     ],
     colors: RIBBON,
+  },
+  // 눈송이 상자 안내: 작은 눈송이
+  snow: {
+    rows: [".#.#.#.", "..###..", "###.###", "..###..", ".#.#.#."],
+    colors: { "#": "#4f8fc8" },
   },
   // VIP 선물 상자 안내: 작은 선물 상자
   gift: {
@@ -367,6 +373,28 @@ const BUBBLE_DECOR = {
     rows: ["#####", ".###.", "..#.."],
     colors: { "#": "#f2c45a" },
   },
+  // 크리스마스 말풍선: 위에 쌓인 눈, 호랑가시
+  snowCap: {
+    rows: [
+      "....######......",
+      "..##oooooo##....",
+      ".#oooooooooo###.",
+      "#oooooooooooooo#",
+      "oooooooooooooooo",
+    ],
+    colors: { "#": "#d3e3ef", o: "#ffffff" },
+  },
+  holly: {
+    rows: [
+      "gg.......gg",
+      "gdgg...ggdg",
+      ".gddg.gddg.",
+      "..ggdrdgg..",
+      "....rrr....",
+      ".....r.....",
+    ],
+    colors: { g: "#4f8a5b", d: "#2f6b45", r: "#d0383a" },
+  },
   sparkle: {
     rows: [
       "...#...",
@@ -406,6 +434,7 @@ export function HeartItemIcon({
 export function MaterialIcon({ material }: { material: Material }) {
   if (material === "heart") return <HeartItemIcon size={10} />;
   if (material === "stamp") return <PawItemIcon size={12} />;
+  if (material === "snow") return <SnowflakeIcon size={12} />;
   return <ItemIcon item={material} size={12} />;
 }
 
@@ -498,14 +527,63 @@ const GIFT_OPEN = {
   ],
   colors: GIFT_COLORS,
 };
-export function GiftBoxIcon({
+// 눈송이 상자 (I-074): VIP 상자와 같은 모양, 파란 상자에 빨간 리본
+const SNOW_BOX_COLORS = {
+  ...GIFT_COLORS,
+  P: "#a82a2f",
+  p: "#e0504a",
+  K: "#d83a3a",
+  L: "#3f78ad",
+  l: "#a9d3ee",
+  B: "#5b93c6",
+  b: "#8fc1e6",
+  h: "#e3f3fb",
+  s: "#ffffff",
+  w: "#cfe6f5",
+};
+// 눈송이: 가지마다 V자 잔가지가 달린 결정
+const SNOWFLAKE = {
+  rows: [
+    "......#......",
+    "...#..#..#...",
+    "....#.#.#....",
+    ".#...###...#.",
+    "..#...#...#..",
+    "...#.o#o.#...",
+    "######o######",
+    "...#.o#o.#...",
+    "..#...#...#..",
+    ".#...###...#.",
+    "....#.#.#....",
+    "...#..#..#...",
+    "......#......",
+  ],
+  colors: { "#": "#4f8fc8", o: "#a9d3ee" },
+};
+/** A snowflake: the winter material from snow boxes (I-074). */
+export function SnowflakeIcon({ size = 14 }: { size?: number }) {
+  return <PixelIcon art={SNOWFLAKE} size={size} />;
+}
+
+const BOX_ART: Record<DailyBox, { closed: Pixels; open: Pixels }> = {
+  gift: { closed: GIFT_BOX, open: GIFT_OPEN },
+  snow: {
+    closed: { rows: GIFT_BOX.rows, colors: SNOW_BOX_COLORS },
+    open: { rows: GIFT_OPEN.rows, colors: SNOW_BOX_COLORS },
+  },
+};
+/** A daily box (VIP gift, winter snow), closed or opened: one shape, two colours. */
+export function BoxIcon({
+  box,
   open = false,
   size,
 }: {
+  box: DailyBox;
   open?: boolean;
   size: number;
 }) {
-  return <PixelIcon art={open ? GIFT_OPEN : GIFT_BOX} size={size} />;
+  const art = BOX_ART[box];
+  return <PixelIcon art={open ? art.open : art.closed} size={size} />;
 }
 
 /** What sits on the device's top edge in each edition. */

@@ -38,6 +38,7 @@ const en: Messages = {
         heart: "One each time affinity reaches a new level",
         stamp: "One each time you finish a focus cycle",
         gift: "Once a day · {count} of each of the {kinds} walk items",
+        snow: "Nov–Feb · {count, plural, one {# snowflake} other {# snowflakes}} once a day",
       },
       count: "× {count}",
       leaf: { name: "Leaf", object: "a leaf" },
@@ -48,6 +49,8 @@ const en: Messages = {
       ball: { name: "Ball", object: "a ball" },
       heart: { name: "Heart" },
       stamp: { name: "Paw stamp" },
+      snow: { name: "Snowflake" },
+      season: "Nov–Feb only",
       needLabel: "{name}: {have} of {need}",
       make: "Make",
       apply: "Use",
@@ -81,6 +84,11 @@ const en: Messages = {
           name: "Palace set",
           to: "the palace set",
           intro: "A palace room in shining gold",
+        },
+        christmas: {
+          name: "Christmas set",
+          to: "the Christmas set",
+          intro: "A Christmas room, the tree all lit up",
         },
         stage: {
           name: "Idol stage set",
@@ -249,6 +257,36 @@ const en: Messages = {
           object: "the center stage",
           to: "the center stage",
         },
+        christmasRoom: {
+          name: "Christmas wallpaper",
+          object: "Christmas wallpaper",
+          to: "the Christmas wallpaper",
+        },
+        christmasWindow: {
+          name: "Twinkle light window",
+          object: "a twinkle light window",
+          to: "the twinkle light window",
+        },
+        christmasTree: {
+          name: "Christmas tree",
+          object: "a Christmas tree",
+          to: "the Christmas tree",
+        },
+        santaRug: {
+          name: "Santa rug",
+          object: "a Santa rug",
+          to: "the Santa rug",
+        },
+        santaSuit: {
+          name: "Santa suit",
+          object: "a Santa suit",
+          to: "the Santa suit",
+        },
+        christmasBubble: {
+          name: "Christmas bubble",
+          object: "a Christmas bubble",
+          to: "the Christmas bubble",
+        },
         cheerBubble: {
           name: "Cheer sign bubble",
           object: "a cheer sign bubble",
@@ -388,6 +426,22 @@ const en: Messages = {
     },
     panel: { collapse: "Collapse", expand: "Expand" },
     edition: { palace: "Palace edition!", stage: "VIP edition!" },
+    snow: {
+      title: "Snow box",
+      arrived: "A snow box is here!",
+      open: "Open the snow box",
+      lead: "Today's gift: {count, plural, one {# snowflake} other {# snowflakes}}",
+      take: "Take",
+      welcome: {
+        title: "Christmas is coming",
+        text: "From November to February, a snowflake comes once a day. Make the 6 Christmas pieces with them.",
+      },
+    },
+    boxes: {
+      arrived: "{count} boxes are here!",
+      open: "Open {count} boxes",
+      step: "{index}/{total}",
+    },
     gift: {
       title: "VIP gift box",
       arrived: "A VIP gift box is here!",
@@ -423,6 +477,7 @@ const en: Messages = {
       place: "Changed the {slot} to {to}",
       set: "Decorated the room with {to}",
       gift: "Got {count} walk items from the VIP gift box",
+      snow: "Got {count, plural, one {# snowflake} other {# snowflakes}} from the snow box",
       walkLimit: "That’s all {count} walks for today. More tomorrow!",
       snackLimit: "That’s all {count} treats for today. More tomorrow!",
     },

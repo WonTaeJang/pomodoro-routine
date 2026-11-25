@@ -19,15 +19,17 @@ export type Slot = (typeof SLOTS)[number];
  * What things are made from: walk finds, hearts from level ups, and paw
  * stamps from finished cycles (counted from focus records, src/features/pet/stamps.ts).
  */
-export type Material = ItemId | "heart" | "stamp";
+export type Material = ItemId | "heart" | "stamp" | "snow";
 export type MaterialCounts = Partial<Record<Material, number>>;
 
 /**
  * Furniture made from walk finds: three each, two of one kind. Outfits take
  * a heart and two finds; the brown hat is everyone's from the start (free).
  * Speech bubbles take a paw stamp and two finds (I-066), and so does the
- * palace set: one more wall, window, pot and rug (I-067). The idol stage and
- * its cheer sign bubble are never made: VIP accounts have them (vip).
+ * palace set: one more wall, window, pot and rug (I-067). The Christmas
+ * pieces take two snowflakes from the winter snow boxes and a find (I-074,
+ * season). The idol stage and its cheer sign bubble are never made: VIP
+ * accounts have them (vip).
  */
 export const FURNITURE = [
   { id: "twigWindow", slot: "window", need: { twig: 2, leaf: 1 } },
@@ -59,6 +61,37 @@ export const FURNITURE = [
     slot: "bubble",
     need: { stamp: 1, twig: 1, pinecone: 1 },
   },
+  {
+    id: "christmasRoom",
+    slot: "room",
+    need: { snow: 2, pinecone: 1 },
+    season: "winter",
+  },
+  {
+    id: "christmasWindow",
+    slot: "window",
+    need: { snow: 2, twig: 1 },
+    season: "winter",
+  },
+  {
+    id: "christmasTree",
+    slot: "pot",
+    need: { snow: 2, leaf: 1 },
+    season: "winter",
+  },
+  { id: "santaRug", slot: "rug", need: { snow: 2, ball: 1 }, season: "winter" },
+  {
+    id: "santaSuit",
+    slot: "outfit",
+    need: { snow: 2, flower: 1 },
+    season: "winter",
+  },
+  {
+    id: "christmasBubble",
+    slot: "bubble",
+    need: { snow: 2, stone: 1 },
+    season: "winter",
+  },
   { id: "stageRoom", slot: "room", need: {}, vip: true },
   { id: "lightstickWindow", slot: "window", need: {}, vip: true },
   { id: "standMicPot", slot: "pot", need: {}, vip: true },
@@ -70,6 +103,8 @@ export const FURNITURE = [
   need: MaterialCounts;
   free?: true;
   vip?: true;
+  /** Made from a season's material, shown once it has come (I-074). */
+  season?: "winter";
 }[];
 
 export type FurnitureId = (typeof FURNITURE)[number]["id"];
@@ -117,6 +152,11 @@ export const mayPlace = (made: readonly FurnitureId[], id: FurnitureId) =>
 export const RECIPES = FURNITURE.filter(
   (piece) => !("free" in piece) && !("vip" in piece),
 );
+/** What can be made now: the Christmas pieces once a snowflake has come. */
+export const recipesFor = (slot: Slot, winter: boolean) =>
+  RECIPES.filter(
+    (piece) => piece.slot === slot && (winter || !("season" in piece)),
+  );
 
 /** A material used on what was made. */
 const spentOn = (material: Material, furniture: readonly FurnitureId[]) =>
@@ -131,6 +171,11 @@ export const heartsSpent = (furniture: readonly FurnitureId[]) =>
 /** Paw stamps used on what was made. */
 export const stampsSpent = (furniture: readonly FurnitureId[]) =>
   spentOn("stamp", furniture);
+/** Snowflakes used on what was made. */
+export const snowSpent = (furniture: readonly FurnitureId[]) =>
+  spentOn("snow", furniture);
+/** Made from a season's limited material (the Christmas pieces). */
+export const isSeasonal = (id: FurnitureId) => "season" in furnitureById(id);
 
 export function isFurnitureId(value: unknown): value is FurnitureId {
   return FURNITURE.some((piece) => piece.id === value);
@@ -234,6 +279,17 @@ export const SETS = [
       rug: "palaceRug",
     },
   },
+  // 눈송이로 만드는 크리스마스 세트 (I-074). 눈송이를 받은 뒤에 보임
+  {
+    id: "christmas",
+    season: "winter",
+    pieces: {
+      room: "christmasRoom",
+      window: "christmasWindow",
+      pot: "christmasTree",
+      rug: "santaRug",
+    },
+  },
   // VIP 계정에만 보임 (조각을 만들지 않고 처음부터 가짐). 다 놓으면 VIP 에디션
   {
     id: "stage",
@@ -253,6 +309,8 @@ export const SETS = [
   edition?: true;
   /** Placed all together, only the device's colour changes, without a word. */
   tint?: true;
+  /** Its pieces take a season's material; shown once it has come. */
+  season?: "winter";
   pieces: Record<SetSlot, FurnitureId>;
 }[];
 export type RoomSet = (typeof SETS)[number];
@@ -262,9 +320,14 @@ export type EditionId = Extract<RoomSet, { edition: true }>["id"];
 /** Sets that only colour the device: cabin, floral and stripe. */
 export type TintId = Extract<RoomSet, { tint: true }>["id"];
 
-/** The sets an account sees: the VIP set only on a VIP account. */
-export const setsFor = (vip: boolean) =>
-  SETS.filter((set) => vip || !("vip" in set));
+/**
+ * The sets an account sees: the VIP set only on a VIP account, the
+ * Christmas set once a snowflake has come.
+ */
+export const setsFor = (vip: boolean, winter = false) =>
+  SETS.filter(
+    (set) => (vip || !("vip" in set)) && (winter || !("season" in set)),
+  );
 
 export const setById = (id: SetId) => SETS.find((set) => set.id === id)!;
 

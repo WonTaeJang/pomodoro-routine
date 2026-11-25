@@ -273,6 +273,8 @@ describe("돌봄 로컬 저장", () => {
       "placed",
       "snackDay",
       "snacksOnDay",
+      "snowDay",
+      "snows",
       "spent",
       "totalPats",
       "totalSnacks",
@@ -825,6 +827,19 @@ describe("방 꾸미기 기록", () => {
     const b = f.store();
     await b.getState().hydrate();
     expect(b.getState().pet).toMatchObject({ gifts: 1 });
+  });
+
+  it("눈송이 상자는 하루 한 번만 받고(시계는 1월), 다른 탭에서도 그대로", async () => {
+    const f = fixture(),
+      a = f.store();
+    await a.getState().hydrate();
+    await a.getState().meet();
+    await a.getState().recordSnow();
+    await a.getState().recordSnow();
+    expect(a.getState().pet).toMatchObject({ snows: 1, walks: 0 });
+    const b = f.store();
+    await b.getState().hydrate();
+    expect(b.getState().pet).toMatchObject({ snows: 1 });
   });
 
   it("VIP 조각은 만들지 않고 놓고, null로 한 번에 기본 모양으로", async () => {

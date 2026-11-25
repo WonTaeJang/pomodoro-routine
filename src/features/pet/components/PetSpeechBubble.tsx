@@ -106,6 +106,19 @@ function BubbleDecor({ look }: { look: LookId }) {
           <StampTail />
         </>
       );
+    case "christmasBubble":
+      // Snow piled on the top right, a holly sprig on the top left.
+      return (
+        <>
+          <Decor place="snowCapRight">
+            <BubbleDecorIcon decor="snowCap" size={7} />
+          </Decor>
+          <Decor place="hollyTopLeft">
+            <BubbleDecorIcon decor="holly" size={12} />
+          </Decor>
+          <BubbleTail />
+        </>
+      );
     case "cheerBubble":
       // A fan's cheer sign: sparkles on two corners, held up on a stick.
       return (

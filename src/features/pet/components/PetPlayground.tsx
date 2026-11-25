@@ -24,11 +24,12 @@ import { PetRoomArt, type RoomDecorating } from "./PetRoomArt";
 import { PetAffinityDetail, PetHearts, usePetAffinity } from "./PetAffinity";
 import {
   EditionMark,
-  GiftBoxIcon,
+  BoxIcon,
   StatusIcon,
   type PetStatusIcon,
 } from "./PetIcons";
 import { PetGiftBox } from "./PetGiftBox";
+import { PetSnowBox } from "./PetSnowBox";
 import { PetPad } from "./PetPad";
 import { PetSpeechBubble } from "./PetSpeechBubble";
 import { DecoratePads, DecoratePick, decorateTag } from "./PetDecorate";
@@ -46,8 +47,8 @@ import {
 import { PET_HAPPY_MS } from "../pet";
 import { lookOf, type FurnitureId, type Slot } from "../furniture";
 import { useDeviceEdition } from "../useDeviceEdition";
-import { useVipGift } from "../useVipGift";
-import { GIFT_TOTAL } from "../profile";
+import { useDailyBoxes } from "../useDailyBoxes";
+import { GIFT_TOTAL, SNOW_EACH, type DailyBox } from "../profile";
 import { shownPlaced, usePetVip, useVipRoomCleanup } from "../usePetVip";
 import { PetFoundCard, PetWalkMap } from "./PetTrip";
 import { PetItemBox } from "./PetItemBox";
@@ -177,15 +178,36 @@ function PetRoom({ retry }: { retry: () => void }) {
     if (levelUp !== null) addLog({ kind: "level", level: levelUp });
   }, [levelUp, addLog]);
 
-  // VIP: one gift box a day in the room (I-070).
-  const gift = useVipGift(vip, record ?? null);
-  const [giftOpen, setGiftOpen] = useState(false);
+  // Daily boxes in the room: a snow box for everyone in the winter months
+  // (I-074) and a gift box for VIP accounts (I-070). Stacked on the floor,
+  // the top one first; opened one after another.
+  const { boxes, first } = useDailyBoxes(vip, record ?? null);
+  const [opening, setOpening] = useState<{
+    boxes: DailyBox[];
+    at: number;
+  } | null>(null);
+  const openingBox = opening?.boxes[opening.at];
+  const boxStep =
+    opening && opening.boxes.length > 1
+      ? t("boxes.step", { index: opening.at + 1, total: opening.boxes.length })
+      : undefined;
+  const nextBox = () =>
+    setOpening((now) =>
+      now && now.at + 1 < now.boxes.length ? { ...now, at: now.at + 1 } : null,
+    );
+  function takeSnow() {
+    void petStore.getState().recordSnow();
+    addLog({ kind: "snow", count: SNOW_EACH });
+    cheer();
+    nextBox();
+  }
   function takeGift(toSets: boolean) {
     void petStore.getState().recordGift();
     addLog({ kind: "gift", count: GIFT_TOTAL });
     cheer();
-    setGiftOpen(false);
-    if (toSets) openBox(true);
+    if (!toSets) return nextBox();
+    setOpening(null);
+    openBox(true);
   }
 
   // A whole edition set placed (palace, idol stage): the device changes.
@@ -284,8 +306,8 @@ function PetRoom({ retry }: { retry: () => void }) {
     : undefined;
 
   // One status at a time in the header: a passing notice in gold (a level
-  // up, then a new device edition), then the mode, then a waiting VIP gift
-  // box (gold too), then the pose.
+  // up, then a new device edition), then the mode, then waiting boxes (gold
+  // too), then the pose.
   function headerStatus(): {
     icon: PetStatusIcon;
     label: string;
@@ -305,8 +327,14 @@ function PetRoom({ retry }: { retry: () => void }) {
       };
     if (walking) return { icon: "walk", label: t("walk.status") };
     if (decorating) return { icon: "decorate", label: t("decorate.status") };
-    if (gift.waiting)
-      return { icon: "gift", label: t("gift.arrived"), notice: true };
+    if (boxes.length > 1)
+      return {
+        icon: "gift",
+        label: t("boxes.arrived", { count: boxes.length }),
+        notice: true,
+      };
+    if (boxes.length === 1)
+      return { icon: boxes[0], label: t(`${boxes[0]}.arrived`), notice: true };
     return { icon: pose, label: t(copy.status) };
   }
   const hud = headerStatus();
@@ -400,16 +428,31 @@ function PetRoom({ retry }: { retry: () => void }) {
                 onClick={clickPet}
                 onKeyDown={stopCareKey}
               />
-              {/* 오늘의 VIP 선물 상자: 까미 옆 바닥에 놓여 있다가 누르면 열림 */}
-              {gift.waiting && !decorating && (
+              {/* 오늘의 상자: 까미 옆 바닥에 쌓여 있다가(3개까지) 누르면 맨 위부터 차례로 열림 */}
+              {boxes.length > 0 && !decorating && (
                 <button
                   type="button"
                   className={styles.giftBox}
-                  aria-label={t("gift.open")}
-                  onClick={() => setGiftOpen(true)}
+                  aria-label={
+                    boxes.length > 1
+                      ? t("boxes.open", { count: boxes.length })
+                      : t(`${boxes[0]}.open`)
+                  }
+                  onClick={() => setOpening({ boxes, at: 0 })}
                   onKeyDown={stopCareKey}
                 >
-                  <GiftBoxIcon size={48} />
+                  {boxes
+                    .slice(0, 3)
+                    .map((kind, depth) => (
+                      <span
+                        key={kind}
+                        className={styles.pileBox}
+                        data-depth={depth}
+                      >
+                        <BoxIcon box={kind} size={44} />
+                      </span>
+                    ))
+                    .reverse()}
                 </button>
               )}
               {/*
@@ -508,10 +551,21 @@ function PetRoom({ retry }: { retry: () => void }) {
           </div>
         )}
       </div>
-      {giftOpen && gift.waiting && (
+      {openingBox === "snow" && boxes.includes("snow") && (
+        <PetSnowBox
+          key={`snow-${opening?.at}`}
+          first={first.snow}
+          step={boxStep}
+          onClose={() => setOpening(null)}
+          onReceive={takeSnow}
+        />
+      )}
+      {openingBox === "gift" && boxes.includes("gift") && (
         <PetGiftBox
-          first={gift.first}
-          onClose={() => setGiftOpen(false)}
+          key={`gift-${opening?.at}`}
+          first={first.gift}
+          step={boxStep}
+          onClose={() => setOpening(null)}
           onReceive={takeGift}
         />
       )}

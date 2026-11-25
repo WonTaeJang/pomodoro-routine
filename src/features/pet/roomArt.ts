@@ -109,6 +109,11 @@ const WINE = "#8e1a2d";
 const NAVY = "#23325e";
 const TASSEL = "#efe3c8";
 const TWIG = "#8a6239";
+// 크리스마스 (눈송이, I-074): 눈과 그늘진 눈
+const SNOW = "#ffffff";
+const SNOW_SHADE = "#dbe7f1";
+/** The Christmas window's white-painted wood. */
+const WHITE_PAINT = "#fbf7ee";
 // 아이돌 무대(VIP): 보라 조명, 핫핑크, 검정 무대, 별빛 금
 const STAGE = {
   wall: "#dccff6",
@@ -171,6 +176,8 @@ const frameColor: Record<WindowLook, (x: number, y: number) => string> = {
       : x + y > 22
         ? STAGE.violetDark
         : STAGE.violet,
+  // White-painted wood, flat: a shaded corner would melt into the wall's shadow.
+  christmasWindow: () => WHITE_PAINT,
 };
 const barColor: Record<WindowLook, string> = {
   plainWindow: CREAM,
@@ -179,9 +186,21 @@ const barColor: Record<WindowLook, string> = {
   stoneWindow: TWIG,
   palaceWindow: GOLD,
   lightstickWindow: STAGE.violet,
+  christmasWindow: WHITE_PAINT,
 };
+type Trim = [x: number, y: number, color: string];
+/** The Christmas window's string lights, left to right. */
+const XMAS_LIGHTS = [
+  "#d83a3a",
+  "#f2c94c",
+  "#4a9a5c",
+  "#4a7fd0",
+  "#d83a3a",
+  "#f2c94c",
+  "#4a9a5c",
+];
 /** Extra cells drawn over everything: twig ends, leaves, flowers, a keystone. */
-const TRIM: Record<WindowLook, [number, number, string][]> = {
+const TRIM: Record<WindowLook, Trim[]> = {
   plainWindow: [],
   twigWindow: [
     [0, 1, TWIG],
@@ -233,7 +252,47 @@ const TRIM: Record<WindowLook, [number, number, string][]> = {
     1,
     STAGE.bulb,
   ]),
+  // String lights on a green wire along the top, a wreath on the bars, snow on the sill.
+  christmasWindow: [
+    ...Array.from({ length: 15 }, (_, x): Trim => [x, 0, "#2f5a3e"]),
+    ...XMAS_LIGHTS.map((color, i): Trim => [1 + i * 2, 1, color]),
+    // The wreath: green ring, darker leaves, red berries and bow, a gold bell.
+    [5, 8, "#3f7a4f"],
+    [5, 9, "#3f7a4f"],
+    [5, 10, "#3f7a4f"],
+    [6, 7, "#3f7a4f"],
+    [7, 7, "#3f7a4f"],
+    [8, 7, "#3f7a4f"],
+    [9, 8, "#3f7a4f"],
+    [9, 9, "#3f7a4f"],
+    [9, 10, "#3f7a4f"],
+    [6, 11, "#3f7a4f"],
+    [8, 11, "#3f7a4f"],
+    [6, 8, "#2f6b45"],
+    [8, 8, "#2f6b45"],
+    [6, 10, "#2f6b45"],
+    [8, 10, "#2f6b45"],
+    [5, 9, "#d83a3a"],
+    [9, 10, "#d83a3a"],
+    [7, 7, "#e2b54c"],
+    [6, 12, "#d0383a"],
+    [8, 12, "#d0383a"],
+    [7, 11, "#d0383a"],
+    [7, 12, "#d0383a"],
+    ...Array.from({ length: 13 }, (_, i): Trim => [1 + i, 17, SNOW]),
+  ],
 };
+/** Snow-covered hills outside the Christmas window: white tops, shaded below. */
+const snowHill = (top: boolean, time: TimeOfDay) =>
+  top ? SNOW : time === "night" ? "#8fa2b8" : SNOW_SHADE;
+/** Snow falling outside the Christmas window. */
+const SNOWFALL = [
+  [4, 4],
+  [10, 5],
+  [5, 8],
+  [11, 9],
+  [8, 11],
+];
 
 export function windowArt(look: WindowLook, time: TimeOfDay): PixelArt {
   const cells = windowCells(look, time);
@@ -311,13 +370,21 @@ function windowCells(look: WindowLook, time: TimeOfDay): Cells {
     ])
       paint(x, y, "#fdf6d8");
   }
+  const snowy = look === "christmasWindow";
   if (look === "lightstickWindow") paintCrowd(paint, time);
   else
     HILL_TOP.forEach((top, i) => {
       const x = PANE.x0 + i;
       for (let y = top; y <= PANE.y1; y++)
-        paint(x, y, hill[y === PANE.y1 ? 1 : 0]);
+        paint(
+          x,
+          y,
+          snowy ? snowHill(y === top, time) : hill[y === PANE.y1 ? 1 : 0],
+        );
     });
+  if (snowy)
+    for (const [x, y] of SNOWFALL)
+      paint(x, y, time === "night" ? "#e8eef8" : SNOW);
 
   for (let y = 0; y < WINDOW_HEIGHT; y++)
     for (let x = 0; x < WINDOW_WIDTH; x++)
@@ -474,6 +541,57 @@ export const POTS: Record<
       b: "#6b4a2a",
     },
   },
+  // A tall Christmas tree: a gold star, ornaments, a gold garland, snow on each tier.
+  christmasTree: {
+    rows: [
+      ".........Y.........",
+      "........YyY........",
+      ".......YYyYY.......",
+      "........Y.Y........",
+      ".........L.........",
+      "........LLD........",
+      ".......LLGRD.......",
+      "......LyGGGDD......",
+      ".....LLGyGyGDD.....",
+      "....LLwLLGDywDD....",
+      "......LLBGGDD......",
+      ".....LYGGGGGRD.....",
+      "....LLyGGWGGGDD....",
+      "...LLGGyyGGGyGDD...",
+      "..LLGGGGGyyGGGGDD..",
+      ".LLwGGLLGGGDDBGwDD.",
+      ".....RLGGGGGDD.....",
+      "....LLGBGGYGGDD....",
+      "...LLyGGGGGGGGyD...",
+      "..LLGGyyGGGGyyGDD..",
+      ".LLGGGGGyyyyGGGGDD.",
+      "LLGGYGGGGGGGGGRGGDD",
+      "LGwGGwBGwRGwWGwGGwD",
+      "........ttt........",
+      "........ttt........",
+      "...ppppppppppppd...",
+      "...YyYyYyYyYyYyd...",
+      "....PPPPPPPPPPd....",
+      "....PPPPPPPPPPd....",
+      "....PPPPPPPPPPd....",
+      "....PPPPPPPPPPd....",
+    ],
+    colors: {
+      Y: "#e8b730",
+      y: "#ffe07a",
+      L: "#4f8a5b",
+      G: "#2f6b45",
+      D: "#215238",
+      w: "#f4f8fa",
+      R: "#d83a3a",
+      B: "#4a7fd0",
+      W: "#ffffff",
+      t: "#6e4a2a",
+      P: "#c2453f",
+      p: "#d8605a",
+      d: "#9c3530",
+    },
+  },
   succulentPot: {
     rows: [
       "............",
@@ -623,6 +741,10 @@ const SPARKLE = [
 ];
 const HEART = [".#.#.", "#####", ".###.", "..#.."];
 
+/** A holly sprig and a small star for the Christmas wall. */
+const HOLLY = ["gg...gg", ".gdrdg.", "..rrr.."];
+const XSTAR = [".#.", "###", ".#."];
+
 export const ROOMS: Record<RoomLook, RoomSurfaces> = {
   // The starting room: the room's own CSS draws it; this is for small pictures.
   plainRoom: {
@@ -690,6 +812,37 @@ export const ROOMS: Record<RoomLook, RoomSurfaces> = {
         const d = Math.floor(x / 4) % 2 ? (x + y) % 8 : mod(x - y, 8);
         if (d === 0) return "#b8956a";
         return d < 4 ? "#d1ae82" : "#c8a477";
+      }),
+    },
+  },
+  // Cream with holly sprigs and little gold stars over a red-green tartan wainscot; warm boards.
+  christmasRoom: {
+    wall: {
+      tile: pattern(28, 30, (x, y) => {
+        const hx = mod(x - 3, 28);
+        const hy = y - 4;
+        const holly = HOLLY[hy]?.[hx];
+        if (holly === "g") return "#4f8a5b";
+        if (holly === "d") return "#2f6b45";
+        if (holly === "r") return "#d0383a";
+        const star = XSTAR[y - 19]?.[mod(x - 17, 28)];
+        if (star === "#") return "#e2b54c";
+        return "#f7f0e1";
+      }),
+      edge: pattern(12, 11, (x, y) => {
+        if (y === 0) return "#fbf6ec";
+        if (y === 1 || y === 10) return "#7c2422";
+        if (x % 12 === 8 || y === 7) return "#e2b54c";
+        const green = x % 12 === 3 || x % 12 === 4 || y === 4 || y === 5;
+        return green ? "#2f6b45" : "#b8342f";
+      }),
+    },
+    floor: {
+      edge: strip(["#9a7350"]),
+      tile: pattern(16, 8, (x, y) => {
+        const board = Math.floor(y / 4);
+        if (y % 4 === 3 || (x + (board ? 8 : 0)) % 16 === 0) return "#a97d55";
+        return board ? "#c8996b" : "#c19163";
       }),
     },
   },
@@ -885,6 +1038,18 @@ const RUGS: Record<RugLook, (width: number, height: number) => Paint> = {
       return "#a3263a";
     });
   },
+  // Red like Santa's coat: a white fluffy rim, snow dots and a gold star.
+  santaRug: (w, h) =>
+    oval(w, h, (r, angle, x, y) => {
+      const edge = 0.95 + 0.05 * Math.cos(angle * 22);
+      if (r > edge) return null;
+      if (r > edge - 0.16) return (x + y) % 2 ? "#eef1f3" : "#ffffff";
+      const phase = mod(((angle + Math.PI / 2) / (2 * Math.PI)) * 5, 1);
+      const star = 0.2 + 0.3 * Math.abs(phase * 2 - 1);
+      if (r < star) return "#e8b730";
+      if ((x * 3 + y * 5) % 11 === 0) return "#f6e9e4";
+      return r > 0.66 ? "#a82e2b" : "#c2403b";
+    }),
   // A dark stage circle ringed with lights, a gold star in the middle.
   centerStageRug: (w, h) =>
     oval(w, h, (r, angle, x) => {
@@ -938,6 +1103,7 @@ const BUBBLE_INK: Record<BubbleLook, BubbleInk> = {
   heartBubble: { line: "#e58a9d", paper: "#ffe4ea", text: "#c56f83" },
   stampBubble: { line: "#c8664a", paper: "#fff6e2", text: "#9c6a4a" },
   cheerBubble: { line: "#ff4f9a", paper: "#fff0f7", text: "#d0508e" },
+  christmasBubble: { line: "#c8373a", paper: "#fffaf3", text: "#b46a5e" },
 };
 const HEART_MARK = ["#.#", "###", ".#."];
 /** 16 x 12: the box (rows 0–8) and its tail below. */
@@ -982,6 +1148,13 @@ function bubbleArt(look: BubbleLook): PixelArt {
       const star =
         (x === 13 && y >= 1 && y <= 3) || (y === 2 && x >= 12 && x <= 14);
       if (star) return STAGE.gold;
+    }
+    if (look === "christmasBubble") {
+      // Snow on the right of the top, a holly sprig on the top left.
+      if (y === 0 && x > 7) return SNOW;
+      if ((y === 0 && (x === 1 || x === 3)) || (y === 1 && x === 2))
+        return "#2f6b45";
+      if (y === 1 && (x === 1 || x === 3)) return "#d0383a";
     }
     if (look === "gameBubble") {
       const ring = (x === 1 || x === 14 || y === 1 || y === 7) && !edge;

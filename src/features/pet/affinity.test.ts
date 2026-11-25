@@ -108,6 +108,8 @@ describe("친밀도 규칙", () => {
       snacksOnDay: 0,
       gifts: 0,
       giftDay: null,
+      snows: 0,
+      snowDay: null,
     });
   });
 
@@ -150,6 +152,8 @@ describe("친밀도 규칙", () => {
       snacksOnDay: 0,
       gifts: 0,
       giftDay: null,
+      snows: 0,
+      snowDay: null,
     });
   });
 
