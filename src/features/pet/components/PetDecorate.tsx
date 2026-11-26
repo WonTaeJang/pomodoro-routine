@@ -9,7 +9,29 @@ import type { LookId } from "../furniture";
 import { PetPad } from "./PetPad";
 import styles from "./PetPlayground.module.scss";
 
-/** Where the choice stands: a dot per option, the current one dark. */
+/** A dot per option, the current one dark; `position` is read out instead. */
+export function PickDots({
+  total,
+  index,
+  position,
+}: {
+  total: number;
+  index: number;
+  position: string;
+}) {
+  return (
+    <>
+      <span className={styles.pickDots} aria-hidden="true">
+        {Array.from({ length: total }, (_, i) => (
+          <i key={i} data-on={i === index} />
+        ))}
+      </span>
+      <VisuallyHidden>{position}</VisuallyHidden>
+    </>
+  );
+}
+
+/** Where the choice stands: the slot's name and a dot per option. */
 export function DecoratePick({
   mode,
   looks,
@@ -23,14 +45,11 @@ export function DecoratePick({
   return (
     <span className={styles.pick}>
       {t(`items.slots.${mode.slot}.name`)}
-      <span className={styles.pickDots} aria-hidden="true">
-        {Array.from({ length: total }, (_, i) => (
-          <i key={i} data-on={i === index} />
-        ))}
-      </span>
-      <VisuallyHidden>
-        {t("decorate.position", { index: index + 1, total })}
-      </VisuallyHidden>
+      <PickDots
+        total={total}
+        index={index}
+        position={t("decorate.position", { index: index + 1, total })}
+      />
     </span>
   );
 }

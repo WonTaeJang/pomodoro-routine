@@ -3,7 +3,7 @@
 import type { ItemId } from "./items";
 import { DAILY_WALKS, walksOn, type PetProfile } from "./profile";
 import { petStore } from "./store";
-import { useDailyLimitReached } from "./useDailyLimit";
+import { useDailyLeft, useDailyLimitReached } from "./useDailyLimit";
 import type { PetLogEvent } from "./usePetLog";
 import { useWalkTrip } from "./useWalkTrip";
 import { FOUND_CARD_MS } from "./walkTrip";
@@ -26,6 +26,7 @@ type Options = {
 export function usePetWalkFlow({ pet, walk, returnHome, addLog }: Options) {
   const card = useMoment<ItemId>(FOUND_CARD_MS);
   const outOfWalks = useDailyLimitReached(pet, walksOn, DAILY_WALKS);
+  const walksLeft = useDailyLeft(pet, walksOn, DAILY_WALKS);
 
   const { trip, begin, step, skip, cancel } = useWalkTrip({
     onFound: (item, skipped) => {
@@ -55,5 +56,5 @@ export function usePetWalkFlow({ pet, walk, returnHome, addLog }: Options) {
     returnHome();
   }
 
-  return { trip, card, outOfWalks, start, step, skip, leave };
+  return { trip, card, outOfWalks, walksLeft, start, step, skip, leave };
 }

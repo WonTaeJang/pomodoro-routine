@@ -1,6 +1,7 @@
 import type { EditionId, Material, Slot } from "../furniture";
 import type { ItemId } from "../items";
 import type { DailyBox } from "../profile";
+import { WALK_GAME_COLORS, walkGameArt, type WalkGameId } from "../walkGames";
 
 // 돌봄 기계의 도트 아이콘. 한 글자가 한 칸이고 '.'은 비워 둡니다.
 // 색은 방 그림과 같은 고정 팔레트라 라이트/다크 모드에서 바뀌지 않습니다.
@@ -747,6 +748,44 @@ export function SleighArt({
     />
   );
 }
+
+// 산책 놀이 카드 (I-076): 공원 산책길의 까미, 잠긴 놀이의 자물쇠
+const gameArt = (game: WalkGameId): Pixels => ({
+  rows: walkGameArt(game),
+  colors: WALK_GAME_COLORS,
+});
+const WALK_GAME_ART: Record<WalkGameId, Pixels> = {
+  walk: gameArt("walk"),
+  run: gameArt("run"),
+};
+/** A walk game's picture, 2px per cell. */
+export const WalkGameArt = ({ game }: { game: WalkGameId }) => (
+  <PixelIcon
+    art={WALK_GAME_ART[game]}
+    size={WALK_GAME_ART[game].rows.length * 2}
+  />
+);
+const LOCK = {
+  rows: [
+    "..ddddd..",
+    ".d.....d.",
+    ".d.....d.",
+    "YYYYYYYYY",
+    "YlllllllY",
+    "YlllklllY",
+    "YlllklllY",
+    "YlllllllY",
+    "yyyyyyyyy",
+  ],
+  colors: {
+    d: "#8a8f99",
+    Y: "#e2b54c",
+    y: GOLD_SHADE,
+    l: "#f2d27a",
+    k: "#5e5246",
+  },
+};
+export const LockIcon = () => <PixelIcon art={LOCK} size={36} />;
 
 // 꾸미기 모드 버튼: 이전·다음·고르기·취소
 const KEY_INK = { "#": "#5e5246" };

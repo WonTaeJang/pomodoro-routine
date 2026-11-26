@@ -7,20 +7,29 @@ import type { PetProfile } from "./profile";
 // Development only: walk and give treats as often as needed to test.
 const LIMITED = process.env.NODE_ENV !== "development";
 
-/**
- * Whether today's count (local date) has reached a daily limit, such as five
- * walks or five treats. The key then rests until tomorrow.
- */
-export function useDailyLimitReached(
+type CountOn = (pet: PetProfile, day: string) => number;
+
+/** How many are left today (local date) of a daily limit, such as five walks. */
+export function useDailyLeft(
   pet: PetProfile | null,
-  countOn: (pet: PetProfile, day: string) => number,
+  countOn: CountOn,
   limit: number,
 ) {
   const today = useToday();
-  return (
-    LIMITED &&
-    pet !== null &&
-    today !== null &&
-    countOn(pet, affinityDay(today)) >= limit
-  );
+  return pet && today !== null
+    ? Math.max(0, limit - countOn(pet, affinityDay(today)))
+    : limit;
+}
+
+/**
+ * Whether today's count has reached a daily limit, such as five walks or five
+ * treats. The key then rests until tomorrow.
+ */
+export function useDailyLimitReached(
+  pet: PetProfile | null,
+  countOn: CountOn,
+  limit: number,
+) {
+  const left = useDailyLeft(pet, countOn, limit);
+  return LIMITED && left === 0;
 }

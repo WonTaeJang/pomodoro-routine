@@ -3,6 +3,7 @@
 @use "sass:list";
 @use "room-art";
 @use "device";
+@use "room-layers";
 
 $page-max: 780px;
 $device-max: 520px;
@@ -521,6 +522,152 @@ $runner-height: 16px;
       background: device.$lcd-text;
     }
   }
+}
+// 산책 놀이 고르기 (I-076): 방을 덮는 목록. 카드마다 그림 · 이름 · 설명 · 레벨.
+// 고른 카드는 포인트 색 테두리와 왼쪽에서 까딱이는 화살표, 잠긴 카드는 흑백 그림에 자물쇠
+$menu-card: #fbf8ee;
+$menu-lock-dim: rgb(60 50 40 / 25%);
+$menu-arrow: 6px;
+.walkMenu {
+  position: absolute;
+  z-index: room-layers.$menu-layer;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5);
+  padding: var(--space-3) var(--space-3) var(--space-2-5) var(--space-4);
+  background: device.$lcd-wall;
+  color: device.$lcd-text;
+}
+.walkMenuTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  text-align: center;
+}
+.walkGames {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.walkGame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2-5);
+  width: 100%;
+  padding: var(--space-1-5) var(--space-2-5) var(--space-1-5) var(--space-1-5);
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: $menu-card;
+  box-shadow:
+    inset 0 0 0 2px device.$lcd-header,
+    0 3px 0 device.$lcd-header-shade;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  &[data-selected="true"] {
+    box-shadow:
+      inset 0 0 0 3px var(--color-accent),
+      0 3px 0 device.$lcd-header-shade;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: -$menu-arrow * 2;
+      margin-top: -$menu-arrow;
+      border: $menu-arrow solid transparent;
+      border-left-color: var(--color-accent);
+      animation: menu-point 0.6s ease-in-out infinite alternate;
+      @include mixins.reduced-motion {
+        animation: none;
+      }
+    }
+  }
+}
+@keyframes menu-point {
+  to {
+    transform: translateX(3px);
+  }
+}
+.walkGameArt {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 2px device.$lcd-header;
+  line-height: 0;
+  // 놀이 그림만 흑백으로 (자물쇠는 그대로)
+  [data-state="locked"] & > svg {
+    filter: grayscale(1) brightness(0.75) contrast(0.8);
+  }
+}
+.walkGameNumber {
+  position: absolute;
+  z-index: 1;
+  top: 3px;
+  left: 3px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: device.$lcd-text;
+  color: device.$lcd-header-light;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+.walkGameLock {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: $menu-lock-dim;
+}
+.walkGameText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.walkGameName {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+}
+.walkGameDescription {
+  font-size: var(--font-size-2xs);
+  line-height: 1.3;
+}
+[data-state="locked"] .walkGameName,
+[data-state="locked"] .walkGameDescription {
+  opacity: 0.6;
+}
+.walkGameLevel {
+  margin-top: 2px;
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-full);
+  background: device.$lcd-header;
+  font-size: 10px;
+  font-weight: 800;
+  [data-state="locked"] & {
+    background: device.$lcd-text;
+    color: device.$lcd-header-light;
+  }
+}
+.walkMenuFoot {
+  margin: 0;
+  font-size: var(--font-size-2xs);
+  font-weight: 700;
+  color: device.$lcd-text-muted;
 }
 .below {
   display: grid;

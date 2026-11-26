@@ -17,6 +17,27 @@ const ko = {
       found: "{object} 주웠어요!",
       foundBox: "아이템 상자에 넣었어요",
     },
+    // 산책 놀이 고르기 (I-076): 친밀도 레벨 n에 n번째 놀이가 열림
+    walkMenu: {
+      status: "산책 놀이 고르기",
+      title: "어떤 놀이를 할까요?",
+      position: "{total}개 중 {index}번째",
+      left: "오늘 산책 {count}/{total}번 남았어요",
+      level: "Lv.{level}",
+      unlockAt: "Lv.{level}에 열려요",
+      soon: "준비 중",
+      prev: "이전",
+      next: "다음",
+      start: "시작",
+      locked: "잠겨 있어요",
+      back: "돌아가기",
+      lockedNotice: "친밀도 Lv.{level}가 되면 열려요",
+      soonNotice: "아직 준비 중이에요. 곧 만나요!",
+      games: {
+        walk: { name: "산책", description: "길에서 재료를 주워요" },
+        run: { name: "장애물 달리기", description: "점프해서 피하며 달려요" },
+      },
+    },
     items: {
       button: "아이템",
       newItems: "새 아이템이 있어요",

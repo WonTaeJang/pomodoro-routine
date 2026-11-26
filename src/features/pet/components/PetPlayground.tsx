@@ -31,6 +31,8 @@ import {
 import { PetGiftBox } from "./PetGiftBox";
 import { PetSnowBox } from "./PetSnowBox";
 import { DeviceSleigh } from "./PetSleigh";
+import { WalkMenu, WalkMenuPads, WalkMenuPick } from "./PetWalkMenu";
+import { useWalkMenu } from "../useWalkMenu";
 import { PetPad } from "./PetPad";
 import { PetSpeechBubble } from "./PetSpeechBubble";
 import { DecoratePads, DecoratePick, decorateTag } from "./PetDecorate";
@@ -239,10 +241,18 @@ function PetRoom({ retry }: { retry: () => void }) {
     addLog,
   });
   const trip = outing.trip;
+  // Walk games (I-076): the walk key opens a list inside the device first.
+  const level = affinity.progress.level;
+  const menu = useWalkMenu({ level, onStart: () => outing.start() });
+  const choosing = menu.index !== null;
+  useFocusAfter(choosing, walkButton);
+  /** Out of walks, the key still only answers in the log. */
+  const openWalks = () => (outing.outOfWalks ? outing.start() : menu.open());
 
   // Home stays on screen until the walk has drawn its first frame. A walk is
   // told apart by when Kkami last came home (homeAt changes after each one).
   const [shownWalk, setShownWalk] = useState<number | null>();
+  const walkShown = walking && shownWalk === homeAt;
 
   const [boxOpen, setBoxOpen] = useState(false);
   // Opening at the sets tab (from the first gift box) starts a fresh box.
@@ -331,7 +341,17 @@ function PetRoom({ retry }: { retry: () => void }) {
         label: t(`edition.${edition.notice}`),
         notice: true,
       };
+    // Only while picking: a started walk or a closed list drops it.
+    if (choosing && menu.notice)
+      return {
+        icon: "walk",
+        label: t(`walkMenu.${menu.notice.kind}Notice`, {
+          level: menu.notice.level,
+        }),
+        notice: true,
+      };
     if (walking) return { icon: "walk", label: t("walk.status") };
+    if (choosing) return { icon: "walk", label: t("walkMenu.status") };
     if (decorating) return { icon: "decorate", label: t("decorate.status") };
     if (boxes.length > 1)
       return {
@@ -374,6 +394,8 @@ function PetRoom({ retry }: { retry: () => void }) {
                 <PetWalkMap progress={trip.progress} item={trip.item} />
               ) : decor.mode ? (
                 <DecoratePick mode={decor.mode} looks={decor.looks} />
+              ) : menu.index !== null ? (
+                <WalkMenuPick index={menu.index} />
               ) : (
                 <PetHearts
                   {...affinity}
@@ -393,10 +415,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                 onShown={() => setShownWalk(homeAt)}
               />
             )}
-            <div
-              className={styles.room}
-              hidden={walking && shownWalk === homeAt}
-            >
+            <div className={styles.room} hidden={walkShown}>
               <PetRoomArt preview={decor.preview} decorating={roomDecorating} />
               <PetSpeechBubble
                 text={speech}
@@ -418,7 +437,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                 aria-describedby="pet-keyboard-help"
                 data-sleeping={sleeping || startled}
                 aria-label={t(copy.label)}
-                disabled={!canCare || decorating}
+                disabled={!canCare || decorating || choosing}
                 onPointerDown={startStroke}
                 onPointerMove={moveStroke}
                 onPointerUp={endStroke}
@@ -428,7 +447,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                 onKeyDown={stopCareKey}
               />
               {/* 오늘의 상자: 까미 옆 바닥에 쌓여 있다가(3개까지) 누르면 맨 위부터 차례로 열림 */}
-              {boxes.length > 0 && !decorating && (
+              {boxes.length > 0 && !decorating && !choosing && (
                 <button
                   type="button"
                   className={styles.giftBox}
@@ -453,6 +472,19 @@ function PetRoom({ retry }: { retry: () => void }) {
                     ))
                     .reverse()}
                 </button>
+              )}
+              {/* Kept over the room until the walk draws its first frame,
+                  so the room does not flash between the list and the walk. */}
+              {(choosing || (walking && !walkShown)) && (
+                <WalkMenu
+                  index={menu.lastIndex}
+                  level={level}
+                  walksLeft={outing.walksLeft}
+                  onPick={(at) => {
+                    // Not while it only covers the room for the walk.
+                    if (choosing) menu.pick(at);
+                  }}
+                />
               )}
               {/*
               까미를 처음 그릴 때까지 방을 가려 두고, 그리면 서서히 걷음 (B-003).
@@ -484,6 +516,15 @@ function PetRoom({ retry }: { retry: () => void }) {
               onConfirm={decor.confirm}
               onBack={decor.back}
             />
+          ) : menu.index !== null ? (
+            <WalkMenuPads
+              index={menu.index}
+              level={level}
+              onPrev={menu.prev}
+              onNext={menu.next}
+              onConfirm={menu.confirm}
+              onBack={menu.close}
+            />
           ) : (
             <>
               {/* While away, the other keys rest and walk becomes skip. */}
@@ -504,7 +545,7 @@ function PetRoom({ retry }: { retry: () => void }) {
                 ref={walkButton}
                 kind={walking ? "skip" : "walk"}
                 label={t(walking ? "walk.skip" : "walk.start")}
-                onClick={walking ? outing.skip : outing.start}
+                onClick={walking ? outing.skip : openWalks}
                 resting={!walking && outing.outOfWalks}
                 disabled={walking ? !trip?.canSkip : !ready || pose !== "idle"}
                 aria-describedby={skipLocked ? `${infoId}-skip` : undefined}

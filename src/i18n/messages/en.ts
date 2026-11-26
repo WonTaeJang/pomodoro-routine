@@ -6,6 +6,29 @@ import type { Messages } from "./ko";
  */
 const en: Messages = {
   pet: {
+    walkMenu: {
+      status: "Pick a walk game",
+      title: "What shall we play?",
+      position: "{index} of {total}",
+      left: "{count} of {total} walks left today",
+      level: "Lv.{level}",
+      unlockAt: "Opens at Lv.{level}",
+      soon: "Coming soon",
+      prev: "Prev",
+      next: "Next",
+      start: "Start",
+      locked: "Locked",
+      back: "Back",
+      lockedNotice: "Opens when Kkami reaches Lv.{level}",
+      soonNotice: "Still in the works. See you soon!",
+      games: {
+        walk: { name: "Walk", description: "Pick things up along the path" },
+        run: {
+          name: "Obstacle run",
+          description: "Jump over things as you run",
+        },
+      },
+    },
     walk: {
       start: "Walk",
       status: "On a walk",
